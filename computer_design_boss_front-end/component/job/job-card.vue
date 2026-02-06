@@ -1,22 +1,33 @@
 <template>
-  <view class="job-card" @click="goToDetail(data)">
-    <view class="card-header">
-      <text class="job-title">{{ data.title }}</text>
-      <text class="salary">{{ formatSalary(data.salary_min, data.salary_max) }}</text>
+  <view class="job-card">
+    <view class="card-content" @click="goToDetail(data)">
+      <view class="card-header">
+        <text class="job-title">{{ data.title }}</text>
+        <text class="salary">{{ formatSalary(data.salary_min, data.salary_max) }}</text>
+      </view>
+      
+      <view class="company-info">
+        <text class="company-name">{{ data.company || '未知公司' }}</text>
+        <text class="company-tag">{{ data.exp_req || '经验不限' }} | {{ data.edu_req || '学历不限' }}</text>
+      </view>
+      
+      <view class="job-tags">
+        <text v-for="tag in getJobTags(data)" :key="tag" class="tag">{{ tag }}</text>
+      </view>
+      
+      <view class="card-footer">
+        <text class="location">{{ data.city || '城市' }}</text>
+        <text class="time">{{ formatTime(data.publish_time) }}</text>
+      </view>
     </view>
     
-    <view class="company-info">
-      <text class="company-name">{{ data.company || '未知公司' }}</text>
-      <text class="company-tag">{{ data.exp_req || '经验不限' }} | {{ data.edu_req || '学历不限' }}</text>
-    </view>
-    
-    <view class="job-tags">
-      <text v-for="tag in getJobTags(data)" :key="tag" class="tag">{{ tag }}</text>
-    </view>
-    
-    <view class="card-footer">
-      <text class="location">{{ data.city || '城市' }}</text>
-      <text class="time">{{ formatTime(data.publish_time) }}</text>
+    <!-- 收藏按钮 -->
+    <view class="favorite-btn" @click.stop="toggleFavorite">
+      <uni-icons 
+        :type="isFavorite ? 'star-filled' : 'star'" 
+        :size="30" 
+        :color="isFavorite ? '#ff9500' : '#ccc'"
+      ></uni-icons>
     </view>
   </view>
 </template>
@@ -30,7 +41,53 @@ export default {
       default: () => ({})
     }
   },
+  data() {
+    return {
+      isFavorite: false
+    }
+  },
+  mounted() {
+    // 检查职位是否已收藏
+    this.checkIsFavorite()
+  },
   methods: {
+    checkIsFavorite() {
+      // 从本地存储获取收藏列表
+      const collections = uni.getStorageSync('collections') || []
+      this.isFavorite = collections.some(item => item.id === this.data.id)
+    },
+    toggleFavorite() {
+      // 获取当前收藏列表
+      let collections = uni.getStorageSync('collections') || []
+      
+      if (this.isFavorite) {
+        // 取消收藏
+        collections = collections.filter(item => item.id !== this.data.id)
+        this.isFavorite = false
+        uni.showToast({
+          title: '已取消收藏',
+          icon: 'success'
+        })
+      } else {
+        // 添加收藏
+        const newCollection = {
+          id: this.data.id,
+          jobTitle: this.data.title,
+          company: this.data.company || '未知公司',
+          salary: this.formatSalary(this.data.salary_min, this.data.salary_max),
+          collectionTime: new Date().toLocaleString()
+        }
+        collections.push(newCollection)
+        this.isFavorite = true
+        uni.showToast({
+          title: '收藏成功',
+          icon: 'success'
+        })
+      }
+      
+      // 保存收藏列表
+      uni.setStorageSync('collections', collections)
+    },
     // 格式化薪资
     formatSalary(min, max) {
       if (min && max) {
@@ -114,6 +171,21 @@ export default {
   break-inside: avoid;
   -webkit-column-break-inside: avoid;
   page-break-inside: avoid;
+  position: relative;
+}
+
+.card-content {
+  /* 卡片内容区域 */
+}
+
+.favorite-btn {
+  position: absolute;
+  top: 30rpx;
+  right: 30rpx;
+  z-index: 10;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 10rpx;
+  border-radius: 50%;
 }
 
 .card-header {

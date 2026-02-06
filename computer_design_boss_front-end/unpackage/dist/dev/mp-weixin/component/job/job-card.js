@@ -8,7 +8,45 @@ const _sfc_main = {
       default: () => ({})
     }
   },
+  data() {
+    return {
+      isFavorite: false
+    };
+  },
+  mounted() {
+    this.checkIsFavorite();
+  },
   methods: {
+    checkIsFavorite() {
+      const collections = common_vendor.index.getStorageSync("collections") || [];
+      this.isFavorite = collections.some((item) => item.id === this.data.id);
+    },
+    toggleFavorite() {
+      let collections = common_vendor.index.getStorageSync("collections") || [];
+      if (this.isFavorite) {
+        collections = collections.filter((item) => item.id !== this.data.id);
+        this.isFavorite = false;
+        common_vendor.index.showToast({
+          title: "\u5DF2\u53D6\u6D88\u6536\u85CF",
+          icon: "success"
+        });
+      } else {
+        const newCollection = {
+          id: this.data.id,
+          jobTitle: this.data.title,
+          company: this.data.company || "\u672A\u77E5\u516C\u53F8",
+          salary: this.formatSalary(this.data.salary_min, this.data.salary_max),
+          collectionTime: new Date().toLocaleString()
+        };
+        collections.push(newCollection);
+        this.isFavorite = true;
+        common_vendor.index.showToast({
+          title: "\u6536\u85CF\u6210\u529F",
+          icon: "success"
+        });
+      }
+      common_vendor.index.setStorageSync("collections", collections);
+    },
     formatSalary(min, max) {
       if (min && max) {
         const minNum = typeof min === "number" ? min : parseFloat(min);
@@ -63,6 +101,10 @@ const _sfc_main = {
     }
   }
 };
+if (!Array) {
+  const _component_uni_icons = common_vendor.resolveComponent("uni-icons");
+  _component_uni_icons();
+}
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return {
     a: common_vendor.t($props.data.title),
@@ -78,7 +120,13 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     g: common_vendor.t($props.data.city || "\u57CE\u5E02"),
     h: common_vendor.t($options.formatTime($props.data.publish_time)),
-    i: common_vendor.o(($event) => $options.goToDetail($props.data))
+    i: common_vendor.o(($event) => $options.goToDetail($props.data)),
+    j: common_vendor.p({
+      type: $data.isFavorite ? "star-filled" : "star",
+      size: 30,
+      color: $data.isFavorite ? "#ff9500" : "#ccc"
+    }),
+    k: common_vendor.o((...args) => $options.toggleFavorite && $options.toggleFavorite(...args))
   };
 }
 var Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-0b59c612"], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/component/job/job-card.vue"]]);

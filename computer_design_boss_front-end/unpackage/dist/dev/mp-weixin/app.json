@@ -6,7 +6,20 @@
     "pages/index/index_index",
     "pages/job/detail/job_detail_index",
     "pages/job/add/job_add_index",
-    "pages/user/user_index"
+    "pages/user/user",
+    "pages/user/resume/user_resume",
+    "pages/user/collection/user_collection",
+    "pages/user/deliver/user_deliver",
+    "pages/user/feedback/user_feedback",
+    "pages/user/account/user_account",
+    "pages/user/device/user_device",
+    "pages/user/display/user_display",
+    "pages/user/account/number/account_number",
+    "pages/user/account/number/number_change",
+    "pages/user/account/email/account_email",
+    "pages/user/account/email/email_change",
+    "pages/user/account/code/account_code",
+    "pages/demo/theme-demo"
   ],
   "window": {
     "navigationBarTextStyle": "black",
@@ -26,7 +39,7 @@
         "selectedIconPath": "/static/tabbar/home-active.png"
       },
       {
-        "pagePath": "pages/user/user_index",
+        "pagePath": "pages/user/user",
         "text": "我的",
         "iconPath": "/static/tabbar/user.png",
         "selectedIconPath": "/static/tabbar/user-active.png"
@@ -34,8 +47,6 @@
     ]
   },
   "usingComponents": {
-    "uni-icons": "/node-modules/@dcloudio/uni-ui/lib/uni-icons/uni-icons",
-    "uni-date-picker": "/node-modules/@dcloudio/uni-ui/lib/uni-datetime-picker/uni-datetime-picker",
-    "uni-data-picker": "/node-modules/@dcloudio/uni-ui/lib/uni-data-picker/uni-data-picker"
+    "uni-icons": "/node-modules/@dcloudio/uni-ui/lib/uni-icons/uni-icons"
   }
 }

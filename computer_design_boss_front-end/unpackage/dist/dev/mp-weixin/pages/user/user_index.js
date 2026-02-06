@@ -1,67 +1,66 @@
-"use strict";
-var common_vendor = require("../../common/vendor.js");
-const _sfc_main = {
-  data() {
-    return {
-      userInfo: null
-    };
-  },
-  onShow() {
-    this.checkLoginStatus();
-  },
-  methods: {
-    checkLoginStatus() {
-      const userInfo = common_vendor.index.getStorageSync("userInfo");
-      if (userInfo) {
-        this.userInfo = JSON.parse(userInfo);
-      }
+// pages/user/user_index.js
+Page({
+
+    /**
+     * 页面的初始数据
+     */
+    data: {
+
     },
-    login() {
-      common_vendor.index.showToast({
-        title: "\u767B\u5F55\u529F\u80FD\u5F00\u53D1\u4E2D",
-        icon: "none"
-      });
+
+    /**
+     * 生命周期函数--监听页面加载
+     */
+    onLoad(options) {
+
+    },
+
+    /**
+     * 生命周期函数--监听页面初次渲染完成
+     */
+    onReady() {
+
+    },
+
+    /**
+     * 生命周期函数--监听页面显示
+     */
+    onShow() {
+
+    },
+
+    /**
+     * 生命周期函数--监听页面隐藏
+     */
+    onHide() {
+
+    },
+
+    /**
+     * 生命周期函数--监听页面卸载
+     */
+    onUnload() {
+
+    },
+
+    /**
+     * 页面相关事件处理函数--监听用户下拉动作
+     */
+    onPullDownRefresh() {
+
+    },
+
+    /**
+     * 页面上拉触底事件的处理函数
+     */
+    onReachBottom() {
+
+    },
+
+    /**
+     * 用户点击右上角分享
+     */
+    onShareAppMessage() {
+
     }
-  }
-};
-if (!Array) {
-  const _component_uni_icons = common_vendor.resolveComponent("uni-icons");
-  _component_uni_icons();
-}
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return {
-    a: common_vendor.o((...args) => $options.login && $options.login(...args)),
-    b: common_vendor.p({
-      type: "person",
-      size: "30",
-      color: "#666"
-    }),
-    c: common_vendor.p({
-      type: "right",
-      size: "20",
-      color: "#999"
-    }),
-    d: common_vendor.p({
-      type: "clock",
-      size: "30",
-      color: "#666"
-    }),
-    e: common_vendor.p({
-      type: "right",
-      size: "20",
-      color: "#999"
-    }),
-    f: common_vendor.p({
-      type: "settings",
-      size: "30",
-      color: "#666"
-    }),
-    g: common_vendor.p({
-      type: "right",
-      size: "20",
-      color: "#999"
-    })
-  };
-}
-var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/user/user_index.vue"]]);
-wx.createPage(MiniProgramPage);
+})

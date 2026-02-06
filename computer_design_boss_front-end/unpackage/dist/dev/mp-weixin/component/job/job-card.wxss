@@ -8,6 +8,19 @@
   /* 防止卡片内容被分割到不同列 */
   break-inside: avoid;
   page-break-inside: avoid;
+  position: relative;
+}
+.card-content.data-v-0b59c612 {
+  /* 卡片内容区域 */
+}
+.favorite-btn.data-v-0b59c612 {
+  position: absolute;
+  top: 30rpx;
+  right: 30rpx;
+  z-index: 10;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 10rpx;
+  border-radius: 50%;
 }
 .card-header.data-v-0b59c612 {
   display: flex;
