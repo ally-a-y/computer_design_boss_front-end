@@ -1,7 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "calendar": "./calendar",
-    "time-picker": "./time-picker"
-  }
-}

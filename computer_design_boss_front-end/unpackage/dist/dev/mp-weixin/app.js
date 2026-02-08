@@ -23,6 +23,8 @@ if (!Math) {
   "./pages/user/account/email/account_email.js";
   "./pages/user/account/email/email_change.js";
   "./pages/user/account/code/account_code.js";
+  "./pages/AI/AI.js";
+  "./pages/AI/interview.js";
 }
 const _sfc_main = {
   onLaunch: function() {

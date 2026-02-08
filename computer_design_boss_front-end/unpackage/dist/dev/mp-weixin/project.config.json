@@ -1,25 +1,31 @@
 {
-    "description": "项目配置文件。",
-    "packOptions": {
-        "ignore": [],
-        "include": []
+  "description": "项目配置文件。",
+  "packOptions": {
+    "ignore": []
+  },
+  "setting": {
+    "urlCheck": false
+  },
+  "compileType": "miniprogram",
+  "libVersion": "",
+  "appid": "touristappid",
+  "projectname": "computer_design_boss_front-end",
+  "condition": {
+    "search": {
+      "current": -1,
+      "list": []
     },
-    "setting": {
-        "urlCheck": false,
-        "ignoreUploadUnusedFiles": true,
-        "babelSetting": {
-            "ignore": [],
-            "disablePlugins": [],
-            "outputPath": ""
-        }
+    "conversation": {
+      "current": -1,
+      "list": []
     },
-    "compileType": "miniprogram",
-    "libVersion": "3.14.0",
-    "appid": "touristappid",
-    "projectname": "computer_design_boss_front-end",
-    "condition": {},
-    "editorSetting": {
-        "tabIndent": "insertSpaces",
-        "tabSize": 4
+    "game": {
+      "current": -1,
+      "list": []
+    },
+    "miniprogram": {
+      "current": -1,
+      "list": []
     }
+  }
 }

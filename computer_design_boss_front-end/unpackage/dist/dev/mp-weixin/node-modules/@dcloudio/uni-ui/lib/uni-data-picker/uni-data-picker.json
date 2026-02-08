@@ -1,6 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "data-picker-view": "../uni-data-pickerview/uni-data-pickerview"
-  }
-}

@@ -19,7 +19,9 @@
     "pages/user/account/email/account_email",
     "pages/user/account/email/email_change",
     "pages/user/account/code/account_code",
-    "pages/demo/theme-demo"
+    "pages/demo/theme-demo",
+    "pages/AI/AI",
+    "pages/AI/interview"
   ],
   "window": {
     "navigationBarTextStyle": "black",
@@ -37,6 +39,12 @@
         "text": "首页",
         "iconPath": "/static/tabbar/home.png",
         "selectedIconPath": "/static/tabbar/home-active.png"
+      },
+      {
+        "pagePath": "pages/AI/AI",
+        "text": "AI助手",
+        "iconPath": "/static/tabbar/AI.png",
+        "selectedIconPath": "/static/tabbar/AI-active.png"
       },
       {
         "pagePath": "pages/user/user",
