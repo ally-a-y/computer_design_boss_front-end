@@ -420,64 +420,40 @@ export default {
       this.loading = true
       
       try {
-        // 准备登录数据
         const loginData = {
           mobile: this.loginForm.mobile
         }
         
         if (this.loginMethod === 'sms') {
           loginData.sms_code = this.loginForm.sms_code
-          // 模拟验证码登录接口
-          // const res = await userApi.smsLogin(loginData)
         } else {
           loginData.password = this.loginForm.password
-          // 调用密码登录接口
-          // const res = await userApi.login(loginData)
         }
         
-        // 模拟登录成功
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        // 调用登录接口
+        const res = await userApi.login(loginData)
         
-        const mockResponse = {
-          code: 200,
-          message: '登录成功',
-          data: {
-            token: 'mock-jwt-token-123456789',
-            user_info: {
-              user_id: '123456789',
-              mobile: this.loginForm.mobile,
-              email: '',
-              real_name: '',
-              avatar_url: '',
-              status: 1,
-              job_status: 1,
-              last_login_time: new Date().toISOString()
-            }
-          }
-        }
+        console.log('登录响应:', res)
         
-        // 处理登录成功
-        if (mockResponse.code === 200) {
+        // 判断是否有 token（
+        if (res && res.token) {
           // 保存登录状态
-          uni.setStorageSync('token', mockResponse.data.token)
-          uni.setStorageSync('userInfo', mockResponse.data.user_info)
+          uni.setStorageSync('token', res.token)
+          uni.setStorageSync('userInfo', res.user_info)
           
-          // 显示成功提示
           uni.showToast({
-            title: mockResponse.message,
+            title: '登录成功',
             icon: 'success'
           })
           
-          // 跳转到首页
           setTimeout(() => {
             uni.switchTab({
               url: '/pages/index/index_index'
             })
           }, 1500)
         } else {
-          // 登录失败
           uni.showToast({
-            title: mockResponse.message || '登录失败',
+            title: res.message || '登录失败',
             icon: 'none'
           })
         }
@@ -491,7 +467,7 @@ export default {
         this.loading = false
       }
     },
-    
+	
     // 跳转到忘记密码页面
     goToForgetPassword() {
       uni.navigateTo({

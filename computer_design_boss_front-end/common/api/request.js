@@ -1,71 +1,109 @@
 import config from '../config.js'
 
+// 构建完整 URL 的辅助函数
+const buildFullUrl = (path, params) => {
+  if (!path) return config.baseURL
+  
+  // 如果已经是完整 URL，直接返回
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    return path
+  }
+
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`
+  
+  // 处理 baseURL 和 path 的 /api 重复问题
+  let baseUrl = config.baseURL || 'http://localhost:5000/api'
+  let finalPath = normalizedPath
+  
+  if (baseUrl.endsWith('/api') && normalizedPath.startsWith('/api/')) {
+    finalPath = normalizedPath.substring(4) 
+  }
+  
+  let url = baseUrl + finalPath
+  
+  // 将查询参数转换为查询字符串（GET请求）
+  if (params && typeof params === 'object' && Object.keys(params).length > 0) {
+    const queryString = Object.keys(params)
+      .filter(key => params[key] !== undefined && params[key] !== null && params[key] !== '')
+      .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+      .join('&')
+    
+    if (queryString) {
+      url += (url.includes('?') ? '&' : '?') + queryString
+    }
+  }
+  
+  return url
+}
+
 // 请求重试机制
 const requestWithRetry = (options, retryCount = 3) => {
   return new Promise((resolve, reject) => {
     const attemptRequest = (attempt) => {
-      // 为每次请求生成唯一的时间戳参数，避免缓存问题
-      const urlWithTimestamp = options.url + (options.url.includes('?') ? '&' : '?') + 't=' + Date.now();
+      const isGet = (options.method || 'GET').toUpperCase() === 'GET'
+     
+      const queryParams = isGet 
+        ? { ...(options.params || {}), ...(options.data || {}) }
+        : (options.params || {})
       
-      uni.request({
-        url: config.baseURL + urlWithTimestamp,
+      const fullUrl = buildFullUrl(options.url, queryParams)
+      const urlWithTimestamp = fullUrl + (fullUrl.includes('?') ? '&' : '?') + 't=' + Date.now()
+      
+      // 构造请求配置
+      const requestConfig = {
+        url: urlWithTimestamp,
         method: options.method || 'GET',
-        data: options.data || {},
-        timeout: 15000, // 增加超时时间到15秒
-        sslVerify: false, // 开发环境下关闭SSL验证（避免证书问题）
-        enableHttp2: false, // 禁用HTTP/2（可能解决序列错误问题）
-        enableHttpDNS: false, // 禁用HTTP DNS（可能解决序列错误问题）
-        enableQuic: false, // 禁用QUIC（可能解决序列错误问题）
+        timeout: 60000,
+        sslVerify: false,
         header: {
           'Content-Type': 'application/json',
-          'Authorization': uni.getStorageSync('token') || '',
-          'Cache-Control': 'no-cache', // 禁用缓存
+          'Authorization': `Bearer ${uni.getStorageSync('token') || ''}`,
+          'Cache-Control': 'no-cache',
           ...options.header
-        },
+        }
+      }
+      
+      // 只有非 GET 请求才设置 data 字段
+      if (!isGet && options.data) {
+        requestConfig.data = options.data
+      }
+      
+      uni.request({
+        ...requestConfig,
         success: (res) => {
+          console.log('【响应】', res.statusCode, res.data)
+          
           if (res.statusCode === 200) {
-            // 检查响应数据格式
-            const data = res.data;
+            const data = res.data
             
-            // 如果后端返回标准格式 {code: 200, data: [...], message: "..."}
-            if (data && typeof data === 'object' && 'code' in data && 'data' in data) {
-              // 检查是否成功
+            if (data && typeof data === 'object' && 'code' in data) {
               if (data.code === 200) {
-                resolve(data.data); // 返回实际数据
+                resolve(data.data !== undefined ? data.data : data)
               } else {
-                // 后端返回错误信息
-                reject(data);
+                reject(new Error(data.message || `请求失败: ${data.code}`))
               }
-            } 
-            // 如果后端直接返回数组或对象
-            else {
-              resolve(data);
+            } else {
+              resolve(data)
             }
           } else {
-            console.error('HTTP请求失败:', res.statusCode, res.errMsg);
-            reject(res.data || { error: `HTTP Error ${res.statusCode}` });
+            reject(new Error(`HTTP ${res.statusCode}: ${res.data?.message || ''}`))
           }
         },
         fail: (err) => {
-          console.error(`网络请求失败 (尝试 ${attempt + 1}/${retryCount}):`, err);
+          console.error(`【请求失败】`, err)
           
-          // 如果还有重试次数，延迟后重试
           if (attempt < retryCount - 1) {
-            const delay = Math.pow(2, attempt) * 1000; // 指数退避策略
-            console.log(`将在 ${delay}ms 后重试...`);
-            setTimeout(() => attemptRequest(attempt + 1), delay);
+            const delay = Math.pow(2, attempt) * 1000
+            setTimeout(() => attemptRequest(attempt + 1), delay)
           } else {
-            // 重试次数耗尽
-            reject(err);
+            reject(new Error(err.errMsg || '网络请求失败'))
           }
         }
       })
-    };
+    }
     
-    // 开始第一次请求
-    attemptRequest(0);
-  });
+    attemptRequest(0)
+  })
 }
 
-// 导出带有重试机制的请求函数
 export default requestWithRetry

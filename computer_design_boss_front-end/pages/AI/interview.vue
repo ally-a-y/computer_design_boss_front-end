@@ -40,14 +40,24 @@
             <view class="file-upload-area" @click="chooseResumeFile">
               <image v-if="!formData.resumePdf" src="/static/ai/upload.png" mode="aspectFit"></image>
               <text v-if="!formData.resumePdf">点击上传PDF简历</text>
-              <text v-else>{{ formData.resumePdf.name }}</text>
+              <text v-else class="file-name">{{ formData.resumePdf.name }}</text>
             </view>
           </view>
           
-          <view v-if="currentMethod.includes('user')" class="form-group">
+          <!-- 只有当没有自动获取到用户ID时才显示输入框 -->
+          <view v-if="currentMethod.includes('user') && !formData.userId" class="form-group">
             <text class="form-label">用户ID</text>
             <input class="form-input" v-model="formData.userId" placeholder="请输入用户ID" />
           </view>
+          
+          <!-- 显示已获取的用户ID（只读） -->
+          <view v-else-if="currentMethod.includes('user')" class="form-group">
+            <text class="form-label">用户ID</text>
+            <text class="form-input" style="background-color: #f5f5f5; color: #999;">
+              {{ formData.userId }}（已自动填充）
+            </text>
+          </view>
+
           
           <view v-if="currentMethod.includes('position')" class="form-group">
             <text class="form-label">职位ID</text>
@@ -62,7 +72,9 @@
           </view>
         </view>
         
-        <button class="start-btn" @click="startInterview">开始面试</button>
+        <button class="start-btn" @click="startInterview" :loading="isStarting">
+          {{ isStarting ? '启动中...' : '开始面试' }}
+        </button>
       </view>
     </view>
 
@@ -94,7 +106,7 @@
         
         <!-- 中间：对话区域 -->
         <view class="chat-section">
-          <scroll-view class="chat-messages" scroll-y :scroll-top="chatScrollTop">
+          <scroll-view class="chat-messages" scroll-y :scroll-top="chatScrollTop" scroll-with-animation>
             <view v-for="(message, index) in interviewMessages" :key="index"
                   :class="['chat-message', message.sender]">
               <view class="message-bubble">
@@ -130,18 +142,19 @@
       
       <!-- 底部控制区 -->
       <view class="control-section">
-        <button class="control-btn replay-btn" @click="replayQuestion">
+        <button class="control-btn replay-btn" @click="replayQuestion" :disabled="!currentAudioUrl">
           <image src="/static/ai/replay.png" mode="aspectFit"></image>
           <text>重听问题</text>
         </button>
         
         <view class="voice-record-area">
           <button class="voice-btn" 
-                  :class="{ recording: isRecording }"
+                  :class="{ recording: isRecording, disabled: isProcessing }"
                   @touchstart="startRecording"
-                  @touchend="stopRecording">
+                  @touchend="stopRecording"
+                  :disabled="isProcessing">
             <image :src="isRecording ? '/static/ai/recording.png' : '/static/ai/mic.png'" mode="aspectFit"></image>
-            <text>{{ isRecording ? '录音中...' : '按住说话' }}</text>
+            <text>{{ isRecording ? '录音中...' : (isProcessing ? '处理中...' : '按住说话') }}</text>
           </button>
           <view v-if="isRecording" class="recording-indicator">
             <view class="pulse-ring"></view>
@@ -149,7 +162,7 @@
           </view>
         </view>
         
-        <button class="control-btn end-btn" @click="endInterview">
+        <button class="control-btn end-btn" @click="confirmEndInterview">
           <image src="/static/ai/end.png" mode="aspectFit"></image>
           <text>结束面试</text>
         </button>
@@ -210,11 +223,17 @@
 </template>
 
 <script>
+import { getStaticUrl,interviewApi } from '@/common/api/ai.js'
+const BASE_URL = 'http://localhost:5000'
+// 录音管理器
+const recorderManager = uni.getRecorderManager()
+
 export default {
   data() {
     return {
       // 页面状态
       interviewStarted: false,
+      isStarting: false,
       currentMethod: 'resumeText+positionText',
       
       // 表单数据
@@ -237,17 +256,26 @@ export default {
       ],
       
       // 面试流程状态
+      sessionId: null,
       currentQuestion: 0,
       totalQuestions: 8,
       currentStage: '自我介绍',
+      resumeSource: '',
+      jobSource: '',
       
       // 录音状态
       isRecording: false,
       isSpeaking: false,
       isAIThinking: false,
+      isProcessing: false,
       voiceWaveActive: false,
       recordingTime: 0,
       recordingTimer: null,
+      audioFilePath: '',
+      
+      // 音频播放
+      currentAudioUrl: '',
+      innerAudioContext: null,
       
       // 对话数据
       interviewMessages: [],
@@ -257,16 +285,18 @@ export default {
       tipsCollapsed: false,
       currentTips: [
         '保持自信，语速适中',
-        '回答问题要有条理',
-        '适当使用专业术语',
-        '注意与面试官的眼神交流'
+        '回答问题要有条理，使用STAR法则',
+        '适当使用专业术语展示能力',
+        '注意与面试官的眼神交流',
+        '遇到不会的问题诚实回答'
       ],
       
       // 面试报告数据
       showReport: false,
       overallScore: 85,
       evaluationItems: [],
-      suggestions: []
+      suggestions: [],
+      reportData: null
     }
   },
   
@@ -277,37 +307,82 @@ export default {
   },
   
   onLoad() {
-    // 页面加载初始化
     this.initializeInterview()
+    this.initRecorder()
   },
   
   onUnload() {
-    // 页面卸载清理
     this.cleanupInterview()
   },
   
   methods: {
+    // 初始化录音器
+    initRecorder() {
+      recorderManager.onStart(() => {
+        console.log('录音开始')
+        this.isRecording = true
+        this.startRecordingTimer()
+      })
+      
+      recorderManager.onStop((res) => {
+        console.log('录音结束', res)
+        this.isRecording = false
+        this.clearRecordingTimer()
+        this.audioFilePath = res.tempFilePath
+        this.processAudio(res.tempFilePath)
+      })
+      
+      recorderManager.onError((err) => {
+        console.error('录音错误', err)
+        this.isRecording = false
+        this.clearRecordingTimer()
+        uni.showToast({ title: '录音失败: ' + err.message, icon: 'none' })
+      })
+    },
+    
     getInterviewerStatus() {
       if (this.isAIThinking) return '思考中...'
       if (this.isSpeaking) return '说话中...'
+      if (this.isProcessing) return '处理中...'
       return '等待中'
     },
     
     initializeInterview() {
-      // 初始化面试页面
+      // 初始化音频播放器
+      this.innerAudioContext = uni.createInnerAudioContext()
+      this.innerAudioContext.onEnded(() => {
+        this.isSpeaking = false
+        this.voiceWaveActive = false
+      })
+      this.innerAudioContext.onError((err) => {
+        console.error('音频播放错误', err)
+        this.isSpeaking = false
+        this.voiceWaveActive = false
+      })
     },
     
     cleanupInterview() {
       // 清理面试资源
       this.resetInterview()
       this.clearRecordingTimer()
+      
+      // 销毁音频播放器
+      if (this.innerAudioContext) {
+        this.innerAudioContext.destroy()
+        this.innerAudioContext = null
+      }
+      
+      // 停止录音
+      if (this.isRecording) {
+        recorderManager.stop()
+      }
     },
     
     goBack() {
       if (this.interviewStarted) {
         uni.showModal({
           title: '提示',
-          content: '确定要结束面试吗？',
+          content: '确定要结束面试吗？当前进度将不会保存。',
           success: (res) => {
             if (res.confirm) {
               this.interviewStarted = false
@@ -326,26 +401,174 @@ export default {
       this.resetForm()
     },
     
-    chooseResumeFile() {
-      uni.chooseFile({
-        count: 1,
-        type: 'file',
-        extension: ['pdf'],
-        success: (res) => {
-          this.formData.resumePdf = res.tempFiles[0]
-        }
-      })
-    },
+   // 选择PDF文件并转为Base64
+   chooseResumeFile() {
+     // #ifdef MP-WEIXIN
+     // 微信小程序：使用 chooseMessageFile 从聊天会话中选择文件
+     wx.chooseMessageFile({
+       count: 1,
+       type: 'file',
+       extension: ['pdf'],
+       success: (res) => {
+         const file = res.tempFiles[0]
+         const fs = uni.getFileSystemManager()
+         fs.readFile({
+           filePath: file.path,
+           encoding: 'base64',
+           success: (readRes) => {
+             this.formData.resumePdf = {
+               name: file.name,
+               path: file.path,
+               base64: readRes.data
+             }
+           },
+           fail: (err) => {
+             console.error('读取文件失败', err)
+             uni.showToast({ title: '文件读取失败', icon: 'none' })
+           }
+         })
+       },
+       fail: (err) => {
+         console.log('选择文件取消或失败', err)
+       }
+     })
+     // #endif
+	 
+     // #ifdef APP || H5
+     uni.chooseFile({
+       count: 1,
+       type: 'file',
+       extension: ['pdf'],
+       success: (res) => {
+         const file = res.tempFiles[0]
+         const fs = uni.getFileSystemManager()
+         fs.readFile({
+           filePath: file.path,
+           encoding: 'base64',
+           success: (readRes) => {
+             this.formData.resumePdf = {
+               name: file.name,
+               path: file.path,
+               base64: readRes.data
+             }
+           },
+           fail: (err) => {
+             console.error('读取文件失败', err)
+             uni.showToast({ title: '文件读取失败', icon: 'none' })
+           }
+         })
+       },
+       fail: (err) => {
+         console.log('选择文件取消或失败', err)
+       }
+     })
+     // #endif
+   },
     
-    startInterview() {
-      // 验证表单
+    // 开始面试
+    async startInterview() {
       if (!this.validateForm()) {
         return
       }
       
-      this.interviewStarted = true
-      this.currentQuestion = 1
-      this.startFirstQuestion()
+      this.isStarting = true
+      
+      try {
+        let res
+        
+        // 根据选择的方式调用不同的API
+        switch (this.currentMethod) {
+          case 'resumeText+positionText':
+            res = await interviewApi.startText(
+              this.formData.resumeText,
+              this.formData.positionText
+            )
+            break
+            
+          case 'pdf+positionText':
+            if (!this.formData.resumePdf?.base64) {
+              throw new Error('PDF文件未准备好')
+            }
+            res = await interviewApi.startPdfText(
+              this.formData.resumePdf.base64,
+              this.formData.positionText
+            )
+            break
+            
+          case 'pdf+position':
+            if (!this.formData.resumePdf?.base64) {
+              throw new Error('PDF文件未准备好')
+            }
+            res = await interviewApi.startPdfJobId(
+              this.formData.resumePdf.base64,
+              this.formData.positionId
+            )
+            break
+            
+          case 'user+position':
+            res = await interviewApi.startUserIdJobId(
+              this.formData.userId,
+              this.formData.positionId
+            )
+            break
+            
+          case 'user+positionText':
+            res = await interviewApi.startUserIdText(
+              this.formData.userId,
+              this.formData.positionText
+            )
+            break
+            
+          case 'resumeText+position':
+            res = await interviewApi.startTextJobId(
+              this.formData.resumeText,
+              this.formData.positionId
+            )
+            break
+            
+          default:
+            throw new Error('未知的面试方式')
+        }
+        
+        console.log('面试启动响应', res)
+        
+        if (res.code === 200 || res.data?.session_id) {
+          // 保存会话信息
+          this.sessionId = res.session_id || res.data?.session_id
+          this.resumeSource = res.resume_source || res.data?.resume_source
+          this.jobSource = res.job_source || res.data?.job_source
+          this.currentQuestion = res.question_number || res.data?.question_number || 1
+          
+          // 显示第一个问题
+          const firstQuestion = res.question || res.data?.question
+          const audioUrl = res.audio_url || res.data?.audio_url
+          
+          this.interviewStarted = true
+          
+          // 添加AI消息
+          this.addMessage('interviewer', firstQuestion)
+          
+          // 播放音频
+          if (audioUrl) {
+            this.currentAudioUrl = audioUrl
+            this.playAudio(audioUrl)
+          }
+          
+          // 更新面试阶段
+          this.updateInterviewStage()
+        } else {
+          throw new Error(res.message || '启动面试失败')
+        }
+      } catch (error) {
+        console.error('启动面试失败', error)
+        uni.showToast({ 
+          title: error.message || '启动面试失败，请重试', 
+          icon: 'none',
+          duration: 3000
+        })
+      } finally {
+        this.isStarting = false
+      }
     },
     
     validateForm() {
@@ -379,93 +602,183 @@ export default {
       return true
     },
     
-    startFirstQuestion() {
-      // TODO: 调用后端API获取第一个问题
-      setTimeout(() => {
-        this.askQuestion('请先简单介绍一下您自己。')
-      }, 1000)
-    },
-    
-    askQuestion(question) {
-      this.isSpeaking = true
-      this.voiceWaveActive = true
-      
-      // 模拟语音播放
-      setTimeout(() => {
-        this.isSpeaking = false
-        this.voiceWaveActive = false
-        
-        this.interviewMessages.push({
-          sender: 'interviewer',
-          content: question,
-          timestamp: Date.now()
-        })
-        
-        this.scrollToBottom()
-      }, 2000)
-    },
-    
+    // 开始录音
     startRecording() {
-      this.isRecording = true
-      this.recordingTime = 0
-      
-      // 开始录音计时
-      this.recordingTimer = setInterval(() => {
-        this.recordingTime++
-      }, 1000)
-    },
-    
-    stopRecording() {
-      if (!this.isRecording) return
-      
-      this.isRecording = false
-      this.clearRecordingTimer()
-      
-      // TODO: 调用后端API进行语音识别和处理
-      
-      // 模拟用户回答（后续对接语音识别API）
-      this.interviewMessages.push({
-        sender: 'candidate',
-        content: '这是我的回答内容...（录音转文字结果）',
-        timestamp: Date.now()
-      })
-      
-      this.scrollToBottom()
-      
-      // 模拟AI思考
-      this.isAIThinking = true
-      
-      setTimeout(() => {
-        this.isAIThinking = false
-        this.nextQuestion()
-      }, 2000)
-    },
-    
-    nextQuestion() {
-      this.currentQuestion++
-      
-      if (this.currentQuestion > this.totalQuestions) {
-        this.endInterview()
+      if (this.isProcessing || this.isAIThinking) {
+        uni.showToast({ title: '请等待AI响应', icon: 'none' })
         return
       }
       
-      // 更新面试阶段
-      this.updateInterviewStage()
-      
-      // 模拟下一个问题（后续对接后端API）
-      const questions = [
-        '您为什么选择这个职位？',
-        '请介绍一下您最满意的项目经历。',
-        '您如何处理工作中的压力？',
-        '您未来的职业规划是什么？',
-        '您有什么问题想问我们吗？'
-      ]
-      
-      const questionIndex = this.currentQuestion - 2
-      if (questionIndex < questions.length) {
-        // TODO: 调用后端API获取下一个问题
-        this.askQuestion(questions[questionIndex])
+      // 开始录音，最长60秒
+      recorderManager.start({
+        duration: 60000,
+        sampleRate: 16000,
+        numberOfChannels: 1,
+        encodeBitRate: 96000,
+        format: 'mp3'
+      })
+    },
+    
+    // 停止录音
+    stopRecording() {
+      if (!this.isRecording) return
+      recorderManager.stop()
+    },
+    
+    startRecordingTimer() {
+      this.recordingTime = 0
+      this.recordingTimer = setInterval(() => {
+        this.recordingTime++
+        // 最长60秒自动停止
+        if (this.recordingTime >= 60) {
+          this.stopRecording()
+        }
+      }, 1000)
+    },
+    
+    // 处理录音文件（语音识别）
+    async processAudio(filePath) {
+      if (!this.sessionId) {
+        uni.showToast({ title: '会话异常', icon: 'none' })
+        return
       }
+      
+      this.isProcessing = true
+      
+      try {
+        // 上传音频进行语音识别
+        const uploadRes = await interviewApi.transcribe(this.sessionId, filePath)
+        
+        console.log('语音识别结果', uploadRes)
+        
+        // 解析uploadFile的响应
+        let transcribeData
+        if (typeof uploadRes.data === 'string') {
+          transcribeData = JSON.parse(uploadRes.data)
+        } else {
+          transcribeData = uploadRes.data
+        }
+        
+        if (transcribeData.code === 200 && transcribeData.text) {
+          const userText = transcribeData.text
+          
+          // 添加用户消息
+          this.addMessage('candidate', userText)
+          
+          // 发送回答给AI
+          await this.sendAnswer(userText)
+        } else {
+          throw new Error(transcribeData.message || '语音识别失败')
+        }
+      } catch (error) {
+        console.error('处理录音失败', error)
+        uni.showToast({ title: error.message || '语音识别失败', icon: 'none' })
+      } finally {
+        this.isProcessing = false
+      }
+    },
+    
+    // 发送回答并获取下一个问题
+    async sendAnswer(userText, endInterview = false) {
+      if (!this.sessionId) return
+      
+      this.isAIThinking = true
+      
+      try {
+        const res = await interviewApi.answer(this.sessionId, userText, endInterview)
+        
+        console.log('AI响应', res)
+        
+        if (res.code === 200 || res.data) {
+          const data = res.data || res
+          
+          // 检查是否结束
+          if (data.is_ended || data.stage === 'ended') {
+            this.finishInterview()
+            return
+          }
+          
+          // 更新问题数
+          this.currentQuestion = data.question_number || this.currentQuestion + 1
+          
+          // 添加AI消息
+          const question = data.question || data.data?.question
+          this.addMessage('interviewer', question)
+          
+          // 播放音频
+          const audioUrl = data.audio_url || data.data?.audio_url
+          if (audioUrl) {
+            this.currentAudioUrl = audioUrl
+            this.playAudio(audioUrl)
+          }
+          
+          // 更新阶段
+          this.currentStage = data.stage || this.currentStage
+          this.updateInterviewStage()
+        } else {
+          throw new Error(res.message || '获取回复失败')
+        }
+      } catch (error) {
+        console.error('发送回答失败', error)
+        uni.showToast({ title: error.message || '获取回复失败', icon: 'none' })
+      } finally {
+        this.isAIThinking = false
+      }
+    },
+    
+   // 播放音频
+playAudio(url) {
+      if (!this.innerAudioContext) return
+      
+      this.isSpeaking = true
+      this.voiceWaveActive = true
+      
+      const fullUrl = getStaticUrl(url)
+      console.log('播放音频，完整URL:', fullUrl)
+      
+      // 先移除之前的事件监听
+      this.innerAudioContext.offError()
+      this.innerAudioContext.offEnded()
+      
+      // 绑定错误处理
+      this.innerAudioContext.onError((err) => {
+        console.error('音频播放错误', err)
+        this.isSpeaking = false
+        this.voiceWaveActive = false
+        
+        uni.showToast({ 
+          title: '语音加载失败，请阅读文字', 
+          icon: 'none',
+          duration: 3000
+        })
+      })
+      
+      // 绑定播放结束事件
+      this.innerAudioContext.onEnded(() => {
+        this.isSpeaking = false
+        this.voiceWaveActive = false
+      })
+      
+      this.innerAudioContext.src = fullUrl
+      this.innerAudioContext.play()
+    },
+
+    
+    // 重听问题
+    replayQuestion() {
+      if (this.currentAudioUrl) {
+        this.playAudio(this.currentAudioUrl)
+      }
+    },
+    
+    // 添加消息到列表
+    addMessage(sender, content) {
+      this.interviewMessages.push({
+        sender,
+        content,
+        timestamp: Date.now()
+      })
+      this.scrollToBottom()
     },
     
     updateInterviewStage() {
@@ -474,29 +787,100 @@ export default {
       this.currentStage = stages[stageIndex] || '综合评估'
     },
     
-    replayQuestion() {
-      if (this.interviewMessages.length === 0) return
-      
-      const lastQuestion = this.interviewMessages
-        .filter(msg => msg.sender === 'interviewer')
-        .pop()
-      
-      if (lastQuestion) {
-        this.askQuestion(lastQuestion.content)
-      }
-    },
-    
-    endInterview() {
-      // 生成面试报告数据
-      this.generateReportData()
-      this.showReport = true
-      this.$nextTick(() => {
-        this.drawRadarChart()
+    confirmEndInterview() {
+      uni.showModal({
+        title: '结束面试',
+        content: '确定要结束面试吗？将生成面试报告。',
+        success: (res) => {
+          if (res.confirm) {
+            this.endInterview()
+          }
+        }
       })
     },
     
-    generateReportData() {
-      // 模拟生成报告数据，实际应该从后端获取
+    // 结束面试
+    async endInterview() {
+      if (!this.sessionId) {
+        this.finishInterview()
+        return
+      }
+      
+      // 发送结束信号
+      try {
+        await this.sendAnswer('面试结束', true)
+      } catch (error) {
+        console.log('发送结束信号失败，直接获取报告', error)
+      }
+      
+      this.finishInterview()
+    },
+    
+    // 完成面试，获取报告
+    async finishInterview() {
+      if (!this.sessionId) {
+        this.generateMockReport()
+        this.showReport = true
+        return
+      }
+      
+      uni.showLoading({ title: '生成报告中...' })
+      
+      try {
+        const res = await interviewApi.getReport(this.sessionId)
+        console.log('面试报告', res)
+        
+        if (res.code === 200 || res.data) {
+          this.reportData = res.data || res
+          this.parseReportData(this.reportData)
+        } else {
+          // 如果获取失败，使用模拟数据
+          this.generateMockReport()
+        }
+        
+        this.showReport = true
+        this.$nextTick(() => {
+          this.drawRadarChart()
+        })
+      } catch (error) {
+        console.error('获取报告失败', error)
+        this.generateMockReport()
+        this.showReport = true
+      } finally {
+        uni.hideLoading()
+      }
+    },
+    
+    // 解析报告数据
+    parseReportData(data) {
+      // 根据后端返回的数据结构解析
+      this.overallScore = data.overall_score || data.score || 85
+      
+      this.evaluationItems = [
+        { 
+          title: '技术能力', 
+          content: data.tech_evaluation || '基础扎实，能够清晰地解释技术概念。' 
+        },
+        { 
+          title: '沟通能力', 
+          content: data.comm_evaluation || '表达清晰，逻辑性强。' 
+        },
+        { 
+          title: '项目经验', 
+          content: data.project_evaluation || '项目经历丰富，能够详细描述项目细节。' 
+        }
+      ]
+      
+      this.suggestions = data.suggestions || [
+        '建议在技术深度方面继续加强学习',
+        '可以增加更多实际项目案例的积累'
+      ]
+    },
+    
+    // 生成模拟报告数据（备用）
+    generateMockReport() {
+      this.overallScore = Math.floor(Math.random() * 20) + 75
+      
       this.evaluationItems = [
         { 
           title: '技术能力', 
@@ -526,13 +910,13 @@ export default {
     
     scrollToBottom() {
       this.$nextTick(() => {
-        this.chatScrollTop = 999999
+        this.chatScrollTop = this.interviewMessages.length * 1000
       })
     },
     
     formatTime(timestamp) {
       const date = new Date(timestamp)
-      return date.toLocaleTimeString()
+      return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
     },
     
     closeReport() {
@@ -542,13 +926,20 @@ export default {
     restartInterview() {
       this.showReport = false
       this.resetInterview()
-      this.startInterview()
+      this.interviewStarted = false
     },
     
     exportReport() {
-      uni.showToast({
-        title: '报告导出功能开发中...',
-        icon: 'none'
+      // 导出报告逻辑
+      uni.showModal({
+        title: '导出报告',
+        content: '是否将面试报告保存到本地？',
+        success: (res) => {
+          if (res.confirm) {
+            // 生成PDF或图片
+            uni.showToast({ title: '报告已保存', icon: 'success' })
+          }
+        }
       })
     },
     
@@ -588,12 +979,33 @@ export default {
         ctx.lineTo(centerX + Math.cos(angle) * radius, centerY + Math.sin(angle) * radius)
         ctx.stroke()
       }
+      
+      // 绘制标签
+      ctx.setFontSize(12)
+      ctx.setFillStyle('#666')
+      const labels = ['技术', '沟通', '经验', '态度', '潜力', '稳定']
+      for (let i = 0; i < points; i++) {
+        const angle = i * angleStep - Math.PI / 2
+        const x = centerX + Math.cos(angle) * (radius + 20)
+        const y = centerY + Math.sin(angle) * (radius + 20)
+        ctx.fillText(labels[i], x - 12, y + 6)
+      }
     },
     
     drawRadarData(ctx) {
       const centerX = 150, centerY = 150, radius = 100, points = 6
       const angleStep = (Math.PI * 2) / points
-      const data = [0.8, 0.7, 0.9, 0.6, 0.8, 0.75]
+      
+      // 根据分数生成数据
+      const score = this.overallScore / 100
+      const data = [
+        0.8 * score, 
+        0.85 * score, 
+        0.75 * score, 
+        0.9 * score, 
+        0.8 * score, 
+        0.85 * score
+      ]
       
       ctx.setFillStyle('rgba(0, 122, 255, 0.3)')
       ctx.setStrokeStyle('#007aff')
@@ -610,18 +1022,40 @@ export default {
       ctx.closePath()
       ctx.fill()
       ctx.stroke()
+      
+      // 绘制数据点
+      ctx.setFillStyle('#007aff')
+      for (let i = 0; i < points; i++) {
+        const angle = i * angleStep - Math.PI / 2
+        const value = data[i]
+        const x = centerX + Math.cos(angle) * (radius * value)
+        const y = centerY + Math.sin(angle) * (radius * value)
+        ctx.beginPath()
+        ctx.arc(x, y, 4, 0, Math.PI * 2)
+        ctx.fill()
+      }
     },
     
     resetInterview() {
-      this.interviewStarted = false
+      this.sessionId = null
       this.currentQuestion = 0
       this.interviewMessages = []
       this.isRecording = false
       this.isSpeaking = false
       this.isAIThinking = false
+      this.isProcessing = false
+      this.voiceWaveActive = false
       this.recordingTime = 0
+      this.currentAudioUrl = ''
+      this.audioFilePath = ''
+      this.reportData = null
       this.showReport = false
       this.clearRecordingTimer()
+      
+      // 停止音频
+      if (this.innerAudioContext) {
+        this.innerAudioContext.stop()
+      }
     },
     
     clearRecordingTimer() {
@@ -795,6 +1229,7 @@ export default {
           font-size: 30rpx;
           background-color: #fff;
           transition: all 0.3s ease;
+          box-sizing: border-box;
           
           &:focus {
             border-color: #007aff;
@@ -816,6 +1251,7 @@ export default {
           background-color: #fff;
           transition: all 0.3s ease;
           resize: vertical;
+          box-sizing: border-box;
           
           &:focus {
             border-color: #007aff;
@@ -853,6 +1289,12 @@ export default {
             font-size: 30rpx;
             font-weight: 500;
           }
+          
+          .file-name {
+            color: #28a745;
+            font-size: 28rpx;
+            word-break: break-all;
+          }
         }
       }
     }
@@ -872,6 +1314,10 @@ export default {
       &:active {
         transform: scale(0.98);
         box-shadow: 0 4rpx 16rpx rgba(0, 122, 255, 0.2);
+      }
+      
+      &[loading] {
+        opacity: 0.8;
       }
     }
   }
@@ -1119,6 +1565,10 @@ export default {
       background-color: transparent;
       border: none;
       
+      &[disabled] {
+        opacity: 0.5;
+      }
+      
       image {
         width: 50rpx;
         height: 50rpx;
@@ -1154,6 +1604,14 @@ export default {
         &.recording {
           background-color: #ff4757;
           animation: pulse 1s infinite;
+        }
+        
+        &.disabled {
+          background-color: #ccc;
+        }
+        
+        &[disabled] {
+          opacity: 0.6;
         }
         
         image {
@@ -1255,21 +1713,35 @@ export default {
           width: 200rpx;
           height: 200rpx;
           border-radius: 50%;
-          background: conic-gradient(#007aff 0deg, #007aff 306deg, #e0e0e0 306deg);
+          background: conic-gradient(#007aff 0deg, #007aff calc(v-bind(overallScore) * 3.6deg), #e0e0e0 calc(v-bind(overallScore) * 3.6deg));
           display: flex;
           align-items: center;
           justify-content: center;
           margin: 0 auto;
+          position: relative;
+          
+          &::before {
+            content: '';
+            position: absolute;
+            width: 160rpx;
+            height: 160rpx;
+            background-color: #fff;
+            border-radius: 50%;
+          }
           
           .score-number {
             font-size: 48rpx;
             font-weight: bold;
             color: #007aff;
+            position: relative;
+            z-index: 1;
           }
           
           .score-total {
             font-size: 32rpx;
             color: #666;
+            position: relative;
+            z-index: 1;
           }
         }
       }

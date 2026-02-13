@@ -15,7 +15,15 @@
         <view v-for="(message, index) in messages" :key="index" 
               :class="['message-item', message.sender === 'user' ? 'user-message' : 'ai-message']">
           <view class="message-bubble">
-            <text class="message-text">{{ message.content }}</text>
+            <view v-if="!needMarkdownRender(message.content)" class="message-text">
+                <text>{{ message.content }}</text>
+              </view>
+              
+              <rich-text 
+                v-else 
+                class="markdown-content"
+                :nodes="parseMarkdown(message.content)"
+              ></rich-text>
             
             <!-- 文件消息 -->
             <view v-if="message.file" class="file-card">
@@ -237,7 +245,10 @@
   </view>
 </template>
 
+
 <script>
+import { aiApi } from '@/common/api/ai.js'
+
 export default {
   data() {
     return {
@@ -253,17 +264,18 @@ export default {
       scrollTop: 0,
       isLoading: false,
       currentPanel: null,
-      currentMethod: 'pdf+position',
+      currentMethod: 'user+position',
       formData: {
-        userId: '',
         positionId: '',
         positionText: '',
-        pdfFile: null
+        pdfFile: null  
       },
+      gradeIndex: 0,
+      gradeOptions: ['大一', '大二', '大三', '大四', '研一', '研二', '研三'],
       
       analysisMethods: [
-        { value: 'user+position', label: '用户ID+职位ID' },
-        { value: 'user+text', label: '用户ID+职位文本' },
+        { value: 'user+position', label: '我的简历+职位ID' },
+        { value: 'user+text', label: '我的简历+职位文本' },
         { value: 'pdf+position', label: 'PDF+职位ID' },
         { value: 'pdf+text', label: 'PDF+职位文本' }
       ]
@@ -283,18 +295,16 @@ export default {
   },
   
   onLoad() {
-    // 页面加载初始化
     this.initializeChat()
   },
   
   onUnload() {
-    // 页面卸载清理
     this.cleanup()
   },
   
   methods: {
     initializeChat() {
-      // 初始化聊天数据
+      // 页面加载初始化
     },
     
     cleanup() {
@@ -307,13 +317,16 @@ export default {
       })
     },
     
-    sendMessage() {
-      if (!this.inputText.trim()) return
+    // 发送普通消息（AI对话）
+    async sendMessage() {
+      if (!this.inputText.trim() || this.isLoading) return
+      
+      const userMessage = this.inputText.trim()
       
       // 添加用户消息
       this.messages.push({
         sender: 'user',
-        content: this.inputText,
+        content: userMessage,
         timestamp: Date.now()
       })
       
@@ -321,8 +334,43 @@ export default {
       this.isLoading = true
       this.inputText = ''
       
-      // 模拟AI回复
-      this.simulateAIResponse()
+      try {
+          const res = await aiApi.chat(userMessage)
+         
+          if (res && res.response) {
+            let aiContent = ''
+            if (Array.isArray(res.response)) {
+              aiContent = res.response
+                .filter(item => item.role === 'assistant')
+                .map(item => item.content)
+                .join('\n')
+            } else {
+              // 如果是字符串，先进行预处理
+              aiContent = typeof res.response === 'string' 
+                ? this.preprocessContent(res.response)  // 添加预处理
+                : res.response
+            }
+            
+            this.messages.push({
+              sender: 'ai',
+              content: aiContent || 'AI未返回有效内容',
+              timestamp: Date.now(),
+              expanded: false
+            })
+          }
+        } catch (error) {
+        console.error('AI对话失败:', error)
+        
+        this.messages.push({
+          sender: 'ai',
+          content: '抱歉，服务暂时不可用，请稍后重试。',
+          timestamp: Date.now(),
+          expanded: false
+        })
+      } finally {
+        this.isLoading = false
+        this.scrollToBottom()
+      }
     },
     
     openPanel(panelType) {
@@ -342,64 +390,488 @@ export default {
         successRate: 'pdf+position',
         studentPlan: 'pdf+position'
       }
-      return defaults[panelType] || 'user'
+      return defaults[panelType] || 'user+position'
     },
     
     onMethodChange(e) {
       this.currentMethod = e.detail.value
     },
     
+    onGradeChange(e) {
+      this.gradeIndex = parseInt(e.detail.value)
+    },
+
+  // 预处理内容：处理 JSON 转义字符和清理残留
+  preprocessContent(text) {
+    if (!text) return ''
     
+    let processed = text
+    
+    // 处理 JSON 转义字符
+    processed = processed
+      .replace(/\\n/g, '\n')      // 将 \n 转为实际换行符
+      .replace(/\\"/g, '"')       // 将 \" 转为 "
+      .replace(/\\'/g, "'")       // 将 \' 转为 '
+      .replace(/\\t/g, '\t')      // 将 \t 转为制表符
+      .replace(/\\r/g, '')        // 移除 \r
+      .replace(/\\\\/g, '\\')     // 将 \\ 转为 \
+    
+    processed = processed
+      .replace(/\s*,\s*"role"\s*:\s*"assistant"\s*\]?\}?$/g, '') 
+      .replace(/\s*,\s*"role"\s*:\s*"user"\s*\]?\}?$/g, '')       
+      .replace(/\]?\}?\s*$/, '')  
+    
+    return processed
+  },
+
+  // 解析 Markdown 文本为 HTML
+  parseMarkdown(text) {
+    if (!text) return ''
+    
+    // 先预处理
+    let html = this.preprocessContent(text)
+    
+    // 清理特殊标记并转换格式
+    html = html
+      .replace(/^\s*#\s*$/gm, '')
+      .replace(/^\s*---\s*$/gm, '')
+      .replace(/\*\*([^*]+)\*\*/g, '<strong style="font-weight:600;color:#222;">$1</strong>')
+      .replace(/\*([^*\n]+)\*/g, '<em style="font-style:italic;color:#555;">$1</em>')
+      .replace(/`([^`]+)`/g, '<code style="background:#f0f0f0;padding:2rpx 8rpx;border-radius:4rpx;color:#e83e8c;font-size:28rpx;">$1</code>')
+      .replace(/###\s+([^\n]+)/g, '<strong style="font-size:32rpx;font-weight:600;display:block;margin:16rpx 0 8rpx;color:#333;">$1</strong>')
+      .replace(/##\s+([^\n]+)/g, '<strong style="font-size:34rpx;font-weight:600;display:block;margin:20rpx 0 12rpx;color:#222;border-bottom:2rpx solid #eee;padding-bottom:6rpx;">$1</strong>')
+      .replace(/#\s+([^\n]+)/g, '<strong style="font-size:36rpx;font-weight:600;display:block;margin:24rpx 0 16rpx;color:#111;">$1</strong>')
+    
+    // 先标记列表项
+    html = html.replace(/^\s*[-•]\s+([^\n]+)/gm, ':::li:::$1:::/li:::')
+    
+    // 将连续的列表项组合成 ul
+    html = html.replace(/(:::li:::.*?:::\/li:::\s*)+/g, function(match) {
+      const items = match.match(/:::li:::(.*?):::\/li:::/g)
+      if (items) {
+        const listItems = items.map(item => {
+          const content = item.replace(/:::li:::/, '').replace(/:::\/li:::/, '')
+          return '<li style="margin:2rpx 0;line-height:1.4;">' + content + '</li>'
+        }).join('')
+        return '<ul style="padding-left:28rpx;margin:6rpx 0 10rpx;list-style-type:disc;">' + listItems + '</ul>'
+      }
+      return match
+    })
+    
+    // 处理换行：段落之间保留适当间距
+    html = html
+      .replace(/\n\s*\n/g, '<br>')      
+      .replace(/\n/g, '<br>')           
+    
+    // 清理多余的 <br> 和空标签
+    html = html
+      .replace(/(<br>\s*){3,}/g, '<br><br>')     
+      .replace(/^<br\s*\/?>|<br\s*\/?>$/g, '')   
+      .replace(/<br><\/li>/g, '</li>')           
+      .replace(/<\/li><br>/g, '</li>')          
+      .replace(/<ul><br>/g, '<ul>')              
+      .replace(/<\/ul><br>/g, '</ul>')          
+      .replace(/<strong><br>/g, '<strong>')      
+      .replace(/<br><\/strong>/g, '</strong>')   
+    
+    return html
+  },
+
+  // 判断是否需要 Markdown 渲染
+  needMarkdownRender(text) {
+    if (!text) return false
+    const patterns = [
+      /\*\*[^*]+\*\*/, /\*[^*]+\*/, /`[^`]+`/,
+      /^#{1,6}\s+/m, /^[-•]\s+/m, /^\d+\.\s+/m,
+      /\\n/, /"role"/, /\\"/
+    ]
+    return patterns.some(p => p.test(text))
+  },
     
     chooseFile() {
-      uni.chooseFile({
+      // #ifdef MP-WEIXIN
+      uni.chooseMessageFile({
         count: 1,
         type: 'file',
         extension: ['pdf'],
         success: (res) => {
-          this.formData.pdfFile = res.tempFiles[0]
+          const file = res.tempFiles[0]
+          
+          // 读取文件为 base64
+          uni.getFileSystemManager().readFile({
+            filePath: file.path,
+            encoding: 'base64',
+            success: (readRes) => {
+              this.formData.pdfFile = {
+                name: file.name,
+                size: file.size,
+                base64: readRes.data
+              }
+              uni.showToast({
+                title: '文件选择成功',
+                icon: 'success',
+                duration: 1500
+              })
+            },
+            fail: (err) => {
+              console.error('读取文件失败:', err)
+              uni.showToast({
+                title: '文件读取失败',
+                icon: 'none'
+              })
+            }
+          })
+        },
+        fail: (err) => {
+          console.error('选择文件失败:', err)
+          if (err.errMsg && !err.errMsg.includes('cancel')) {
+            uni.showToast({
+              title: '文件选择失败',
+              icon: 'none'
+            })
+          }
         }
       })
+      // #endif
+
+      // #ifdef H5
+      // H5：创建input元素选择文件
+      const input = document.createElement('input')
+      input.type = 'file'
+      input.accept = '.pdf,application/pdf'
+      input.onchange = (e) => {
+        const file = e.target.files[0]
+        if (!file) return
+        
+        // 检查文件类型
+        if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
+          uni.showToast({
+            title: '请选择PDF文件',
+            icon: 'none'
+          })
+          return
+        }
+
+        // 读取为base64
+        const reader = new FileReader()
+        reader.onload = (event) => {
+          const base64 = event.target.result.split(',')[1] 
+          this.formData.pdfFile = {
+            name: file.name,
+            size: file.size,
+            base64: base64
+          }
+          uni.showToast({
+            title: '文件选择成功',
+            icon: 'success',
+            duration: 1500
+          })
+        }
+        reader.onerror = () => {
+          uni.showToast({
+            title: '文件读取失败',
+            icon: 'none'
+          })
+        }
+        reader.readAsDataURL(file)
+      }
+      input.click()
+      // #endif
+
+      // #ifdef APP-PLUS
+      // App端
+      uni.chooseFile({
+        count: 1,
+        type: 'all',
+        extension: ['pdf'],
+        success: (res) => {
+          const filePath = res.tempFilePaths[0]
+          // 获取文件信息
+          uni.getFileInfo({
+            filePath: filePath,
+            success: (info) => {
+              // 读取为base64
+              uni.getFileSystemManager().readFile({
+                filePath: filePath,
+                encoding: 'base64',
+                success: (readRes) => {
+                  this.formData.pdfFile = {
+                    name: res.tempFiles[0]?.name || filePath.substring(filePath.lastIndexOf('/') + 1),
+                    size: info.size,
+                    base64: readRes.data
+                  }
+                  uni.showToast({
+                    title: '文件选择成功',
+                    icon: 'success',
+                    duration: 1500
+                  })
+                },
+                fail: (err) => {
+                  console.error('读取文件失败:', err)
+                  uni.showToast({
+                    title: '文件读取失败',
+                    icon: 'none'
+                  })
+                }
+              })
+            },
+            fail: (err) => {
+              console.error('获取文件信息失败:', err)
+            }
+          })
+        },
+        fail: (err) => {
+          console.error('选择文件失败:', err)
+          if (err.errMsg && !err.errMsg.includes('cancel')) {
+            uni.showToast({
+              title: '文件选择失败',
+              icon: 'none'
+            })
+          }
+        }
+      })
+      // #endif
     },
     
-    submitFunction() {
+    async submitFunction() {
+      if (!this.validateForm()) {
+        return
+      }
+      const panelType = this.currentPanel
+      if (!panelType) {
+        uni.showToast({ title: '操作异常，请重试', icon: 'none' })
+        return
+      }
+    
+      const savedFormData = {
+        positionId: this.formData.positionId,
+        positionText: this.formData.positionText,
+        pdfFile: this.formData.pdfFile ? { ...this.formData.pdfFile } : null
+      }
+      const savedMethod = this.currentMethod
+      
       // 添加用户消息
-      let userMessage = ''
-      switch (this.currentPanel) {
-        case 'resumeAnalysis':
-          userMessage = '请分析这份简历'
-          break
-        case 'resumeEvaluation':
-          userMessage = '请评估我的简历'
-          break
-        case 'successRate':
-          userMessage = '请分析我的求职成功率'
-          break
-        case 'studentPlan':
-          userMessage = '请为我制定大学生活规划'
-          break
-      }
-      
-      if (this.formData.pdfFile) {
-        userMessage += `：[${this.formData.pdfFile.name}]`
-      }
-      
+      const userMessage = this.getUserMessageText()
       this.messages.push({
         sender: 'user',
         content: userMessage,
         timestamp: Date.now(),
-        file: this.formData.pdfFile
+        file: this.formData.pdfFile ? {
+          name: this.formData.pdfFile.name,
+          size: this.formData.pdfFile.size
+        } : null
       })
       
+      // 关闭面板
       this.closePanel()
       this.scrollToBottom()
+      this.isLoading = true
       
-      // 模拟AI分析结果
-      this.simulateAnalysisResult()
+      try {
+        let result = null
+        switch (panelType) {  
+          case 'resumeAnalysis':
+            result = await this.submitResumeAnalysis(savedFormData, savedMethod)
+            break
+          case 'resumeEvaluation':
+            result = await this.submitResumeEvaluation(savedFormData, savedMethod)
+            break
+          case 'successRate':
+            result = await this.submitSuccessRate(savedFormData, savedMethod)
+            break
+          case 'studentPlan':
+            result = await this.submitStudentPlan(savedFormData, savedMethod)
+            break
+          default:
+            throw new Error('未知操作类型: ' + panelType)
+        }
+        
+        // 处理成功结果，添加到消息列表
+        if (result) {
+          this.messages.push({
+            sender: 'ai',
+            content: typeof result === 'string' ? result : JSON.stringify(result),
+            timestamp: Date.now(),
+            expanded: false
+          })
+        }
+        
+      } catch (error) {
+        console.error('提交失败:', error)
+        this.messages.push({
+          sender: 'ai',
+          content: '抱歉，分析失败：' + (error.message || '未知错误'),
+          timestamp: Date.now(),
+          expanded: false
+        })
+      } finally {
+        this.isLoading = false
+        this.scrollToBottom()
+      }
+    },
+    
+    // 简历分析
+    async submitResumeAnalysis(formData, method) {
+      try {
+        if (method === 'user+position') {
+          const jobId = String(formData.positionId || '').trim()
+          if (!jobId) {
+            throw new Error('职位ID不能为空')
+          }
+          
+          const res = await aiApi.askByUserJobId(jobId)
+          return res?.analysis || res?.data?.analysis || res?.data || res
+          
+        } else if (method === 'user+text') {
+          const res = await aiApi.askByUserJobText(formData.positionText)
+          return res?.analysis || res?.data?.analysis || res?.data || res
+          
+        } else if (method === 'pdf+position') {
+          if (!formData.pdfFile?.base64) {
+            throw new Error('PDF 文件没有 base64 数据')
+          }
+          const res = await aiApi.askByPdfJobId(
+            {
+              name: formData.pdfFile.name,
+              base64: formData.pdfFile.base64
+            },
+            formData.positionId
+          )
+          return res?.analysis || res?.data?.analysis || res?.data || res
+          
+        } else if (method === 'pdf+text') {
+          const res = await aiApi.askByPdfJobText(
+            {
+              name: formData.pdfFile.name,
+              base64: formData.pdfFile.base64
+            },
+            formData.positionText
+          )
+          return res?.analysis || res?.data?.analysis || res?.data || res
+        }
+      } catch (err) {
+        console.error('简历分析失败:', err)
+        throw err  
+      }
+    },
+    
+    // 简历评估
+    async submitResumeEvaluation(formData, method) {
+      if (method === 'user') {
+        const res = await aiApi.resumeEvaluation()
+        if (res.code !== 200) throw new Error(res.message)
+        return res.data?.evaluation || res.data
+      } else if (method === 'pdf') {
+        if (!formData.pdfFile?.base64) {
+          throw new Error('PDF 文件没有 base64 数据')
+        }
+        const res = await aiApi.resumeEvaluationByPdf({
+          name: formData.pdfFile.name,
+          base64: formData.pdfFile.base64
+        })
+        return res.data?.evaluation || res.data
+      }
+    },
+    
+    // 成功率分析
+    async submitSuccessRate(formData, method) {
+      if (method === 'pdf+position') {
+        if (!formData.pdfFile?.base64) {
+          throw new Error('PDF 文件没有 base64 数据')
+        }
+        const res = await aiApi.successRateByPdfJobId(
+          {
+            name: formData.pdfFile.name,
+            base64: formData.pdfFile.base64
+          },
+          formData.positionId
+        )
+        return res.data?.analysis || res.data
+      } else if (method === 'pdf+text') {
+        if (!formData.pdfFile?.base64) {
+          throw new Error('PDF 文件没有 base64 数据')
+        }
+        const res = await aiApi.successRateByPdfJobText(
+          {
+            name: formData.pdfFile.name,
+            base64: formData.pdfFile.base64
+          },
+          formData.positionText
+        )
+        return res.data?.analysis || res.data
+      }
+    },
+    
+    // 大学生规划
+    async submitStudentPlan(formData, method) {
+      const userGrade = this.gradeOptions[this.gradeIndex]
+      
+      if (method === 'pdf+position') {
+        if (!formData.pdfFile?.base64) {
+          throw new Error('PDF 文件没有 base64 数据')
+        }
+        const res = await aiApi.universityPlanByPdfJobId(
+          {
+            name: formData.pdfFile.name,
+            base64: formData.pdfFile.base64
+          },
+          formData.positionId,
+          userGrade
+        )
+        return res.data?.plan || res.data
+      } else if (method === 'pdf+text') {
+        if (!formData.pdfFile?.base64) {
+          throw new Error('PDF 文件没有 base64 数据')
+        }
+        const res = await aiApi.universityPlanByPdfJobText(
+          {
+            name: formData.pdfFile.name,
+            base64: formData.pdfFile.base64
+          },
+          formData.positionText,
+          userGrade
+        )
+        return res.data?.plan || res.data
+      }
+    },
+	
+    getUserMessageText() {
+      const texts = {
+        resumeAnalysis: '请分析这份简历与岗位的匹配度',
+        resumeEvaluation: '请评估我的简历',
+        successRate: '请分析我的求职成功率',
+        studentPlan: '请为我制定大学生活规划'
+      }
+      let text = texts[this.currentPanel] || '提交分析'
+      if (this.formData.pdfFile) {
+        text += `：[${this.formData.pdfFile.name}]`
+      }
+      return text
+    },
+    
+    validateForm() {
+      const method = this.currentMethod
+      
+      if (method.includes('position') && !this.formData.positionId.trim()) {
+        uni.showToast({ title: '请输入职位ID', icon: 'none' })
+        return false
+      }
+      
+      if (method.includes('text') && !this.formData.positionText.trim()) {
+        uni.showToast({ title: '请输入职位描述', icon: 'none' })
+        return false
+      }
+      
+      if (method.includes('pdf') && !this.formData.pdfFile) {
+        uni.showToast({ title: '请上传PDF文件', icon: 'none' })
+        return false
+      }
+      
+      return true
     },
     
     toggleCard(index) {
-      this.messages[index].expanded = !this.messages[index].expanded
+      this.$set(this.messages[index], 'expanded', !this.messages[index].expanded)
     },
     
     scrollToBottom() {
@@ -409,11 +881,11 @@ export default {
     },
     
     loadMoreHistory() {
-      // 加载更多历史消息
       // TODO: 实现历史消息加载功能
     },
     
     formatFileSize(size) {
+      if (!size) return '0B'
       if (size < 1024) return size + 'B'
       if (size < 1024 * 1024) return (size / 1024).toFixed(1) + 'KB'
       return (size / (1024 * 1024)).toFixed(1) + 'MB'
@@ -426,40 +898,11 @@ export default {
     
     resetForm() {
       this.formData = {
-        userId: '',
         positionId: '',
         positionText: '',
         pdfFile: null
       }
-    },
-    
-    simulateAIResponse() {
-      setTimeout(() => {
-        this.isLoading = false
-        this.messages.push({
-          sender: 'ai',
-          content: '我已经收到您的消息，正在为您分析...',
-          timestamp: Date.now(),
-          expanded: false
-        })
-        this.scrollToBottom()
-      }, 1500)
-    },
-    
-    simulateAnalysisResult() {
-      setTimeout(() => {
-        this.messages.push({
-          sender: 'ai',
-          content: '分析完成，以下是详细结果：',
-          timestamp: Date.now(),
-          expanded: false,
-          analysisResult: {
-            title: '简历分析报告',
-            content: '<p><strong>优势：</strong></p><ul><li>技术能力突出</li><li>项目经验丰富</li></ul><p><strong>建议：</strong></p><ul><li>可以增加更多量化成果</li><li>优化关键词匹配</li></ul>'
-          }
-        })
-        this.scrollToBottom()
-      }, 2000)
+      this.gradeIndex = 0
     }
   }
 }
@@ -661,32 +1104,76 @@ export default {
             }
           }
         }
-        
-        .progress-bar {
-          margin-top: 24rpx;
-          height: 12rpx;
-          background-color: #f0f0f0;
-          border-radius: 6rpx;
-          position: relative;
-          overflow: hidden;
-          
-          .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #007aff 0%, #00d4ff 100%);
-            border-radius: 6rpx;
-            transition: width 0.4s ease;
-          }
-          
-          .progress-text {
-            position: absolute;
-            right: 0;
-            top: -36rpx;
-            font-size: 24rpx;
-            color: #666;
-            font-weight: 500;
-          }
-        }
       }
+	  
+	  .markdown-content {
+	    font-size: 32rpx;
+	    line-height: 1.8;
+	    color: #333;
+	    
+	    // 确保 rich-text 内的样式生效
+	    ::v-deep {
+	      p {
+	        margin: 16rpx 0;
+	        line-height: 1.8;
+	      }
+	      
+	      strong {
+	        font-weight: 600;
+	        color: #222;
+	      }
+	      
+	      em {
+	        font-style: italic;
+	        color: #555;
+	      }
+	      
+	      h1, h2, h3 {
+	        font-weight: 600;
+	        margin: 24rpx 0 16rpx;
+	      }
+	      
+	      ul, ol {
+	        margin: 16rpx 0;
+	        padding-left: 40rpx;
+	      }
+	      
+	      li {
+	        margin: 12rpx 0;
+	      }
+	      
+	      pre {
+	        background: #f8f9fa;
+	        padding: 20rpx;
+	        border-radius: 12rpx;
+	        overflow-x: auto;
+	        margin: 16rpx 0;
+	      }
+	      
+	      code {
+	        font-family: monospace;
+	        font-size: 28rpx;
+	      }
+	      
+	      blockquote {
+	        border-left: 8rpx solid #007aff;
+	        padding: 16rpx 24rpx;
+	        margin: 16rpx 0;
+	        background: #f8f9fa;
+	      }
+	      
+	      a {
+	        color: #007aff;
+	        text-decoration: none;
+	      }
+	      
+	      hr {
+	        border: none;
+	        border-top: 2rpx solid #e9ecef;
+	        margin: 32rpx 0;
+	      }
+	    }
+	  }
       
       .message-time {
         font-size: 24rpx;
