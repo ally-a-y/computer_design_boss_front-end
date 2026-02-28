@@ -1,0 +1,540 @@
+// 论坛页面主题样式
+
+// 颜色变量 - 使用全局主题变量
+$forum-primary: var(--primary-color, #007aff);
+$forum-secondary: var(--primary-color, #007aff);
+$forum-success: var(--success-color, #4cd964);
+$forum-warning: var(--warning-color, #ff9500);
+$forum-danger: var(--error-color, #ff3b30);
+$forum-info: var(--primary-color, #007aff);
+$forum-light: var(--bg-secondary, #f5f5f5);
+$forum-dark: var(--text-primary, #333333);
+
+$forum-white: var(--bg-primary, #ffffff);
+$forum-gray-100: var(--bg-secondary, #f5f5f5);
+$forum-gray-200: var(--border-color, #eeeeee);
+$forum-gray-300: var(--border-color, #eeeeee);
+$forum-gray-400: var(--border-color, #eeeeee);
+$forum-gray-500: var(--text-tertiary, #999999);
+$forum-gray-600: var(--text-secondary, #666666);
+$forum-gray-700: var(--text-primary, #333333);
+$forum-gray-800: var(--text-primary, #333333);
+$forum-gray-900: var(--text-primary, #333333);
+
+// 渐变背景
+$forum-gradient-primary: linear-gradient(135deg, $forum-primary 0%, $forum-secondary 100%);
+$forum-gradient-success: linear-gradient(135deg, $forum-success 0%, $forum-success 100%);
+$forum-gradient-warning: linear-gradient(135deg, $forum-warning 0%, $forum-warning 100%);
+$forum-gradient-danger: linear-gradient(135deg, $forum-danger 0%, $forum-danger 100%);
+
+// 阴影变量
+$forum-shadow-sm: var(--shadow-light, 0 2rpx 8rpx rgba(0, 0, 0, 0.1));
+$forum-shadow: var(--shadow-light, 0 2rpx 8rpx rgba(0, 0, 0, 0.1));
+$forum-shadow-lg: var(--shadow-medium, 0 4rpx 16rpx rgba(0, 0, 0, 0.12));
+$forum-shadow-xl: var(--shadow-heavy, 0 8rpx 32rpx rgba(0, 0, 0, 0.15));
+
+// 圆角变量
+$forum-radius-sm: 10rpx;
+$forum-radius: 15rpx;
+$forum-radius-lg: 20rpx;
+$forum-radius-xl: 25rpx;
+$forum-radius-pill: 50rpx;
+
+// 间距变量
+$forum-spacing-xs: 10rpx;
+$forum-spacing-sm: 20rpx;
+$forum-spacing-md: 30rpx;
+$forum-spacing-lg: 40rpx;
+$forum-spacing-xl: 50rpx;
+
+// 字体大小
+$forum-font-size-xs: 20rpx;
+$forum-font-size-sm: 24rpx;
+$forum-font-size-base: 28rpx;
+$forum-font-size-lg: 32rpx;
+$forum-font-size-xl: 36rpx;
+$forum-font-size-2xl: 40rpx;
+$forum-font-size-3xl: 48rpx;
+
+// 字体权重
+$forum-font-weight-light: 300;
+$forum-font-weight-normal: 400;
+$forum-font-weight-medium: 500;
+$forum-font-weight-semibold: 600;
+$forum-font-weight-bold: 700;
+
+// 混合样式
+@mixin forum-button-base {
+  border: none;
+  border-radius: $forum-radius-pill;
+  font-size: $forum-font-size-base;
+  font-weight: $forum-font-weight-medium;
+  padding: $forum-spacing-sm $forum-spacing-md;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $forum-spacing-xs;
+  box-shadow: $forum-shadow-sm;
+  
+  &:hover {
+    transform: translateY(-2rpx);
+    box-shadow: $forum-shadow;
+  }
+  
+  &:active {
+    transform: translateY(0);
+    box-shadow: $forum-shadow-sm;
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+@mixin forum-card-base {
+  background: $forum-white;
+  border-radius: $forum-radius-lg;
+  padding: $forum-spacing-md;
+  box-shadow: $forum-shadow-sm;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    box-shadow: $forum-shadow;
+    transform: translateY(-2rpx);
+  }
+}
+
+@mixin forum-input-base {
+  background: $forum-gray-100;
+  border: 2rpx solid $forum-gray-200;
+  border-radius: $forum-radius;
+  padding: $forum-spacing-sm;
+  font-size: $forum-font-size-base;
+  transition: all 0.3s ease;
+  
+  &:focus {
+    outline: none;
+    border-color: $forum-primary;
+    box-shadow: 0 0 0 4rpx rgba($forum-primary, 0.1);
+  }
+  
+  &::placeholder {
+    color: $forum-gray-500;
+  }
+}
+
+// 按钮样式
+.forum-btn {
+  @include forum-button-base;
+  
+  &-primary {
+    background: $forum-gradient-primary;
+    color: $forum-white;
+  }
+  
+  &-secondary {
+    background: $forum-gray-600;
+    color: $forum-white;
+  }
+  
+  &-success {
+    background: $forum-gradient-success;
+    color: $forum-white;
+  }
+  
+  &-warning {
+    background: $forum-gradient-warning;
+    color: $forum-white;
+  }
+  
+  &-danger {
+    background: $forum-gradient-danger;
+    color: $forum-white;
+  }
+  
+  &-outline {
+    background: transparent;
+    border: 2rpx solid $forum-primary;
+    color: $forum-primary;
+    
+    &:hover {
+      background: $forum-primary;
+      color: $forum-white;
+    }
+  }
+  
+  &-ghost {
+    background: transparent;
+    border: 2rpx solid $forum-white;
+    color: $forum-white;
+    
+    &:hover {
+      background: $forum-white;
+      color: $forum-primary;
+    }
+  }
+}
+
+// 卡片样式
+.forum-card {
+  @include forum-card-base;
+  
+  &-highlight {
+    border-left: 6rpx solid $forum-primary;
+  }
+  
+  &-success {
+    border-left: 6rpx solid $forum-success;
+  }
+  
+  &-warning {
+    border-left: 6rpx solid $forum-warning;
+  }
+  
+  &-danger {
+    border-left: 6rpx solid $forum-danger;
+  }
+}
+
+// 输入框样式
+.forum-input {
+  @include forum-input-base;
+  
+  &-lg {
+    padding: $forum-spacing-md;
+    font-size: $forum-font-size-lg;
+  }
+  
+  &-sm {
+    padding: $forum-spacing-xs;
+    font-size: $forum-font-size-sm;
+  }
+}
+
+.forum-textarea {
+  @include forum-input-base;
+  min-height: 200rpx;
+  resize: vertical;
+}
+
+// 标签样式
+.forum-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: $forum-spacing-xs $forum-spacing-sm;
+  border-radius: $forum-radius-pill;
+  font-size: $forum-font-size-sm;
+  font-weight: $forum-font-weight-medium;
+  
+  &-primary {
+    background: rgba($forum-primary, 0.1);
+    color: $forum-primary;
+    border: 2rpx solid rgba($forum-primary, 0.2);
+  }
+  
+  &-success {
+    background: rgba($forum-success, 0.1);
+    color: $forum-success;
+    border: 2rpx solid rgba($forum-success, 0.2);
+  }
+  
+  &-warning {
+    background: rgba($forum-warning, 0.1);
+    color: $forum-warning;
+    border: 2rpx solid rgba($forum-warning, 0.2);
+  }
+  
+  &-danger {
+    background: rgba($forum-danger, 0.1);
+    color: $forum-danger;
+    border: 2rpx solid rgba($forum-danger, 0.2);
+  }
+  
+  &-info {
+    background: rgba($forum-info, 0.1);
+    color: $forum-info;
+    border: 2rpx solid rgba($forum-info, 0.2);
+  }
+}
+
+// 徽章样式
+.forum-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rpx 12rpx;
+  border-radius: $forum-radius-pill;
+  font-size: $forum-font-size-xs;
+  font-weight: $forum-font-weight-bold;
+  
+  &-primary {
+    background: $forum-primary;
+    color: $forum-white;
+  }
+  
+  &-success {
+    background: $forum-success;
+    color: $forum-white;
+  }
+  
+  &-warning {
+    background: $forum-warning;
+    color: $forum-dark;
+  }
+  
+  &-danger {
+    background: $forum-danger;
+    color: $forum-white;
+  }
+}
+
+// 头像样式
+.forum-avatar {
+  border-radius: 50%;
+  overflow: hidden;
+  
+  &-sm {
+    width: 60rpx;
+    height: 60rpx;
+  }
+  
+  &-md {
+    width: 80rpx;
+    height: 80rpx;
+  }
+  
+  &-lg {
+    width: 120rpx;
+    height: 120rpx;
+  }
+  
+  &-xl {
+    width: 160rpx;
+    height: 160rpx;
+  }
+}
+
+// 统计数字样式
+.forum-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $forum-spacing-xs;
+  
+  &-number {
+    font-size: $forum-font-size-xl;
+    font-weight: $forum-font-weight-bold;
+    color: $forum-primary;
+  }
+  
+  &-label {
+    font-size: $forum-font-size-sm;
+    color: $forum-gray-600;
+  }
+}
+
+// 加载动画
+@keyframes forum-pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes forum-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.forum-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $forum-spacing-xl;
+  
+  &-spinner {
+    width: 60rpx;
+    height: 60rpx;
+    border: 4rpx solid $forum-gray-200;
+    border-top: 4rpx solid $forum-primary;
+    border-radius: 50%;
+    animation: forum-spin 1s linear infinite;
+  }
+  
+  &-pulse {
+    animation: forum-pulse 1.5s ease-in-out infinite;
+  }
+}
+
+// 骨架屏样式
+.forum-skeleton {
+  background: linear-gradient(90deg, $forum-gray-100 25%, $forum-gray-200 50%, $forum-gray-100 75%);
+  background-size: 200% 100%;
+  animation: forum-skeleton-loading 1.5s infinite;
+  
+  @keyframes forum-skeleton-loading {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+  
+  &-text {
+    height: 32rpx;
+    border-radius: $forum-radius-sm;
+    margin-bottom: $forum-spacing-xs;
+    
+    &:last-child {
+      margin-bottom: 0;
+      width: 80%;
+    }
+  }
+  
+  &-avatar {
+    width: 80rpx;
+    height: 80rpx;
+    border-radius: 50%;
+  }
+  
+  &-button {
+    height: 80rpx;
+    border-radius: $forum-radius-pill;
+  }
+}
+
+// 响应式工具类
+.forum-hidden {
+  &-mobile {
+    @media (max-width: 768px) {
+      display: none !important;
+    }
+  }
+  
+  &-desktop {
+    @media (min-width: 769px) {
+      display: none !important;
+    }
+  }
+}
+
+.forum-text {
+  &-center {
+    text-align: center;
+  }
+  
+  &-left {
+    text-align: left;
+  }
+  
+  &-right {
+    text-align: right;
+  }
+  
+  &-primary {
+    color: $forum-primary;
+  }
+  
+  &-success {
+    color: $forum-success;
+  }
+  
+  &-warning {
+    color: $forum-warning;
+  }
+  
+  &-danger {
+    color: $forum-danger;
+  }
+  
+  &-muted {
+    color: $forum-gray-600;
+  }
+}
+
+.forum-flex {
+  display: flex;
+  
+  &-column {
+    flex-direction: column;
+  }
+  
+  &-wrap {
+    flex-wrap: wrap;
+  }
+  
+  &-center {
+    align-items: center;
+    justify-content: center;
+  }
+  
+  &-between {
+    justify-content: space-between;
+  }
+  
+  &-around {
+    justify-content: space-around;
+  }
+  
+  &-end {
+    justify-content: flex-end;
+  }
+}
+
+// 间距工具类
+@each $size, $value in ('xs': $forum-spacing-xs, 'sm': $forum-spacing-sm, 'md': $forum-spacing-md, 'lg': $forum-spacing-lg, 'xl': $forum-spacing-xl) {
+  .forum-m-#{$size} {
+    margin: $value;
+  }
+  
+  .forum-mt-#{$size} {
+    margin-top: $value;
+  }
+  
+  .forum-mb-#{$size} {
+    margin-bottom: $value;
+  }
+  
+  .forum-ml-#{$size} {
+    margin-left: $value;
+  }
+  
+  .forum-mr-#{$size} {
+    margin-right: $value;
+  }
+  
+  .forum-p-#{$size} {
+    padding: $value;
+  }
+  
+  .forum-pt-#{$size} {
+    padding-top: $value;
+  }
+  
+  .forum-pb-#{$size} {
+    padding-bottom: $value;
+  }
+  
+  .forum-pl-#{$size} {
+    padding-left: $value;
+  }
+  
+  .forum-pr-#{$size} {
+    padding-right: $value;
+  }
+}

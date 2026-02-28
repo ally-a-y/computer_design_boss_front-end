@@ -1,13 +1,39 @@
 "use strict";
 var common_vendor = require("../../../common/vendor.js");
+var common_api_user = require("../../../common/api/user.js");
+require("../../../common/api/request.js");
+require("../../../common/config.js");
 const _sfc_main = {
   data() {
     return {
-      currentPhone: "138****8000",
-      currentEmail: "zhangsan@example.com"
+      currentPhone: "",
+      currentEmail: ""
     };
   },
+  onLoad() {
+    this.getUserInfo();
+  },
   methods: {
+    async getUserInfo() {
+      console.log("======== \u5F00\u59CB\u8BF7\u6C42\u7528\u6237\u4FE1\u606F ========");
+      try {
+        const res = await common_api_user.userApi.getUserProfile();
+        console.log("\u8BF7\u6C42\u6210\u529F\uFF0C\u5B8C\u6574\u54CD\u5E94:", res);
+        console.log("\u54CD\u5E94\u6570\u636E:", res.data);
+        console.log("\u624B\u673A\u53F7:", res.mobile);
+        console.log("\u90AE\u7BB1:", res.email);
+        if (res) {
+          this.currentPhone = res.mobile ? res.mobile.replace(/(\d{3})\d{4}(\d{4})/, "$1****$2") : "\u672A\u7ED1\u5B9A";
+          this.currentEmail = res.email || "\u672A\u8BBE\u7F6E";
+          console.log("\u9875\u9762\u663E\u793A:", this.currentPhone, this.currentEmail);
+        }
+      } catch (error) {
+        console.error("======== \u8BF7\u6C42\u5931\u8D25 ========");
+        console.error("\u9519\u8BEF\u4FE1\u606F:", error.message);
+        console.error("\u5B8C\u6574\u9519\u8BEF:", error);
+      }
+      console.log("======== \u8BF7\u6C42\u7ED3\u675F ========");
+    },
     goBack() {
       common_vendor.index.navigateBack();
     },

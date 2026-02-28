@@ -25,32 +25,12 @@
 					
 					console.log('当前主题:', currentTheme, '主题模式:', themeMode)
 					
-					// 应用主题到全局
-					this.applyGlobalTheme(currentTheme)
+					// 通知所有页面更新主题
+					themeManager.notifyThemeChange(currentTheme)
 					
 				} catch (error) {
 					console.error('初始化主题失败:', error)
 				}
-			},
-			
-			/**
-			 * 应用全局主题
-			 */
-			applyGlobalTheme(theme) {
-				// 设置页面基础样式
-				const pageStyle = `
-					--bg-primary: ${theme === 'dark' ? '#1a1a1a' : '#ffffff'};
-					--bg-secondary: ${theme === 'dark' ? '#2c2c2c' : '#f5f5f5'};
-					--text-primary: ${theme === 'dark' ? '#ffffff' : '#333333'};
-					--text-secondary: ${theme === 'dark' ? '#cccccc' : '#666666'};
-					--border-color: ${theme === 'dark' ? '#404040' : '#eeeeee'};
-					--primary-color: ${theme === 'dark' ? '#0a84ff' : '#007aff'};
-				`
-				
-				// 添加到页面样式
-				const style = document.createElement('style')
-				style.textContent = `:root { ${pageStyle} }`
-				document.head.appendChild(style)
 			}
 		}
 	}

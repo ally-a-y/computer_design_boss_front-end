@@ -420,26 +420,31 @@ export default {
       this.loading = true
       
       try {
-        const loginData = {
-          mobile: this.loginForm.mobile
-        }
+        let res
         
         if (this.loginMethod === 'sms') {
-          loginData.sms_code = this.loginForm.sms_code
+          // 验证码登录
+          const loginData = {
+            mobile: this.loginForm.mobile,
+            sms_code: this.loginForm.sms_code
+          }
+          res = await userApi.smsLogin(loginData)
         } else {
-          loginData.password = this.loginForm.password
+          // 密码登录
+          const loginData = {
+            mobile: this.loginForm.mobile,
+            password: this.loginForm.password
+          }
+          res = await userApi.login(loginData)
         }
-        
-        // 调用登录接口
-        const res = await userApi.login(loginData)
         
         console.log('登录响应:', res)
         
-        // 判断是否有 token（
+        // 判断是否有 token
         if (res && res.token) {
           // 保存登录状态
           uni.setStorageSync('token', res.token)
-          uni.setStorageSync('userInfo', res.user_info)
+          uni.setStorageSync('userInfo', JSON.stringify(res.user_info))
           
           uni.showToast({
             title: '登录成功',
@@ -460,7 +465,7 @@ export default {
       } catch (error) {
         console.error('登录失败:', error)
         uni.showToast({
-          title: '登录失败，请稍后重试',
+          title: error.message || '登录失败，请稍后重试',
           icon: 'none'
         })
       } finally {

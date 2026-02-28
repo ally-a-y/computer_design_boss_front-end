@@ -23,76 +23,146 @@
       
       <!-- 空状态 -->
       <view v-if="collections.length === 0" class="empty-state">
-        <uni-icons type="star" size="80" color="#ccc"></uni-icons>
-        <text>暂无收藏职位</text>
+        <uni-icons 
+          type="star" 
+          size="80" 
+          :color="isFavorite ? '#FFD700' : '#ccc'" 
+          @click="toggleFavorite"
+        ></uni-icons>
+        <text>{{ isFavorite ? '已收藏示例职位' : '暂无收藏职位' }}</text>
       </view>
     </view>
   </view>
 </template>
 
+
 <script>
+import {favoriteApi} from '@/common/api/favorite.js'
+
 export default {
   data() {
     return {
-      collections: [
-        {
-          jobTitle: '前端开发工程师',
-          company: '科技有限公司',
-          salary: '15k-25k',
-          collectionTime: '2024-01-15 14:30'
-        },
-        {
-          jobTitle: '后端开发工程师',
-          company: '互联网公司',
-          salary: '20k-30k',
-          collectionTime: '2024-01-16 10:20'
-        },
-        {
-          jobTitle: '产品经理',
-          company: '创业公司',
-          salary: '18k-28k',
-          collectionTime: '2024-01-17 09:15'
-        }
-      ]
+      collections: [],
+      userId: 1,  // 实际项目应该从登录信息里拿
+      loading: false
     }
   },
+
+  async onLoad() {
+    await this.loadFavorites()
+  },
+	data() {
+	  return {
+	    collections: [],
+	    userId: 1,
+	    loading: false,
+	    isFavorite: false // 新增
+	  }
+	},
   methods: {
-    goBack() {
-      uni.navigateBack()
-    },
-    cancelCollection(index) {
+	goBack() {
+	  uni.navigateBack()
+	},
+	async loadFavorites() {
+	  try {
+		this.loading = true
+		const res = await favoriteApi.getFavoriteList(this.userId)
+
+		const rawList = Array.isArray(res) ? res : []
+
+		this.collections = rawList.map(item => {
+		  const snapshot = JSON.parse(item.job_snapshot || '{}')
+		  return {
+			jobTitle: snapshot.title || '',
+			company: snapshot.location || '',
+			salary: snapshot.salary || '',
+			collectionTime: new Date(item.created_at).toLocaleString(),
+			boss_job_id: item.boss_job_id
+		  }
+		})
+
+		console.log("转换后的collections:", this.collections)
+
+	  } catch (err) {
+		uni.showToast({
+		  title: err.message || '获取收藏失败',
+		  icon: 'none'
+		})
+	  } finally {
+		this.loading = false
+	  }
+	},
+
+    async cancelCollection(index) {
+      const item = this.collections[index]
+
       uni.showModal({
         title: '提示',
-        content: '确定要取消收藏该职位吗？',
-        success: (res) => {
+        content: '确定取消收藏吗？',
+        success: async (res) => {
           if (res.confirm) {
-            this.collections.splice(index, 1)
-            uni.showToast({
-              title: '已取消收藏',
-              icon: 'success'
-            })
+            try {
+              await favoriteApi.cancelFavorite({
+                user_id: this.userId,
+                boss_job_id: item.boss_job_id
+              })
+
+              this.collections.splice(index, 1)
+
+              uni.showToast({
+                title: '已取消收藏',
+                icon: 'success'
+              })
+
+            } catch (err) {
+              uni.showToast({
+                title: err.message || '取消失败',
+                icon: 'none'
+              })
+            }
           }
         }
       })
     },
-    viewDetails(item) {
-      // 查看详情逻辑
-      uni.showToast({
-        title: `查看${item.jobTitle}详情`,
-        icon: 'none'
-      })
-    }
-  },
-  onLoad() {
-    // 从存储中加载收藏数据
-    const savedCollections = uni.getStorageSync('collections')
-    if (savedCollections) {
-      this.collections = savedCollections
-    }
-  },
-  onUnload() {
-    // 保存收藏数据
-    uni.setStorageSync('collections', this.collections)
+	async addToFavorite(jobId) {
+	  try {
+	    await favoriteApi.addFavorite({
+	      user_id: this.userId,
+	      job_id: jobId
+	    })
+	
+	    uni.showToast({
+	      title: '收藏成功',
+	      icon: 'success'
+	    })
+	
+	  } catch (err) {
+	    uni.showToast({
+	      title: err.message || '收藏失败',
+	      icon: 'none'
+	    })
+	  }
+	},
+	async toggleFavorite() {
+	    if (this.isFavorite) {
+	      try {
+	        await favoriteApi.cancelFavorite({ user_id: this.userId, boss_job_id: 1 })
+	        this.isFavorite = false
+	        uni.showToast({ title: '已取消收藏', icon: 'none' })
+	      } catch (err) {
+	        uni.showToast({ title: err.message || '取消失败', icon: 'none' })
+	      }
+	    } else {
+	      try {
+	        await favoriteApi.addFavorite({ user_id: this.userId, job_id: 1 })
+	        this.isFavorite = true
+	        uni.showToast({ title: '收藏成功', icon: 'success' })
+	      } catch (err) {
+	        uni.showToast({ title: err.message || '收藏失败', icon: 'none' })
+	      }
+	    }
+	  }
+	
   }
 }
 </script>

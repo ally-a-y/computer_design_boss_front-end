@@ -1,5 +1,7 @@
 "use strict";
 var __defProp = Object.defineProperty;
+var __defProps = Object.defineProperties;
+var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
 var __getOwnPropSymbols = Object.getOwnPropertySymbols;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __propIsEnum = Object.prototype.propertyIsEnumerable;
@@ -15,54 +17,79 @@ var __spreadValues = (a, b) => {
     }
   return a;
 };
+var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
 var common_vendor = require("../vendor.js");
 var common_config = require("../config.js");
+const buildFullUrl = (path, params) => {
+  if (!path)
+    return common_config.config.baseURL;
+  if (path.startsWith("http://") || path.startsWith("https://")) {
+    return path;
+  }
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  let baseUrl = common_config.config.baseURL;
+  let finalPath = normalizedPath;
+  if (baseUrl.endsWith("/api") && normalizedPath.startsWith("/api/")) {
+    finalPath = normalizedPath.substring(4);
+  }
+  let url = baseUrl + finalPath;
+  if (params && typeof params === "object" && Object.keys(params).length > 0) {
+    const queryString = Object.keys(params).filter((key) => params[key] !== void 0 && params[key] !== null && params[key] !== "").map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`).join("&");
+    if (queryString) {
+      url += (url.includes("?") ? "&" : "?") + queryString;
+    }
+  }
+  return url;
+};
 const requestWithRetry = (options, retryCount = 3) => {
   return new Promise((resolve, reject) => {
     const attemptRequest = (attempt) => {
-      const urlWithTimestamp = options.url + (options.url.includes("?") ? "&" : "?") + "t=" + Date.now();
-      common_vendor.index.request({
-        url: common_config.config.baseURL + urlWithTimestamp,
+      const isGet = (options.method || "GET").toUpperCase() === "GET";
+      const queryParams = isGet ? __spreadValues(__spreadValues({}, options.params || {}), options.data || {}) : options.params || {};
+      const fullUrl = buildFullUrl(options.url, queryParams);
+      const urlWithTimestamp = fullUrl + (fullUrl.includes("?") ? "&" : "?") + "t=" + Date.now();
+      const requestConfig = {
+        url: urlWithTimestamp,
         method: options.method || "GET",
-        data: options.data || {},
-        timeout: 15e3,
+        timeout: 6e4,
         sslVerify: false,
-        enableHttp2: false,
-        enableHttpDNS: false,
-        enableQuic: false,
         header: __spreadValues({
           "Content-Type": "application/json",
-          "Authorization": common_vendor.index.getStorageSync("token") || "",
+          "Authorization": `Bearer ${common_vendor.index.getStorageSync("token") || ""}`,
           "Cache-Control": "no-cache"
-        }, options.header),
+        }, options.header)
+      };
+      if (!isGet && options.data) {
+        requestConfig.data = options.data;
+      }
+      common_vendor.index.request(__spreadProps(__spreadValues({}, requestConfig), {
         success: (res) => {
+          var _a;
           if (res.statusCode === 200) {
             const data = res.data;
-            if (data && typeof data === "object" && "code" in data && "data" in data) {
+            if (data && typeof data === "object" && "code" in data) {
               if (data.code === 200) {
-                resolve(data.data);
+                resolve(data.data !== void 0 ? data.data : data);
               } else {
-                reject(data);
+                reject(new Error(data.message || `\u8BF7\u6C42\u5931\u8D25: ${data.code}`));
               }
             } else {
               resolve(data);
             }
           } else {
-            console.error("HTTP\u8BF7\u6C42\u5931\u8D25:", res.statusCode, res.errMsg);
-            reject(res.data || { error: `HTTP Error ${res.statusCode}` });
+            reject(new Error(`HTTP ${res.statusCode}: ${((_a = res.data) == null ? void 0 : _a.message) || ""}`));
           }
         },
         fail: (err) => {
-          console.error(`\u7F51\u7EDC\u8BF7\u6C42\u5931\u8D25 (\u5C1D\u8BD5 ${attempt + 1}/${retryCount}):`, err);
+          console.error(`\u3010\u8BF7\u6C42\u5931\u8D25\u3011`, err);
           if (attempt < retryCount - 1) {
             const delay = Math.pow(2, attempt) * 1e3;
-            console.log(`\u5C06\u5728 ${delay}ms \u540E\u91CD\u8BD5...`);
             setTimeout(() => attemptRequest(attempt + 1), delay);
           } else {
-            reject(err);
+            reject(new Error(err.errMsg || "\u7F51\u7EDC\u8BF7\u6C42\u5931\u8D25"));
           }
         }
-      });
+      }));
     };
     attemptRequest(0);
   });

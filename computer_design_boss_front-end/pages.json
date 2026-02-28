@@ -122,12 +122,6 @@
       }
     },
     {
-      "path": "pages/demo/theme-demo",
-      "style": {
-        "navigationBarTitleText": "主题演示"
-      }
-    },
-    {
       "path": "pages/AI/AI",
       "style": {
         "navigationBarTitleText": "AI求职助手",
@@ -139,6 +133,25 @@
       "style": {
         "navigationBarTitleText": "AI模拟面试",
         "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/forum/forum",
+      "style": {
+        "navigationBarTitleText": "技术论坛",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/forum/details/forum_detail",
+      "style": {
+        "navigationBarTitleText": "帖子详情"
+      }
+    },
+    {
+      "path": "pages/forum/post",
+      "style": {
+        "navigationBarTitleText": "发布话题"
       }
     }
   ],
@@ -158,6 +171,12 @@
       "text": "首页",
       "iconPath": "/static/tabbar/home.png",
       "selectedIconPath": "/static/tabbar/home-active.png"
+      },
+      {
+      "pagePath": "pages/forum/forum",
+      "text": "论坛",
+      "iconPath": "/static/tabbar/forum.png",
+      "selectedIconPath": "/static/tabbar/forum-active.png"
       },
       {
       "pagePath": "pages/AI/AI",

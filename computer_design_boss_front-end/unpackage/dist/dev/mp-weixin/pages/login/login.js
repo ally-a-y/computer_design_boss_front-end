@@ -1,5 +1,8 @@
 "use strict";
 var common_vendor = require("../../common/vendor.js");
+var common_api_user = require("../../common/api/user.js");
+require("../../common/api/request.js");
+require("../../common/config.js");
 const _sfc_main = {
   data() {
     return {
@@ -143,37 +146,26 @@ const _sfc_main = {
       }
       this.loading = true;
       try {
-        const loginData = {
-          mobile: this.loginForm.mobile
-        };
+        let res;
         if (this.loginMethod === "sms") {
-          loginData.sms_code = this.loginForm.sms_code;
+          const loginData = {
+            mobile: this.loginForm.mobile,
+            sms_code: this.loginForm.sms_code
+          };
+          res = await common_api_user.userApi.smsLogin(loginData);
         } else {
-          loginData.password = this.loginForm.password;
+          const loginData = {
+            mobile: this.loginForm.mobile,
+            password: this.loginForm.password
+          };
+          res = await common_api_user.userApi.login(loginData);
         }
-        await new Promise((resolve) => setTimeout(resolve, 1e3));
-        const mockResponse = {
-          code: 200,
-          message: "\u767B\u5F55\u6210\u529F",
-          data: {
-            token: "mock-jwt-token-123456789",
-            user_info: {
-              user_id: "123456789",
-              mobile: this.loginForm.mobile,
-              email: "",
-              real_name: "",
-              avatar_url: "",
-              status: 1,
-              job_status: 1,
-              last_login_time: new Date().toISOString()
-            }
-          }
-        };
-        if (mockResponse.code === 200) {
-          common_vendor.index.setStorageSync("token", mockResponse.data.token);
-          common_vendor.index.setStorageSync("userInfo", mockResponse.data.user_info);
+        console.log("\u767B\u5F55\u54CD\u5E94:", res);
+        if (res && res.token) {
+          common_vendor.index.setStorageSync("token", res.token);
+          common_vendor.index.setStorageSync("userInfo", JSON.stringify(res.user_info));
           common_vendor.index.showToast({
-            title: mockResponse.message,
+            title: "\u767B\u5F55\u6210\u529F",
             icon: "success"
           });
           setTimeout(() => {
@@ -181,11 +173,16 @@ const _sfc_main = {
               url: "/pages/index/index_index"
             });
           }, 1500);
+        } else {
+          common_vendor.index.showToast({
+            title: res.message || "\u767B\u5F55\u5931\u8D25",
+            icon: "none"
+          });
         }
       } catch (error) {
         console.error("\u767B\u5F55\u5931\u8D25:", error);
         common_vendor.index.showToast({
-          title: "\u767B\u5F55\u5931\u8D25\uFF0C\u8BF7\u7A0D\u540E\u91CD\u8BD5",
+          title: error.message || "\u767B\u5F55\u5931\u8D25\uFF0C\u8BF7\u7A0D\u540E\u91CD\u8BD5",
           icon: "none"
         });
       } finally {

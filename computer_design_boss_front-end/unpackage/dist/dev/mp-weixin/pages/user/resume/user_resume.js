@@ -1,233 +1,193 @@
 "use strict";
+var __defProp = Object.defineProperty;
+var __defProps = Object.defineProperties;
+var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
+var __getOwnPropSymbols = Object.getOwnPropertySymbols;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __propIsEnum = Object.prototype.propertyIsEnumerable;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __spreadValues = (a, b) => {
+  for (var prop in b || (b = {}))
+    if (__hasOwnProp.call(b, prop))
+      __defNormalProp(a, prop, b[prop]);
+  if (__getOwnPropSymbols)
+    for (var prop of __getOwnPropSymbols(b)) {
+      if (__propIsEnum.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
+    }
+  return a;
+};
+var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
 var common_vendor = require("../../../common/vendor.js");
+var common_api_resume = require("../../../common/api/resume.js");
+require("../../../common/api/request.js");
+require("../../../common/config.js");
 const _sfc_main = {
   data() {
     return {
       genderOptions: ["\u7537", "\u5973"],
       genderIndex: 0,
-      certTypeOptions: ["english", "computer", "professional"],
-      certTypeDisplayOptions: ["\u82F1\u8BED\u8BC1\u4E66", "\u8BA1\u7B97\u673A\u8BC1\u4E66", "\u804C\u4E1A\u8D44\u683C\u8BC1\u4E66"],
-      companySizeOptions: ["1-50\u4EBA", "51-200\u4EBA", "201-500\u4EBA", "501-1000\u4EBA", "1001-5000\u4EBA", "5000\u4EBA\u4EE5\u4E0A"],
-      companySizeIndex: 4,
-      workTypeOptions: ["\u5168\u804C", "\u517C\u804C", "\u5B9E\u4E60", "\u8FDC\u7A0B\u5DE5\u4F5C", "\u81EA\u7531\u804C\u4E1A"],
+      companySizeOptions: ["\u4E0D\u9650", "\u5C0F\u578B", "\u4E2D\u578B", "\u5927\u578B"],
+      companySizeIndex: 0,
+      workTypeOptions: ["\u5168\u804C", "\u517C\u804C", "\u5B9E\u4E60"],
       workTypeIndex: 0,
+      certTypeOptions: ["\u6280\u80FD\u7C7B", "\u8D44\u683C\u7C7B", "\u8BED\u8A00\u7C7B", "\u5176\u4ED6"],
       resume: {
-        real_name: "\u5F20\u4E09",
+        real_name: "",
         gender: 1,
-        birth_date: "2000-01-01",
-        phone: "13800138000",
-        email: "zhangsan@example.com",
-        wechat: "zhangsan123",
-        city: "\u5317\u4EAC",
-        education_level: "\u672C\u79D1",
-        school_name: "\u5317\u4EAC\u5927\u5B66",
-        major: "\u8BA1\u7B97\u673A\u79D1\u5B66\u4E0E\u6280\u672F",
-        graduation_year: "2022",
-        gpa: "3.8",
-        self_introduction: "\u6211\u662F\u4E00\u540D\u8BA1\u7B97\u673A\u4E13\u4E1A\u7684\u6BD5\u4E1A\u751F\uFF0C\u5177\u6709\u624E\u5B9E\u7684\u4E13\u4E1A\u57FA\u7840\u548C\u8F83\u5F3A\u7684\u5B66\u4E60\u80FD\u529B...",
+        birth_date: "",
+        phone: "",
+        email: "",
+        wechat: "",
+        city: "",
+        education_level: "",
+        school_name: "",
+        major: "",
+        graduation_year: "",
+        gpa: "",
+        self_introduction: "",
         intention: {
-          industry: "\u4E92\u8054\u7F51",
-          position: "\u524D\u7AEF\u5F00\u53D1\u5DE5\u7A0B\u5E08",
-          city: "\u5317\u4EAC",
-          salary: "15k-25k",
-          available_time: "\u7ACB\u5373\u5230\u5C97"
+          industry: "",
+          position: "",
+          city: "",
+          salary: "",
+          available_time: ""
         },
         preference: {
-          internship_conversion: true,
+          internship_conversion: false,
           remote_work: false,
-          campus_recommendation: true,
-          overtime: true,
-          business_trip: false,
-          company_size: "1000-5000\u4EBA",
-          work_type: "\u5168\u804C"
+          campus_recommendation: false,
+          overtime: false,
+          business_trip: false
         },
         campus_experience: {
-          student_union: true,
-          club: true,
-          scholarship: true,
+          student_union: false,
+          club: false,
+          scholarship: false,
           honor: false,
-          description: "\u66FE\u62C5\u4EFB\u5B66\u751F\u4F1A\u5BA3\u4F20\u90E8\u90E8\u957F\uFF0C\u7EC4\u7EC7\u8FC7\u591A\u6B21\u6821\u56ED\u6D3B\u52A8..."
+          description: ""
         },
-        certificates: [
-          {
-            cert_type: "computer",
-            cert_name: "\u8BA1\u7B97\u673A\u4E8C\u7EA7\u8BC1\u4E66",
-            cert_level: "\u4E8C\u7EA7",
-            issue_date: "2021-03-15",
-            expiry_date: null,
-            issuing_authority: "\u6559\u80B2\u90E8\u8003\u8BD5\u4E2D\u5FC3",
-            certificate_no: "NCRE20210315001",
-            attachment_url: null
-          }
-        ]
+        certificates: []
       }
     };
+  },
+  async onLoad() {
+    await this.loadResume();
   },
   methods: {
     goBack() {
       common_vendor.index.navigateBack();
     },
-    saveResume() {
-      const backendResume = this.convertToBackendFormat();
-      common_vendor.index.setStorageSync("resume", this.resume);
-      common_vendor.index.setStorageSync("backend_resume", backendResume);
-      common_vendor.index.showToast({
-        title: "\u4FDD\u5B58\u6210\u529F",
-        icon: "success"
-      });
+    async loadResume() {
+      try {
+        const basic = await common_api_resume.resumeApi.getBasic();
+        const preference = await common_api_resume.resumeApi.getPreference();
+        const campus = await common_api_resume.resumeApi.getCampus();
+        this.resume = __spreadProps(__spreadValues(__spreadValues({}, this.resume), basic.data), {
+          intention: intention.data || {},
+          preference: preference.data || {},
+          campus_experience: campus.data || {},
+          certificates: certificates.data || []
+        });
+        this.genderIndex = this.resume.gender === 2 ? 1 : 0;
+      } catch (err) {
+        console.log("\u6682\u65E0\u7B80\u5386");
+      }
+    },
+    async saveResume() {
+      try {
+        await common_api_resume.resumeApi.saveBasic({
+          real_name: this.resume.real_name,
+          phone: this.resume.gender,
+          birth_date: this.resume.birth_date,
+          email: this.resume.email,
+          education_level: this.resume.education_level,
+          school_name: this.resume.school_name,
+          major: this.resume.major,
+          graduation_year: this.resume.graduation_year,
+          gpa: this.resume.gpa,
+          self_introduction: this.resume.self_introduction
+        });
+        await common_api_resume.resumeApi.saveIntention({
+          target_industries: this.resume.intention.industry,
+          target_positions: this.resume.intention.position,
+          salary_min: 100,
+          salary_max: 1e4,
+          target_city: this.resume.intention.city,
+          available_time: this.resume.intention.available_time
+        });
+        await common_api_resume.resumeApi.savePreference(this.resume.preference);
+        await common_api_resume.resumeApi.saveCampus(this.resume.campus_experience);
+        common_vendor.index.showToast({
+          title: "\u4FDD\u5B58\u6210\u529F",
+          icon: "success"
+        });
+      } catch (err) {
+        common_vendor.index.showToast({
+          title: err.message || "\u4FDD\u5B58\u5931\u8D25",
+          icon: "none"
+        });
+      }
     },
     onGenderChange(e) {
       this.genderIndex = e.detail.value;
-      this.resume.gender = this.genderIndex + 1;
+      this.resume.gender = this.genderIndex === 1 ? 2 : 1;
     },
     onCompanySizeChange(e) {
-      this.companySizeIndex = parseInt(e.detail.value);
-      this.resume.preference.company_size = this.companySizeOptions[this.companySizeIndex];
+      this.companySizeIndex = e.detail.value;
     },
     onWorkTypeChange(e) {
-      this.workTypeIndex = parseInt(e.detail.value);
-      this.resume.preference.work_type = this.workTypeOptions[this.workTypeIndex];
+      this.workTypeIndex = e.detail.value;
     },
-    togglePreference(preferenceKey) {
-      this.resume.preference[preferenceKey] = !this.resume.preference[preferenceKey];
+    addCertificate() {
+      this.resume.certificates.push({
+        cert_name: "",
+        cert_type: 0,
+        cert_level: "",
+        issue_date: "",
+        expiry_date: "",
+        issuing_authority: "",
+        certificate_no: "",
+        attachment_url: ""
+      });
     },
-    toggleCampusExperience(experienceKey) {
-      this.resume.campus_experience[experienceKey] = !this.resume.campus_experience[experienceKey];
+    deleteCertificate(index) {
+      const cert = this.resume.certificates[index];
+      if (!cert.id) {
+        this.resume.certificates.splice(index, 1);
+        return;
+      }
+      common_vendor.index.showModal({
+        title: "\u5220\u9664\u8BC1\u4E66",
+        content: "\u786E\u5B9A\u5220\u9664\u6B64\u8BC1\u4E66\u5417\uFF1F",
+        success: async (res) => {
+          if (res.confirm) {
+            try {
+              await common_api_resume.resumeApi.deleteCertificate(cert.id);
+              this.resume.certificates.splice(index, 1);
+              common_vendor.index.showToast({ title: "\u5220\u9664\u6210\u529F", icon: "success" });
+            } catch (err) {
+              common_vendor.index.showToast({ title: "\u5220\u9664\u5931\u8D25", icon: "none" });
+            }
+          }
+        }
+      });
+    },
+    getCertTypeIndex(type) {
+      return this.certTypeOptions.indexOf(type);
     },
     onCertTypeChange(e, index) {
-      const certTypeIndex = parseInt(e.detail.value);
-      this.resume.certificates[index].cert_type = this.certTypeOptions[certTypeIndex];
+      const val = e.detail.value;
+      this.resume.certificates[index].cert_type = this.certTypeOptions[val];
     },
     onCertDateChange(e, index, field) {
       this.resume.certificates[index][field] = e.detail.value;
     },
-    getCertTypeIndex(certType) {
-      return this.certTypeOptions.indexOf(certType);
-    },
-    addCertificate() {
-      this.resume.certificates.push({
-        cert_type: "professional",
-        cert_name: "",
-        cert_level: "",
-        issue_date: "",
-        expiry_date: null,
-        issuing_authority: "",
-        certificate_no: "",
-        attachment_url: null
-      });
-    },
-    editCertificate(index) {
-      common_vendor.index.showToast({
-        title: "\u7F16\u8F91\u8BC1\u4E66\u529F\u80FD\u5F00\u53D1\u4E2D",
-        icon: "none"
-      });
-    },
-    deleteCertificate(index) {
-      common_vendor.index.showModal({
-        title: "\u63D0\u793A",
-        content: "\u786E\u5B9A\u8981\u5220\u9664\u8BE5\u8BC1\u4E66\u5417\uFF1F",
-        success: (res) => {
-          if (res.confirm) {
-            this.resume.certificates.splice(index, 1);
-          }
-        }
-      });
-    },
-    uploadCertificateFile(index) {
-      common_vendor.index.chooseFile({
-        count: 1,
-        type: "file",
-        extension: [".pdf"],
-        success: (res) => {
-          const file = res.tempFiles[0];
-          if (file && file.name.toLowerCase().endsWith(".pdf")) {
-            const mockFileUrl = `https://cert-bucket.com/${file.name}`;
-            this.resume.certificates[index].attachment_url = mockFileUrl;
-            common_vendor.index.showToast({
-              title: "\u6587\u4EF6\u4E0A\u4F20\u6210\u529F",
-              icon: "success"
-            });
-          } else {
-            common_vendor.index.showToast({
-              title: "\u8BF7\u9009\u62E9PDF\u6587\u4EF6",
-              icon: "none"
-            });
-          }
-        },
-        fail: () => {
-          common_vendor.index.showToast({
-            title: "\u6587\u4EF6\u9009\u62E9\u5931\u8D25",
-            icon: "none"
-          });
-        }
-      });
-    },
     getFileName(url) {
       if (!url)
         return "";
-      return url.split("/").pop();
-    },
-    convertToBackendFormat() {
-      return {
-        real_name: this.resume.real_name,
-        gender: this.resume.gender,
-        birth_date: this.resume.birth_date,
-        phone: this.resume.phone,
-        email: this.resume.email,
-        wechat: this.resume.wechat,
-        city: this.resume.city,
-        education_level: this.resume.education_level,
-        school_name: this.resume.school_name,
-        major: this.resume.major,
-        graduation_year: this.resume.graduation_year,
-        gpa: this.resume.gpa,
-        self_introduction: this.resume.self_introduction,
-        intention: {
-          industry: this.resume.intention.industry,
-          position: this.resume.intention.position,
-          city: this.resume.intention.city,
-          salary: this.resume.intention.salary,
-          available_time: this.resume.intention.available_time
-        },
-        preference: {
-          internship_conversion: this.resume.preference.internship_conversion,
-          remote_work: this.resume.preference.remote_work,
-          campus_recommendation: this.resume.preference.campus_recommendation,
-          overtime: this.resume.preference.overtime,
-          business_trip: this.resume.preference.business_trip,
-          company_size: this.resume.preference.company_size,
-          work_type: this.resume.preference.work_type
-        },
-        campus_experience: {
-          has_student_union: this.resume.campus_experience.student_union ? 1 : 0,
-          student_union_details: this.resume.campus_experience.student_union ? this.resume.campus_experience.description : null,
-          has_club: this.resume.campus_experience.club ? 1 : 0,
-          club_details: this.resume.campus_experience.club ? this.resume.campus_experience.description : null,
-          has_scholarship: this.resume.campus_experience.scholarship ? 1 : 0,
-          scholarship_details: this.resume.campus_experience.scholarship ? this.resume.campus_experience.description : null,
-          has_honor: this.resume.campus_experience.honor ? 1 : 0,
-          honor_details: this.resume.campus_experience.honor ? this.resume.campus_experience.description : null
-        },
-        certificates: this.resume.certificates.map((cert) => ({
-          cert_type: cert.cert_type,
-          cert_name: cert.cert_name,
-          cert_level: cert.cert_level,
-          issue_date: cert.issue_date,
-          expiry_date: cert.expiry_date,
-          issuing_authority: cert.issuing_authority,
-          certificate_no: cert.certificate_no,
-          attachment_url: cert.attachment_url
-        }))
-      };
-    }
-  },
-  onLoad() {
-    const savedResume = common_vendor.index.getStorageSync("resume");
-    if (savedResume) {
-      this.resume = savedResume;
-      this.genderIndex = this.resume.gender === 1 ? 0 : 1;
-      this.companySizeIndex = this.companySizeOptions.indexOf(this.resume.preference.company_size) || 4;
-      this.workTypeIndex = this.workTypeOptions.indexOf(this.resume.preference.work_type) || 0;
+      const parts = url.split("/");
+      return parts[parts.length - 1];
     }
   }
 };
@@ -277,19 +237,19 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     Q: common_vendor.o(($event) => $data.resume.intention.available_time = $event.detail.value),
     R: $data.resume.preference.internship_conversion,
     S: common_vendor.o((e) => $data.resume.preference.internship_conversion = e.detail.value),
-    T: common_vendor.o(($event) => $options.togglePreference("internship_conversion")),
+    T: common_vendor.o(($event) => _ctx.togglePreference("internship_conversion")),
     U: $data.resume.preference.remote_work,
     V: common_vendor.o((e) => $data.resume.preference.remote_work = e.detail.value),
-    W: common_vendor.o(($event) => $options.togglePreference("remote_work")),
+    W: common_vendor.o(($event) => _ctx.togglePreference("remote_work")),
     X: $data.resume.preference.campus_recommendation,
     Y: common_vendor.o((e) => $data.resume.preference.campus_recommendation = e.detail.value),
-    Z: common_vendor.o(($event) => $options.togglePreference("campus_recommendation")),
+    Z: common_vendor.o(($event) => _ctx.togglePreference("campus_recommendation")),
     aa: $data.resume.preference.overtime,
     ab: common_vendor.o((e) => $data.resume.preference.overtime = e.detail.value),
-    ac: common_vendor.o(($event) => $options.togglePreference("overtime")),
+    ac: common_vendor.o(($event) => _ctx.togglePreference("overtime")),
     ad: $data.resume.preference.business_trip,
     ae: common_vendor.o((e) => $data.resume.preference.business_trip = e.detail.value),
-    af: common_vendor.o(($event) => $options.togglePreference("business_trip")),
+    af: common_vendor.o(($event) => _ctx.togglePreference("business_trip")),
     ag: common_vendor.t($data.companySizeOptions[$data.companySizeIndex]),
     ah: common_vendor.o((...args) => $options.onCompanySizeChange && $options.onCompanySizeChange(...args)),
     ai: $data.companySizeIndex,
@@ -300,16 +260,16 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     an: $data.workTypeOptions,
     ao: $data.resume.campus_experience.student_union,
     ap: common_vendor.o((e) => $data.resume.campus_experience.student_union = e.detail.value),
-    aq: common_vendor.o(($event) => $options.toggleCampusExperience("student_union")),
+    aq: common_vendor.o(($event) => _ctx.toggleCampusExperience("student_union")),
     ar: $data.resume.campus_experience.club,
     as: common_vendor.o((e) => $data.resume.campus_experience.club = e.detail.value),
-    at: common_vendor.o(($event) => $options.toggleCampusExperience("club")),
+    at: common_vendor.o(($event) => _ctx.toggleCampusExperience("club")),
     av: $data.resume.campus_experience.scholarship,
     aw: common_vendor.o((e) => $data.resume.campus_experience.scholarship = e.detail.value),
-    ax: common_vendor.o(($event) => $options.toggleCampusExperience("scholarship")),
+    ax: common_vendor.o(($event) => _ctx.toggleCampusExperience("scholarship")),
     ay: $data.resume.campus_experience.honor,
     az: common_vendor.o((e) => $data.resume.campus_experience.honor = e.detail.value),
-    aA: common_vendor.o(($event) => $options.toggleCampusExperience("honor")),
+    aA: common_vendor.o(($event) => _ctx.toggleCampusExperience("honor")),
     aB: $data.resume.campus_experience.description,
     aC: common_vendor.o(($event) => $data.resume.campus_experience.description = $event.detail.value),
     aD: common_vendor.o((...args) => $options.addCertificate && $options.addCertificate(...args)),
@@ -332,12 +292,12 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         o: common_vendor.o(($event) => certificate.issuing_authority = $event.detail.value),
         p: certificate.certificate_no,
         q: common_vendor.o(($event) => certificate.certificate_no = $event.detail.value),
-        r: common_vendor.o(($event) => $options.uploadCertificateFile(index)),
+        r: common_vendor.o(($event) => _ctx.uploadCertificateFile(index)),
         s: certificate.attachment_url
       }, certificate.attachment_url ? {
         t: common_vendor.t($options.getFileName(certificate.attachment_url))
       } : {}, {
-        v: common_vendor.o(($event) => $options.editCertificate(index)),
+        v: common_vendor.o(($event) => _ctx.editCertificate(index)),
         w: common_vendor.o(($event) => $options.deleteCertificate(index)),
         x: index
       });

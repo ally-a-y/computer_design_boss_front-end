@@ -53,34 +53,40 @@
           </view>
         </view>
         
-       <!-- 出生日期选择 -->
+        <!-- 出生日期选择 -->
         <view class="form-item">
           <view class="form-label">出生日期</view>
-          <view class="form-input-wrapper">
-            <uni-icons type="calendar" size="24" color="#999"></uni-icons>
-            <uni-date-picker 
-              v-model="basicInfoForm.birth_date" 
-              type="date" 
-              placeholder="请选择出生日期"
-              @confirm="handleDateChange"
-              class="form-input"
-            ></uni-date-picker>
-          </view>
+          <picker mode="date" :value="basicInfoForm.birth_date" start="1950-01-01" end="2010-12-31" @change="onBirthDateChange">
+            <view class="form-input-wrapper picker-wrapper">
+              <uni-icons type="calendar" size="24" color="#999"></uni-icons>
+              <input 
+                type="text" 
+                placeholder="请选择出生日期"
+                v-model="basicInfoForm.birth_date"
+                class="form-input"
+                disabled
+              />
+              <uni-icons type="arrowright" size="18" color="#999"></uni-icons>
+            </view>
+          </picker>
         </view>
         
         <!-- 所在城市选择 -->
         <view class="form-item">
           <view class="form-label">所在城市</view>
-          <view class="form-input-wrapper">
-            <uni-icons type="location" size="24" color="#999"></uni-icons>
-            <uni-data-picker 
-              v-model="basicInfoForm.city" 
-              :localdata="cityOptions" 
-              @confirm="handleCityChange"
-              placeholder="请选择所在城市"
-              class="form-input"
-            ></uni-data-picker>
-          </view>
+          <picker mode="multiSelector" :range="cityRange" :value="cityIndex" @change="onCityChange" @columnchange="onCityColumnChange">
+            <view class="form-input-wrapper picker-wrapper">
+              <uni-icons type="location" size="24" color="#999"></uni-icons>
+              <input 
+                type="text" 
+                placeholder="请选择所在城市"
+                v-model="basicInfoForm.city"
+                class="form-input"
+                disabled
+              />
+              <uni-icons type="arrowright" size="18" color="#999"></uni-icons>
+            </view>
+          </picker>
         </view>
         
         <!-- 邮箱输入框 -->
@@ -122,16 +128,19 @@
         <!-- 学历选择 -->
         <view class="form-item">
           <view class="form-label">学历水平</view>
-          <view class="form-input-wrapper">
-            <uni-icons type="book" size="24" color="#999"></uni-icons>
-            <uni-data-picker 
-              v-model="educationForm.degree" 
-              :localdata="degreeOptions" 
-              @confirm="handleDegreeChange"
-              placeholder="请选择学历"
-              class="form-input"
-            ></uni-data-picker>
-          </view>
+          <picker mode="selector" :range="degreeOptions" range-key="text" :value="degreeIndex" @change="onDegreeChange">
+            <view class="form-input-wrapper picker-wrapper">
+              <uni-icons type="book" size="24" color="#999"></uni-icons>
+              <input 
+                type="text" 
+                placeholder="请选择学历"
+                :value="degreeText"
+                class="form-input"
+                disabled
+              />
+              <uni-icons type="arrowright" size="18" color="#999"></uni-icons>
+            </view>
+          </picker>
         </view>
         
         <!-- 学校名称输入框 -->
@@ -165,16 +174,19 @@
         <!-- 毕业年份选择 -->
         <view class="form-item">
           <view class="form-label">毕业年份</view>
-          <view class="form-input-wrapper">
-            <uni-icons type="calendar" size="24" color="#999"></uni-icons>
-            <input 
-              type="number" 
-              placeholder="请输入毕业年份"
-              v-model="educationForm.graduation_year"
-              class="form-input"
-              maxlength="4"
-            />
-          </view>
+          <picker mode="selector" :range="graduationYears" :value="yearIndex" @change="onYearChange">
+            <view class="form-input-wrapper picker-wrapper">
+              <uni-icons type="calendar" size="24" color="#999"></uni-icons>
+              <input 
+                type="text" 
+                placeholder="请选择毕业年份"
+                :value="educationForm.graduation_year ? educationForm.graduation_year + '年' : ''"
+                class="form-input"
+                disabled
+              />
+              <uni-icons type="arrowright" size="18" color="#999"></uni-icons>
+            </view>
+          </picker>
         </view>
         
         <!-- 按钮区域 -->
@@ -216,15 +228,19 @@
         <!-- 期望工作城市 -->
         <view class="form-item">
           <view class="form-label">期望工作城市</view>
-          <view class="form-input-wrapper">
-            <uni-icons type="location" size="24" color="#999"></uni-icons>
-            <input 
-              type="text" 
-              placeholder="请输入期望工作城市"
-              v-model="jobIntentForm.expected_city"
-              class="form-input"
-            />
-          </view>
+          <picker mode="multiSelector" :range="expectedCityRange" :value="expectedCityIndex" @change="onExpectedCityChange" @columnchange="onExpectedCityColumnChange">
+            <view class="form-input-wrapper picker-wrapper">
+              <uni-icons type="location" size="24" color="#999"></uni-icons>
+              <input 
+                type="text" 
+                placeholder="请输入期望工作城市"
+                v-model="jobIntentForm.expected_city"
+                class="form-input"
+                disabled
+              />
+              <uni-icons type="arrowright" size="18" color="#999"></uni-icons>
+            </view>
+          </picker>
         </view>
         
         <!-- 期望薪资范围 -->
@@ -253,15 +269,19 @@
         <!-- 到岗时间 -->
         <view class="form-item">
           <view class="form-label">到岗时间</view>
-          <view class="form-input-wrapper">
-            <uni-icons type="time" size="24" color="#999"></uni-icons>
-            <input 
-              type="text" 
-              placeholder="请输入到岗时间（如：立即到岗/一个月内等）"
-              v-model="jobIntentForm.available_time"
-              class="form-input"
-            />
-          </view>
+          <picker mode="selector" :range="availableTimeOptions" :value="timeIndex" @change="onTimeChange">
+            <view class="form-input-wrapper picker-wrapper">
+              <uni-icons type="time" size="24" color="#999"></uni-icons>
+              <input 
+                type="text" 
+                placeholder="请选择到岗时间"
+                v-model="jobIntentForm.available_time"
+                class="form-input"
+                disabled
+              />
+              <uni-icons type="arrowright" size="18" color="#999"></uni-icons>
+            </view>
+          </picker>
         </view>
         
         <!-- 按钮区域 -->
@@ -308,7 +328,7 @@ export default {
       // 用户基本信息表单
       basicInfoForm: {
         real_name: '',
-        gender: 0, // 0: 未知, 1: 男, 2: 女
+        gender: 0,
         birth_date: '',
         city: '',
         email: ''
@@ -316,25 +336,67 @@ export default {
       
       // 教育背景表单
       educationForm: {
-        degree: '', // 学历
-        school_name: '', // 学校名称
-        major: '', // 专业
-        graduation_year: '' // 毕业年份
+        degree: '',
+        school_name: '',
+        major: '',
+        graduation_year: ''
       },
-      // 城市选择器数据
-      cityOptions: [
-        { value: '北京', text: '北京' },
-        { value: '上海', text: '上海' },
-        { value: '广州', text: '广州' },
-        { value: '深圳', text: '深圳' },
-        { value: '杭州', text: '杭州' },
-        { value: '成都', text: '成都' },
-        { value: '武汉', text: '武汉' },
-        { value: '西安', text: '西安' },
-        { value: '重庆', text: '重庆' },
-        { value: '南京', text: '南京' }
-      ],
-      // 学历选项
+      
+      // 求职意向表单
+      jobIntentForm: {
+        job_direction: '',
+        expected_city: '',
+        expected_salary_min: '',
+        expected_salary_max: '',
+        available_time: ''
+      },
+      
+      // 注册步骤
+      registerStep: 2,
+      loading: false,
+      
+      // ========== 城市选择器数据 ==========
+      provinces: ['北京', '上海', '广东', '浙江', '江苏', '四川', '湖北', '陕西', '重庆', '湖南', '河南', '山东', '安徽', '福建', '河北'],
+      cities: {
+        '北京': ['北京市'],
+        '上海': ['上海市'],
+        '广东': ['广州', '深圳', '佛山', '东莞', '珠海', '中山', '惠州', '江门', '汕头', '湛江'],
+        '浙江': ['杭州', '宁波', '温州', '嘉兴', '绍兴', '金华', '台州', '湖州', '衢州', '丽水'],
+        '江苏': ['南京', '苏州', '无锡', '常州', '徐州', '南通', '扬州', '盐城', '淮安', '连云港'],
+        '四川': ['成都', '绵阳', '德阳', '乐山', '宜宾', '南充', '泸州', '达州', '眉山', '遂宁'],
+        '湖北': ['武汉', '宜昌', '襄阳', '荆州', '黄石', '十堰', '孝感', '荆门', '鄂州', '黄冈'],
+        '陕西': ['西安', '宝鸡', '咸阳', '渭南', '汉中', '榆林', '延安', '安康', '商洛', '铜川'],
+        '重庆': ['重庆市'],
+        '湖南': ['长沙', '株洲', '湘潭', '衡阳', '岳阳', '常德', '邵阳', '郴州', '永州', '怀化'],
+        '河南': ['郑州', '洛阳', '开封', '新乡', '许昌', '平顶山', '焦作', '商丘', '安阳', '南阳'],
+        '山东': ['济南', '青岛', '烟台', '潍坊', '临沂', '淄博', '威海', '东营', '日照', '德州'],
+        '安徽': ['合肥', '芜湖', '蚌埠', '淮南', '马鞍山', '淮北', '铜陵', '安庆', '黄山', '滁州'],
+        '福建': ['福州', '厦门', '泉州', '莆田', '漳州', '龙岩', '三明', '南平', '宁德', '武夷山'],
+        '河北': ['石家庄', '唐山', '秦皇岛', '邯郸', '邢台', '保定', '张家口', '承德', '沧州', '廊坊']
+      },
+      districts: {
+        '北京市': ['朝阳区', '海淀区', '东城区', '西城区', '丰台区', '石景山区', '门头沟区', '房山区', '通州区', '顺义区', '昌平区', '大兴区', '怀柔区', '平谷区', '密云区', '延庆区'],
+        '上海市': ['浦东新区', '黄浦区', '徐汇区', '长宁区', '静安区', '普陀区', '虹口区', '杨浦区', '闵行区', '宝山区', '嘉定区', '金山区', '松江区', '青浦区', '奉贤区', '崇明区'],
+        '广州': ['天河区', '越秀区', '海珠区', '白云区', '番禺区', '荔湾区', '黄埔区', '花都区', '南沙区', '从化区', '增城区'],
+        '深圳': ['福田区', '罗湖区', '南山区', '宝安区', '龙岗区', '盐田区', '龙华区', '坪山区', '光明区'],
+        '杭州': ['西湖区', '上城区', '下城区', '江干区', '拱墅区', '滨江区', '萧山区', '余杭区', '富阳区', '临安区', '桐庐县', '淳安县', '建德市'],
+        '南京': ['鼓楼区', '玄武区', '秦淮区', '建邺区', '雨花台区', '浦口区', '栖霞区', '江宁区', '六合区', '溧水区', '高淳区'],
+        '成都': ['锦江区', '青羊区', '金牛区', '武侯区', '成华区', '龙泉驿区', '青白江区', '新都区', '温江区', '双流区', '郫都区', '新津区', '都江堰市', '彭州市', '邛崃市', '崇州市', '简阳市'],
+        '武汉': ['江岸区', '江汉区', '硚口区', '汉阳区', '武昌区', '青山区', '洪山区', '东西湖区', '汉南区', '蔡甸区', '江夏区', '黄陂区', '新洲区'],
+        '西安': ['新城区', '碑林区', '莲湖区', '雁塔区', '未央区', '灞桥区', '长安区', '阎良区', '临潼区', '高陵区', '鄠邑区', '蓝田县', '周至县'],
+        '重庆市': ['渝中区', '江北区', '南岸区', '九龙坡区', '沙坪坝区', '大渡口区', '北碚区', '渝北区', '巴南区', '涪陵区', '万州区', '黔江区', '长寿区', '江津区', '合川区', '永川区', '南川区', '綦江区', '大足区', '璧山区', '铜梁区', '潼南区', '荣昌区', '开州区', '梁平区', '武隆区'],
+        '长沙': ['芙蓉区', '天心区', '岳麓区', '开福区', '雨花区', '望城区', '长沙县', '浏阳市', '宁乡市'],
+        '郑州': ['中原区', '二七区', '管城回族区', '金水区', '上街区', '惠济区', '中牟县', '巩义市', '荥阳市', '新密市', '新郑市', '登封市'],
+        '济南': ['历下区', '市中区', '槐荫区', '天桥区', '历城区', '长清区', '章丘区', '济阳区', '莱芜区', '钢城区', '平阴县', '商河县'],
+        '合肥': ['瑶海区', '庐阳区', '蜀山区', '包河区', '长丰县', '肥东县', '肥西县', '庐江县', '巢湖市'],
+        '福州': ['鼓楼区', '台江区', '仓山区', '马尾区', '晋安区', '长乐区', '闽侯县', '连江县', '罗源县', '闽清县', '永泰县', '平潭县', '福清市'],
+        '石家庄': ['长安区', '桥西区', '新华区', '井陉矿区', '裕华区', '藁城区', '鹿泉区', '栾城区', '井陉县', '正定县', '行唐县', '灵寿县', '高邑县', '深泽县', '赞皇县', '无极县', '平山县', '元氏县', '赵县', '晋州市', '新乐市']
+      },
+      // 城市选择器索引 [省, 市, 区]
+      cityIndex: [0, 0, 0],
+      expectedCityIndex: [0, 0, 0],
+      
+      // ========== 学历选择器数据 ==========
       degreeOptions: [
         { value: 'high_school', text: '高中' },
         { value: 'college', text: '专科' },
@@ -342,35 +404,53 @@ export default {
         { value: 'master', text: '硕士' },
         { value: 'doctor', text: '博士' }
       ],
+      degreeIndex: 2, // 默认本科
       
-      // 求职意向表单（可选）
-      jobIntentForm: {
-        job_direction: '', // 期望职位方向
-        expected_city: '', // 期望工作城市
-        expected_salary_min: '', // 期望薪资范围-最低
-        expected_salary_max: '', // 期望薪资范围-最高
-        available_time: '' // 到岗时间
-      },
+      // ========== 毕业年份数据 ==========
+      graduationYears: [],
+      yearIndex: 5, // 默认当前年份
       
-      // 注册步骤
-      registerStep: 2, // 2: 基本信息, 3: 教育背景, 4: 求职意向（可选）
-      
-      loading: false
+      // ========== 到岗时间选项 ==========
+      availableTimeOptions: ['立即到岗', '一周内到岗', '两周内到岗', '一个月内到岗', '两个月内到岗', '三个月内到岗', '待定'],
+      timeIndex: 0
     }
   },
+  
   computed: {
+    // 所在城市选择器范围
+    cityRange() {
+      const province = this.provinces[this.cityIndex[0]] || this.provinces[0]
+      const cityList = this.cities[province] || ['其他']
+      const city = cityList[this.cityIndex[1]] || cityList[0]
+      const districtList = this.districts[city] || ['其他']
+      
+      return [this.provinces, cityList, districtList]
+    },
+    
+    // 期望城市选择器范围（独立的计算属性）
+    expectedCityRange() {
+      const province = this.provinces[this.expectedCityIndex[0]] || this.provinces[0]
+      const cityList = this.cities[province] || ['其他']
+      const city = cityList[this.expectedCityIndex[1]] || cityList[0]
+      const districtList = this.districts[city] || ['其他']
+      
+      return [this.provinces, cityList, districtList]
+    },
+    
+    // 学历文本显示
+    degreeText() {
+      const item = this.degreeOptions[this.degreeIndex]
+      return item ? item.text : ''
+    },
+    
     // 基本信息表单验证
     isBasicInfoFormValid() {
       const { real_name, birth_date, city, email } = this.basicInfoForm
-      // 邮箱验证（可选，但格式要正确）
       const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
       
-      // 必填项验证
       const realNameValid = real_name.trim().length > 0
       const birthDateValid = birth_date.trim().length > 0
       const cityValid = city.trim().length > 0
-      
-      // 邮箱如果填写则必须格式正确
       const emailValid = email.trim() === '' || emailRegex.test(email)
       
       return realNameValid && birthDateValid && cityValid && emailValid
@@ -380,7 +460,6 @@ export default {
     isEducationFormValid() {
       const { degree, school_name, major, graduation_year } = this.educationForm
       
-      // 必填项验证
       const degreeValid = degree.trim().length > 0
       const schoolNameValid = school_name.trim().length > 0
       const majorValid = major.trim().length > 0
@@ -389,47 +468,120 @@ export default {
       return degreeValid && schoolNameValid && majorValid && graduationYearValid
     },
     
-    // 求职意向表单验证（可选）
+    // 求职意向表单验证
     isJobIntentFormValid() {
-      // 求职意向为可选步骤，所有字段都是可选的
-      // 但如果填写了薪资范围，需要确保格式正确
       const { expected_salary_min, expected_salary_max } = this.jobIntentForm
       
-      if (expected_salary_min && isNaN(expected_salary_min)) {
-        return false
-      }
-      
-      if (expected_salary_max && isNaN(expected_salary_max)) {
-        return false
-      }
+      if (expected_salary_min && isNaN(expected_salary_min)) return false
+      if (expected_salary_max && isNaN(expected_salary_max)) return false
       
       return true
     }
   },
+  
   onLoad(options) {
     // 接收从登录页面传递过来的注册数据
     if (options.registerData) {
-      this.registerForm = JSON.parse(decodeURIComponent(options.registerData))
+      try {
+        this.registerForm = JSON.parse(decodeURIComponent(options.registerData))
+        console.log('接收到的注册数据:', this.registerForm)
+      } catch (e) {
+        console.error('解析注册数据失败:', e)
+      }
     }
+    
+    // 初始化年份数据
+    this.initYearData()
   },
+  
   methods: {
-    // 处理学历选择变化
-    handleDegreeChange(e) {
-      // uni-data-picker直接返回选中的值
-      this.educationForm.degree = e.detail.value
+    initYearData() {
+      // 生成毕业年份列表（2020-2030）
+      this.graduationYears = []
+      const currentYear = new Date().getFullYear()
+      for (let i = currentYear - 5; i <= currentYear + 5; i++) {
+        this.graduationYears.push(i + '年')
+      }
+      // 默认选中当前年份
+      this.yearIndex = 5
     },
-    // 处理日期选择变化
-    handleDateChange(e) {
+    
+    // ========== 出生日期选择 ==========
+    onBirthDateChange(e) {
       this.basicInfoForm.birth_date = e.detail.value
     },
-
-    // 处理城市选择变化
-    handleCityChange(e) {
-      this.basicInfoForm.city = e.detail.value
+    
+    // ========== 所在城市选择器方法 ==========
+    onCityChange(e) {
+      const value = e.detail.value
+      const province = this.provinces[value[0]]
+      const cityList = this.cities[province] || ['其他']
+      const city = cityList[value[1]]
+      const districtList = this.districts[city] || ['其他']
+      const district = districtList[value[2]]
+      
+      this.basicInfoForm.city = `${province} ${city} ${district}`
+      this.cityIndex = value
     },
-    // 注册步骤：进入下一步
+    
+    onCityColumnChange(e) {
+      const { column, value } = e.detail
+      
+      if (column === 0) {
+        this.cityIndex = [value, 0, 0]
+      } else if (column === 1) {
+        this.cityIndex = [this.cityIndex[0], value, 0]
+      } else {
+        this.cityIndex = [this.cityIndex[0], this.cityIndex[1], value]
+      }
+    },
+    
+    // ========== 期望城市选择器方法 ==========
+    onExpectedCityChange(e) {
+      const value = e.detail.value
+      const province = this.provinces[value[0]]
+      const cityList = this.cities[province] || ['其他']
+      const city = cityList[value[1]]
+      const districtList = this.districts[city] || ['其他']
+      const district = districtList[value[2]]
+      
+      this.jobIntentForm.expected_city = `${province} ${city} ${district}`
+      this.expectedCityIndex = value
+    },
+    
+    onExpectedCityColumnChange(e) {
+      const { column, value } = e.detail
+      
+      if (column === 0) {
+        this.expectedCityIndex = [value, 0, 0]
+      } else if (column === 1) {
+        this.expectedCityIndex = [this.expectedCityIndex[0], value, 0]
+      } else {
+        this.expectedCityIndex = [this.expectedCityIndex[0], this.expectedCityIndex[1], value]
+      }
+    },
+    
+    // ========== 学历选择 ==========
+    onDegreeChange(e) {
+      this.degreeIndex = e.detail.value
+      this.educationForm.degree = this.degreeOptions[this.degreeIndex].value
+    },
+    
+    // ========== 毕业年份选择 ==========
+    onYearChange(e) {
+      this.yearIndex = e.detail.value
+      const yearStr = this.graduationYears[this.yearIndex]
+      this.educationForm.graduation_year = yearStr.replace('年', '')
+    },
+    
+    // ========== 到岗时间选择 ==========
+    onTimeChange(e) {
+      this.timeIndex = e.detail.value
+      this.jobIntentForm.available_time = this.availableTimeOptions[this.timeIndex]
+    },
+    
+    // ========== 步骤控制方法 ==========
     nextRegisterStep() {
-      // 根据当前步骤和表单验证结果，进入下一步
       if (this.registerStep === 2 && this.isBasicInfoFormValid) {
         this.registerStep = 3
       } else if (this.registerStep === 3 && this.isEducationFormValid) {
@@ -437,116 +589,93 @@ export default {
       }
     },
     
-    // 注册步骤：返回上一步
     prevRegisterStep() {
-      // 返回上一步，不验证表单
       if (this.registerStep > 2) {
         this.registerStep--
       } else {
-        // 返回登录页面的注册表单
         uni.navigateBack()
       }
     },
     
-    // 完成注册
+    // ========== 完成注册 ==========
     async completeRegister() {
       this.loading = true
       
       try {
-        // 准备完整的注册数据
+        // 准备注册数据 
         const registerData = {
           mobile: this.registerForm.mobile,
           sms_code: this.registerForm.sms_code,
           password: this.registerForm.password,
-          ...this.basicInfoForm,
-          ...this.educationForm,
-          ...this.jobIntentForm
+          // 基本信息
+          real_name: this.basicInfoForm.real_name.trim(),
+          gender: this.basicInfoForm.gender,
+          birth_date: this.basicInfoForm.birth_date,
+          city: this.basicInfoForm.city,
+          email: this.basicInfoForm.email.trim() || undefined,
+          // 教育背景
+          education_level: this.educationForm.degree,
+          school_name: this.educationForm.school_name.trim(),
+          major: this.educationForm.major.trim(),
+          graduation_year: this.educationForm.graduation_year
         }
         
-        // 模拟注册流程：
-        // 1. 验证手机号和验证码
-        // 2. 创建 sys_user 记录
-        // 3. 创建空 resume 记录
-        // 4. 返回 Token
+        console.log('发送注册数据:', registerData)
         
-        // 模拟网络请求
-        await new Promise(resolve => setTimeout(resolve, 1500))
+        // 调用注册接口
+        const res = await userApi.register(registerData)
+        console.log('注册响应:', res)
         
-        // 模拟成功响应
-        const mockResponse = {
-          code: 200,
-          message: '注册成功',
-          data: {
-            token: 'mock-jwt-token-987654321',
-            user_info: {
-              user_id: '987654321',
-              mobile: this.registerForm.mobile,
-              email: this.basicInfoForm.email,
-              real_name: this.basicInfoForm.real_name,
-              gender: this.basicInfoForm.gender,
-              birth_date: this.basicInfoForm.birth_date,
-              city: this.basicInfoForm.city,
-              avatar_url: '',
-              status: 1,
-              job_status: 1,
-              register_time: new Date().toISOString()
-            },
-            // 模拟创建的简历记录
-            resume_info: {
-              resume_id: 'resume-001',
-              user_id: '987654321',
-              status: this.registerStep === 4 ? 1 : 0, // 如果完成了所有步骤，状态为已完善
-              create_time: new Date().toISOString(),
-              // 教育背景信息
-              education: {
-                degree: this.educationForm.degree,
-                school_name: this.educationForm.school_name,
-                major: this.educationForm.major,
-                graduation_year: this.educationForm.graduation_year
-              },
-              // 求职意向信息（如果填写）
-              job_intent: this.registerStep === 4 ? {
+        if (res && res.user_id) {
+          // 注册成功，自动登录
+          console.log('注册成功，开始自动登录')
+          
+          const loginRes = await userApi.login({
+            mobile: this.registerForm.mobile,
+            password: this.registerForm.password
+          })
+          
+          console.log('登录响应:', loginRes)
+          
+          if (loginRes && loginRes.token) {
+            // 保存登录信息
+            uni.setStorageSync('token', loginRes.token)
+            uni.setStorageSync('userInfo', JSON.stringify(loginRes.user_info))
+            
+            // 保存求职意向
+            if (this.registerStep === 4 && this.jobIntentForm.expected_city) {
+              const resumeInfo = {
                 job_direction: this.jobIntentForm.job_direction,
                 expected_city: this.jobIntentForm.expected_city,
                 expected_salary_min: this.jobIntentForm.expected_salary_min,
                 expected_salary_max: this.jobIntentForm.expected_salary_max,
                 available_time: this.jobIntentForm.available_time
-              } : null
+              }
+              uni.setStorageSync('resumeInfo', JSON.stringify(resumeInfo))
             }
-          }
-        }
-        
-        // 处理注册成功
-        if (mockResponse.code === 200) {
-          // 保存登录状态
-          uni.setStorageSync('token', mockResponse.data.token)
-          uni.setStorageSync('userInfo', mockResponse.data.user_info)
-          uni.setStorageSync('resumeInfo', mockResponse.data.resume_info)
-          
-          // 显示成功提示
-          uni.showToast({
-            title: mockResponse.message,
-            icon: 'success'
-          })
-          
-          // 跳转到首页
-          setTimeout(() => {
-            uni.switchTab({
-              url: '/pages/index/index_index'
+            
+            uni.showToast({
+              title: '注册成功',
+              icon: 'success'
             })
-          }, 1500)
+            
+            setTimeout(() => {
+              uni.switchTab({
+                url: '/pages/index/index_index'
+              })
+            }, 1500)
+          } else {
+            throw new Error('自动登录失败')
+          }
         } else {
-          // 注册失败
-          uni.showToast({
-            title: mockResponse.message || '注册失败',
-            icon: 'none'
-          })
+          throw new Error('注册失败：未返回用户ID')
         }
       } catch (error) {
         console.error('注册失败:', error)
         uni.showToast({
-          title: '注册失败，请稍后重试',
-          icon: 'none'
+          title: error.message || '注册失败，请稍后重试',
+          icon: 'none',
+          duration: 3000
         })
       } finally {
         this.loading = false
@@ -603,16 +732,29 @@ export default {
   background-color: #fafafa;
 }
 
+/* picker包装器样式 */
+.picker-wrapper {
+  width: 100%;
+}
+
+/* 确保picker覆盖整个区域 */
+picker {
+  width: 100%;
+}
+
 .form-input {
   flex: 1;
   height: 88rpx;
   font-size: 32rpx;
   color: #333;
   padding-left: 16rpx;
+  background-color: transparent;
 }
 
-.form-input:focus {
-  outline: none;
+.form-input:disabled {
+  color: #333;
+  opacity: 1;
+  -webkit-text-fill-color: #333;
 }
 
 .error-text {
@@ -636,7 +778,6 @@ export default {
   background-color: #ccc;
 }
 
-/* 步骤标题 */
 .step-title {
   font-size: 36rpx;
   font-weight: bold;
@@ -645,13 +786,11 @@ export default {
   text-align: center;
 }
 
-/* 注册步骤 */
 .register-step {
   display: block;
   animation: fadeIn 0.3s ease-in-out;
 }
 
-/* 可选步骤标记 */
 .optional-tag {
   font-size: 24rpx;
   color: #007aff;
@@ -659,7 +798,6 @@ export default {
   margin-left: 10rpx;
 }
 
-/* 跳过按钮 */
 .skip-btn {
   flex: 1;
   height: 96rpx;
@@ -671,20 +809,6 @@ export default {
   margin: 40rpx 10rpx;
 }
 
-/* Picker组件样式 */
-.picker-input {
-  flex: 1;
-  padding-right: 40rpx;
-  background-color: transparent;
-  border: none;
-}
-
-.picker-arrow {
-  position: absolute;
-  right: 20rpx;
-}
-
-/* 薪资范围 */
 .salary-range {
   display: flex;
   align-items: center;
@@ -712,7 +836,6 @@ export default {
   color: #999;
 }
 
-/* 性别选择器 */
 .gender-selector {
   display: flex;
   gap: 20rpx;
@@ -742,7 +865,6 @@ export default {
   font-weight: bold;
 }
 
-/* 注册按钮区域 */
 .register-buttons {
   display: flex;
   gap: 20rpx;
@@ -772,7 +894,6 @@ export default {
   background-color: #ccc;
 }
 
-/* 动画效果 */
 @keyframes fadeIn {
   from {
     opacity: 0;

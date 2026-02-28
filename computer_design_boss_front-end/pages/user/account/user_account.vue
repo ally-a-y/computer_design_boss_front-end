@@ -41,14 +41,48 @@
 </template>
 
 <script>
+	import { userApi } from '../../../common/api/user.js'
 export default {
   data() {
     return {
-      currentPhone: '138****8000',
-      currentEmail: 'zhangsan@example.com'
+      currentPhone: '',
+      currentEmail: ''
     }
   },
+  
+  onLoad() {
+    this.getUserInfo()
+  },
+  
   methods: {
+async getUserInfo() {
+  console.log('======== 开始请求用户信息 ========')
+  
+  try {
+    const res = await userApi.getUserProfile()
+    
+    console.log('请求成功，完整响应:', res)
+    console.log('响应数据:', res.data)
+    console.log('手机号:', res.mobile)
+    console.log('邮箱:', res.email)
+    
+
+    if (res) {
+      this.currentPhone = res.mobile 
+        ? res.mobile.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') 
+        : '未绑定'
+      this.currentEmail = res.email || '未设置'
+      
+      console.log('页面显示:', this.currentPhone, this.currentEmail)
+    }
+  } catch (error) {
+    console.error('======== 请求失败 ========')
+    console.error('错误信息:', error.message)
+    console.error('完整错误:', error)
+  }
+  
+  console.log('======== 请求结束 ========')
+},
     goBack() {
       uni.navigateBack()
     },

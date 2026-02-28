@@ -335,30 +335,37 @@ export default {
       this.inputText = ''
       
       try {
-          const res = await aiApi.chat(userMessage)
-         
-          if (res && res.response) {
-            let aiContent = ''
-            if (Array.isArray(res.response)) {
-              aiContent = res.response
-                .filter(item => item.role === 'assistant')
-                .map(item => item.content)
-                .join('\n')
-            } else {
-              // 如果是字符串，先进行预处理
-              aiContent = typeof res.response === 'string' 
-                ? this.preprocessContent(res.response)  // 添加预处理
-                : res.response
-            }
-            
-            this.messages.push({
-              sender: 'ai',
-              content: aiContent || 'AI未返回有效内容',
-              timestamp: Date.now(),
-              expanded: false
-            })
+        const res = await aiApi.chat(userMessage)
+       
+        let aiContent = ''
+        
+        if (typeof res === 'string') {
+          aiContent = this.preprocessContent(res)
+        } 
+        else if (res && res.response) {
+          if (Array.isArray(res.response)) {
+            aiContent = res.response
+              .filter(item => item.role === 'assistant')
+              .map(item => item.content)
+              .join('\n')
+          } else if (typeof res.response === 'string') {
+            aiContent = this.preprocessContent(res.response)
+          } else {
+            aiContent = JSON.stringify(res.response)
           }
-        } catch (error) {
+        }
+        else {
+          aiContent = res?.data || res?.message || JSON.stringify(res) || 'AI未返回有效内容'
+        }
+        
+        this.messages.push({
+          sender: 'ai',
+          content: aiContent || 'AI未返回有效内容',
+          timestamp: Date.now(),
+          expanded: false
+        })
+          
+      } catch (error) {
         console.error('AI对话失败:', error)
         
         this.messages.push({

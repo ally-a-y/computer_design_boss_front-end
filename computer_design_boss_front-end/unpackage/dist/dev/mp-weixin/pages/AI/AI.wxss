@@ -189,27 +189,59 @@
   color: #333;
   font-weight: 600;
 }
-.chat-area .message-list .message-item .message-bubble .progress-bar.data-v-6fa74974 {
-  margin-top: 24rpx;
-  height: 12rpx;
-  background-color: #f0f0f0;
-  border-radius: 6rpx;
-  position: relative;
-  overflow: hidden;
+.chat-area .message-list .message-item .markdown-content.data-v-6fa74974 {
+  font-size: 32rpx;
+  line-height: 1.8;
+  color: #333;
 }
-.chat-area .message-list .message-item .message-bubble .progress-bar .progress-fill.data-v-6fa74974 {
-  height: 100%;
-  background: linear-gradient(90deg, #007aff 0%, #00d4ff 100%);
-  border-radius: 6rpx;
-  transition: width 0.4s ease;
+.chat-area .message-list .message-item .markdown-content.data-v-6fa74974 p {
+  margin: 16rpx 0;
+  line-height: 1.8;
 }
-.chat-area .message-list .message-item .message-bubble .progress-bar .progress-text.data-v-6fa74974 {
-  position: absolute;
-  right: 0;
-  top: -36rpx;
-  font-size: 24rpx;
-  color: #666;
-  font-weight: 500;
+.chat-area .message-list .message-item .markdown-content.data-v-6fa74974 strong {
+  font-weight: 600;
+  color: #222;
+}
+.chat-area .message-list .message-item .markdown-content.data-v-6fa74974 em {
+  font-style: italic;
+  color: #555;
+}
+.chat-area .message-list .message-item .markdown-content.data-v-6fa74974 h1, .chat-area .message-list .message-item .markdown-content.data-v-6fa74974 h2, .chat-area .message-list .message-item .markdown-content.data-v-6fa74974 h3 {
+  font-weight: 600;
+  margin: 24rpx 0 16rpx;
+}
+.chat-area .message-list .message-item .markdown-content.data-v-6fa74974 ul, .chat-area .message-list .message-item .markdown-content.data-v-6fa74974 ol {
+  margin: 16rpx 0;
+  padding-left: 40rpx;
+}
+.chat-area .message-list .message-item .markdown-content.data-v-6fa74974 li {
+  margin: 12rpx 0;
+}
+.chat-area .message-list .message-item .markdown-content.data-v-6fa74974 pre {
+  background: #f8f9fa;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  overflow-x: auto;
+  margin: 16rpx 0;
+}
+.chat-area .message-list .message-item .markdown-content.data-v-6fa74974 code {
+  font-family: monospace;
+  font-size: 28rpx;
+}
+.chat-area .message-list .message-item .markdown-content.data-v-6fa74974 blockquote {
+  border-left: 8rpx solid #007aff;
+  padding: 16rpx 24rpx;
+  margin: 16rpx 0;
+  background: #f8f9fa;
+}
+.chat-area .message-list .message-item .markdown-content.data-v-6fa74974 a {
+  color: #007aff;
+  text-decoration: none;
+}
+.chat-area .message-list .message-item .markdown-content.data-v-6fa74974 hr {
+  border: none;
+  border-top: 2rpx solid #e9ecef;
+  margin: 32rpx 0;
 }
 .chat-area .message-list .message-item .message-time.data-v-6fa74974 {
   font-size: 24rpx;

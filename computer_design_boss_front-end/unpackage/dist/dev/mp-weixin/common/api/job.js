@@ -47,6 +47,26 @@ const jobApi = {
       method: "POST",
       data: jobData
     });
+  },
+  addFavorite: (Favoriteadd) => {
+    return common_api_request.requestWithRetry({
+      url: "/api/job/favorite/add",
+      method: "POST",
+      data: Favoriteadd
+    });
+  },
+  cancelFavorite: (Favoritecancel) => {
+    return common_api_request.requestWithRetry({
+      url: "/api/job/favorite/cancel",
+      method: "POST",
+      data: Favoritecancel
+    });
+  },
+  getUserFavorites: () => {
+    return common_api_request.requestWithRetry({
+      url: "/api/job/favorite/list",
+      method: "GET"
+    });
   }
 };
 exports.jobApi = jobApi;

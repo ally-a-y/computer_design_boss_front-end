@@ -5,7 +5,7 @@
       <text class="back-btn" @click="goBack">←</text>
       <text class="title">投递职位</text>
     </view>
-    
+
     <!-- 投递列表 -->
     <view class="deliver-list">
       <view v-for="(item, index) in delivers" :key="index" class="deliver-item">
@@ -23,7 +23,7 @@
           <button class="detail-btn" @click="viewDetails(item)">查看详情</button>
         </view>
       </view>
-      
+
       <!-- 空状态 -->
       <view v-if="delivers.length === 0" class="empty-state">
         <uni-icons type="paperplane" size="80" color="#ccc"></uni-icons>
@@ -34,82 +34,115 @@
 </template>
 
 <script>
+import { deliverApi } from '@/common/api/deliver.js' // 你需要写对应的deliverApi封装
+
 export default {
   data() {
     return {
-      delivers: [
-        {
-          jobTitle: '前端开发工程师',
-          company: '科技有限公司',
-          salary: '15k-25k',
-          deliverTime: '2024-01-15 14:30',
-          status: 'pending',
-          statusText: '待处理'
-        },
-        {
-          jobTitle: '后端开发工程师',
-          company: '互联网公司',
-          salary: '20k-30k',
-          deliverTime: '2024-01-16 10:20',
-          status: 'reviewing',
-          statusText: '审核中'
-        },
-        {
-          jobTitle: '产品经理',
-          company: '创业公司',
-          salary: '18k-28k',
-          deliverTime: '2024-01-17 09:15',
-          status: 'rejected',
-          statusText: '已拒绝'
-        },
-        {
-          jobTitle: 'UI设计师',
-          company: '设计公司',
-          salary: '12k-20k',
-          deliverTime: '2024-01-18 16:45',
-          status: 'accepted',
-          statusText: '已通过'
-        }
-      ]
+      delivers: [],
+      userId: 1, // 实际项目应该从登录信息里拿
+      loading: false
     }
   },
+
+  async onLoad() {
+    await this.loadDelivers()
+  },
+
   methods: {
     goBack() {
       uni.navigateBack()
     },
-    cancelDeliver(index) {
+
+	async loadDelivers() {
+	  try {
+		this.loading = true
+		const res = await deliverApi.getDeliverList(this.userId)
+
+		
+		const rawList = Array.isArray(res) ? res : []
+
+		this.delivers = rawList.map(item => {
+		  // const snapshot = item.job_snapshot || {}
+		  const snapshot = JSON.parse(item.job_snapshot || '{}')
+			console.log("转换前的delivers:", snapshot)
+		  return {
+			jobTitle: snapshot.title || '',
+			company: snapshot.location || '',  // 如果以后有 company_name 再换
+			salary: snapshot.salary || '',
+			deliverTime: new Date(item.created_at).toLocaleString(),
+			status: item.status || 'pending',
+			statusText: item.status_text || '待处理',
+			boss_job_id: item.boss_job_id,
+
+			// 如果你后面详情页要用，可以一起存
+			address: snapshot.address || '',
+			eduReq: snapshot.edu_req || '',
+			expReq: snapshot.exp_req || ''
+		  }
+		})
+		console.log("转换后的delivers:", this.delivers.jobTitle)
+		console.log("转换后的delivers:", this.delivers)
+	  } catch (err) {
+		uni.showToast({
+		  title: err.message || '获取投递失败',
+		  icon: 'none'
+		})
+	  } finally {
+		this.loading = false
+	  }
+	},
+    async cancelDeliver(index) {
+      const item = this.delivers[index]
+
       uni.showModal({
         title: '提示',
-        content: '确定要取消投递该职位吗？',
-        success: (res) => {
+        content: '确定取消投递该职位吗？',
+        success: async (res) => {
           if (res.confirm) {
-            this.delivers.splice(index, 1)
-            uni.showToast({
-              title: '已取消投递',
-              icon: 'success'
-            })
+            try {
+              await deliverApi.cancelDeliver({
+                user_id: this.userId,
+                boss_job_id: item.boss_job_id
+              })
+
+              this.delivers.splice(index, 1)
+
+              uni.showToast({
+                title: '已取消投递',
+                icon: 'success'
+              })
+            } catch (err) {
+              uni.showToast({
+                title: err.message || '取消失败',
+                icon: 'none'
+              })
+            }
           }
         }
       })
     },
-    viewDetails(item) {
-      // 查看详情逻辑
-      uni.showToast({
-        title: `查看${item.jobTitle}详情`,
-        icon: 'none'
-      })
+
+    async viewDetails(item) {
+      try {
+        const res = await deliverApi.getDeliverDetail({
+          user_id: this.userId,
+          boss_job_id: item.boss_job_id
+        })
+
+        // 跳转到详情页或者弹窗显示
+        console.log('投递详情:', res.data)
+        uni.showToast({
+          title: `查看${item.jobTitle}详情`,
+          icon: 'none'
+        })
+      } catch (err) {
+        uni.showToast({
+          title: err.message || '获取详情失败',
+          icon: 'none'
+        })
+      }
     }
-  },
-  onLoad() {
-    // 从存储中加载投递数据
-    const savedDelivers = uni.getStorageSync('delivers')
-    if (savedDelivers) {
-      this.delivers = savedDelivers
-    }
-  },
-  onUnload() {
-    // 保存投递数据
-    uni.setStorageSync('delivers', this.delivers)
   }
 }
 </script>

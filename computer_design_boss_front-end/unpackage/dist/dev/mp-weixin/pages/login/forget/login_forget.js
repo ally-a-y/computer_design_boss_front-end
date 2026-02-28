@@ -19,6 +19,9 @@ var __spreadValues = (a, b) => {
 };
 var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
 var common_vendor = require("../../../common/vendor.js");
+var common_api_user = require("../../../common/api/user.js");
+require("../../../common/api/request.js");
+require("../../../common/config.js");
 const _sfc_main = {
   data() {
     return {
@@ -134,14 +137,10 @@ const _sfc_main = {
           sms_code: this.forgetForm.sms_code,
           new_password: this.forgetForm.new_password
         });
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        const mockResponse = {
-          code: 200,
-          message: "\u5BC6\u7801\u91CD\u7F6E\u6210\u529F"
-        };
-        if (mockResponse.code === 200) {
+        const res = await common_api_user.userApi.forgetPassword(resetData);
+        if (res) {
           common_vendor.index.showToast({
-            title: mockResponse.message,
+            title: "\u5BC6\u7801\u91CD\u7F6E\u6210\u529F",
             icon: "success"
           });
           setTimeout(() => {
@@ -153,7 +152,7 @@ const _sfc_main = {
       } catch (error) {
         console.error("\u5BC6\u7801\u91CD\u7F6E\u5931\u8D25:", error);
         common_vendor.index.showToast({
-          title: "\u5BC6\u7801\u91CD\u7F6E\u5931\u8D25\uFF0C\u8BF7\u7A0D\u540E\u91CD\u8BD5",
+          title: error.message || "\u5BC6\u7801\u91CD\u7F6E\u5931\u8D25\uFF0C\u8BF7\u7A0D\u540E\u91CD\u8BD5",
           icon: "none"
         });
       } finally {

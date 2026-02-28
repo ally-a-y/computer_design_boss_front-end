@@ -1,64 +1,119 @@
 "use strict";
 var common_vendor = require("../../../common/vendor.js");
+var common_api_favorite = require("../../../common/api/favorite.js");
+require("../../../common/api/request.js");
+require("../../../common/config.js");
 const _sfc_main = {
   data() {
     return {
-      collections: [
-        {
-          jobTitle: "\u524D\u7AEF\u5F00\u53D1\u5DE5\u7A0B\u5E08",
-          company: "\u79D1\u6280\u6709\u9650\u516C\u53F8",
-          salary: "15k-25k",
-          collectionTime: "2024-01-15 14:30"
-        },
-        {
-          jobTitle: "\u540E\u7AEF\u5F00\u53D1\u5DE5\u7A0B\u5E08",
-          company: "\u4E92\u8054\u7F51\u516C\u53F8",
-          salary: "20k-30k",
-          collectionTime: "2024-01-16 10:20"
-        },
-        {
-          jobTitle: "\u4EA7\u54C1\u7ECF\u7406",
-          company: "\u521B\u4E1A\u516C\u53F8",
-          salary: "18k-28k",
-          collectionTime: "2024-01-17 09:15"
-        }
-      ]
+      collections: [],
+      userId: 1,
+      loading: false
+    };
+  },
+  async onLoad() {
+    await this.loadFavorites();
+  },
+  data() {
+    return {
+      collections: [],
+      userId: 1,
+      loading: false,
+      isFavorite: false
     };
   },
   methods: {
     goBack() {
       common_vendor.index.navigateBack();
     },
-    cancelCollection(index) {
+    async loadFavorites() {
+      try {
+        this.loading = true;
+        const res = await common_api_favorite.favoriteApi.getFavoriteList(this.userId);
+        const rawList = Array.isArray(res) ? res : [];
+        this.collections = rawList.map((item) => {
+          const snapshot = JSON.parse(item.job_snapshot || "{}");
+          return {
+            jobTitle: snapshot.title || "",
+            company: snapshot.location || "",
+            salary: snapshot.salary || "",
+            collectionTime: new Date(item.created_at).toLocaleString(),
+            boss_job_id: item.boss_job_id
+          };
+        });
+        console.log("\u8F6C\u6362\u540E\u7684collections:", this.collections);
+      } catch (err) {
+        common_vendor.index.showToast({
+          title: err.message || "\u83B7\u53D6\u6536\u85CF\u5931\u8D25",
+          icon: "none"
+        });
+      } finally {
+        this.loading = false;
+      }
+    },
+    async cancelCollection(index) {
+      const item = this.collections[index];
       common_vendor.index.showModal({
         title: "\u63D0\u793A",
-        content: "\u786E\u5B9A\u8981\u53D6\u6D88\u6536\u85CF\u8BE5\u804C\u4F4D\u5417\uFF1F",
-        success: (res) => {
+        content: "\u786E\u5B9A\u53D6\u6D88\u6536\u85CF\u5417\uFF1F",
+        success: async (res) => {
           if (res.confirm) {
-            this.collections.splice(index, 1);
-            common_vendor.index.showToast({
-              title: "\u5DF2\u53D6\u6D88\u6536\u85CF",
-              icon: "success"
-            });
+            try {
+              await common_api_favorite.favoriteApi.cancelFavorite({
+                user_id: this.userId,
+                boss_job_id: item.boss_job_id
+              });
+              this.collections.splice(index, 1);
+              common_vendor.index.showToast({
+                title: "\u5DF2\u53D6\u6D88\u6536\u85CF",
+                icon: "success"
+              });
+            } catch (err) {
+              common_vendor.index.showToast({
+                title: err.message || "\u53D6\u6D88\u5931\u8D25",
+                icon: "none"
+              });
+            }
           }
         }
       });
     },
-    viewDetails(item) {
-      common_vendor.index.showToast({
-        title: `\u67E5\u770B${item.jobTitle}\u8BE6\u60C5`,
-        icon: "none"
-      });
+    async addToFavorite(jobId) {
+      try {
+        await common_api_favorite.favoriteApi.addFavorite({
+          user_id: this.userId,
+          job_id: jobId
+        });
+        common_vendor.index.showToast({
+          title: "\u6536\u85CF\u6210\u529F",
+          icon: "success"
+        });
+      } catch (err) {
+        common_vendor.index.showToast({
+          title: err.message || "\u6536\u85CF\u5931\u8D25",
+          icon: "none"
+        });
+      }
+    },
+    async toggleFavorite() {
+      if (this.isFavorite) {
+        try {
+          await common_api_favorite.favoriteApi.cancelFavorite({ user_id: this.userId, boss_job_id: 1 });
+          this.isFavorite = false;
+          common_vendor.index.showToast({ title: "\u5DF2\u53D6\u6D88\u6536\u85CF", icon: "none" });
+        } catch (err) {
+          common_vendor.index.showToast({ title: err.message || "\u53D6\u6D88\u5931\u8D25", icon: "none" });
+        }
+      } else {
+        try {
+          await common_api_favorite.favoriteApi.addFavorite({ user_id: this.userId, job_id: 1 });
+          this.isFavorite = true;
+          common_vendor.index.showToast({ title: "\u6536\u85CF\u6210\u529F", icon: "success" });
+        } catch (err) {
+          common_vendor.index.showToast({ title: err.message || "\u6536\u85CF\u5931\u8D25", icon: "none" });
+        }
+      }
     }
-  },
-  onLoad() {
-    const savedCollections = common_vendor.index.getStorageSync("collections");
-    if (savedCollections) {
-      this.collections = savedCollections;
-    }
-  },
-  onUnload() {
-    common_vendor.index.setStorageSync("collections", this.collections);
   }
 };
 if (!Array) {
@@ -75,17 +130,19 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         c: common_vendor.t(item.salary),
         d: common_vendor.t(item.collectionTime),
         e: common_vendor.o(($event) => $options.cancelCollection(index)),
-        f: common_vendor.o(($event) => $options.viewDetails(item)),
+        f: common_vendor.o(($event) => _ctx.viewDetails(item)),
         g: index
       };
     }),
     c: $data.collections.length === 0
   }, $data.collections.length === 0 ? {
-    d: common_vendor.p({
+    d: common_vendor.o($options.toggleFavorite),
+    e: common_vendor.p({
       type: "star",
       size: "80",
-      color: "#ccc"
-    })
+      color: $data.isFavorite ? "#FFD700" : "#ccc"
+    }),
+    f: common_vendor.t($data.isFavorite ? "\u5DF2\u6536\u85CF\u793A\u4F8B\u804C\u4F4D" : "\u6682\u65E0\u6536\u85CF\u804C\u4F4D")
   } : {});
 }
 var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/user/collection/user_collection.vue"]]);

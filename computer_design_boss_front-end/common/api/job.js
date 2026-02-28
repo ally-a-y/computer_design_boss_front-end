@@ -61,5 +61,31 @@ export const jobApi = {
       method: 'POST',
       data: jobData
     })
-  }
+  },
+
+  // 发布新职位
+  addFavorite: (Favoriteadd) => {
+    return request({
+      url: '/api/job/favorite/add',
+      method: 'POST',
+      data: Favoriteadd
+    })
+  },
+  
+  // 发布新职位
+  cancelFavorite: (Favoritecancel) => {
+    return request({
+      url: '/api/job/favorite/cancel',
+      method: 'POST',
+      data: Favoritecancel
+    })
+  },
+  
+  // 获取职位分类列表
+  getUserFavorites: () => {
+    return request({
+      url: '/api/job/favorite/list',
+      method: 'GET'
+    })
+  },
 }

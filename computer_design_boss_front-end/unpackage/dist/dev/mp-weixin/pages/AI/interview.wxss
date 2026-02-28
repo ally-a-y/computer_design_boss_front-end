@@ -157,6 +157,7 @@
   font-size: 30rpx;
   background-color: #fff;
   transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 .config-section .config-card .form-fields .form-group .form-input.data-v-638c375a:focus {
   border-color: #007aff;
@@ -178,6 +179,7 @@
   background-color: #fff;
   transition: all 0.3s ease;
   resize: vertical;
+  box-sizing: border-box;
 }
 .config-section .config-card .form-fields .form-group .form-textarea.data-v-638c375a:focus {
   border-color: #007aff;
@@ -213,6 +215,11 @@
   font-size: 30rpx;
   font-weight: 500;
 }
+.config-section .config-card .form-fields .form-group .file-upload-area .file-name.data-v-638c375a {
+  color: #28a745;
+  font-size: 28rpx;
+  word-break: break-all;
+}
 .config-section .config-card .start-btn.data-v-638c375a {
   width: 100%;
   background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
@@ -228,6 +235,9 @@
 .config-section .config-card .start-btn.data-v-638c375a:active {
   transform: scale(0.98);
   box-shadow: 0 4rpx 16rpx rgba(0, 122, 255, 0.2);
+}
+.config-section .config-card .start-btn[loading].data-v-638c375a {
+  opacity: 0.8;
 }
 .interview-area.data-v-638c375a {
   flex: 1;
@@ -442,6 +452,9 @@
   background-color: transparent;
   border: none;
 }
+.interview-area .control-section .control-btn[disabled].data-v-638c375a {
+  opacity: 0.5;
+}
 .interview-area .control-section .control-btn image.data-v-638c375a {
   width: 50rpx;
   height: 50rpx;
@@ -471,6 +484,12 @@
 .interview-area .control-section .voice-record-area .voice-btn.recording.data-v-638c375a {
   background-color: #ff4757;
   animation: pulse-638c375a 1s infinite;
+}
+.interview-area .control-section .voice-record-area .voice-btn.disabled.data-v-638c375a {
+  background-color: #ccc;
+}
+.interview-area .control-section .voice-record-area .voice-btn[disabled].data-v-638c375a {
+  opacity: 0.6;
 }
 .interview-area .control-section .voice-record-area .voice-btn image.data-v-638c375a {
   width: 50rpx;
@@ -558,20 +577,33 @@
   width: 200rpx;
   height: 200rpx;
   border-radius: 50%;
-  background: conic-gradient(#007aff 0deg, #007aff 306deg, #e0e0e0 306deg);
+  background: conic-gradient(#007aff 0deg, #007aff calc(var(--638c375a-overallScore) * 3.6deg), #e0e0e0 calc(var(--638c375a-overallScore) * 3.6deg));
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto;
+  position: relative;
+}
+.report-overlay .report-modal .report-content .score-section .score-circle.data-v-638c375a::before {
+  content: "";
+  position: absolute;
+  width: 160rpx;
+  height: 160rpx;
+  background-color: #fff;
+  border-radius: 50%;
 }
 .report-overlay .report-modal .report-content .score-section .score-circle .score-number.data-v-638c375a {
   font-size: 48rpx;
   font-weight: bold;
   color: #007aff;
+  position: relative;
+  z-index: 1;
 }
 .report-overlay .report-modal .report-content .score-section .score-circle .score-total.data-v-638c375a {
   font-size: 32rpx;
   color: #666;
+  position: relative;
+  z-index: 1;
 }
 .report-overlay .report-modal .report-content .radar-section.data-v-638c375a {
   margin-bottom: 40rpx;

@@ -1,0 +1,379 @@
+"use strict";
+var common_vendor = require("../../../common/vendor.js");
+var common_api_forum = require("../../../common/api/forum.js");
+require("../../../common/api/request.js");
+require("../../../common/config.js");
+const _sfc_main = {
+  data() {
+    return {
+      postId: null,
+      post: null,
+      replies: [],
+      newReply: {
+        content: "",
+        parent_id: null
+      },
+      replySort: "time_asc",
+      showAdvancedEditor: false,
+      categoryMap: {
+        "101": "\u524D\u7AEF",
+        "102": "\u540E\u7AEF",
+        "103": "\u79FB\u52A8\u7AEF",
+        "104": "\u6570\u636E\u4E0EAI",
+        "105": "\u8FD0\u7EF4\u4E0E\u6D4B\u8BD5"
+      }
+    };
+  },
+  computed: {
+    isOriginalAuthor() {
+      const userInfo = common_vendor.index.getStorageSync("userInfo");
+      return userInfo && userInfo.user_id && this.post && this.post.user_id === userInfo.user_id;
+    }
+  },
+  onLoad(options) {
+    this.postId = options.id;
+    this.loadPostDetail();
+    this.loadReplies();
+  },
+  methods: {
+    async loadPostDetail() {
+      try {
+        const res = await common_api_forum.forumApi.getCommentDetail(this.postId);
+        if (res && res.length > 0) {
+          this.post = res[0];
+        }
+      } catch (error) {
+        console.error("\u52A0\u8F7D\u5E16\u5B50\u8BE6\u60C5\u5931\u8D25:", error);
+        common_vendor.index.showToast({
+          title: "\u52A0\u8F7D\u5931\u8D25",
+          icon: "none"
+        });
+      }
+    },
+    async loadReplies() {
+      try {
+        const res = await common_api_forum.forumApi.getCommentReplies(this.postId);
+        if (res) {
+          this.replies = res;
+        }
+      } catch (error) {
+        console.error("\u52A0\u8F7D\u56DE\u590D\u5931\u8D25:", error);
+      }
+    },
+    async submitReply() {
+      if (!this.newReply.content.trim()) {
+        common_vendor.index.showToast({
+          title: "\u8BF7\u8F93\u5165\u56DE\u590D\u5185\u5BB9",
+          icon: "none"
+        });
+        return;
+      }
+      try {
+        const userInfo = common_vendor.index.getStorageSync("userInfo");
+        if (!userInfo || !userInfo.user_id) {
+          common_vendor.index.showToast({
+            title: "\u8BF7\u5148\u767B\u5F55",
+            icon: "none"
+          });
+          return;
+        }
+        const replyData = {
+          category_id: this.post.category_id,
+          user_id: userInfo.user_id,
+          parent_id: this.postId,
+          content: this.newReply.content.trim(),
+          level: 2,
+          sort_order: 0
+        };
+        await common_api_forum.forumApi.addReply(replyData);
+        common_vendor.index.showToast({
+          title: "\u56DE\u590D\u6210\u529F",
+          icon: "success"
+        });
+        this.newReply.content = "";
+        this.loadReplies();
+      } catch (error) {
+        console.error("\u63D0\u4EA4\u56DE\u590D\u5931\u8D25:", error);
+        common_vendor.index.showToast({
+          title: "\u63D0\u4EA4\u5931\u8D25\uFF0C\u8BF7\u91CD\u8BD5",
+          icon: "none"
+        });
+      }
+    },
+    replyToReply(reply) {
+      this.newReply.content = `@\u7528\u6237${reply.user_id} `;
+    },
+    async toggleLike() {
+      try {
+        const userInfo = common_vendor.index.getStorageSync("userInfo");
+        if (!userInfo || !userInfo.user_id) {
+          common_vendor.index.showToast({
+            title: "\u8BF7\u5148\u767B\u5F55",
+            icon: "none"
+          });
+          return;
+        }
+        await common_api_forum.forumApi.toggleLike({
+          user_id: userInfo.user_id,
+          comment_id: this.postId,
+          action: this.post.is_liked ? "unlike" : "like"
+        });
+        if (this.post.is_liked) {
+          this.post.like_count--;
+          this.post.is_liked = false;
+        } else {
+          this.post.like_count++;
+          this.post.is_liked = true;
+        }
+      } catch (error) {
+        console.error("\u70B9\u8D5E\u5931\u8D25:", error);
+      }
+    },
+    async toggleFavorite() {
+      try {
+        const userInfo = common_vendor.index.getStorageSync("userInfo");
+        if (!userInfo || !userInfo.user_id) {
+          common_vendor.index.showToast({
+            title: "\u8BF7\u5148\u767B\u5F55",
+            icon: "none"
+          });
+          return;
+        }
+        await common_api_forum.forumApi.toggleFavorite({
+          user_id: userInfo.user_id,
+          comment_id: this.postId,
+          action: this.post.is_favorited ? "unfavorite" : "favorite"
+        });
+        if (this.post.is_favorited) {
+          this.post.favorite_count--;
+          this.post.is_favorited = false;
+        } else {
+          this.post.favorite_count++;
+          this.post.is_favorited = true;
+        }
+      } catch (error) {
+        console.error("\u6536\u85CF\u5931\u8D25:", error);
+      }
+    },
+    async toggleReplyLike(reply) {
+      try {
+        const userInfo = common_vendor.index.getStorageSync("userInfo");
+        if (!userInfo || !userInfo.user_id) {
+          common_vendor.index.showToast({
+            title: "\u8BF7\u5148\u767B\u5F55",
+            icon: "none"
+          });
+          return;
+        }
+        await common_api_forum.forumApi.toggleLike({
+          user_id: userInfo.user_id,
+          comment_id: reply.id,
+          action: reply.is_liked ? "unlike" : "like"
+        });
+        if (reply.is_liked) {
+          reply.like_count--;
+          reply.is_liked = false;
+        } else {
+          reply.like_count++;
+          reply.is_liked = true;
+        }
+      } catch (error) {
+        console.error("\u70B9\u8D5E\u5931\u8D25:", error);
+      }
+    },
+    sharePost() {
+      common_vendor.index.showShareMenu({
+        title: this.post.content,
+        path: `/pages/forum/details/forum_detail?id=${this.postId}`
+      });
+    },
+    switchReplySort(sortBy) {
+      this.replySort = sortBy;
+      this.sortReplies();
+    },
+    sortReplies() {
+      const sortedReplies = [...this.replies];
+      switch (this.replySort) {
+        case "time_asc":
+          sortedReplies.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+          break;
+        case "time_desc":
+          sortedReplies.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+          break;
+        case "likes":
+          sortedReplies.sort((a, b) => (b.like_count || 0) - (a.like_count || 0));
+          break;
+      }
+      this.replies = sortedReplies;
+    },
+    toggleAdvancedEditor() {
+      this.showAdvancedEditor = !this.showAdvancedEditor;
+    },
+    insertBold() {
+      this.newReply.content += "**\u7C97\u4F53\u6587\u672C**";
+    },
+    insertItalic() {
+      this.newReply.content += "*\u659C\u4F53\u6587\u672C*";
+    },
+    insertLink() {
+      common_vendor.index.prompt({
+        title: "\u63D2\u5165\u94FE\u63A5",
+        message: "\u8BF7\u8F93\u5165\u94FE\u63A5\u5730\u5740",
+        success: (res) => {
+          if (res.confirm) {
+            this.newReply.content += `[\u94FE\u63A5](${res.value})`;
+          }
+        }
+      });
+    },
+    insertCode() {
+      this.newReply.content += "```\n\u4EE3\u7801\n```";
+    },
+    uploadImage() {
+      common_vendor.index.chooseImage({
+        count: 1,
+        success: (res) => {
+          this.newReply.content += `![\u56FE\u7247](${res.tempFilePaths[0]})`;
+        }
+      });
+    },
+    goToUserProfile(userId) {
+      common_vendor.index.showToast({
+        title: "\u7528\u6237\u4E2A\u4EBA\u4E3B\u9875\u529F\u80FD\u6682\u672A\u5B9E\u73B0",
+        icon: "none"
+      });
+    },
+    reportPost() {
+      common_vendor.index.showModal({
+        title: "\u4E3E\u62A5\u5E16\u5B50",
+        content: "\u786E\u5B9A\u8981\u4E3E\u62A5\u8FD9\u4E2A\u5E16\u5B50\u5417\uFF1F",
+        success: (res) => {
+          if (res.confirm) {
+            common_vendor.index.showToast({
+              title: "\u4E3E\u62A5\u6210\u529F\uFF0C\u6211\u4EEC\u4F1A\u5C3D\u5FEB\u5904\u7406",
+              icon: "success"
+            });
+          }
+        }
+      });
+    },
+    reportReply(reply) {
+      common_vendor.index.showModal({
+        title: "\u4E3E\u62A5\u56DE\u590D",
+        content: "\u786E\u5B9A\u8981\u4E3E\u62A5\u8FD9\u4E2A\u56DE\u590D\u5417\uFF1F",
+        success: (res) => {
+          if (res.confirm) {
+            common_vendor.index.showToast({
+              title: "\u4E3E\u62A5\u6210\u529F\uFF0C\u6211\u4EEC\u4F1A\u5C3D\u5FEB\u5904\u7406",
+              icon: "success"
+            });
+          }
+        }
+      });
+    },
+    getCategoryName(categoryId) {
+      return this.categoryMap[categoryId] || "\u5176\u4ED6";
+    },
+    formatTime(timeStr) {
+      if (!timeStr)
+        return "\u672A\u77E5\u65F6\u95F4";
+      try {
+        const date = new Date(timeStr.replace(/-/g, "/"));
+        const now = new Date();
+        const diff = now - date;
+        const minute = 60 * 1e3;
+        const hour = 60 * minute;
+        const day = 24 * hour;
+        if (diff < minute) {
+          return "\u521A\u521A";
+        } else if (diff < hour) {
+          return Math.floor(diff / minute) + "\u5206\u949F\u524D";
+        } else if (diff < day) {
+          return Math.floor(diff / hour) + "\u5C0F\u65F6\u524D";
+        } else {
+          return Math.floor(diff / day) + "\u5929\u524D";
+        }
+      } catch (e) {
+        return timeStr;
+      }
+    }
+  }
+};
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return common_vendor.e({
+    a: $data.post
+  }, $data.post ? common_vendor.e({
+    b: common_vendor.o(($event) => $options.goToUserProfile($data.post.user_id)),
+    c: common_vendor.t($data.post.user_id),
+    d: common_vendor.o(($event) => $options.goToUserProfile($data.post.user_id)),
+    e: $options.isOriginalAuthor
+  }, $options.isOriginalAuthor ? {} : {}, {
+    f: common_vendor.t($options.formatTime($data.post.created_at)),
+    g: $data.post.updated_at && $data.post.updated_at !== $data.post.created_at
+  }, $data.post.updated_at && $data.post.updated_at !== $data.post.created_at ? {
+    h: common_vendor.t($options.formatTime($data.post.updated_at))
+  } : {}, {
+    i: common_vendor.t($options.getCategoryName($data.post.category_id)),
+    j: common_vendor.t($data.post.title || $data.post.content),
+    k: common_vendor.t($data.post.content),
+    l: common_vendor.t($data.post.view_count || 0),
+    m: common_vendor.t($data.post.reply_count || 0),
+    n: common_vendor.t($data.post.favorite_count || 0),
+    o: common_vendor.t($data.post.like_count || 0),
+    p: common_vendor.o((...args) => $options.toggleLike && $options.toggleLike(...args)),
+    q: $data.post.is_liked ? 1 : "",
+    r: common_vendor.t($data.post.favorite_count || 0),
+    s: common_vendor.o((...args) => $options.toggleFavorite && $options.toggleFavorite(...args)),
+    t: $data.post.is_favorited ? 1 : "",
+    v: common_vendor.o((...args) => $options.sharePost && $options.sharePost(...args)),
+    w: common_vendor.o((...args) => $options.reportPost && $options.reportPost(...args))
+  }) : {}, {
+    x: $data.post
+  }, $data.post ? common_vendor.e({
+    y: common_vendor.t($data.replies.length),
+    z: $data.replySort === "time_asc" ? 1 : "",
+    A: common_vendor.o(($event) => $options.switchReplySort("time_asc")),
+    B: $data.replySort === "time_desc" ? 1 : "",
+    C: common_vendor.o(($event) => $options.switchReplySort("time_desc")),
+    D: $data.replySort === "likes" ? 1 : "",
+    E: common_vendor.o(($event) => $options.switchReplySort("likes")),
+    F: common_vendor.f($data.replies, (reply, index, i0) => {
+      return common_vendor.e({
+        a: common_vendor.o(($event) => $options.goToUserProfile(reply.user_id)),
+        b: common_vendor.t(reply.user_id),
+        c: common_vendor.o(($event) => $options.goToUserProfile(reply.user_id)),
+        d: $options.isOriginalAuthor && reply.user_id === $data.post.user_id
+      }, $options.isOriginalAuthor && reply.user_id === $data.post.user_id ? {} : {}, {
+        e: reply.is_best_answer
+      }, reply.is_best_answer ? {} : {}, {
+        f: common_vendor.t($options.formatTime(reply.created_at)),
+        g: common_vendor.t(index + 1),
+        h: common_vendor.t(reply.content),
+        i: common_vendor.o(($event) => $options.replyToReply(reply)),
+        j: common_vendor.t(reply.like_count || 0),
+        k: common_vendor.o(($event) => $options.toggleReplyLike(reply)),
+        l: reply.is_liked ? 1 : "",
+        m: common_vendor.o(($event) => $options.reportReply(reply)),
+        n: reply.id
+      });
+    }),
+    G: $data.replies.length === 0
+  }, $data.replies.length === 0 ? {} : {}) : {}, {
+    H: $data.post
+  }, $data.post ? common_vendor.e({
+    I: common_vendor.o((...args) => $options.toggleAdvancedEditor && $options.toggleAdvancedEditor(...args)),
+    J: $data.newReply.content,
+    K: common_vendor.o(($event) => $data.newReply.content = $event.detail.value),
+    L: common_vendor.o((...args) => $options.submitReply && $options.submitReply(...args)),
+    M: !$data.newReply.content.trim(),
+    N: $data.showAdvancedEditor
+  }, $data.showAdvancedEditor ? {
+    O: common_vendor.o((...args) => $options.insertBold && $options.insertBold(...args)),
+    P: common_vendor.o((...args) => $options.insertItalic && $options.insertItalic(...args)),
+    Q: common_vendor.o((...args) => $options.insertLink && $options.insertLink(...args)),
+    R: common_vendor.o((...args) => $options.insertCode && $options.insertCode(...args)),
+    S: common_vendor.o((...args) => $options.uploadImage && $options.uploadImage(...args))
+  } : {}) : {});
+}
+var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-2f1ba243"], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/forum/details/forum_detail.vue"]]);
+wx.createPage(MiniProgramPage);

@@ -324,24 +324,13 @@ export default {
           new_password: this.forgetForm.new_password
         }
         
-        // 模拟密码重置流程：
-        // 1. 验证身份和验证码
-        // 2. 更新 sys_user.password_hash
-        // 3. 返回结果
-        
-        // 模拟网络延迟
-        await new Promise(resolve => setTimeout(resolve, 1500))
-        
-        // 模拟成功响应
-        const mockResponse = {
-          code: 200,
-          message: '密码重置成功'
-        }
+        // 调用后端接口
+        const res = await userApi.forgetPassword(resetData)
         
         // 处理成功
-        if (mockResponse.code === 200) {
+        if (res) {
           uni.showToast({
-            title: mockResponse.message,
+            title: '密码重置成功',
             icon: 'success'
           })
           
@@ -351,17 +340,11 @@ export default {
               url: '/pages/login/login'
             })
           }, 1500)
-        } else {
-          // 处理失败
-          uni.showToast({
-            title: mockResponse.message || '密码重置失败',
-            icon: 'none'
-          })
         }
       } catch (error) {
         console.error('密码重置失败:', error)
         uni.showToast({
-          title: '密码重置失败，请稍后重试',
+          title: error.message || '密码重置失败，请稍后重试',
           icon: 'none'
         })
       } finally {

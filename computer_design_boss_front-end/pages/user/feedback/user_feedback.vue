@@ -56,53 +56,118 @@
 </template>
 
 <script>
+import {
+  getComplaintTypes,
+  getFeedbackList,
+  submitFeedback
+} from '@/common/api/feedback.js'
+
 export default {
   data() {
     return {
-      feedbacks: [
-        {
-          type: '账号问题',
-          submitTime: '2024-01-15 14:30',
-          status: 'pending',
-          statusText: '待处理',
-          description: '登录账号遇到问题，无法正常登录'
-        },
-        {
-          type: '职位信息错误',
-          submitTime: '2024-01-16 10:20',
-          status: 'processed',
-          statusText: '已处理',
-          description: '某职位的薪资信息显示错误',
-          response: '已核实并修正该职位的薪资信息，感谢您的反馈'
-        }
-      ],
-      typeOptions: ['账号问题', '职位信息错误', '平台功能问题', '其他'],
+      feedbacks: [],
+      typeOptions: [],
+      typeCodeMap: {},   // 保存 type_name -> type_code 映射
       typeIndex: 0,
       newFeedback: {
-        type: '',
+        complaint_type: null,
         description: ''
-      }
+      },
+      page: 1,
+      limit: 20
     }
   },
+
+  async onLoad() {
+    await this.loadComplaintTypes()
+    await this.loadFeedbackList()
+  },
+
   methods: {
     goBack() {
       uni.navigateBack()
     },
-    addFeedback() {
-      this.newFeedback = {
-        type: this.typeOptions[this.typeIndex],
-        description: ''
+
+    // ================= 加载投诉类型 =================
+    async loadComplaintTypes() {
+      try {
+        const res = await getComplaintTypes()
+        
+		console.log("转换后的collections:")
+			
+        const types = res || []
+        this.typeOptions = types.map(t => t.type_name)
+
+          // 建立映射关系
+        types.forEach(t => {
+			this.typeCodeMap[t.type_name] = t.type_code
+        })
+		console.log("转换后的collections:",this.typeOptions)
+
+        // 默认选第一个
+        if (types.length > 0) {
+            this.newFeedback.complaint_type = types[0].type_code
+        }
+        
+      } catch (err) {
+		  
+        uni.showToast({
+          title: '获取投诉类型失败',
+          icon: 'none'
+        })
       }
+    },
+
+    // ================= 加载反馈列表 =================
+    async loadFeedbackList() {
+      try {
+        const res = await getFeedbackList({
+          page: this.page,
+          limit: this.limit
+        })
+		
+		console.log("转换后的collections:",res)
+        const list = res || []
+		console.log("转换后的collections:",list)
+        this.feedbacks = list.map(item => ({
+            id: item.id,
+            type: this.typeOptions[item.complaint_type - 1] ,   // 后端最好返回 type_name
+            submitTime: item.create_time,
+            status: item.is_resolved === 1 ? 'processed' : 'pending',
+            statusText: item.is_resolved === 1 ? '已处理' : '待处理',
+            description: item.description,
+            response: item.feedback_content
+          }))
+        
+      } catch (err) {
+        uni.showToast({
+          title: '获取反馈列表失败',
+          icon: 'none'
+        })
+      }
+    },
+
+    // ================= 打开弹窗 =================
+    addFeedback() {
+      this.newFeedback.description = ''
       this.$refs.addPopup.open()
     },
+
     closePopup() {
-      this.$refs.addPopup.close()
+      if (this.$refs.addPopup) {
+        this.$refs.addPopup.close()
+      }
     },
+
+    // ================= 类型切换 =================
     onTypeChange(e) {
       this.typeIndex = e.detail.value
-      this.newFeedback.type = this.typeOptions[this.typeIndex]
+      const typeName = this.typeOptions[this.typeIndex]
+      this.newFeedback.complaint_type = this.typeCodeMap[typeName]
     },
-    submitFeedback() {
+
+    // ================= 提交反馈 =================
+    async submitFeedback() {
       if (!this.newFeedback.description.trim()) {
         uni.showToast({
           title: '请输入投诉描述',
@@ -110,33 +175,37 @@ export default {
         })
         return
       }
-      
-      const feedback = {
-        type: this.newFeedback.type,
-        submitTime: new Date().toLocaleString(),
-        status: 'pending',
-        statusText: '待处理',
-        description: this.newFeedback.description
+
+      if (this.newFeedback.description.length < 10) {
+        uni.showToast({
+          title: '描述不能少于10个字',
+          icon: 'none'
+        })
+        return
       }
-      
-      this.feedbacks.unshift(feedback)
-      this.closePopup()
-      uni.showToast({
-        title: '反馈提交成功',
-        icon: 'success'
-      })
+
+      try {
+        const res = await submitFeedback({
+          complaint_type: this.newFeedback.complaint_type,
+          description: this.newFeedback.description
+        })
+
+        if (res.code === 200) {
+          uni.showToast({
+            title: '反馈提交成功',
+            icon: 'success'
+          })
+
+          this.closePopup()
+          await this.loadFeedbackList()
+        }
+      } catch (err) {
+        uni.showToast({
+          title: err.message || '提交失败',
+          icon: 'none'
+        })
+      }
     }
-  },
-  onLoad() {
-    // 从存储中加载反馈数据
-    const savedFeedbacks = uni.getStorageSync('feedbacks')
-    if (savedFeedbacks) {
-      this.feedbacks = savedFeedbacks
-    }
-  },
-  onUnload() {
-    // 保存反馈数据
-    uni.setStorageSync('feedbacks', this.feedbacks)
   }
 }
 </script>

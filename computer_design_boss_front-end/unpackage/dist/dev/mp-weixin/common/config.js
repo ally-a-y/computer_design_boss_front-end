@@ -2,11 +2,15 @@
 const config = {
   development: {
     baseURL: "http://localhost:5000/api",
-    staticURL: "http://localhost:5000"
+    staticURL: "http://localhost:5000",
+    apiBase: "http://localhost:5000/api",
+    fileBase: "http://localhost:5000"
   },
   production: {
     baseURL: "https://api.yourdomain.com/api",
-    staticURL: "https://yourdomain.com"
+    staticURL: "https://yourdomain.com",
+    apiBase: "https://api.yourdomain.com/api",
+    fileBase: "https://yourdomain.com"
   }
 };
 const env = "development";

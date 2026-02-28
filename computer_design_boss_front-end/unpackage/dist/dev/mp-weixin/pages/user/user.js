@@ -82,7 +82,7 @@ if (!Array) {
 }
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return {
-    a: common_vendor.t($data.userInfo.name || "\u672A\u767B\u5F55"),
+    a: common_vendor.t($data.userInfo.name || "\u5DF2\u767B\u5F55"),
     b: common_vendor.o((...args) => $options.navigateToResume && $options.navigateToResume(...args)),
     c: common_vendor.p({
       type: "star",

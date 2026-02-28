@@ -268,242 +268,227 @@
 </template>
 
 <script>
+import { resumeApi } from '@/common/api/resume.js'
+
 export default {
   data() {
     return {
       genderOptions: ['男', '女'],
       genderIndex: 0,
-      certTypeOptions: ['english', 'computer', 'professional'],
-      certTypeDisplayOptions: ['英语证书', '计算机证书', '职业资格证书'],
-      companySizeOptions: ['1-50人', '51-200人', '201-500人', '501-1000人', '1001-5000人', '5000人以上'],
-      companySizeIndex: 4, // 默认1001-5000人
-      workTypeOptions: ['全职', '兼职', '实习', '远程工作', '自由职业'],
-      workTypeIndex: 0, // 默认全职
+
+      companySizeOptions: ['不限', '小型', '中型', '大型'],
+      companySizeIndex: 0,
+
+      workTypeOptions: ['全职', '兼职', '实习'],
+      workTypeIndex: 0,
+
+      certTypeOptions: ['技能类', '资格类', '语言类', '其他'],
+
       resume: {
-        real_name: '张三',
+        real_name: '',
         gender: 1,
-        birth_date: '2000-01-01',
-        phone: '13800138000',
-        email: 'zhangsan@example.com',
-        wechat: 'zhangsan123',
-        city: '北京',
-        education_level: '本科',
-        school_name: '北京大学',
-        major: '计算机科学与技术',
-        graduation_year: '2022',
-        gpa: '3.8',
-        self_introduction: '我是一名计算机专业的毕业生，具有扎实的专业基础和较强的学习能力...',
+        birth_date: '',
+        phone: '',
+        email: '',
+        wechat: '',
+        city: '',
+        education_level: '',
+        school_name: '',
+        major: '',
+        graduation_year: '',
+        gpa: '',
+        self_introduction: '',
+
         intention: {
-          industry: '互联网',
-          position: '前端开发工程师',
-          city: '北京',
-          salary: '15k-25k',
-          available_time: '立即到岗'
+          industry: '',
+          position: '',
+          city: '',
+          salary: '',
+          available_time: ''
         },
+
         preference: {
-          internship_conversion: true,
+          internship_conversion: false,
           remote_work: false,
-          campus_recommendation: true,
-          overtime: true,
-          business_trip: false,
-          company_size: '1000-5000人',
-          work_type: '全职'
+          campus_recommendation: false,
+          overtime: false,
+          business_trip: false
         },
+
         campus_experience: {
-          student_union: true,
-          club: true,
-          scholarship: true,
+          student_union: false,
+          club: false,
+          scholarship: false,
           honor: false,
-          description: '曾担任学生会宣传部部长，组织过多次校园活动...'
+          description: ''
         },
-        certificates: [
-          {
-            cert_type: 'computer',
-            cert_name: '计算机二级证书',
-            cert_level: '二级',
-            issue_date: '2021-03-15',
-            expiry_date: null,
-            issuing_authority: '教育部考试中心',
-            certificate_no: 'NCRE20210315001',
-            attachment_url: null
-          }
-        ]
+
+        certificates: []
       }
     }
   },
+
+  async onLoad() {
+    await this.loadResume()
+  },
+
   methods: {
+
     goBack() {
       uni.navigateBack()
     },
-    saveResume() {
-      // 保存简历逻辑 - 转换为后端格式
-      const backendResume = this.convertToBackendFormat()
-      uni.setStorageSync('resume', this.resume)
-      uni.setStorageSync('backend_resume', backendResume)
-      uni.showToast({
-        title: '保存成功',
-        icon: 'success'
-      })
+
+    /* =============================
+       加载完整简历
+    ============================= */
+    async loadResume() {
+      try {
+        const basic = await resumeApi.getBasic()
+        //const intention = await resumeApi.getIntention()
+        const preference = await resumeApi.getPreference()
+        const campus = await resumeApi.getCampus()
+
+        this.resume = {
+          ...this.resume,
+          ...basic.data,
+          intention: intention.data || {},
+          preference: preference.data || {},
+          campus_experience: campus.data || {},
+          certificates: certificates.data || []
+        }
+
+        // 设置选择器索引
+        this.genderIndex = this.resume.gender === 2 ? 1 : 0
+      } catch (err) {
+        console.log('暂无简历')
+      }
     },
+
+    /* =============================
+       保存简历
+    ============================= */
+    async saveResume() {
+      try {
+       // 1️⃣ 保存基本信息
+        await resumeApi.saveBasic({
+          real_name: this.resume.real_name,
+          phone: this.resume.gender,
+          birth_date: this.resume.birth_date,
+          //phone: this.resume.phone,
+          email: this.resume.email,
+          //wechat: this.resume.wechat,
+          //city: this.resume.city,
+          education_level: this.resume.education_level,
+          school_name: this.resume.school_name,
+          major: this.resume.major,
+          graduation_year: this.resume.graduation_year,
+          gpa: this.resume.gpa,
+          self_introduction: this.resume.self_introduction
+        })
+
+        // 2️⃣ 保存求职意向
+        await resumeApi.saveIntention({
+          target_industries: this.resume.intention.industry,
+          target_positions: this.resume.intention.position,
+          salary_min: 100,
+          salary_max: 10000,
+          target_city: this.resume.intention.city,
+          available_time: this.resume.intention.available_time
+        })
+
+        // 3️⃣ 保存求职偏好
+        await resumeApi.savePreference(this.resume.preference)
+
+        // 4️⃣ 保存校园经历
+        await resumeApi.saveCampus(this.resume.campus_experience)
+
+        uni.showToast({
+          title: '保存成功',
+          icon: 'success'
+        })
+
+      } catch (err) {
+        uni.showToast({
+          title: err.message || '保存失败',
+          icon: 'none'
+        })
+      }
+    },
+
+    /* =============================
+       选择器事件处理
+    ============================= */
     onGenderChange(e) {
       this.genderIndex = e.detail.value
-      this.resume.gender = this.genderIndex + 1 // 1-男，2-女
+      this.resume.gender = this.genderIndex === 1 ? 2 : 1
     },
+
     onCompanySizeChange(e) {
-      this.companySizeIndex = parseInt(e.detail.value)
-      this.resume.preference.company_size = this.companySizeOptions[this.companySizeIndex]
+      this.companySizeIndex = e.detail.value
     },
+
     onWorkTypeChange(e) {
-      this.workTypeIndex = parseInt(e.detail.value)
-      this.resume.preference.work_type = this.workTypeOptions[this.workTypeIndex]
+      this.workTypeIndex = e.detail.value
     },
-    togglePreference(preferenceKey) {
-      // 点击整行切换开关状态
-      this.resume.preference[preferenceKey] = !this.resume.preference[preferenceKey]
+
+    /* =============================
+       证书操作
+    ============================= */
+    addCertificate() {
+      this.resume.certificates.push({
+        cert_name: '',
+        cert_type: 0,
+        cert_level: '',
+        issue_date: '',
+        expiry_date: '',
+        issuing_authority: '',
+        certificate_no: '',
+        attachment_url: ''
+      })
     },
-    toggleCampusExperience(experienceKey) {
-      // 点击整行切换校园经历开关状态
-      this.resume.campus_experience[experienceKey] = !this.resume.campus_experience[experienceKey]
+
+    deleteCertificate(index) {
+      const cert = this.resume.certificates[index]
+      if (!cert.id) {
+        this.resume.certificates.splice(index, 1)
+        return
+      }
+      uni.showModal({
+        title: '删除证书',
+        content: '确定删除此证书吗？',
+        success: async (res) => {
+          if (res.confirm) {
+            try {
+              await resumeApi.deleteCertificate(cert.id)
+              this.resume.certificates.splice(index, 1)
+              uni.showToast({ title: '删除成功', icon: 'success' })
+            } catch (err) {
+              uni.showToast({ title: '删除失败', icon: 'none' })
+            }
+          }
+        }
+      })
     },
+
+    getCertTypeIndex(type) {
+      return this.certTypeOptions.indexOf(type)
+    },
+
     onCertTypeChange(e, index) {
-      const certTypeIndex = parseInt(e.detail.value)
-      this.resume.certificates[index].cert_type = this.certTypeOptions[certTypeIndex]
+      const val = e.detail.value
+      this.resume.certificates[index].cert_type = this.certTypeOptions[val]
     },
+
     onCertDateChange(e, index, field) {
       this.resume.certificates[index][field] = e.detail.value
     },
-    getCertTypeIndex(certType) {
-      return this.certTypeOptions.indexOf(certType)
-    },
-    addCertificate() {
-      this.resume.certificates.push({
-        cert_type: 'professional',
-        cert_name: '',
-        cert_level: '',
-        issue_date: '',
-        expiry_date: null,
-        issuing_authority: '',
-        certificate_no: '',
-        attachment_url: null
-      })
-    },
-    editCertificate(index) {
-      // 编辑证书逻辑
-      uni.showToast({
-        title: '编辑证书功能开发中',
-        icon: 'none'
-      })
-    },
-    deleteCertificate(index) {
-      uni.showModal({
-        title: '提示',
-        content: '确定要删除该证书吗？',
-        success: (res) => {
-          if (res.confirm) {
-            this.resume.certificates.splice(index, 1)
-          }
-        }
-      })
-    },
-    uploadCertificateFile(index) {
-      // 上传PDF证书文件
-      uni.chooseFile({
-        count: 1,
-        type: 'file',
-        extension: ['.pdf'],
-        success: (res) => {
-          const file = res.tempFiles[0]
-          if (file && file.name.toLowerCase().endsWith('.pdf')) {
-            // 模拟文件上传
-            const mockFileUrl = `https://cert-bucket.com/${file.name}`
-            this.resume.certificates[index].attachment_url = mockFileUrl
-            uni.showToast({
-              title: '文件上传成功',
-              icon: 'success'
-            })
-          } else {
-            uni.showToast({
-              title: '请选择PDF文件',
-              icon: 'none'
-            })
-          }
-        },
-        fail: () => {
-          uni.showToast({
-            title: '文件选择失败',
-            icon: 'none'
-          })
-        }
-      })
-    },
+
     getFileName(url) {
       if (!url) return ''
-      return url.split('/').pop()
-    },
-    convertToBackendFormat() {
-      // 转换为后端数据格式
-      return {
-        real_name: this.resume.real_name,
-        gender: this.resume.gender,
-        birth_date: this.resume.birth_date,
-        phone: this.resume.phone,
-        email: this.resume.email,
-        wechat: this.resume.wechat,
-        city: this.resume.city,
-        education_level: this.resume.education_level,
-        school_name: this.resume.school_name,
-        major: this.resume.major,
-        graduation_year: this.resume.graduation_year,
-        gpa: this.resume.gpa,
-        self_introduction: this.resume.self_introduction,
-        intention: {
-          industry: this.resume.intention.industry,
-          position: this.resume.intention.position,
-          city: this.resume.intention.city,
-          salary: this.resume.intention.salary,
-          available_time: this.resume.intention.available_time
-        },
-        preference: {
-          internship_conversion: this.resume.preference.internship_conversion,
-          remote_work: this.resume.preference.remote_work,
-          campus_recommendation: this.resume.preference.campus_recommendation,
-          overtime: this.resume.preference.overtime,
-          business_trip: this.resume.preference.business_trip,
-          company_size: this.resume.preference.company_size,
-          work_type: this.resume.preference.work_type
-        },
-        campus_experience: {
-          has_student_union: this.resume.campus_experience.student_union ? 1 : 0,
-          student_union_details: this.resume.campus_experience.student_union ? this.resume.campus_experience.description : null,
-          has_club: this.resume.campus_experience.club ? 1 : 0,
-          club_details: this.resume.campus_experience.club ? this.resume.campus_experience.description : null,
-          has_scholarship: this.resume.campus_experience.scholarship ? 1 : 0,
-          scholarship_details: this.resume.campus_experience.scholarship ? this.resume.campus_experience.description : null,
-          has_honor: this.resume.campus_experience.honor ? 1 : 0,
-          honor_details: this.resume.campus_experience.honor ? this.resume.campus_experience.description : null
-        },
-        certificates: this.resume.certificates.map(cert => ({
-          cert_type: cert.cert_type,
-          cert_name: cert.cert_name,
-          cert_level: cert.cert_level,
-          issue_date: cert.issue_date,
-          expiry_date: cert.expiry_date,
-          issuing_authority: cert.issuing_authority,
-          certificate_no: cert.certificate_no,
-          attachment_url: cert.attachment_url
-        }))
-      }
+      const parts = url.split('/')
+      return parts[parts.length - 1]
     }
-  },
-  onLoad() {
-    // 从存储中加载简历数据
-    const savedResume = uni.getStorageSync('resume')
-    if (savedResume) {
-      this.resume = savedResume
-      this.genderIndex = this.resume.gender === 1 ? 0 : 1
-      this.companySizeIndex = this.companySizeOptions.indexOf(this.resume.preference.company_size) || 4
-      this.workTypeIndex = this.workTypeOptions.indexOf(this.resume.preference.work_type) || 0
-    }
+
   }
 }
 </script>

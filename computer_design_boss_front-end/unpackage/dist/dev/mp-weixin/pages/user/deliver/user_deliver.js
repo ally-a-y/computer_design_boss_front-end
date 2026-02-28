@@ -1,78 +1,100 @@
 "use strict";
 var common_vendor = require("../../../common/vendor.js");
+var common_api_deliver = require("../../../common/api/deliver.js");
+require("../../../common/api/request.js");
+require("../../../common/config.js");
 const _sfc_main = {
   data() {
     return {
-      delivers: [
-        {
-          jobTitle: "\u524D\u7AEF\u5F00\u53D1\u5DE5\u7A0B\u5E08",
-          company: "\u79D1\u6280\u6709\u9650\u516C\u53F8",
-          salary: "15k-25k",
-          deliverTime: "2024-01-15 14:30",
-          status: "pending",
-          statusText: "\u5F85\u5904\u7406"
-        },
-        {
-          jobTitle: "\u540E\u7AEF\u5F00\u53D1\u5DE5\u7A0B\u5E08",
-          company: "\u4E92\u8054\u7F51\u516C\u53F8",
-          salary: "20k-30k",
-          deliverTime: "2024-01-16 10:20",
-          status: "reviewing",
-          statusText: "\u5BA1\u6838\u4E2D"
-        },
-        {
-          jobTitle: "\u4EA7\u54C1\u7ECF\u7406",
-          company: "\u521B\u4E1A\u516C\u53F8",
-          salary: "18k-28k",
-          deliverTime: "2024-01-17 09:15",
-          status: "rejected",
-          statusText: "\u5DF2\u62D2\u7EDD"
-        },
-        {
-          jobTitle: "UI\u8BBE\u8BA1\u5E08",
-          company: "\u8BBE\u8BA1\u516C\u53F8",
-          salary: "12k-20k",
-          deliverTime: "2024-01-18 16:45",
-          status: "accepted",
-          statusText: "\u5DF2\u901A\u8FC7"
-        }
-      ]
+      delivers: [],
+      userId: 1,
+      loading: false
     };
+  },
+  async onLoad() {
+    await this.loadDelivers();
   },
   methods: {
     goBack() {
       common_vendor.index.navigateBack();
     },
-    cancelDeliver(index) {
+    async loadDelivers() {
+      try {
+        this.loading = true;
+        const res = await common_api_deliver.deliverApi.getDeliverList(this.userId);
+        const rawList = Array.isArray(res) ? res : [];
+        this.delivers = rawList.map((item) => {
+          const snapshot = JSON.parse(item.job_snapshot || "{}");
+          console.log("\u8F6C\u6362\u524D\u7684delivers:", snapshot);
+          return {
+            jobTitle: snapshot.title || "",
+            company: snapshot.location || "",
+            salary: snapshot.salary || "",
+            deliverTime: new Date(item.created_at).toLocaleString(),
+            status: item.status || "pending",
+            statusText: item.status_text || "\u5F85\u5904\u7406",
+            boss_job_id: item.boss_job_id,
+            address: snapshot.address || "",
+            eduReq: snapshot.edu_req || "",
+            expReq: snapshot.exp_req || ""
+          };
+        });
+        console.log("\u8F6C\u6362\u540E\u7684delivers:", this.delivers.jobTitle);
+        console.log("\u8F6C\u6362\u540E\u7684delivers:", this.delivers);
+      } catch (err) {
+        common_vendor.index.showToast({
+          title: err.message || "\u83B7\u53D6\u6295\u9012\u5931\u8D25",
+          icon: "none"
+        });
+      } finally {
+        this.loading = false;
+      }
+    },
+    async cancelDeliver(index) {
+      const item = this.delivers[index];
       common_vendor.index.showModal({
         title: "\u63D0\u793A",
-        content: "\u786E\u5B9A\u8981\u53D6\u6D88\u6295\u9012\u8BE5\u804C\u4F4D\u5417\uFF1F",
-        success: (res) => {
+        content: "\u786E\u5B9A\u53D6\u6D88\u6295\u9012\u8BE5\u804C\u4F4D\u5417\uFF1F",
+        success: async (res) => {
           if (res.confirm) {
-            this.delivers.splice(index, 1);
-            common_vendor.index.showToast({
-              title: "\u5DF2\u53D6\u6D88\u6295\u9012",
-              icon: "success"
-            });
+            try {
+              await common_api_deliver.deliverApi.cancelDeliver({
+                user_id: this.userId,
+                boss_job_id: item.boss_job_id
+              });
+              this.delivers.splice(index, 1);
+              common_vendor.index.showToast({
+                title: "\u5DF2\u53D6\u6D88\u6295\u9012",
+                icon: "success"
+              });
+            } catch (err) {
+              common_vendor.index.showToast({
+                title: err.message || "\u53D6\u6D88\u5931\u8D25",
+                icon: "none"
+              });
+            }
           }
         }
       });
     },
-    viewDetails(item) {
-      common_vendor.index.showToast({
-        title: `\u67E5\u770B${item.jobTitle}\u8BE6\u60C5`,
-        icon: "none"
-      });
+    async viewDetails(item) {
+      try {
+        const res = await common_api_deliver.deliverApi.getDeliverDetail({
+          user_id: this.userId,
+          boss_job_id: item.boss_job_id
+        });
+        console.log("\u6295\u9012\u8BE6\u60C5:", res.data);
+        common_vendor.index.showToast({
+          title: `\u67E5\u770B${item.jobTitle}\u8BE6\u60C5`,
+          icon: "none"
+        });
+      } catch (err) {
+        common_vendor.index.showToast({
+          title: err.message || "\u83B7\u53D6\u8BE6\u60C5\u5931\u8D25",
+          icon: "none"
+        });
+      }
     }
-  },
-  onLoad() {
-    const savedDelivers = common_vendor.index.getStorageSync("delivers");
-    if (savedDelivers) {
-      this.delivers = savedDelivers;
-    }
-  },
-  onUnload() {
-    common_vendor.index.setStorageSync("delivers", this.delivers);
   }
 };
 if (!Array) {

@@ -5,7 +5,7 @@
       <view class="user-header">
         <image class="avatar" src="/static/logo.png" mode="aspectFill"></image>
         <view class="user-info">
-          <text class="user-name">{{ userInfo.name || '未登录' }}</text>
+          <text class="user-name">{{ userInfo.name || '已登录' }}</text>
           <text class="edit-resume" @click="navigateToResume">编辑简历</text>
         </view>
       </view>
