@@ -87,10 +87,27 @@
           <text class="label">期望城市</text>
           <input class="input" v-model="resume.intention.city" placeholder="请输入期望城市" />
         </view>
-        <view class="form-item">
-          <text class="label">薪资范围</text>
-          <input class="input" v-model="resume.intention.salary" placeholder="请输入期望薪资范围" />
-        </view>
+		<view class="form-item">
+		  <text class="label">薪资范围</text>
+
+		  <view class="salary-box">
+			<input
+			  class="salary-input"
+			  type="number"
+			  v-model="resume.intention.salary_min"
+			  placeholder="最低薪资"
+			/>
+			
+			<text class="wave">~</text>
+
+			<input
+			  class="salary-input"
+			  type="number"
+			  v-model="resume.intention.salary_max"
+			  placeholder="最高薪资"
+			/>
+		  </view>
+		</view>
         <view class="form-item">
           <text class="label">到岗时间</text>
           <input class="input" v-model="resume.intention.available_time" placeholder="请输入到岗时间" />
@@ -161,53 +178,95 @@
         </view>
       </view>
       
-      <!-- 校园经历 -->
-      <view class="section">
-        <text class="section-title">校园经历</text>
-        <view class="campus-group">
-          <view class="campus-item" @click="toggleCampusExperience('student_union')">
-            <text class="campus-label">学生会经历</text>
-            <switch 
-              :checked="resume.campus_experience.student_union" 
-              @change="(e) => resume.campus_experience.student_union = e.detail.value"
-              color="#007aff"
-              style="transform: scale(0.8);"
-            />
-          </view>
-          <view class="campus-item" @click="toggleCampusExperience('club')">
-            <text class="campus-label">社团经历</text>
-            <switch 
-              :checked="resume.campus_experience.club" 
-              @change="(e) => resume.campus_experience.club = e.detail.value"
-              color="#007aff"
-              style="transform: scale(0.8);"
-            />
-          </view>
-          <view class="campus-item" @click="toggleCampusExperience('scholarship')">
-            <text class="campus-label">奖学金</text>
-            <switch 
-              :checked="resume.campus_experience.scholarship" 
-              @change="(e) => resume.campus_experience.scholarship = e.detail.value"
-              color="#007aff"
-              style="transform: scale(0.8);"
-            />
-          </view>
-          <view class="campus-item" @click="toggleCampusExperience('honor')">
-            <text class="campus-label">荣誉</text>
-            <switch 
-              :checked="resume.campus_experience.honor" 
-              @change="(e) => resume.campus_experience.honor = e.detail.value"
-              color="#007aff"
-              style="transform: scale(0.8);"
-            />
-          </view>
-        </view>
-        <view class="form-item">
-          <text class="label">详细描述</text>
-          <textarea class="textarea" v-model="resume.campus_experience.description" placeholder="请输入详细描述" />
-        </view>
-      </view>
-      
+		<!-- 校园经历 -->
+		<view class="section">
+		  <text class="section-title">校园经历</text>
+		  
+		  <!-- 学生会 -->
+		  <view class="campus-group">
+			<view class="campus-item" @click="toggleCampusExperience('student_union')">
+			  <text class="campus-label">学生会经历</text>
+			  <switch 
+				:checked="resume.campus_experience.student_union" 
+				@change="(e) => resume.campus_experience.student_union = e.detail.value"
+				color="#007aff"
+				style="transform: scale(0.8);"
+			  />
+			</view>
+			<!-- 学生会描述文本框（条件渲染） -->
+			<view v-if="resume.campus_experience.student_union" class="campus-desc-box">
+			  <textarea 
+				class="campus-textarea" 
+				v-model="resume.campus_experience.student_union_desc" 
+				placeholder="请描述学生会经历（职务、工作内容、成果等）"
+			  />
+			</view>
+		  </view>
+
+		  <!-- 社团 -->
+		  <view class="campus-group">
+			<view class="campus-item" @click="toggleCampusExperience('club')">
+			  <text class="campus-label">社团经历</text>
+			  <switch 
+				:checked="resume.campus_experience.club" 
+				@change="(e) => resume.campus_experience.club = e.detail.value"
+				color="#007aff"
+				style="transform: scale(0.8);"
+			  />
+			</view>
+			<!-- 社团描述文本框（条件渲染） -->
+			<view v-if="resume.campus_experience.club" class="campus-desc-box">
+			  <textarea 
+				class="campus-textarea" 
+				v-model="resume.campus_experience.club_desc" 
+				placeholder="请描述社团经历（社团名称、职务、活动等）"
+			  />
+			</view>
+		  </view>
+
+		  <!-- 奖学金 -->
+		  <view class="campus-group">
+			<view class="campus-item" @click="toggleCampusExperience('scholarship')">
+			  <text class="campus-label">奖学金</text>
+			  <switch 
+				:checked="resume.campus_experience.scholarship" 
+				@change="(e) => resume.campus_experience.scholarship = e.detail.value"
+				color="#007aff"
+				style="transform: scale(0.8);"
+			  />
+			</view>
+			<!-- 奖学金描述文本框（条件渲染） -->
+			<view v-if="resume.campus_experience.scholarship" class="campus-desc-box">
+			  <textarea 
+				class="campus-textarea" 
+				v-model="resume.campus_experience.scholarship_desc" 
+				placeholder="请描述奖学金情况（奖项名称、等级、时间等）"
+			  />
+			</view>
+		  </view>
+
+		  <!-- 荣誉 -->
+		  <view class="campus-group">
+			<view class="campus-item" @click="toggleCampusExperience('honor')">
+			  <text class="campus-label">荣誉</text>
+			  <switch 
+				:checked="resume.campus_experience.honor" 
+				@change="(e) => resume.campus_experience.honor = e.detail.value"
+				color="#007aff"
+				style="transform: scale(0.8);"
+			  />
+			</view>
+			<!-- 荣誉描述文本框（条件渲染） -->
+			<view v-if="resume.campus_experience.honor" class="campus-desc-box">
+			  <textarea 
+				class="campus-textarea" 
+				v-model="resume.campus_experience.honor_desc" 
+				placeholder="请描述获得荣誉（奖项名称、颁发机构、时间等）"
+			  />
+			</view>
+		  </view>
+		</view>
+			  
       <!-- 证书管理 -->
       <view class="section">
         <view class="section-header">
@@ -250,17 +309,6 @@
             <text class="label">证书编号</text>
             <input class="input" v-model="certificate.certificate_no" placeholder="请输入证书编号" />
           </view>
-          <view class="form-item">
-            <text class="label">证书附件</text>
-            <view class="file-upload">
-              <text class="upload-btn" @click="uploadCertificateFile(index)">上传PDF证书</text>
-              <text class="file-name" v-if="certificate.attachment_url">{{ getFileName(certificate.attachment_url) }}</text>
-            </view>
-          </view>
-          <view class="certificate-actions">
-            <text class="action-btn edit" @click="editCertificate(index)">编辑</text>
-            <text class="action-btn delete" @click="deleteCertificate(index)">删除</text>
-          </view>
         </view>
       </view>
     </scroll-view>
@@ -286,7 +334,7 @@ export default {
 
       resume: {
         real_name: '',
-        gender: 1,
+        gender: '',
         birth_date: '',
         phone: '',
         email: '',
@@ -303,7 +351,8 @@ export default {
           industry: '',
           position: '',
           city: '',
-          salary: '',
+          salary_min: '',
+          salary_max: '',
           available_time: ''
         },
 
@@ -315,15 +364,18 @@ export default {
           business_trip: false
         },
 
-        campus_experience: {
-          student_union: false,
-          club: false,
-          scholarship: false,
-          honor: false,
-          description: ''
-        },
+		campus_experience: {
+        student_union: false,
+        student_union_desc: '',        // 学生会详细描述
+        club: false,
+        club_desc: '',                 // 社团详细描述
+        scholarship: false,
+        scholarship_desc: '',          // 奖学金详细描述
+        honor: false,
+        honor_desc: '',                // 荣誉详细描述         
+      },
 
-        certificates: []
+        certificates: [],
       }
     }
   },
@@ -344,19 +396,61 @@ export default {
     async loadResume() {
       try {
         const basic = await resumeApi.getBasic()
-        //const intention = await resumeApi.getIntention()
+		console.log("basic",basic)
+        const intention = await resumeApi.getIntention()
+		console.log("intention",intention)
         const preference = await resumeApi.getPreference()
+		console.log("preference",preference)
         const campus = await resumeApi.getCampus()
-
-        this.resume = {
-          ...this.resume,
-          ...basic.data,
-          intention: intention.data || {},
-          preference: preference.data || {},
-          campus_experience: campus.data || {},
-          certificates: certificates.data || []
-        }
-
+		console.log("campus",campus)
+		const certificates = await resumeApi.getCertificates()
+		console.log("certificates",certificates)
+		this.companySizeIndex =
+		  preference.company_size_preference ?? 0
+		console.log('暂无简历',this.resume.intention.city_priority)
+		this.workTypeIndex =
+		  preference.work_type_preference ?? 0
+    Object.assign(this.resume, {
+      real_name: basic.real_name,
+      gender: basic.gender,
+      birth_date: basic.birth_date,
+      phone: basic.mobile,
+      email: basic.email,
+      wechat: basic.wechat,
+      city: basic.city,
+      education_level: basic.education_level,
+      school_name: basic.school_name,
+      major: basic.major,
+      graduation_year: basic.graduation_year,
+      gpa: basic.gpa,
+      self_introduction: basic.self_introduction
+    })
+	this.resume.intention= {
+	  industry:intention.target_industries,
+	  position: intention.target_positions,
+	  city: intention.city_priority,
+	  salary_min: intention.salary_min,
+	  salary_max: intention.salary_max,
+	  available_time: intention.availability
+	},
+    Object.assign(this.resume.preference = {
+      internship_conversion: preference.accept_intern_to_full === 1,
+      remote_work: preference.accept_remote_city === 1,
+      campus_recommendation: preference.need_campus_referral === 1,
+      overtime: preference.accept_overtime === 1,
+      business_trip: preference.accept_business_trip === 1,
+    })
+	Object.assign(this.resume.campus_experience, {
+	  student_union: campus.has_student_union === 1,
+	  student_union_desc: campus.student_union_details || '',
+	  club: campus.has_club === 1,
+	  club_desc: campus.club_details || '',
+	  scholarship: campus.has_scholarship === 1,
+	  scholarship_desc: campus.scholarship_details || '',
+	  honor: campus.has_honor === 1,
+	  honor_desc: campus.honor_details || '',
+	})
+		this.resume.certificates = certificates || []
         // 设置选择器索引
         this.genderIndex = this.resume.gender === 2 ? 1 : 0
       } catch (err) {
@@ -369,39 +463,70 @@ export default {
     ============================= */
     async saveResume() {
       try {
-       // 1️⃣ 保存基本信息
-        await resumeApi.saveBasic({
-          real_name: this.resume.real_name,
-          phone: this.resume.gender,
-          birth_date: this.resume.birth_date,
-          //phone: this.resume.phone,
-          email: this.resume.email,
-          //wechat: this.resume.wechat,
-          //city: this.resume.city,
-          education_level: this.resume.education_level,
-          school_name: this.resume.school_name,
-          major: this.resume.major,
-          graduation_year: this.resume.graduation_year,
-          gpa: this.resume.gpa,
-          self_introduction: this.resume.self_introduction
-        })
+           // 1️⃣ 保存基本信息
+           await resumeApi.saveBasic({
+             real_name: this.resume.real_name,
+             gender: this.resume.gender,  // 1=男 2=女
+             birth_date: this.resume.birth_date,
+             phone: this.resume.phone,    // 修正
+             email: this.resume.email,
+             wechat: this.resume.wechat,  // 加回
+             city: this.resume.city,
+             education_level: this.resume.education_level,
+             school_name: this.resume.school_name,
+             major: this.resume.major,
+             graduation_year: this.resume.graduation_year,
+             gpa: this.resume.gpa,
+             self_introduction: this.resume.self_introduction
+           })
+       
+           // 2️⃣ 保存求职意向
+           await resumeApi.saveIntention({
+             target_industries: this.resume.intention.industry,
+             target_positions: this.resume.intention.position,
+             city_priority: this.resume.intention.city, // 对应 city_priority
+             salary_min: this.resume.intention.salary_min,
+             salary_max: this.resume.intention.salary_max,
+             availability: this.resume.intention.available_time
+           })
+       
+           // 3️⃣ 保存求职偏好
+           await resumeApi.savePreference({
+             accept_intern_to_full: this.resume.preference.internship_conversion ? 1 : 0,
+             accept_remote_city: this.resume.preference.remote_work ? 1 : 0,
+             need_campus_referral: this.resume.preference.campus_recommendation ? 1 : 0,
+             accept_overtime: this.resume.preference.overtime ? 1 : 0,
+             accept_business_trip: this.resume.preference.business_trip ? 1 : 0,
+             company_size_preference: this.companySizeIndex,
+             work_type_preference: this.workTypeIndex
+           })
+       
+           // 4️⃣ 保存校园经历
+			await resumeApi.saveCampus({
+			  has_student_union: this.resume.campus_experience.student_union ? 1 : 0,
+			  student_union_details: this.resume.campus_experience.student_union_desc,
+			  has_club: this.resume.campus_experience.club ? 1 : 0,
+			  club_details: this.resume.campus_experience.club_desc,
+			  has_scholarship: this.resume.campus_experience.scholarship ? 1 : 0,
+			  scholarship_details: this.resume.campus_experience.scholarship_desc,
+			  has_honor: this.resume.campus_experience.honor ? 1 : 0,
+			  honor_details: this.resume.campus_experience.honor_desc,
+			})
 
-        // 2️⃣ 保存求职意向
-        await resumeApi.saveIntention({
-          target_industries: this.resume.intention.industry,
-          target_positions: this.resume.intention.position,
-          salary_min: 100,
-          salary_max: 10000,
-          target_city: this.resume.intention.city,
-          available_time: this.resume.intention.available_time
-        })
-
-        // 3️⃣ 保存求职偏好
-        await resumeApi.savePreference(this.resume.preference)
-
-        // 4️⃣ 保存校园经历
-        await resumeApi.saveCampus(this.resume.campus_experience)
-
+		for (const cert of this.resume.certificates) {
+			if (!cert.id) {
+			  await resumeApi.saveCertificates({
+				cert_name: cert.cert_name,
+				cert_type: cert.cert_type,
+				issue_date: cert.issue_date,
+				expiry_date: cert.expiry_date,
+				certificate_no: cert.certificate_no,
+				cert_level: cert.cert_level,
+				issuing_authority: cert.issuing_authority,
+				attachment_url: cert.attachment_url
+			  })
+			}
+		}
         uni.showToast({
           title: '保存成功',
           icon: 'success'
@@ -684,4 +809,51 @@ export default {
   font-size: 26rpx;
   color: #333;
 }
+.salary-box {
+  display: flex;
+  align-items: center;
+}
+
+.salary-input {
+  flex: 1;
+  border: 1px solid #ddd;
+  padding: 8rpx 12rpx;
+  border-radius: 8rpx;
+}
+
+.wave {
+  margin: 0 16rpx;
+  font-size: 28rpx;
+}
+.campus-desc-box {
+  padding: 20rpx;
+  background-color: #f9f9f9;
+  border-radius: 8rpx;
+  margin-top: 10rpx;
+  animation: slideDown 0.3s ease;
+}
+
+.campus-textarea {
+  width: 100%;
+  height: 120rpx;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 8rpx;
+  padding: 16rpx;
+  font-size: 26rpx;
+  background-color: #fff;
+  box-sizing: border-box;
+}
+
+/* 展开动画 */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 </style>

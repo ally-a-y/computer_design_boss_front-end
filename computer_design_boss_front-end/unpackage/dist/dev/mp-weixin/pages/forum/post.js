@@ -43,15 +43,25 @@ const _sfc_main = {
       if (!this.canSubmit)
         return;
       try {
+        console.log("=== \u5F00\u59CB\u53D1\u5E03\u8BDD\u9898 ===");
+        const token = common_vendor.index.getStorageSync("token");
+        console.log("\u5B58\u50A8\u7684token:", token);
         let userInfo = common_vendor.index.getStorageSync("userInfo");
+        console.log("\u539F\u59CBuserInfo:", userInfo);
+        console.log("userInfo\u7C7B\u578B:", typeof userInfo);
         if (typeof userInfo === "string") {
           try {
             userInfo = JSON.parse(userInfo);
+            console.log("\u89E3\u6790\u540E\u7684userInfo:", userInfo);
           } catch (e) {
+            console.error("\u89E3\u6790userInfo\u5931\u8D25:", e);
             userInfo = null;
           }
         }
+        console.log("\u6700\u7EC8userInfo:", userInfo);
+        console.log("\u662F\u5426\u6709user_id:", userInfo && userInfo.user_id);
         if (!userInfo || !userInfo.user_id) {
+          console.error("\u767B\u5F55\u72B6\u6001\u68C0\u67E5\u5931\u8D25:", { userInfo, hasUserId: userInfo && userInfo.user_id });
           common_vendor.index.showToast({
             title: "\u8BF7\u5148\u767B\u5F55",
             icon: "none"
@@ -84,6 +94,8 @@ const _sfc_main = {
           icon: "none",
           duration: 3e3
         });
+      } finally {
+        console.log("=== \u53D1\u5E03\u8BDD\u9898\u7ED3\u675F ===");
       }
     }
   }

@@ -29,7 +29,7 @@ export const resumeApi = {
 
   getIntention() {
     return request({
-      url: '/api/resume/complete',
+      url: '/api/resume/job-intention',
       method: 'GET'
     })
   },
@@ -62,6 +62,22 @@ export const resumeApi = {
   getCampus() {
     return request({
       url: '/api/resume/campus-experience',
+      method: 'GET'
+    })
+  },
+  
+  // 校园经历
+  saveCertificates(data) {
+    return request({
+      url: '/api/resume/certificates',
+      method: 'POST',
+      data
+    })
+  },
+  
+  getCertificates() {
+    return request({
+      url: '/api/resume/certificates',
       method: 'GET'
     })
   }

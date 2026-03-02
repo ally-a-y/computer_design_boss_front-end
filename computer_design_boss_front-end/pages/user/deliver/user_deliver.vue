@@ -35,7 +35,7 @@
 
 <script>
 import { deliverApi } from '@/common/api/deliver.js' // 你需要写对应的deliverApi封装
-
+import { jobApi } from '@/common/api/job.js'
 export default {
   data() {
     return {
@@ -58,6 +58,8 @@ export default {
 	  try {
 		this.loading = true
 		const res = await deliverApi.getDeliverList(this.userId)
+		const job = await jobApi.getAllJobs()
+		console.log("转换后的id:",job)
 
 		
 		const rawList = Array.isArray(res) ? res : []
@@ -67,6 +69,7 @@ export default {
 		  const snapshot = JSON.parse(item.job_snapshot || '{}')
 			console.log("转换前的delivers:", snapshot)
 		  return {
+			id: item.id,  // 保存投递记录的 id
 			jobTitle: snapshot.title || '',
 			company: snapshot.location || '',  // 如果以后有 company_name 再换
 			salary: snapshot.salary || '',
@@ -81,6 +84,7 @@ export default {
 			expReq: snapshot.exp_req || ''
 		  }
 		})
+		console.log("转换后的id:",job)
 		console.log("转换后的delivers:", this.delivers.jobTitle)
 		console.log("转换后的delivers:", this.delivers)
 	  } catch (err) {
@@ -94,7 +98,6 @@ export default {
 	},
     async cancelDeliver(index) {
       const item = this.delivers[index]
-
       uni.showModal({
         title: '提示',
         content: '确定取消投递该职位吗？',
@@ -123,26 +126,20 @@ export default {
       })
     },
 
-    async viewDetails(item) {
-      try {
-        const res = await deliverApi.getDeliverDetail({
-          user_id: this.userId,
-          boss_job_id: item.boss_job_id
-        })
-
-        // 跳转到详情页或者弹窗显示
-        console.log('投递详情:', res.data)
-        uni.showToast({
-          title: `查看${item.jobTitle}详情`,
-          icon: 'none'
-        })
-      } catch (err) {
-        uni.showToast({
-          title: err.message || '获取详情失败',
-          icon: 'none'
-        })
-      }
-    }
+	viewDetails(item) {
+	  if (!item.id) {
+		uni.showToast({
+		  title: '职位ID不存在',
+		  icon: 'none'
+		})
+		return
+	  }
+	console.log("转换后的a:",item)
+	  uni.navigateTo({
+		  
+		url: `/pages/job/detail/job_detail_index?id=${item.id}`
+	  }) 
+	}
   }
 }
 </script>

@@ -38,6 +38,14 @@ export const deliverApi = {
       method: 'POST',
       data
     })
+  },
+  
+  checkDeliver(data) {
+    return request({
+      url: '/api/job/deliver/check',
+      method: 'POST',
+      data
+    })
   }
 
 }

@@ -87,16 +87,32 @@ export default {
       if (!this.canSubmit) return
       
       try {
+        console.log('=== 开始发布话题 ===')
+        
+        // 检查存储的所有数据
+        const token = uni.getStorageSync('token')
+        console.log('存储的token:', token)
+        
         let userInfo = uni.getStorageSync('userInfo')
+        console.log('原始userInfo:', userInfo)
+        console.log('userInfo类型:', typeof userInfo)
+        
         // 处理userInfo可能是JSON字符串的情况
         if (typeof userInfo === 'string') {
           try {
             userInfo = JSON.parse(userInfo)
+            console.log('解析后的userInfo:', userInfo)
           } catch (e) {
+            console.error('解析userInfo失败:', e)
             userInfo = null
           }
         }
+        
+        console.log('最终userInfo:', userInfo)
+        console.log('是否有user_id:', userInfo && userInfo.user_id)
+        
         if (!userInfo || !userInfo.user_id) {
+          console.error('登录状态检查失败:', { userInfo, hasUserId: userInfo && userInfo.user_id })
           uni.showToast({
             title: '请先登录',
             icon: 'none'
@@ -134,6 +150,8 @@ export default {
           icon: 'none',
           duration: 3000
         })
+      } finally {
+        console.log('=== 发布话题结束 ===')
       }
     }
   }

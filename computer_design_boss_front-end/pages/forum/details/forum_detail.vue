@@ -66,7 +66,7 @@
     </view>
     
     <!-- 回复列表 -->
-    <view class="replies-section" v-if="post">
+    <view class="replies-section" v-if="true">
       <view class="section-header">
         <text class="section-title">全部回复 ({{replies.length}})</text>
         <view class="sort-options">
@@ -130,7 +130,7 @@
     </view>
     
     <!-- 回复输入框 -->
-    <view class="reply-input-section" v-if="post">
+    <view class="reply-input-section" v-if="true">
       <view class="input-header">
         <text class="input-title">快速回复</text>
         <button class="advanced-btn" @click="toggleAdvancedEditor">
@@ -206,7 +206,9 @@ export default {
   },
   
   onLoad(options) {
-    this.postId = options.id
+    // 确保postId是整数类型
+    this.postId = parseInt(options.id) || null
+    console.log('帖子ID (整数):', this.postId)
     this.loadPostDetail()
     this.loadReplies()
   },
@@ -215,9 +217,17 @@ export default {
     // 加载帖子详情
     async loadPostDetail() {
       try {
+        console.log('=== 开始加载帖子详情 ===')
+        console.log('帖子ID:', this.postId)
+        
         const res = await forumApi.getCommentDetail(this.postId)
+        console.log('getCommentDetail返回结果:', res)
+        
         if (res && res.length > 0) {
+          console.log('帖子详情:', res[0])
           this.post = res[0]
+        } else {
+          console.log('未找到帖子详情')
         }
       } catch (error) {
         console.error('加载帖子详情失败:', error)
@@ -225,18 +235,30 @@ export default {
           title: '加载失败',
           icon: 'none'
         })
+      } finally {
+        console.log('=== 加载帖子详情结束 ===')
       }
     },
     
     // 加载回复列表
     async loadReplies() {
       try {
+        console.log('=== 开始加载回复列表 ===')
+        console.log('帖子ID:', this.postId)
+        
         const res = await forumApi.getCommentReplies(this.postId)
+        console.log('getCommentReplies返回结果:', res)
+        
         if (res) {
+          console.log('回复列表长度:', res.length)
           this.replies = res
+        } else {
+          console.log('getCommentReplies返回null或undefined')
         }
       } catch (error) {
         console.error('加载回复失败:', error)
+      } finally {
+        console.log('=== 加载回复列表结束 ===')
       }
     },
     
@@ -251,7 +273,17 @@ export default {
       }
       
       try {
-        const userInfo = uni.getStorageSync('userInfo')
+        console.log('=== 开始提交回复 ===')
+        
+        let userInfo = uni.getStorageSync('userInfo')
+        // 处理userInfo可能是JSON字符串的情况
+        if (typeof userInfo === 'string') {
+          try {
+            userInfo = JSON.parse(userInfo)
+          } catch (e) {
+            userInfo = null
+          }
+        }
         if (!userInfo || !userInfo.user_id) {
           uni.showToast({
             title: '请先登录',
@@ -269,7 +301,10 @@ export default {
           sort_order: 0
         }
         
-        await forumApi.addReply(replyData)
+        console.log('提交的回复数据:', replyData)
+        
+        const addReplyResult = await forumApi.addReply(replyData)
+        console.log('addReply返回结果:', addReplyResult)
         
         uni.showToast({
           title: '回复成功',
@@ -280,7 +315,9 @@ export default {
         this.newReply.content = ''
         
         // 重新加载回复列表
-        this.loadReplies()
+        console.log('开始重新加载回复列表...')
+        await this.loadReplies()
+        console.log('回复列表加载完成，当前回复数:', this.replies.length)
         
       } catch (error) {
         console.error('提交回复失败:', error)
@@ -288,6 +325,8 @@ export default {
           title: '提交失败，请重试',
           icon: 'none'
         })
+      } finally {
+        console.log('=== 提交回复结束 ===')
       }
     },
     
@@ -299,7 +338,15 @@ export default {
     // 点赞帖子
     async toggleLike() {
       try {
-        const userInfo = uni.getStorageSync('userInfo')
+        let userInfo = uni.getStorageSync('userInfo')
+        // 处理userInfo可能是JSON字符串的情况
+        if (typeof userInfo === 'string') {
+          try {
+            userInfo = JSON.parse(userInfo)
+          } catch (e) {
+            userInfo = null
+          }
+        }
         if (!userInfo || !userInfo.user_id) {
           uni.showToast({
             title: '请先登录',
@@ -331,7 +378,15 @@ export default {
     // 收藏帖子
     async toggleFavorite() {
       try {
-        const userInfo = uni.getStorageSync('userInfo')
+        let userInfo = uni.getStorageSync('userInfo')
+        // 处理userInfo可能是JSON字符串的情况
+        if (typeof userInfo === 'string') {
+          try {
+            userInfo = JSON.parse(userInfo)
+          } catch (e) {
+            userInfo = null
+          }
+        }
         if (!userInfo || !userInfo.user_id) {
           uni.showToast({
             title: '请先登录',
@@ -363,7 +418,15 @@ export default {
     // 点赞回复
     async toggleReplyLike(reply) {
       try {
-        const userInfo = uni.getStorageSync('userInfo')
+        let userInfo = uni.getStorageSync('userInfo')
+        // 处理userInfo可能是JSON字符串的情况
+        if (typeof userInfo === 'string') {
+          try {
+            userInfo = JSON.parse(userInfo)
+          } catch (e) {
+            userInfo = null
+          }
+        }
         if (!userInfo || !userInfo.user_id) {
           uni.showToast({
             title: '请先登录',

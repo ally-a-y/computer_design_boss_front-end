@@ -65,6 +65,9 @@ const requestWithRetry = (options, retryCount = 3) => {
       common_vendor.index.request(__spreadProps(__spreadValues({}, requestConfig), {
         success: (res) => {
           var _a;
+          {
+            console.log("\u3010\u54CD\u5E94\u3011", res.statusCode, res.data);
+          }
           if (res.statusCode === 200) {
             const data = res.data;
             if (data && typeof data === "object" && "code" in data) {

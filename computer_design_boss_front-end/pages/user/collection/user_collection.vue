@@ -38,7 +38,7 @@
 
 <script>
 import {favoriteApi} from '@/common/api/favorite.js'
-
+import { jobApi } from '@/common/api/job.js'
 export default {
   data() {
     return {
@@ -67,12 +67,14 @@ export default {
 	  try {
 		this.loading = true
 		const res = await favoriteApi.getFavoriteList(this.userId)
-
+		console.log("转换后的collections:", res)
+		const job = await jobApi.getAllJobs()
 		const rawList = Array.isArray(res) ? res : []
 
 		this.collections = rawList.map(item => {
 		  const snapshot = JSON.parse(item.job_snapshot || '{}')
 		  return {
+			id: item.id, 
 			jobTitle: snapshot.title || '',
 			company: snapshot.location || '',
 			salary: snapshot.salary || '',
@@ -92,7 +94,19 @@ export default {
 		this.loading = false
 	  }
 	},
-
+	viewDetails(item) {
+	  if (!item.id) {
+	    uni.showToast({
+	      title: '职位ID不存在',
+	      icon: 'none'
+	    })
+	    return
+	  }
+	
+	  uni.navigateTo({
+	    url: `/pages/job/detail/job_detail_index?id=${item.id}`
+	  })
+	},
     async cancelCollection(index) {
       const item = this.collections[index]
 

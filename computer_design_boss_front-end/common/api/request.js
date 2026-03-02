@@ -72,7 +72,7 @@ const requestWithRetry = (options, retryCount = 3) => {
         ...requestConfig,
         success: (res) => {
           // 只在调试模式下显示响应日志
-          const debugMode = false // 可以在这里设置为true来开启调试
+          const debugMode = true // 可以在这里设置为true来开启调试
           if (debugMode) {
             console.log('【响应】', res.statusCode, res.data)
           }

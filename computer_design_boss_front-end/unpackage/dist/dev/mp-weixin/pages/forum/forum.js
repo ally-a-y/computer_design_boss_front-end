@@ -75,6 +75,7 @@ const _sfc_main = {
   },
   onShow() {
     this.loadUserInfo();
+    this.loadPosts(true);
   },
   onUnload() {
     if (this.loadMoreTimer) {

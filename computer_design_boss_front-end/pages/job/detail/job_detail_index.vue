@@ -71,91 +71,223 @@
         <text>{{ formatDate(jobDetail.publish_time) }}</text>
       </view>
     </view>
+	<view class="apply-button-container">
+	  <button 
+	    :disabled="isApplied" 
+	    :class="['apply-button', { 'disabled': isApplied }]" 
+	    @click="applyForJob"
+	  >
+	    {{ isApplied ? '已加入投递列表' : '投递' }}
+	  </button>
+	        <!-- 收藏按钮 -->
+      <button 
+        :disabled="isFavorited" 
+        :class="['collect-button', { 'disabled': isFavorited }]" 
+        @click="favoriteJob"
+      >
+        {{ isFavorited ? '已收藏' : '收藏' }}
+      </button>
+	</view>
   </view>
 </template>
 
 <script>
 import { jobApi } from '@/common/api/job.js'
+import { userApi } from '@/common/api/user.js'
+import { favoriteApi } from '@/common/api/favorite.js'
+import { deliverApi } from '@/common/api/deliver.js'
 
 export default {
   data() {
     return {
       jobId: '',
-      jobDetail: {}
+      jobDetail: {},
+      userProfile: null,
+
+      isApplied: false,
+      isFavorited: false
     }
   },
-  onLoad(options) {
-    if (options.id) {
-      this.jobId = options.id
-      this.getJobDetail()
-    }
+
+  async onLoad(options) {
+    if (!options.id) return
+
+    this.jobId = options.id
+
+    // 1️⃣ 获取职位详情
+    await this.getJobDetail()
+
+    // 2️⃣ 获取用户信息
+    await this.getUserProfile()
+
+    // 3️⃣ 检查收藏状态
+    await this.checkFavoriteStatus()
+
+    // 4️⃣ 检查投递状态
+    await this.checkDeliverStatus()
   },
+
   methods: {
+
+    /* ================= 获取职位详情 ================= */
     async getJobDetail() {
       try {
-        // 向后端发送POST请求获取职位详情
         const res = await jobApi.getJobDetail(this.jobId)
-        console.log('职位详情返回数据:', res)
-        
-        // 处理后端返回的数据格式
+		console.log("转换后的delivers:", res)
+		this.jobDetail = res
         if (Array.isArray(res) && res.length > 0) {
           this.jobDetail = res[0]
-        } else if (res && typeof res === 'object' && Object.keys(res).length > 0) {
+        } else if (res && typeof res === 'object') {
           this.jobDetail = res
         } else {
           this.jobDetail = {}
         }
-        
-        // 解析JSON格式的字段
-        try {
-          if (this.jobDetail.require_list && typeof this.jobDetail.require_list === 'string') {
-            this.jobDetail.require_list = JSON.parse(this.jobDetail.require_list)
-          }
-          
-          if (this.jobDetail.welfare_list && typeof this.jobDetail.welfare_list === 'string') {
-            this.jobDetail.welfare_list = JSON.parse(this.jobDetail.welfare_list)
-          }
-        } catch (error) {
-          console.error('JSON解析失败:', error)
+
+        // 解析 JSON 字段
+        if (typeof this.jobDetail.require_list === 'string') {
+          this.jobDetail.require_list = JSON.parse(this.jobDetail.require_list)
         }
+
+        if (typeof this.jobDetail.welfare_list === 'string') {
+          this.jobDetail.welfare_list = JSON.parse(this.jobDetail.welfare_list)
+        }
+
       } catch (error) {
         console.error('获取职位详情失败:', error)
-        uni.showToast({
-          title: '获取详情失败',
-          icon: 'none'
-        })
-        this.jobDetail = {}
+        uni.showToast({ title: '获取详情失败', icon: 'none' })
       }
     },
-    
+
+    /* ================= 获取用户信息 ================= */
+    async getUserProfile() {
+      try {
+        const user = await userApi.getUserProfile()
+        
+      } catch (error) {
+        console.error('获取用户信息失败:', error)
+      }
+    },
+
+    /* ================= 点击投递 ================= */
+    async applyForJob() {
+      if (this.isApplied) return
+
+      if (!this.jobDetail?.boss_job_id) {
+        uni.showToast({ title: '职位信息不完整', icon: 'none' })
+        return
+      }
+
+      try {
+        await deliverApi.addDeliver({
+          job_id: this.jobDetail.boss_job_id
+        })
+
+        this.isApplied = true
+
+        uni.showToast({
+          title: '投递成功',
+          icon: 'success'
+        })
+
+      } catch (error) {
+        console.error('投递失败:', error)
+        uni.showToast({
+          title: error?.data?.message || '投递失败',
+          icon: 'none'
+        })
+      }
+    },
+
+    /* ================= 点击收藏 ================= */
+    async favoriteJob() {
+      if (this.isFavorited) return
+
+      if (!this.jobDetail?.boss_job_id) {
+        uni.showToast({ title: '职位信息不完整', icon: 'none' })
+        return
+      }
+		
+      try {
+        await favoriteApi.addFavorite({
+          job_id: this.jobDetail.boss_job_id
+        })
+		
+        
+        this.isFavorited = true
+
+        uni.showToast({
+          title: '收藏成功',
+          icon: 'success'
+        })
+
+      } catch (error) {
+		  console.log("转换后的collections:",this.jobDetail.boss_job_id)
+        console.error('收藏失败:', error)
+        uni.showToast({
+          title: error?.data?.message || '收藏失败',
+          icon: 'none'
+        })
+      }
+    },
+
+    /* ================= 检查收藏状态 ================= */
+    async checkFavoriteStatus() {
+      if (!this.jobDetail?.boss_job_id) return
+
+      try {
+        const res = await favoriteApi.checkFavorite({
+          boss_job_id: this.jobDetail.boss_job_id
+        })
+		
+        this.isFavorited = res.is_favorite
+		console.log("转换后的collections:")
+      } catch (error) {
+		  console.log("转换后的collections:",this.jobDetail.boss_job_id)
+        console.error('检查收藏状态失败:', error)
+      }
+    },
+
+    /* ================= 检查投递状态 ================= */
+    async checkDeliverStatus() {
+      if (!this.jobDetail?.boss_job_id) return
+
+      try {
+        const res = await deliverApi.checkDeliver({
+          boss_job_id: this.jobDetail.boss_job_id
+        })
+
+        this.isApplied = res.is_deliver
+
+      } catch (error) {
+        console.error('检查投递状态失败:', error)
+      }
+    },
+
+    /* ================= 工具方法 ================= */
     getEmpTypeText(type) {
-      const typeMap = {
+      const map = {
         '1': '全职',
         '2': '兼职',
         '3': '实习'
       }
-      return typeMap[type] || '全职'
+      return map[type] || '全职'
     },
-    
+
     formatDate(dateString) {
       if (!dateString) return ''
-      
-      try {
-        const date = new Date(dateString)
-        const year = date.getFullYear()
-        const month = String(date.getMonth() + 1).padStart(2, '0')
-        const day = String(date.getDate()).padStart(2, '0')
-        const hours = String(date.getHours()).padStart(2, '0')
-        const minutes = String(date.getMinutes()).padStart(2, '0')
-        
-        return `${year}-${month}-${day} ${hours}:${minutes}`
-      } catch (error) {
-        console.error('日期格式化失败:', error)
-        return dateString
-      }
+
+      const date = new Date(dateString)
+      const y = date.getFullYear()
+      const m = String(date.getMonth() + 1).padStart(2, '0')
+      const d = String(date.getDate()).padStart(2, '0')
+      const h = String(date.getHours()).padStart(2, '0')
+      const min = String(date.getMinutes()).padStart(2, '0')
+
+      return `${y}-${m}-${d} ${h}:${min}`
     }
   }
 }
+
 </script>
 
 <style>
@@ -262,5 +394,56 @@ export default {
   display: none;
 }
 
+.apply-button-container {
+  position: fixed;
+  bottom: 20rpx;
+  left: 20rpx;
+  right: 20rpx;
+  padding: 20rpx;
+}
 
+.apply-button {
+  width: 100%;
+  height: 60rpx;
+  background-color: #ff6b35;
+  color: #fff;
+  font-size: 32rpx;
+  border: none;
+  border-radius: 10rpx;
+}
+
+.apply-button.disabled {
+  background-color: #ccc;
+}
+
+.apply-button:disabled {
+  cursor: not-allowed;
+}
+
+.apply-collect-buttons {
+  display: flex;
+  position: fixed;
+  bottom: 20rpx;
+  left: 20rpx;
+  right: 20rpx;
+  gap: 10rpx;
+}
+
+.apply-button, .collect-button {
+  flex: 1;
+  height: 60rpx;
+  background-color: #ff6b35;
+  color: #fff;
+  font-size: 32rpx;
+  border: none;
+  border-radius: 10rpx;
+}
+
+.apply-button.disabled, .collect-button.disabled {
+  background-color: #ccc;
+}
+
+.apply-button:disabled, .collect-button:disabled {
+  cursor: not-allowed;
+}
 </style>

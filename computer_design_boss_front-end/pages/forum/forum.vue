@@ -189,6 +189,8 @@ export default {
   
   onShow() {
     this.loadUserInfo()
+    // 重新加载帖子数据，确保新发布的话题显示
+    this.loadPosts(true)
   },
   
   onUnload() {

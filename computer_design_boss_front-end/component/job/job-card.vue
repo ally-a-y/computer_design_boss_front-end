@@ -99,6 +99,7 @@ export default {
       return '薪资面议'
     },
     goToDetail(data) {
+		console.log("转换后的b:",data.id)
 	  uni.navigateTo({
 		url: `/pages/job/detail/job_detail_index?id=${data.id}`
 	  })
@@ -174,9 +175,6 @@ export default {
   position: relative;
 }
 
-.card-content {
-  /* 卡片内容区域 */
-}
 
 .favorite-btn {
   position: absolute;

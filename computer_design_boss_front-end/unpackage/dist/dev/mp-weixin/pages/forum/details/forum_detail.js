@@ -31,16 +31,23 @@ const _sfc_main = {
     }
   },
   onLoad(options) {
-    this.postId = options.id;
+    this.postId = parseInt(options.id) || null;
+    console.log("\u5E16\u5B50ID (\u6574\u6570):", this.postId);
     this.loadPostDetail();
     this.loadReplies();
   },
   methods: {
     async loadPostDetail() {
       try {
+        console.log("=== \u5F00\u59CB\u52A0\u8F7D\u5E16\u5B50\u8BE6\u60C5 ===");
+        console.log("\u5E16\u5B50ID:", this.postId);
         const res = await common_api_forum.forumApi.getCommentDetail(this.postId);
+        console.log("getCommentDetail\u8FD4\u56DE\u7ED3\u679C:", res);
         if (res && res.length > 0) {
+          console.log("\u5E16\u5B50\u8BE6\u60C5:", res[0]);
           this.post = res[0];
+        } else {
+          console.log("\u672A\u627E\u5230\u5E16\u5B50\u8BE6\u60C5");
         }
       } catch (error) {
         console.error("\u52A0\u8F7D\u5E16\u5B50\u8BE6\u60C5\u5931\u8D25:", error);
@@ -48,16 +55,26 @@ const _sfc_main = {
           title: "\u52A0\u8F7D\u5931\u8D25",
           icon: "none"
         });
+      } finally {
+        console.log("=== \u52A0\u8F7D\u5E16\u5B50\u8BE6\u60C5\u7ED3\u675F ===");
       }
     },
     async loadReplies() {
       try {
+        console.log("=== \u5F00\u59CB\u52A0\u8F7D\u56DE\u590D\u5217\u8868 ===");
+        console.log("\u5E16\u5B50ID:", this.postId);
         const res = await common_api_forum.forumApi.getCommentReplies(this.postId);
+        console.log("getCommentReplies\u8FD4\u56DE\u7ED3\u679C:", res);
         if (res) {
+          console.log("\u56DE\u590D\u5217\u8868\u957F\u5EA6:", res.length);
           this.replies = res;
+        } else {
+          console.log("getCommentReplies\u8FD4\u56DEnull\u6216undefined");
         }
       } catch (error) {
         console.error("\u52A0\u8F7D\u56DE\u590D\u5931\u8D25:", error);
+      } finally {
+        console.log("=== \u52A0\u8F7D\u56DE\u590D\u5217\u8868\u7ED3\u675F ===");
       }
     },
     async submitReply() {
@@ -69,7 +86,15 @@ const _sfc_main = {
         return;
       }
       try {
-        const userInfo = common_vendor.index.getStorageSync("userInfo");
+        console.log("=== \u5F00\u59CB\u63D0\u4EA4\u56DE\u590D ===");
+        let userInfo = common_vendor.index.getStorageSync("userInfo");
+        if (typeof userInfo === "string") {
+          try {
+            userInfo = JSON.parse(userInfo);
+          } catch (e) {
+            userInfo = null;
+          }
+        }
         if (!userInfo || !userInfo.user_id) {
           common_vendor.index.showToast({
             title: "\u8BF7\u5148\u767B\u5F55",
@@ -85,19 +110,25 @@ const _sfc_main = {
           level: 2,
           sort_order: 0
         };
-        await common_api_forum.forumApi.addReply(replyData);
+        console.log("\u63D0\u4EA4\u7684\u56DE\u590D\u6570\u636E:", replyData);
+        const addReplyResult = await common_api_forum.forumApi.addReply(replyData);
+        console.log("addReply\u8FD4\u56DE\u7ED3\u679C:", addReplyResult);
         common_vendor.index.showToast({
           title: "\u56DE\u590D\u6210\u529F",
           icon: "success"
         });
         this.newReply.content = "";
-        this.loadReplies();
+        console.log("\u5F00\u59CB\u91CD\u65B0\u52A0\u8F7D\u56DE\u590D\u5217\u8868...");
+        await this.loadReplies();
+        console.log("\u56DE\u590D\u5217\u8868\u52A0\u8F7D\u5B8C\u6210\uFF0C\u5F53\u524D\u56DE\u590D\u6570:", this.replies.length);
       } catch (error) {
         console.error("\u63D0\u4EA4\u56DE\u590D\u5931\u8D25:", error);
         common_vendor.index.showToast({
           title: "\u63D0\u4EA4\u5931\u8D25\uFF0C\u8BF7\u91CD\u8BD5",
           icon: "none"
         });
+      } finally {
+        console.log("=== \u63D0\u4EA4\u56DE\u590D\u7ED3\u675F ===");
       }
     },
     replyToReply(reply) {
@@ -105,7 +136,14 @@ const _sfc_main = {
     },
     async toggleLike() {
       try {
-        const userInfo = common_vendor.index.getStorageSync("userInfo");
+        let userInfo = common_vendor.index.getStorageSync("userInfo");
+        if (typeof userInfo === "string") {
+          try {
+            userInfo = JSON.parse(userInfo);
+          } catch (e) {
+            userInfo = null;
+          }
+        }
         if (!userInfo || !userInfo.user_id) {
           common_vendor.index.showToast({
             title: "\u8BF7\u5148\u767B\u5F55",
@@ -131,7 +169,14 @@ const _sfc_main = {
     },
     async toggleFavorite() {
       try {
-        const userInfo = common_vendor.index.getStorageSync("userInfo");
+        let userInfo = common_vendor.index.getStorageSync("userInfo");
+        if (typeof userInfo === "string") {
+          try {
+            userInfo = JSON.parse(userInfo);
+          } catch (e) {
+            userInfo = null;
+          }
+        }
         if (!userInfo || !userInfo.user_id) {
           common_vendor.index.showToast({
             title: "\u8BF7\u5148\u767B\u5F55",
@@ -157,7 +202,14 @@ const _sfc_main = {
     },
     async toggleReplyLike(reply) {
       try {
-        const userInfo = common_vendor.index.getStorageSync("userInfo");
+        let userInfo = common_vendor.index.getStorageSync("userInfo");
+        if (typeof userInfo === "string") {
+          try {
+            userInfo = JSON.parse(userInfo);
+          } catch (e) {
+            userInfo = null;
+          }
+        }
         if (!userInfo || !userInfo.user_id) {
           common_vendor.index.showToast({
             title: "\u8BF7\u5148\u767B\u5F55",
@@ -327,17 +379,15 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     t: $data.post.is_favorited ? 1 : "",
     v: common_vendor.o((...args) => $options.sharePost && $options.sharePost(...args)),
     w: common_vendor.o((...args) => $options.reportPost && $options.reportPost(...args))
-  }) : {}, {
-    x: $data.post
-  }, $data.post ? common_vendor.e({
-    y: common_vendor.t($data.replies.length),
-    z: $data.replySort === "time_asc" ? 1 : "",
-    A: common_vendor.o(($event) => $options.switchReplySort("time_asc")),
-    B: $data.replySort === "time_desc" ? 1 : "",
-    C: common_vendor.o(($event) => $options.switchReplySort("time_desc")),
-    D: $data.replySort === "likes" ? 1 : "",
-    E: common_vendor.o(($event) => $options.switchReplySort("likes")),
-    F: common_vendor.f($data.replies, (reply, index, i0) => {
+  }) : {}, common_vendor.e({
+    x: common_vendor.t($data.replies.length),
+    y: $data.replySort === "time_asc" ? 1 : "",
+    z: common_vendor.o(($event) => $options.switchReplySort("time_asc")),
+    A: $data.replySort === "time_desc" ? 1 : "",
+    B: common_vendor.o(($event) => $options.switchReplySort("time_desc")),
+    C: $data.replySort === "likes" ? 1 : "",
+    D: common_vendor.o(($event) => $options.switchReplySort("likes")),
+    E: common_vendor.f($data.replies, (reply, index, i0) => {
       return common_vendor.e({
         a: common_vendor.o(($event) => $options.goToUserProfile(reply.user_id)),
         b: common_vendor.t(reply.user_id),
@@ -357,23 +407,21 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         n: reply.id
       });
     }),
-    G: $data.replies.length === 0
-  }, $data.replies.length === 0 ? {} : {}) : {}, {
-    H: $data.post
-  }, $data.post ? common_vendor.e({
-    I: common_vendor.o((...args) => $options.toggleAdvancedEditor && $options.toggleAdvancedEditor(...args)),
-    J: $data.newReply.content,
-    K: common_vendor.o(($event) => $data.newReply.content = $event.detail.value),
-    L: common_vendor.o((...args) => $options.submitReply && $options.submitReply(...args)),
-    M: !$data.newReply.content.trim(),
-    N: $data.showAdvancedEditor
+    F: $data.replies.length === 0
+  }, $data.replies.length === 0 ? {} : {}), common_vendor.e({
+    G: common_vendor.o((...args) => $options.toggleAdvancedEditor && $options.toggleAdvancedEditor(...args)),
+    H: $data.newReply.content,
+    I: common_vendor.o(($event) => $data.newReply.content = $event.detail.value),
+    J: common_vendor.o((...args) => $options.submitReply && $options.submitReply(...args)),
+    K: !$data.newReply.content.trim(),
+    L: $data.showAdvancedEditor
   }, $data.showAdvancedEditor ? {
-    O: common_vendor.o((...args) => $options.insertBold && $options.insertBold(...args)),
-    P: common_vendor.o((...args) => $options.insertItalic && $options.insertItalic(...args)),
-    Q: common_vendor.o((...args) => $options.insertLink && $options.insertLink(...args)),
-    R: common_vendor.o((...args) => $options.insertCode && $options.insertCode(...args)),
-    S: common_vendor.o((...args) => $options.uploadImage && $options.uploadImage(...args))
-  } : {}) : {});
+    M: common_vendor.o((...args) => $options.insertBold && $options.insertBold(...args)),
+    N: common_vendor.o((...args) => $options.insertItalic && $options.insertItalic(...args)),
+    O: common_vendor.o((...args) => $options.insertLink && $options.insertLink(...args)),
+    P: common_vendor.o((...args) => $options.insertCode && $options.insertCode(...args)),
+    Q: common_vendor.o((...args) => $options.uploadImage && $options.uploadImage(...args))
+  } : {}));
 }
 var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-2f1ba243"], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/forum/details/forum_detail.vue"]]);
 wx.createPage(MiniProgramPage);

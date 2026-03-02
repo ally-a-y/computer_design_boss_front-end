@@ -33,14 +33,11 @@ export const favoriteApi = {
   },
 
   // 4️⃣ 检查是否收藏
-  checkFavorite(user_id, boss_job_id) {
+  checkFavorite(data) {
     return request({
       url: '/api/job/favorite/check',
-      method: 'GET',
-      data: {
-        user_id,
-        boss_job_id
-      }
+      method: 'POST',
+      data
     })
   },
 
