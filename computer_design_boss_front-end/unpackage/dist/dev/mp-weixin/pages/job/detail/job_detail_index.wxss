@@ -88,5 +88,48 @@
 .comment-count {
   display: none;
 }
-
-
+.apply-button-container {
+  position: fixed;
+  bottom: 20rpx;
+  left: 20rpx;
+  right: 20rpx;
+  padding: 20rpx;
+}
+.apply-button {
+  width: 100%;
+  height: 60rpx;
+  background-color: #ff6b35;
+  color: #fff;
+  font-size: 32rpx;
+  border: none;
+  border-radius: 10rpx;
+}
+.apply-button.disabled {
+  background-color: #ccc;
+}
+.apply-button:disabled {
+  cursor: not-allowed;
+}
+.apply-collect-buttons {
+  display: flex;
+  position: fixed;
+  bottom: 20rpx;
+  left: 20rpx;
+  right: 20rpx;
+  gap: 10rpx;
+}
+.apply-button, .collect-button {
+  flex: 1;
+  height: 60rpx;
+  background-color: #ff6b35;
+  color: #fff;
+  font-size: 32rpx;
+  border: none;
+  border-radius: 10rpx;
+}
+.apply-button.disabled, .collect-button.disabled {
+  background-color: #ccc;
+}
+.apply-button:disabled, .collect-button:disabled {
+  cursor: not-allowed;
+}

@@ -30,6 +30,13 @@ const deliverApi = {
       method: "POST",
       data
     });
+  },
+  checkDeliver(data) {
+    return common_api_request.requestWithRetry({
+      url: "/api/job/deliver/check",
+      method: "POST",
+      data
+    });
   }
 };
 exports.deliverApi = deliverApi;

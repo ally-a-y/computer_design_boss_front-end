@@ -19,6 +19,7 @@ var common_vendor = require("../../common/vendor.js");
 var common_api_ai = require("../../common/api/ai.js");
 require("../../common/api/request.js");
 require("../../common/config.js");
+const BASE_URL = "http://localhost:5000";
 const _sfc_main = {
   data() {
     return {
@@ -35,6 +36,9 @@ const _sfc_main = {
       isLoading: false,
       currentPanel: null,
       currentMethod: "user+position",
+      isLoadingUser: false,
+      userInfo: null,
+      currentUserId: null,
       formData: {
         positionId: "",
         positionText: "",
@@ -42,10 +46,22 @@ const _sfc_main = {
       },
       gradeIndex: 0,
       gradeOptions: ["\u5927\u4E00", "\u5927\u4E8C", "\u5927\u4E09", "\u5927\u56DB", "\u7814\u4E00", "\u7814\u4E8C", "\u7814\u4E09"],
+      categories: [
+        { id: "101", name: "\u524D\u7AEF\u5F00\u53D1" },
+        { id: "102", name: "\u540E\u7AEF\u5F00\u53D1" },
+        { id: "103", name: "\u79FB\u52A8\u7AEF\u5F00\u53D1" },
+        { id: "104", name: "\u6570\u636E\u4E0EAI" },
+        { id: "105", name: "\u8FD0\u7EF4\u4E0E\u6D4B\u8BD5" },
+        { id: "106", name: "\u4EA7\u54C1\u8BBE\u8BA1" },
+        { id: "107", name: "\u7F51\u7EDC\u5B89\u5168" },
+        { id: "108", name: "\u5D4C\u5165\u5F0F\u5F00\u53D1" },
+        { id: "200", name: "\u4EA7\u54C1\u4E0E\u8BBE\u8BA1\u7C7B" },
+        { id: "300", name: "\u6280\u672F\u7BA1\u7406\u7C7B" }
+      ],
       analysisMethods: [
-        { value: "user+position", label: "\u6211\u7684\u7B80\u5386+\u804C\u4F4DID" },
+        { value: "user+position", label: "\u6211\u7684\u7B80\u5386+\u804C\u4F4D\u7C7B\u578B" },
         { value: "user+text", label: "\u6211\u7684\u7B80\u5386+\u804C\u4F4D\u6587\u672C" },
-        { value: "pdf+position", label: "PDF+\u804C\u4F4DID" },
+        { value: "pdf+position", label: "PDF+\u804C\u4F4D\u7C7B\u578B" },
         { value: "pdf+text", label: "PDF+\u804C\u4F4D\u6587\u672C" }
       ]
     };
@@ -63,12 +79,65 @@ const _sfc_main = {
   },
   onLoad() {
     this.initializeChat();
+    this.fetchUserInfo();
   },
   onUnload() {
     this.cleanup();
   },
   methods: {
     initializeChat() {
+    },
+    async fetchUserInfo() {
+      this.isLoadingUser = true;
+      try {
+        const token = common_vendor.index.getStorageSync("token");
+        if (!token) {
+          console.log("\u672A\u627E\u5230\u767B\u5F55token\uFF0C\u9700\u8981\u7528\u6237\u767B\u5F55");
+          this.currentUserId = null;
+          return;
+        }
+        const cachedUserInfo = common_vendor.index.getStorageSync("userInfo");
+        if (cachedUserInfo && cachedUserInfo.user_id) {
+          this.userInfo = cachedUserInfo;
+          this.currentUserId = String(cachedUserInfo.user_id);
+          console.log("\u4ECE\u7F13\u5B58\u83B7\u53D6\u7528\u6237ID:", this.currentUserId);
+          return;
+        }
+        const res = await this.getUserProfile();
+        if (res.code === 200 && res.data) {
+          this.userInfo = res.data;
+          this.currentUserId = String(res.data.user_id || res.data.userId || res.data.id);
+          common_vendor.index.setStorageSync("userInfo", res.data);
+          console.log("\u4ECE\u540E\u7AEF\u83B7\u53D6\u7528\u6237ID:", this.currentUserId);
+        }
+      } catch (error) {
+        console.error("\u83B7\u53D6\u7528\u6237\u4FE1\u606F\u5931\u8D25:", error);
+        common_vendor.index.showToast({
+          title: "\u83B7\u53D6\u7528\u6237\u4FE1\u606F\u5931\u8D25",
+          icon: "none",
+          duration: 2e3
+        });
+        this.currentUserId = null;
+      } finally {
+        this.isLoadingUser = false;
+      }
+    },
+    getUserProfile() {
+      return new Promise((resolve, reject) => {
+        common_vendor.index.request({
+          url: `${BASE_URL}/api/user/profile`,
+          method: "GET",
+          header: {
+            "Authorization": `Bearer ${common_vendor.index.getStorageSync("token")}`
+          },
+          success: (res) => {
+            resolve(res.data);
+          },
+          fail: (err) => {
+            reject(err);
+          }
+        });
+      });
     },
     cleanup() {
     },
@@ -127,6 +196,9 @@ const _sfc_main = {
     openPanel(panelType) {
       this.currentPanel = panelType;
       this.currentMethod = this.getDefaultMethod(panelType);
+      if (!this.currentUserId && !this.isLoadingUser) {
+        this.fetchUserInfo();
+      }
     },
     closePanel() {
       this.currentPanel = null;
@@ -146,6 +218,12 @@ const _sfc_main = {
     },
     onGradeChange(e) {
       this.gradeIndex = parseInt(e.detail.value);
+    },
+    onPositionChange(e) {
+      const index = parseInt(e.detail.value);
+      if (index >= 0 && index < this.categories.length) {
+        this.formData.positionId = this.categories[index].id;
+      }
     },
     preprocessContent(text) {
       if (!text)
@@ -235,6 +313,15 @@ const _sfc_main = {
       });
     },
     async submitFunction() {
+      if (this.currentMethod.includes("user") && !this.currentUserId) {
+        common_vendor.index.showToast({
+          title: "\u8BF7\u5148\u767B\u5F55",
+          icon: "none",
+          duration: 2e3
+        });
+        this.fetchUserInfo();
+        return;
+      }
       if (!this.validateForm()) {
         return;
       }
@@ -246,7 +333,8 @@ const _sfc_main = {
       const savedFormData = {
         positionId: this.formData.positionId,
         positionText: this.formData.positionText,
-        pdfFile: this.formData.pdfFile ? __spreadValues({}, this.formData.pdfFile) : null
+        pdfFile: this.formData.pdfFile ? __spreadValues({}, this.formData.pdfFile) : null,
+        userId: this.currentUserId
       };
       const savedMethod = this.currentMethod;
       const userMessage = this.getUserMessageText();
@@ -304,32 +392,47 @@ const _sfc_main = {
     async submitResumeAnalysis(formData, method) {
       var _a, _b, _c, _d, _e;
       try {
+        let res;
         if (method === "user+position") {
           const jobId = String(formData.positionId || "").trim();
           if (!jobId) {
             throw new Error("\u804C\u4F4DID\u4E0D\u80FD\u4E3A\u7A7A");
           }
-          const res = await common_api_ai.aiApi.askByUserJobId(jobId);
+          if (!formData.userId) {
+            throw new Error("\u7528\u6237\u672A\u767B\u5F55");
+          }
+          res = await common_api_ai.aiApi.askByUserJobId(jobId);
           return (res == null ? void 0 : res.analysis) || ((_a = res == null ? void 0 : res.data) == null ? void 0 : _a.analysis) || (res == null ? void 0 : res.data) || res;
         } else if (method === "user+text") {
-          const res = await common_api_ai.aiApi.askByUserJobText(formData.positionText);
+          if (!formData.positionText.trim()) {
+            throw new Error("\u804C\u4F4D\u63CF\u8FF0\u4E0D\u80FD\u4E3A\u7A7A");
+          }
+          if (!formData.userId) {
+            throw new Error("\u7528\u6237\u672A\u767B\u5F55");
+          }
+          res = await common_api_ai.aiApi.askByUserJobText(formData.positionText);
           return (res == null ? void 0 : res.analysis) || ((_b = res == null ? void 0 : res.data) == null ? void 0 : _b.analysis) || (res == null ? void 0 : res.data) || res;
         } else if (method === "pdf+position") {
           if (!((_c = formData.pdfFile) == null ? void 0 : _c.base64)) {
             throw new Error("PDF \u6587\u4EF6\u6CA1\u6709 base64 \u6570\u636E");
           }
-          const res = await common_api_ai.aiApi.askByPdfJobId({
-            name: formData.pdfFile.name,
-            base64: formData.pdfFile.base64
-          }, formData.positionId);
-          return (res == null ? void 0 : res.analysis) || ((_d = res == null ? void 0 : res.data) == null ? void 0 : _d.analysis) || (res == null ? void 0 : res.data) || res;
+          const jobId = String(formData.positionId || "").trim();
+          if (!jobId) {
+            throw new Error("\u804C\u4F4DID\u4E0D\u80FD\u4E3A\u7A7A");
+          }
+          res = await common_api_ai.aiApi.askByPdfJobId({ name: formData.pdfFile.name, base64: formData.pdfFile.base64 }, jobId);
         } else if (method === "pdf+text") {
-          const res = await common_api_ai.aiApi.askByPdfJobText({
-            name: formData.pdfFile.name,
-            base64: formData.pdfFile.base64
-          }, formData.positionText);
-          return (res == null ? void 0 : res.analysis) || ((_e = res == null ? void 0 : res.data) == null ? void 0 : _e.analysis) || (res == null ? void 0 : res.data) || res;
+          if (!((_d = formData.pdfFile) == null ? void 0 : _d.base64)) {
+            throw new Error("PDF \u6587\u4EF6\u6CA1\u6709 base64 \u6570\u636E");
+          }
+          if (!formData.positionText.trim()) {
+            throw new Error("\u804C\u4F4D\u63CF\u8FF0\u4E0D\u80FD\u4E3A\u7A7A");
+          }
+          res = await common_api_ai.aiApi.askByPdfJobText({ name: formData.pdfFile.name, base64: formData.pdfFile.base64 }, formData.positionText);
+        } else {
+          throw new Error(`\u4E0D\u652F\u6301\u7684\u7B80\u5386\u5206\u6790\u65B9\u6CD5: ${method}`);
         }
+        return (res == null ? void 0 : res.analysis) || ((_e = res == null ? void 0 : res.data) == null ? void 0 : _e.analysis) || (res == null ? void 0 : res.data) || res;
       } catch (err) {
         console.error("\u7B80\u5386\u5206\u6790\u5931\u8D25:", err);
         throw err;
@@ -339,9 +442,7 @@ const _sfc_main = {
       var _a, _b, _c;
       if (method === "user") {
         const res = await common_api_ai.aiApi.resumeEvaluation();
-        if (res.code !== 200)
-          throw new Error(res.message);
-        return ((_a = res.data) == null ? void 0 : _a.evaluation) || res.data;
+        return ((_a = res == null ? void 0 : res.data) == null ? void 0 : _a.evaluation) || (res == null ? void 0 : res.evaluation) || (res == null ? void 0 : res.data) || res;
       } else if (method === "pdf") {
         if (!((_b = formData.pdfFile) == null ? void 0 : _b.base64)) {
           throw new Error("PDF \u6587\u4EF6\u6CA1\u6709 base64 \u6570\u636E");
@@ -350,52 +451,58 @@ const _sfc_main = {
           name: formData.pdfFile.name,
           base64: formData.pdfFile.base64
         });
-        return ((_c = res.data) == null ? void 0 : _c.evaluation) || res.data;
+        return ((_c = res == null ? void 0 : res.data) == null ? void 0 : _c.evaluation) || (res == null ? void 0 : res.evaluation) || (res == null ? void 0 : res.data) || res;
+      } else {
+        throw new Error(`\u4E0D\u652F\u6301\u7684\u7B80\u5386\u8BC4\u4F30\u65B9\u6CD5: ${method}`);
       }
     },
     async submitSuccessRate(formData, method) {
-      var _a, _b, _c, _d;
+      var _a, _b, _c, _d, _e, _f;
       if (method === "pdf+position") {
         if (!((_a = formData.pdfFile) == null ? void 0 : _a.base64)) {
           throw new Error("PDF \u6587\u4EF6\u6CA1\u6709 base64 \u6570\u636E");
         }
-        const res = await common_api_ai.aiApi.successRateByPdfJobId({
-          name: formData.pdfFile.name,
-          base64: formData.pdfFile.base64
-        }, formData.positionId);
-        return ((_b = res.data) == null ? void 0 : _b.analysis) || res.data;
+        const res = await common_api_ai.aiApi.successRateByPdfJobId({ name: formData.pdfFile.name, base64: formData.pdfFile.base64 }, formData.positionId);
+        return ((_b = res == null ? void 0 : res.data) == null ? void 0 : _b.analysis) || (res == null ? void 0 : res.analysis) || (res == null ? void 0 : res.data) || res;
       } else if (method === "pdf+text") {
         if (!((_c = formData.pdfFile) == null ? void 0 : _c.base64)) {
           throw new Error("PDF \u6587\u4EF6\u6CA1\u6709 base64 \u6570\u636E");
         }
-        const res = await common_api_ai.aiApi.successRateByPdfJobText({
-          name: formData.pdfFile.name,
-          base64: formData.pdfFile.base64
-        }, formData.positionText);
-        return ((_d = res.data) == null ? void 0 : _d.analysis) || res.data;
+        const res = await common_api_ai.aiApi.successRateByPdfJobText({ name: formData.pdfFile.name, base64: formData.pdfFile.base64 }, formData.positionText);
+        return ((_d = res == null ? void 0 : res.data) == null ? void 0 : _d.analysis) || (res == null ? void 0 : res.analysis) || (res == null ? void 0 : res.data) || res;
+      } else if (method === "user+position") {
+        const res = await common_api_ai.aiApi.successRateByUserJobId(formData.positionId);
+        return ((_e = res == null ? void 0 : res.data) == null ? void 0 : _e.analysis) || (res == null ? void 0 : res.analysis) || (res == null ? void 0 : res.data) || res;
+      } else if (method === "user+text") {
+        const res = await common_api_ai.aiApi.successRateByUserJobText(formData.positionText);
+        return ((_f = res == null ? void 0 : res.data) == null ? void 0 : _f.analysis) || (res == null ? void 0 : res.analysis) || (res == null ? void 0 : res.data) || res;
+      } else {
+        throw new Error(`\u4E0D\u652F\u6301\u7684\u6210\u529F\u7387\u5206\u6790\u65B9\u6CD5: ${method}`);
       }
     },
     async submitStudentPlan(formData, method) {
-      var _a, _b, _c, _d;
+      var _a, _b, _c, _d, _e, _f;
       const userGrade = this.gradeOptions[this.gradeIndex];
       if (method === "pdf+position") {
         if (!((_a = formData.pdfFile) == null ? void 0 : _a.base64)) {
           throw new Error("PDF \u6587\u4EF6\u6CA1\u6709 base64 \u6570\u636E");
         }
-        const res = await common_api_ai.aiApi.universityPlanByPdfJobId({
-          name: formData.pdfFile.name,
-          base64: formData.pdfFile.base64
-        }, formData.positionId, userGrade);
-        return ((_b = res.data) == null ? void 0 : _b.plan) || res.data;
+        const res = await common_api_ai.aiApi.universityPlanByPdfJobId({ name: formData.pdfFile.name, base64: formData.pdfFile.base64 }, formData.positionId, userGrade);
+        return ((_b = res == null ? void 0 : res.data) == null ? void 0 : _b.plan) || (res == null ? void 0 : res.plan) || (res == null ? void 0 : res.data) || res;
       } else if (method === "pdf+text") {
         if (!((_c = formData.pdfFile) == null ? void 0 : _c.base64)) {
           throw new Error("PDF \u6587\u4EF6\u6CA1\u6709 base64 \u6570\u636E");
         }
-        const res = await common_api_ai.aiApi.universityPlanByPdfJobText({
-          name: formData.pdfFile.name,
-          base64: formData.pdfFile.base64
-        }, formData.positionText, userGrade);
-        return ((_d = res.data) == null ? void 0 : _d.plan) || res.data;
+        const res = await common_api_ai.aiApi.universityPlanByPdfJobText({ name: formData.pdfFile.name, base64: formData.pdfFile.base64 }, formData.positionText, userGrade);
+        return ((_d = res == null ? void 0 : res.data) == null ? void 0 : _d.plan) || (res == null ? void 0 : res.plan) || (res == null ? void 0 : res.data) || res;
+      } else if (method === "user+position") {
+        const res = await common_api_ai.aiApi.universityPlanByUserJobId(formData.positionId, userGrade);
+        return ((_e = res == null ? void 0 : res.data) == null ? void 0 : _e.plan) || (res == null ? void 0 : res.plan) || (res == null ? void 0 : res.data) || res;
+      } else if (method === "user+text") {
+        const res = await common_api_ai.aiApi.universityPlanByUserJobText(formData.positionText, userGrade);
+        return ((_f = res == null ? void 0 : res.data) == null ? void 0 : _f.plan) || (res == null ? void 0 : res.plan) || (res == null ? void 0 : res.data) || res;
+      } else {
+        throw new Error(`\u4E0D\u652F\u6301\u7684\u5927\u5B66\u751F\u89C4\u5212\u65B9\u6CD5: ${method}`);
       }
     },
     getUserMessageText() {
@@ -413,8 +520,19 @@ const _sfc_main = {
     },
     validateForm() {
       const method = this.currentMethod;
+      if (method.includes("user")) {
+        if (!this.currentUserId) {
+          common_vendor.index.showToast({
+            title: "\u672A\u83B7\u53D6\u5230\u7528\u6237\u4FE1\u606F\uFF0C\u8BF7\u91CD\u65B0\u767B\u5F55",
+            icon: "none",
+            duration: 3e3
+          });
+          this.fetchUserInfo();
+          return false;
+        }
+      }
       if (method.includes("position") && !this.formData.positionId.trim()) {
-        common_vendor.index.showToast({ title: "\u8BF7\u8F93\u5165\u804C\u4F4DID", icon: "none" });
+        common_vendor.index.showToast({ title: "\u8BF7\u9009\u62E9\u804C\u4F4D\u7C7B\u578B", icon: "none" });
         return false;
       }
       if (method.includes("text") && !this.formData.positionText.trim()) {
@@ -461,6 +579,7 @@ const _sfc_main = {
   }
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _a, _b, _c;
   return common_vendor.e({
     a: common_vendor.o((...args) => $options.goToInterview && $options.goToInterview(...args)),
     b: common_vendor.f($data.messages, (message, index, i0) => {
@@ -525,96 +644,100 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       };
     }),
     t: common_vendor.o((...args) => $options.onMethodChange && $options.onMethodChange(...args)),
-    v: $data.currentMethod.includes("user")
-  }, $data.currentMethod.includes("user") ? {
-    w: $data.formData.userId,
-    x: common_vendor.o(($event) => $data.formData.userId = $event.detail.value)
-  } : {}, {
-    y: $data.currentMethod.includes("position")
-  }, $data.currentMethod.includes("position") ? {
-    z: $data.formData.positionId,
-    A: common_vendor.o(($event) => $data.formData.positionId = $event.detail.value)
-  } : {}, {
-    B: $data.currentMethod.includes("text")
-  }, $data.currentMethod.includes("text") ? {
-    C: $data.formData.positionText,
-    D: common_vendor.o(($event) => $data.formData.positionText = $event.detail.value)
-  } : {}, {
-    E: $data.currentMethod.includes("pdf")
-  }, $data.currentMethod.includes("pdf") ? {
-    F: common_vendor.t($data.formData.pdfFile ? $data.formData.pdfFile.name : "\u70B9\u51FB\u9009\u62E9PDF\u6587\u4EF6"),
-    G: common_vendor.o((...args) => $options.chooseFile && $options.chooseFile(...args))
-  } : {}) : {}, {
-    H: $data.currentPanel === "resumeEvaluation"
+    v: $data.isLoadingUser
+  }, $data.isLoadingUser ? {} : $data.currentUserId ? {
+    x: common_vendor.t($data.currentUserId)
+  } : {
+    y: common_vendor.o((...args) => $options.fetchUserInfo && $options.fetchUserInfo(...args))
+  }, {
+    w: $data.currentUserId,
+    z: $data.isLoadingUser ? 1 : "",
+    A: !$data.currentUserId && !$data.isLoadingUser ? 1 : "",
+    B: $data.currentMethod.includes("user"),
+    C: common_vendor.t($data.formData.positionId ? ((_a = $data.categories.find((c) => c.id === $data.formData.positionId)) == null ? void 0 : _a.name) || "\u8BF7\u9009\u62E9\u804C\u4F4D\u7C7B\u578B" : "\u8BF7\u9009\u62E9\u804C\u4F4D\u7C7B\u578B"),
+    D: common_vendor.o((...args) => $options.onPositionChange && $options.onPositionChange(...args)),
+    E: $data.categories,
+    F: $data.currentMethod.includes("position"),
+    G: $data.formData.positionText,
+    H: common_vendor.o(($event) => $data.formData.positionText = $event.detail.value),
+    I: $data.currentMethod.includes("text"),
+    J: common_vendor.t($data.formData.pdfFile ? $data.formData.pdfFile.name : "\u70B9\u51FB\u9009\u62E9PDF\u6587\u4EF6"),
+    K: common_vendor.o((...args) => $options.chooseFile && $options.chooseFile(...args)),
+    L: $data.currentMethod.includes("pdf")
+  }) : {}, {
+    M: $data.currentPanel === "resumeEvaluation"
   }, $data.currentPanel === "resumeEvaluation" ? common_vendor.e({
-    I: $data.currentMethod === "user",
-    J: $data.currentMethod === "pdf",
-    K: common_vendor.o((...args) => $options.onMethodChange && $options.onMethodChange(...args)),
-    L: $data.currentMethod === "user"
-  }, $data.currentMethod === "user" ? {
-    M: $data.formData.userId,
-    N: common_vendor.o(($event) => $data.formData.userId = $event.detail.value)
-  } : {}, {
-    O: $data.currentMethod === "pdf"
-  }, $data.currentMethod === "pdf" ? {
-    P: common_vendor.t($data.formData.pdfFile ? $data.formData.pdfFile.name : "\u70B9\u51FB\u9009\u62E9PDF\u6587\u4EF6"),
-    Q: common_vendor.o((...args) => $options.chooseFile && $options.chooseFile(...args))
-  } : {}) : {}, {
-    R: $data.currentPanel === "successRate"
+    N: $data.currentMethod,
+    O: common_vendor.o((...args) => $options.onMethodChange && $options.onMethodChange(...args)),
+    P: $data.isLoadingUser
+  }, $data.isLoadingUser ? {} : $data.currentUserId ? {
+    R: common_vendor.t($data.currentUserId)
+  } : {
+    S: common_vendor.o((...args) => $options.fetchUserInfo && $options.fetchUserInfo(...args))
+  }, {
+    Q: $data.currentUserId,
+    T: $data.isLoadingUser ? 1 : "",
+    U: !$data.currentUserId && !$data.isLoadingUser ? 1 : "",
+    V: $data.currentMethod === "user",
+    W: common_vendor.t($data.formData.pdfFile ? $data.formData.pdfFile.name : "\u70B9\u51FB\u9009\u62E9PDF\u6587\u4EF6"),
+    X: common_vendor.o((...args) => $options.chooseFile && $options.chooseFile(...args)),
+    Y: $data.currentMethod === "pdf"
+  }) : {}, {
+    Z: $data.currentPanel === "successRate"
   }, $data.currentPanel === "successRate" ? common_vendor.e({
-    S: $data.currentMethod === "pdf+position",
-    T: $data.currentMethod === "user+text",
-    U: common_vendor.o((...args) => $options.onMethodChange && $options.onMethodChange(...args)),
-    V: $data.currentMethod === "user+text"
-  }, $data.currentMethod === "user+text" ? {
-    W: $data.formData.userId,
-    X: common_vendor.o(($event) => $data.formData.userId = $event.detail.value)
-  } : {}, {
-    Y: $data.currentMethod.includes("position")
-  }, $data.currentMethod.includes("position") ? {
-    Z: $data.formData.positionId,
-    aa: common_vendor.o(($event) => $data.formData.positionId = $event.detail.value)
-  } : {}, {
-    ab: $data.currentMethod.includes("text")
-  }, $data.currentMethod.includes("text") ? {
-    ac: $data.formData.positionText,
-    ad: common_vendor.o(($event) => $data.formData.positionText = $event.detail.value)
-  } : {}, {
-    ae: $data.currentMethod.includes("pdf")
-  }, $data.currentMethod.includes("pdf") ? {
-    af: common_vendor.t($data.formData.pdfFile ? $data.formData.pdfFile.name : "\u70B9\u51FB\u9009\u62E9PDF\u6587\u4EF6"),
-    ag: common_vendor.o((...args) => $options.chooseFile && $options.chooseFile(...args))
-  } : {}) : {}, {
-    ah: $data.currentPanel === "studentPlan"
+    aa: $data.currentMethod,
+    ab: common_vendor.o((...args) => $options.onMethodChange && $options.onMethodChange(...args)),
+    ac: $data.isLoadingUser
+  }, $data.isLoadingUser ? {} : $data.currentUserId ? {
+    ae: common_vendor.t($data.currentUserId)
+  } : {
+    af: common_vendor.o((...args) => $options.fetchUserInfo && $options.fetchUserInfo(...args))
+  }, {
+    ad: $data.currentUserId,
+    ag: $data.isLoadingUser ? 1 : "",
+    ah: !$data.currentUserId && !$data.isLoadingUser ? 1 : "",
+    ai: $data.currentMethod.includes("user"),
+    aj: common_vendor.t($data.formData.positionId ? ((_b = $data.categories.find((c) => c.id === $data.formData.positionId)) == null ? void 0 : _b.name) || "\u8BF7\u9009\u62E9\u804C\u4F4D\u7C7B\u578B" : "\u8BF7\u9009\u62E9\u804C\u4F4D\u7C7B\u578B"),
+    ak: common_vendor.o((...args) => $options.onPositionChange && $options.onPositionChange(...args)),
+    al: $data.categories,
+    am: $data.currentMethod.includes("position"),
+    an: $data.formData.positionText,
+    ao: common_vendor.o(($event) => $data.formData.positionText = $event.detail.value),
+    ap: $data.currentMethod.includes("text"),
+    aq: common_vendor.t($data.formData.pdfFile ? $data.formData.pdfFile.name : "\u70B9\u51FB\u9009\u62E9PDF\u6587\u4EF6"),
+    ar: common_vendor.o((...args) => $options.chooseFile && $options.chooseFile(...args)),
+    as: $data.currentMethod.includes("pdf")
+  }) : {}, {
+    at: $data.currentPanel === "studentPlan"
   }, $data.currentPanel === "studentPlan" ? common_vendor.e({
-    ai: $data.currentMethod === "pdf+position",
-    aj: $data.currentMethod === "user+text",
-    ak: common_vendor.o((...args) => $options.onMethodChange && $options.onMethodChange(...args)),
-    al: $data.currentMethod.includes("user")
-  }, $data.currentMethod.includes("user") ? {
-    am: $data.formData.userId,
-    an: common_vendor.o(($event) => $data.formData.userId = $event.detail.value)
-  } : {}, {
-    ao: $data.currentMethod.includes("position")
-  }, $data.currentMethod.includes("position") ? {
-    ap: $data.formData.positionId,
-    aq: common_vendor.o(($event) => $data.formData.positionId = $event.detail.value)
-  } : {}, {
-    ar: $data.currentMethod.includes("text")
-  }, $data.currentMethod.includes("text") ? {
-    as: $data.formData.positionText,
-    at: common_vendor.o(($event) => $data.formData.positionText = $event.detail.value)
-  } : {}, {
-    av: $data.currentMethod.includes("pdf")
-  }, $data.currentMethod.includes("pdf") ? {
-    aw: common_vendor.t($data.formData.pdfFile ? $data.formData.pdfFile.name : "\u70B9\u51FB\u9009\u62E9PDF\u6587\u4EF6"),
-    ax: common_vendor.o((...args) => $options.chooseFile && $options.chooseFile(...args))
-  } : {}) : {}, {
-    ay: common_vendor.o((...args) => $options.submitFunction && $options.submitFunction(...args)),
-    az: common_vendor.o((...args) => $options.closePanel && $options.closePanel(...args)),
-    aA: common_vendor.o(() => {
+    av: $data.currentMethod,
+    aw: common_vendor.o((...args) => $options.onMethodChange && $options.onMethodChange(...args)),
+    ax: $data.isLoadingUser
+  }, $data.isLoadingUser ? {} : $data.currentUserId ? {
+    az: common_vendor.t($data.currentUserId)
+  } : {
+    aA: common_vendor.o((...args) => $options.fetchUserInfo && $options.fetchUserInfo(...args))
+  }, {
+    ay: $data.currentUserId,
+    aB: $data.isLoadingUser ? 1 : "",
+    aC: !$data.currentUserId && !$data.isLoadingUser ? 1 : "",
+    aD: $data.currentMethod.includes("user"),
+    aE: common_vendor.t($data.formData.positionId ? ((_c = $data.categories.find((c) => c.id === $data.formData.positionId)) == null ? void 0 : _c.name) || "\u8BF7\u9009\u62E9\u804C\u4F4D\u7C7B\u578B" : "\u8BF7\u9009\u62E9\u804C\u4F4D\u7C7B\u578B"),
+    aF: common_vendor.o((...args) => $options.onPositionChange && $options.onPositionChange(...args)),
+    aG: $data.categories,
+    aH: $data.currentMethod.includes("position"),
+    aI: $data.formData.positionText,
+    aJ: common_vendor.o(($event) => $data.formData.positionText = $event.detail.value),
+    aK: $data.currentMethod.includes("text"),
+    aL: common_vendor.t($data.formData.pdfFile ? $data.formData.pdfFile.name : "\u70B9\u51FB\u9009\u62E9PDF\u6587\u4EF6"),
+    aM: common_vendor.o((...args) => $options.chooseFile && $options.chooseFile(...args)),
+    aN: $data.currentMethod.includes("pdf")
+  }) : {}, {
+    aO: common_vendor.o((...args) => $options.submitFunction && $options.submitFunction(...args)),
+    aP: common_vendor.o((...args) => $options.closePanel && $options.closePanel(...args)),
+    aQ: common_vendor.o(() => {
     }),
-    aB: common_vendor.o((...args) => $options.closePanel && $options.closePanel(...args))
+    aR: common_vendor.o((...args) => $options.closePanel && $options.closePanel(...args))
   }) : {});
 }
 var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-6fa74974"], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/AI/AI.vue"]]);

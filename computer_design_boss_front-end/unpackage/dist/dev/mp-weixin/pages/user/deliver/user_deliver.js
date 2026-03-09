@@ -1,6 +1,7 @@
 "use strict";
 var common_vendor = require("../../../common/vendor.js");
 var common_api_deliver = require("../../../common/api/deliver.js");
+var common_api_job = require("../../../common/api/job.js");
 require("../../../common/api/request.js");
 require("../../../common/config.js");
 const _sfc_main = {
@@ -22,11 +23,14 @@ const _sfc_main = {
       try {
         this.loading = true;
         const res = await common_api_deliver.deliverApi.getDeliverList(this.userId);
+        const job = await common_api_job.jobApi.getAllJobs();
+        console.log("\u8F6C\u6362\u540E\u7684id:", job);
         const rawList = Array.isArray(res) ? res : [];
         this.delivers = rawList.map((item) => {
           const snapshot = JSON.parse(item.job_snapshot || "{}");
           console.log("\u8F6C\u6362\u524D\u7684delivers:", snapshot);
           return {
+            id: item.id,
             jobTitle: snapshot.title || "",
             company: snapshot.location || "",
             salary: snapshot.salary || "",
@@ -39,6 +43,7 @@ const _sfc_main = {
             expReq: snapshot.exp_req || ""
           };
         });
+        console.log("\u8F6C\u6362\u540E\u7684id:", job);
         console.log("\u8F6C\u6362\u540E\u7684delivers:", this.delivers.jobTitle);
         console.log("\u8F6C\u6362\u540E\u7684delivers:", this.delivers);
       } catch (err) {
@@ -77,23 +82,18 @@ const _sfc_main = {
         }
       });
     },
-    async viewDetails(item) {
-      try {
-        const res = await common_api_deliver.deliverApi.getDeliverDetail({
-          user_id: this.userId,
-          boss_job_id: item.boss_job_id
-        });
-        console.log("\u6295\u9012\u8BE6\u60C5:", res.data);
+    viewDetails(item) {
+      if (!item.id) {
         common_vendor.index.showToast({
-          title: `\u67E5\u770B${item.jobTitle}\u8BE6\u60C5`,
+          title: "\u804C\u4F4DID\u4E0D\u5B58\u5728",
           icon: "none"
         });
-      } catch (err) {
-        common_vendor.index.showToast({
-          title: err.message || "\u83B7\u53D6\u8BE6\u60C5\u5931\u8D25",
-          icon: "none"
-        });
+        return;
       }
+      console.log("\u8F6C\u6362\u540E\u7684a:", item);
+      common_vendor.index.navigateTo({
+        url: `/pages/job/detail/job_detail_index?id=${item.id}`
+      });
     }
   }
 };

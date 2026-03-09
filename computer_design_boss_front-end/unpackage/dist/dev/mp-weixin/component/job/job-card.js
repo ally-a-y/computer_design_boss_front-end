@@ -56,6 +56,7 @@ const _sfc_main = {
       return "\u85AA\u8D44\u9762\u8BAE";
     },
     goToDetail(data) {
+      console.log("\u8F6C\u6362\u540E\u7684b:", data.id);
       common_vendor.index.navigateTo({
         url: `/pages/job/detail/job_detail_index?id=${data.id}`
       });

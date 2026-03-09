@@ -104,22 +104,34 @@
             </view>
             
             <view class="input-fields">
-              <view v-if="currentMethod.includes('user')" class="input-group">
+              <view v-show="currentMethod.includes('user')" class="input-group user-id-group">
                 <text class="input-label">用户ID</text>
-                <input class="input-field" v-model="formData.userId" placeholder="请输入用户ID" />
+                <view class="user-id-display" :class="{ 'loading': isLoadingUser, 'error': !currentUserId && !isLoadingUser }">
+                  <text v-if="isLoadingUser" class="loading-text">获取用户信息中...</text>
+                  <text v-else-if="currentUserId" class="user-id-text">
+                    {{ currentUserId }}
+                  </text>
+                  <text v-else class="error-text">
+                    未获取到用户信息，请
+                    <text class="retry-link" @click.stop="fetchUserInfo">点击重试</text>
+                    或重新登录
+                  </text>
+                </view>
               </view>
               
-              <view v-if="currentMethod.includes('position')" class="input-group">
-                <text class="input-label">职位ID</text>
-                <input class="input-field" v-model="formData.positionId" placeholder="请输入职位ID" />
+              <view v-show="currentMethod.includes('position')" class="input-group">
+                <text class="input-label">职位类型</text>
+                <picker @change="onPositionChange" :range="categories" range-key="name" class="picker-field">
+                  <view class="picker-text">{{ formData.positionId ? categories.find(c => c.id === formData.positionId)?.name || '请选择职位类型' : '请选择职位类型' }}</view>
+                </picker>
               </view>
               
-              <view v-if="currentMethod.includes('text')" class="input-group">
+              <view v-show="currentMethod.includes('text')" class="input-group">
                 <text class="input-label">职位描述</text>
                 <textarea class="input-field" v-model="formData.positionText" placeholder="请输入职位描述"></textarea>
               </view>
               
-              <view v-if="currentMethod.includes('pdf')" class="input-group">
+              <view v-show="currentMethod.includes('pdf')" class="input-group">
                 <text class="input-label">PDF文件</text>
                 <view class="file-upload" @click="chooseFile">
                   <text>{{ formData.pdfFile ? formData.pdfFile.name : '点击选择PDF文件' }}</text>
@@ -131,24 +143,34 @@
           <!-- 其他面板类似结构 -->
           <view v-if="currentPanel === 'resumeEvaluation'">
             <view class="method-selector">
-              <radio-group @change="onMethodChange">
+              <radio-group :value="currentMethod" @change="onMethodChange">
                 <label class="radio-item">
-                  <radio value="user" :checked="currentMethod === 'user'" />
+                  <radio value="user" />
                   <text>用户ID</text>
                 </label>
                 <label class="radio-item">
-                  <radio value="pdf" :checked="currentMethod === 'pdf'" />
+                  <radio value="pdf" />
                   <text>PDF上传</text>
                 </label>
               </radio-group>
             </view>
             
             <view class="input-fields">
-              <view v-if="currentMethod === 'user'" class="input-group">
+              <view v-show="currentMethod === 'user'" class="input-group" key="user-group">
                 <text class="input-label">用户ID</text>
-                <input class="input-field" v-model="formData.userId" placeholder="请输入用户ID" />
+                <view class="user-id-display" :class="{ 'loading': isLoadingUser, 'error': !currentUserId && !isLoadingUser }">
+                  <text v-if="isLoadingUser" class="loading-text">获取用户信息中...</text>
+                  <text v-else-if="currentUserId" class="user-id-text">
+                    {{ currentUserId }}
+                  </text>
+                  <text v-else class="error-text">
+                    未获取到用户信息，请
+                    <text class="retry-link" @click.stop="fetchUserInfo">点击重试</text>
+                    或重新登录
+                  </text>
+                </view>
               </view>
-              <view v-if="currentMethod === 'pdf'" class="input-group">
+              <view v-show="currentMethod === 'pdf'" class="input-group" key="pdf-group">
                 <text class="input-label">PDF文件</text>
                 <view class="file-upload" @click="chooseFile">
                   <text>{{ formData.pdfFile ? formData.pdfFile.name : '点击选择PDF文件' }}</text>
@@ -159,35 +181,47 @@
           
           <view v-if="currentPanel === 'successRate'">
             <view class="method-selector">
-              <radio-group @change="onMethodChange">
+              <radio-group :value="currentMethod" @change="onMethodChange">
                 <label class="radio-item">
-                  <radio value="pdf+position" :checked="currentMethod === 'pdf+position'" />
-                  <text>PDF+职位ID</text>
+                  <radio value="pdf+position" />
+                  <text>PDF+职位类型</text>
                 </label>
                 <label class="radio-item">
-                  <radio value="user+text" :checked="currentMethod === 'user+text'" />
+                  <radio value="user+text" />
                   <text>用户ID+职位描述</text>
                 </label>
               </radio-group>
             </view>
             
             <view class="input-fields">
-              <view v-if="currentMethod === 'user+text'" class="input-group">
+              <view v-show="currentMethod.includes('user')" class="input-group" key="user-group">
                 <text class="input-label">用户ID</text>
-                <input class="input-field" v-model="formData.userId" placeholder="请输入用户ID" />
+                <view class="user-id-display" :class="{ 'loading': isLoadingUser, 'error': !currentUserId && !isLoadingUser }">
+                  <text v-if="isLoadingUser" class="loading-text">获取用户信息中...</text>
+                  <text v-else-if="currentUserId" class="user-id-text">
+                    {{ currentUserId }}
+                  </text>
+                  <text v-else class="error-text">
+                    未获取到用户信息，请
+                    <text class="retry-link" @click.stop="fetchUserInfo">点击重试</text>
+                    或重新登录
+                  </text>
+                </view>
               </view>
               
-              <view v-if="currentMethod.includes('position')" class="input-group">
-                <text class="input-label">职位ID</text>
-                <input class="input-field" v-model="formData.positionId" placeholder="请输入职位ID" />
+              <view v-show="currentMethod.includes('position')" class="input-group" key="position-group">
+                <text class="input-label">职位类型</text>
+                <picker @change="onPositionChange" :range="categories" range-key="name" class="picker-field">
+                  <view class="picker-text">{{ formData.positionId ? categories.find(c => c.id === formData.positionId)?.name || '请选择职位类型' : '请选择职位类型' }}</view>
+                </picker>
               </view>
               
-              <view v-if="currentMethod.includes('text')" class="input-group">
+              <view v-show="currentMethod.includes('text')" class="input-group" key="text-group">
                 <text class="input-label">职位描述</text>
                 <textarea class="input-field" v-model="formData.positionText" placeholder="请输入职位描述"></textarea>
               </view>
               
-              <view v-if="currentMethod.includes('pdf')" class="input-group">
+              <view v-show="currentMethod.includes('pdf')" class="input-group" key="pdf-group">
                 <text class="input-label">PDF文件</text>
                 <view class="file-upload" @click="chooseFile">
                   <text>{{ formData.pdfFile ? formData.pdfFile.name : '点击选择PDF文件' }}</text>
@@ -198,35 +232,47 @@
           
           <view v-if="currentPanel === 'studentPlan'">
             <view class="method-selector">
-              <radio-group @change="onMethodChange">
+              <radio-group :value="currentMethod" @change="onMethodChange">
                 <label class="radio-item">
-                  <radio value="pdf+position" :checked="currentMethod === 'pdf+position'" />
-                  <text>PDF+职位ID</text>
+                  <radio value="pdf+position" />
+                  <text>PDF+职位类型</text>
                 </label>
                 <label class="radio-item">
-                  <radio value="user+text" :checked="currentMethod === 'user+text'" />
+                  <radio value="user+text" />
                   <text>用户ID+职位描述</text>
                 </label>
               </radio-group>
             </view>
             
             <view class="input-fields">
-              <view v-if="currentMethod.includes('user')" class="input-group">
+              <view v-show="currentMethod.includes('user')" class="input-group" key="user-group">
                 <text class="input-label">用户ID</text>
-                <input class="input-field" v-model="formData.userId" placeholder="请输入用户ID" />
+                <view class="user-id-display" :class="{ 'loading': isLoadingUser, 'error': !currentUserId && !isLoadingUser }">
+                  <text v-if="isLoadingUser" class="loading-text">获取用户信息中...</text>
+                  <text v-else-if="currentUserId" class="user-id-text">
+                    {{ currentUserId }}
+                  </text>
+                  <text v-else class="error-text">
+                    未获取到用户信息，请
+                    <text class="retry-link" @click.stop="fetchUserInfo">点击重试</text>
+                    或重新登录
+                  </text>
+                </view>
               </view>
               
-              <view v-if="currentMethod.includes('position')" class="input-group">
-                <text class="input-label">职位ID</text>
-                <input class="input-field" v-model="formData.positionId" placeholder="请输入职位ID" />
+              <view v-show="currentMethod.includes('position')" class="input-group" key="position-group">
+                <text class="input-label">职位类型</text>
+                <picker @change="onPositionChange" :range="categories" range-key="name" class="picker-field">
+                  <view class="picker-text">{{ formData.positionId ? categories.find(c => c.id === formData.positionId)?.name || '请选择职位类型' : '请选择职位类型' }}</view>
+                </picker>
               </view>
               
-              <view v-if="currentMethod.includes('text')" class="input-group">
+              <view v-show="currentMethod.includes('text')" class="input-group" key="text-group">
                 <text class="input-label">职位描述</text>
                 <textarea class="input-field" v-model="formData.positionText" placeholder="请输入职位描述"></textarea>
               </view>
               
-              <view v-if="currentMethod.includes('pdf')" class="input-group">
+              <view v-show="currentMethod.includes('pdf')" class="input-group" key="pdf-group">
                 <text class="input-label">PDF文件</text>
                 <view class="file-upload" @click="chooseFile">
                   <text>{{ formData.pdfFile ? formData.pdfFile.name : '点击选择PDF文件' }}</text>
@@ -248,6 +294,7 @@
 
 <script>
 import { aiApi } from '@/common/api/ai.js'
+const BASE_URL = 'http://localhost:5000'
 
 export default {
   data() {
@@ -265,6 +312,9 @@ export default {
       isLoading: false,
       currentPanel: null,
       currentMethod: 'user+position',
+	  isLoadingUser: false,
+      userInfo: null, 
+	  currentUserId: null,
       formData: {
         positionId: '',
         positionText: '',
@@ -273,10 +323,24 @@ export default {
       gradeIndex: 0,
       gradeOptions: ['大一', '大二', '大三', '大四', '研一', '研二', '研三'],
       
+      // 职位分类列表
+      categories: [ 
+        { id: '101', name: '前端开发' }, 
+        { id: '102', name: '后端开发' }, 
+        { id: '103', name: '移动端开发' }, 
+        { id: '104', name: '数据与AI' }, 
+        { id: '105', name: '运维与测试' }, 
+        { id: '106', name: '产品设计' }, 
+        { id: '107', name: '网络安全' }, 
+        { id: '108', name: '嵌入式开发' }, 
+        { id: '200', name: '产品与设计类' }, 
+        { id: '300', name: '技术管理类' } 
+      ],
+      
       analysisMethods: [
-        { value: 'user+position', label: '我的简历+职位ID' },
+        { value: 'user+position', label: '我的简历+职位类型' },
         { value: 'user+text', label: '我的简历+职位文本' },
-        { value: 'pdf+position', label: 'PDF+职位ID' },
+        { value: 'pdf+position', label: 'PDF+职位类型' },
         { value: 'pdf+text', label: 'PDF+职位文本' }
       ]
     }
@@ -296,6 +360,7 @@ export default {
   
   onLoad() {
     this.initializeChat()
+	this.fetchUserInfo()
   },
   
   onUnload() {
@@ -303,9 +368,75 @@ export default {
   },
   
   methods: {
-    initializeChat() {
-      // 页面加载初始化
-    },
+      initializeChat() {
+      },
+      
+      // 获取用户信息
+      async fetchUserInfo() {
+        this.isLoadingUser = true
+        
+        try {
+          //从本地存储获取token，然后请求用户信息
+          const token = uni.getStorageSync('token')
+          
+          if (!token) {
+            console.log('未找到登录token，需要用户登录')
+            // 跳转到登录页面
+            // uni.navigateTo({ url: '/pages/login/login' })
+            this.currentUserId = null
+            return
+          }
+          
+          // 从本地存储获取缓存的用户信息
+          const cachedUserInfo = uni.getStorageSync('userInfo')
+          if (cachedUserInfo && cachedUserInfo.user_id) {
+            this.userInfo = cachedUserInfo
+            this.currentUserId = String(cachedUserInfo.user_id)
+            console.log('从缓存获取用户ID:', this.currentUserId)
+            return
+          }
+          
+          // 如果本地没有，请求后端API获取用户信息
+          const res = await this.getUserProfile()
+          
+          if (res.code === 200 && res.data) {
+            this.userInfo = res.data
+            this.currentUserId = String(res.data.user_id || res.data.userId || res.data.id)
+            // 缓存到本地
+            uni.setStorageSync('userInfo', res.data)
+            console.log('从后端获取用户ID:', this.currentUserId)
+          }
+        } catch (error) {
+          console.error('获取用户信息失败:', error)
+          uni.showToast({
+            title: '获取用户信息失败',
+            icon: 'none',
+            duration: 2000
+          })
+          this.currentUserId = null
+        } finally {
+          this.isLoadingUser = false
+        }
+      },
+      
+      // 请求后端获取用户信息的API
+      getUserProfile() {
+        return new Promise((resolve, reject) => {
+          uni.request({
+            url: `${BASE_URL}/api/user/profile`,
+            method: 'GET',
+            header: {
+              'Authorization': `Bearer ${uni.getStorageSync('token')}`
+            },
+            success: (res) => {
+              resolve(res.data)
+            },
+            fail: (err) => {
+              reject(err)
+            }
+          })
+        })
+      },
     
     cleanup() {
       // 清理资源
@@ -383,6 +514,10 @@ export default {
     openPanel(panelType) {
       this.currentPanel = panelType
       this.currentMethod = this.getDefaultMethod(panelType)
+	  // 打开面板时确保用户信息已加载
+      if (!this.currentUserId && !this.isLoadingUser) {
+        this.fetchUserInfo()
+      }
     },
     
     closePanel() {
@@ -406,6 +541,13 @@ export default {
     
     onGradeChange(e) {
       this.gradeIndex = parseInt(e.detail.value)
+    },
+    
+    onPositionChange(e) {
+      const index = parseInt(e.detail.value)
+      if (index >= 0 && index < this.categories.length) {
+        this.formData.positionId = this.categories[index].id
+      }
     },
 
   // 预处理内容：处理 JSON 转义字符和清理残留
@@ -641,6 +783,17 @@ export default {
     },
     
     async submitFunction() {
+	  // 检查用户是否已登录（仅当需要user时）
+      if (this.currentMethod.includes('user') && !this.currentUserId) {
+        uni.showToast({ 
+          title: '请先登录', 
+          icon: 'none',
+          duration: 2000
+        })
+        // 尝试重新获取用户信息
+        this.fetchUserInfo()
+        return
+      }
       if (!this.validateForm()) {
         return
       }
@@ -653,7 +806,8 @@ export default {
       const savedFormData = {
         positionId: this.formData.positionId,
         positionText: this.formData.positionText,
-        pdfFile: this.formData.pdfFile ? { ...this.formData.pdfFile } : null
+        pdfFile: this.formData.pdfFile ? { ...this.formData.pdfFile } : null,
+		userId: this.currentUserId
       }
       const savedMethod = this.currentMethod
       
@@ -720,42 +874,62 @@ export default {
     // 简历分析
     async submitResumeAnalysis(formData, method) {
       try {
+        let res;
+        
         if (method === 'user+position') {
           const jobId = String(formData.positionId || '').trim()
           if (!jobId) {
             throw new Error('职位ID不能为空')
           }
-          
-          const res = await aiApi.askByUserJobId(jobId)
-          return res?.analysis || res?.data?.analysis || res?.data || res
+		  // 使用当前用户ID（已从formData自动填充）
+          if (!formData.userId) {
+            throw new Error('用户未登录')
+          }
+           res = await aiApi.askByUserJobId(jobId)
+                return res?.analysis || res?.data?.analysis || res?.data || res
           
         } else if (method === 'user+text') {
-          const res = await aiApi.askByUserJobText(formData.positionText)
-          return res?.analysis || res?.data?.analysis || res?.data || res
+          if (!formData.positionText.trim()) {
+            throw new Error('职位描述不能为空')
+          }
+		  if (!formData.userId) {
+            throw new Error('用户未登录')
+          }
+          res = await aiApi.askByUserJobText(formData.positionText)
+                return res?.analysis || res?.data?.analysis || res?.data || res
           
         } else if (method === 'pdf+position') {
           if (!formData.pdfFile?.base64) {
             throw new Error('PDF 文件没有 base64 数据')
           }
-          const res = await aiApi.askByPdfJobId(
-            {
-              name: formData.pdfFile.name,
-              base64: formData.pdfFile.base64
-            },
-            formData.positionId
+          const jobId = String(formData.positionId || '').trim()
+          if (!jobId) {
+            throw new Error('职位ID不能为空')
+          }
+          res = await aiApi.askByPdfJobId(
+            { name: formData.pdfFile.name, base64: formData.pdfFile.base64 },
+            jobId
           )
-          return res?.analysis || res?.data?.analysis || res?.data || res
           
         } else if (method === 'pdf+text') {
-          const res = await aiApi.askByPdfJobText(
-            {
-              name: formData.pdfFile.name,
-              base64: formData.pdfFile.base64
-            },
+          if (!formData.pdfFile?.base64) {
+            throw new Error('PDF 文件没有 base64 数据')
+          }
+          if (!formData.positionText.trim()) {
+            throw new Error('职位描述不能为空')
+          }
+          res = await aiApi.askByPdfJobText(
+            { name: formData.pdfFile.name, base64: formData.pdfFile.base64 },
             formData.positionText
           )
-          return res?.analysis || res?.data?.analysis || res?.data || res
+          
+        } else {
+          throw new Error(`不支持的简历分析方法: ${method}`)
         }
+        
+        // 统一处理返回结果
+        return res?.analysis || res?.data?.analysis || res?.data || res
+        
       } catch (err) {
         console.error('简历分析失败:', err)
         throw err  
@@ -766,8 +940,7 @@ export default {
     async submitResumeEvaluation(formData, method) {
       if (method === 'user') {
         const res = await aiApi.resumeEvaluation()
-        if (res.code !== 200) throw new Error(res.message)
-        return res.data?.evaluation || res.data
+        return res?.data?.evaluation || res?.evaluation || res?.data || res
       } else if (method === 'pdf') {
         if (!formData.pdfFile?.base64) {
           throw new Error('PDF 文件没有 base64 数据')
@@ -776,7 +949,9 @@ export default {
           name: formData.pdfFile.name,
           base64: formData.pdfFile.base64
         })
-        return res.data?.evaluation || res.data
+        return res?.data?.evaluation || res?.evaluation || res?.data || res
+      } else {
+        throw new Error(`不支持的简历评估方法: ${method}`)
       }
     },
     
@@ -787,25 +962,31 @@ export default {
           throw new Error('PDF 文件没有 base64 数据')
         }
         const res = await aiApi.successRateByPdfJobId(
-          {
-            name: formData.pdfFile.name,
-            base64: formData.pdfFile.base64
-          },
+          { name: formData.pdfFile.name, base64: formData.pdfFile.base64 },
           formData.positionId
         )
-        return res.data?.analysis || res.data
+        return res?.data?.analysis || res?.analysis || res?.data || res
+        
       } else if (method === 'pdf+text') {
         if (!formData.pdfFile?.base64) {
           throw new Error('PDF 文件没有 base64 数据')
         }
         const res = await aiApi.successRateByPdfJobText(
-          {
-            name: formData.pdfFile.name,
-            base64: formData.pdfFile.base64
-          },
+          { name: formData.pdfFile.name, base64: formData.pdfFile.base64 },
           formData.positionText
         )
-        return res.data?.analysis || res.data
+        return res?.data?.analysis || res?.analysis || res?.data || res
+        
+      } else if (method === 'user+position') {
+        const res = await aiApi.successRateByUserJobId(formData.positionId)
+        return res?.data?.analysis || res?.analysis || res?.data || res
+        
+      } else if (method === 'user+text') {
+        const res = await aiApi.successRateByUserJobText(formData.positionText)
+        return res?.data?.analysis || res?.analysis || res?.data || res
+        
+      } else {
+        throw new Error(`不支持的成功率分析方法: ${method}`)
       }
     },
     
@@ -818,27 +999,39 @@ export default {
           throw new Error('PDF 文件没有 base64 数据')
         }
         const res = await aiApi.universityPlanByPdfJobId(
-          {
-            name: formData.pdfFile.name,
-            base64: formData.pdfFile.base64
-          },
+          { name: formData.pdfFile.name, base64: formData.pdfFile.base64 },
           formData.positionId,
           userGrade
         )
-        return res.data?.plan || res.data
+        return res?.data?.plan || res?.plan || res?.data || res
+        
       } else if (method === 'pdf+text') {
         if (!formData.pdfFile?.base64) {
           throw new Error('PDF 文件没有 base64 数据')
         }
         const res = await aiApi.universityPlanByPdfJobText(
-          {
-            name: formData.pdfFile.name,
-            base64: formData.pdfFile.base64
-          },
+          { name: formData.pdfFile.name, base64: formData.pdfFile.base64 },
           formData.positionText,
           userGrade
         )
-        return res.data?.plan || res.data
+        return res?.data?.plan || res?.plan || res?.data || res
+        
+      } else if (method === 'user+position') {
+        const res = await aiApi.universityPlanByUserJobId(
+          formData.positionId,
+          userGrade
+        )
+        return res?.data?.plan || res?.plan || res?.data || res
+        
+      } else if (method === 'user+text') {
+        const res = await aiApi.universityPlanByUserJobText(
+          formData.positionText,
+          userGrade
+        )
+        return res?.data?.plan || res?.plan || res?.data || res
+        
+      } else {
+        throw new Error(`不支持的大学生规划方法: ${method}`)
       }
     },
 	
@@ -858,9 +1051,23 @@ export default {
     
     validateForm() {
       const method = this.currentMethod
-      
+     
+      // 对于需要userId的方式，检查是否已自动获取
+      if (method.includes('user')) {
+        if (!this.currentUserId) {
+          uni.showToast({ 
+            title: '未获取到用户信息，请重新登录', 
+            icon: 'none',
+            duration: 3000
+          })
+          // 触发重新获取用户信息
+          this.fetchUserInfo()
+          return false
+        }
+      }
+	  
       if (method.includes('position') && !this.formData.positionId.trim()) {
-        uni.showToast({ title: '请输入职位ID', icon: 'none' })
+        uni.showToast({ title: '请选择职位类型', icon: 'none' })
         return false
       }
       
@@ -1411,6 +1618,80 @@ export default {
             
             &::placeholder {
               color: #adb5bd;
+            }
+          }
+          
+          .picker-field {
+            width: 100%;
+            padding: 24rpx 28rpx;
+            border: 2rpx solid #e9ecef;
+            border-radius: 16rpx;
+            font-size: 30rpx;
+            background-color: #fff;
+            transition: all 0.3s ease;
+          }
+          
+          .picker-text {
+            color: #495057;
+          }
+		  
+		  // 用户信息展示样式（参照interview.vue）
+          .user-id-display {
+            width: 100%;
+            padding: 24rpx 28rpx;
+            border: 2rpx solid #e9ecef;
+            border-radius: 16rpx;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+            
+            &.loading {
+              background-color: #fffbeb;
+              border-color: #f59e0b;
+            }
+            
+            &.error {
+              background-color: #fef2f2;
+              border-color: #ef4444;
+            }
+            
+            .loading-text {
+              font-size: 30rpx;
+              color: #d97706;
+            }
+            
+            .user-id-text {
+              font-size: 30rpx;
+              color: #007aff;
+              font-weight: 500;
+              display: flex;
+              align-items: center;
+              flex-wrap: wrap;
+              gap: 16rpx;
+              
+              .auto-tag {
+                display: inline-block;
+                font-size: 22rpx;
+                color: #fff;
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                padding: 4rpx 12rpx;
+                border-radius: 8rpx;
+                font-weight: 500;
+              }
+            }
+            
+            .error-text {
+              font-size: 30rpx;
+              color: #dc2626;
+              
+              .retry-link {
+                color: #007aff;
+                text-decoration: underline;
+                font-weight: 500;
+                
+                &:active {
+                  opacity: 0.7;
+                }
+              }
             }
           }
           

@@ -25,14 +25,11 @@ const favoriteApi = {
       }
     });
   },
-  checkFavorite(user_id, boss_job_id) {
+  checkFavorite(data) {
     return common_api_request.requestWithRetry({
       url: "/api/job/favorite/check",
-      method: "GET",
-      data: {
-        user_id,
-        boss_job_id
-      }
+      method: "POST",
+      data
     });
   },
   updateRemarks(data) {

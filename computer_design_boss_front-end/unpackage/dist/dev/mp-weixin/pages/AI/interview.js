@@ -3,6 +3,7 @@ var common_vendor = require("../../common/vendor.js");
 var common_api_ai = require("../../common/api/ai.js");
 require("../../common/api/request.js");
 require("../../common/config.js");
+const BASE_URL = "http://localhost:5000";
 const recorderManager = common_vendor.index.getRecorderManager();
 const __default__ = {
   data() {
@@ -17,6 +18,8 @@ const __default__ = {
         positionId: "",
         positionText: ""
       },
+      userInfo: null,
+      isLoadingUser: false,
       interviewMethods: [
         { value: "resumeText+positionText", label: "\u7B80\u5386\u6587\u672C+\u5C97\u4F4D\u6587\u672C" },
         { value: "pdf+positionText", label: "PDF\u7B80\u5386+\u5C97\u4F4D\u6587\u672C" },
@@ -61,16 +64,70 @@ const __default__ = {
   computed: {
     progressPercent() {
       return Math.min(this.currentQuestion / this.totalQuestions * 100, 100);
+    },
+    hasUserInfo() {
+      return !!this.formData.userId;
     }
   },
   onLoad() {
     this.initializeInterview();
     this.initRecorder();
+    this.fetchUserInfo();
   },
   onUnload() {
     this.cleanupInterview();
   },
   methods: {
+    async fetchUserInfo() {
+      this.isLoadingUser = true;
+      try {
+        const token = common_vendor.index.getStorageSync("token");
+        if (!token) {
+          console.log("\u672A\u627E\u5230\u767B\u5F55token\uFF0C\u9700\u8981\u7528\u6237\u767B\u5F55");
+          return;
+        }
+        const cachedUserInfo = common_vendor.index.getStorageSync("userInfo");
+        if (cachedUserInfo && cachedUserInfo.user_id) {
+          this.userInfo = cachedUserInfo;
+          this.formData.userId = String(cachedUserInfo.user_id);
+          console.log("\u4ECE\u7F13\u5B58\u83B7\u53D6\u7528\u6237ID:", this.formData.userId);
+          return;
+        }
+        const res = await this.getUserProfile();
+        if (res.code === 200 && res.data) {
+          this.userInfo = res.data;
+          this.formData.userId = String(res.data.user_id || res.data.userId || res.data.id);
+          common_vendor.index.setStorageSync("userInfo", res.data);
+          console.log("\u4ECE\u540E\u7AEF\u83B7\u53D6\u7528\u6237ID:", this.formData.userId);
+        }
+      } catch (error) {
+        console.error("\u83B7\u53D6\u7528\u6237\u4FE1\u606F\u5931\u8D25:", error);
+        common_vendor.index.showToast({
+          title: "\u83B7\u53D6\u7528\u6237\u4FE1\u606F\u5931\u8D25",
+          icon: "none",
+          duration: 2e3
+        });
+      } finally {
+        this.isLoadingUser = false;
+      }
+    },
+    getUserProfile() {
+      return new Promise((resolve, reject) => {
+        common_vendor.index.request({
+          url: `${BASE_URL}/api/user/profile`,
+          method: "GET",
+          header: {
+            "Authorization": `Bearer ${common_vendor.index.getStorageSync("token")}`
+          },
+          success: (res) => {
+            resolve(res.data);
+          },
+          fail: (err) => {
+            reject(err);
+          }
+        });
+      });
+    },
     initRecorder() {
       recorderManager.onStart(() => {
         console.log("\u5F55\u97F3\u5F00\u59CB");
@@ -143,6 +200,9 @@ const __default__ = {
     selectMethod(method) {
       this.currentMethod = method;
       this.resetForm();
+      if (this.userInfo) {
+        this.formData.userId = String(this.userInfo.user_id || this.userInfo.userId || this.userInfo.id);
+      }
     },
     chooseResumeFile() {
       wx.chooseMessageFile({
@@ -198,7 +258,7 @@ const __default__ = {
             res = await common_api_ai.interviewApi.startPdfJobId(this.formData.resumePdf.base64, this.formData.positionId);
             break;
           case "user+position":
-            res = await common_api_ai.interviewApi.startUserIdJobId(this.formData.userId, this.formData.positionId);
+            res = await common_api_ai.interviewApi.startUserIdJobId(null, this.formData.positionId);
             break;
           case "user+positionText":
             res = await common_api_ai.interviewApi.startUserIdText(this.formData.userId, this.formData.positionText);
@@ -248,9 +308,16 @@ const __default__ = {
         common_vendor.index.showToast({ title: "\u8BF7\u4E0A\u4F20PDF\u7B80\u5386", icon: "none" });
         return false;
       }
-      if (method.includes("user") && !this.formData.userId.trim()) {
-        common_vendor.index.showToast({ title: "\u8BF7\u8F93\u5165\u7528\u6237ID", icon: "none" });
-        return false;
+      if (method.includes("user")) {
+        if (!this.formData.userId) {
+          common_vendor.index.showToast({
+            title: "\u672A\u83B7\u53D6\u5230\u7528\u6237\u4FE1\u606F\uFF0C\u8BF7\u91CD\u65B0\u767B\u5F55",
+            icon: "none",
+            duration: 3e3
+          });
+          this.fetchUserInfo();
+          return false;
+        }
       }
       if (method.includes("position") && !this.formData.positionId.trim()) {
         common_vendor.index.showToast({ title: "\u8BF7\u8F93\u5165\u804C\u4F4DID", icon: "none" });
@@ -628,7 +695,7 @@ const __default__ = {
       this.formData = {
         resumeText: "",
         resumePdf: null,
-        userId: "",
+        userId: this.userInfo ? String(this.userInfo.user_id || this.userInfo.userId || this.userInfo.id) : "",
         positionId: "",
         positionText: ""
       };
@@ -676,46 +743,50 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   }, {
     k: common_vendor.o((...args) => $options.chooseResumeFile && $options.chooseResumeFile(...args))
   }) : {}, {
-    l: $data.currentMethod.includes("user") && !$data.formData.userId
-  }, $data.currentMethod.includes("user") && !$data.formData.userId ? {
-    m: $data.formData.userId,
-    n: common_vendor.o(($event) => $data.formData.userId = $event.detail.value)
-  } : $data.currentMethod.includes("user") ? {
-    p: common_vendor.t($data.formData.userId)
-  } : {}, {
-    o: $data.currentMethod.includes("user"),
-    q: $data.currentMethod.includes("position")
+    l: $data.currentMethod.includes("user")
+  }, $data.currentMethod.includes("user") ? common_vendor.e({
+    m: $data.isLoadingUser
+  }, $data.isLoadingUser ? {} : $data.formData.userId ? {
+    o: common_vendor.t($data.formData.userId)
+  } : {
+    p: common_vendor.o((...args) => $options.fetchUserInfo && $options.fetchUserInfo(...args))
+  }, {
+    n: $data.formData.userId,
+    q: $data.isLoadingUser ? 1 : "",
+    r: !$data.formData.userId ? 1 : ""
+  }) : {}, {
+    s: $data.currentMethod.includes("position")
   }, $data.currentMethod.includes("position") ? {
-    r: $data.formData.positionId,
-    s: common_vendor.o(($event) => $data.formData.positionId = $event.detail.value)
+    t: $data.formData.positionId,
+    v: common_vendor.o(($event) => $data.formData.positionId = $event.detail.value)
   } : {}, {
-    t: $data.currentMethod.includes("positionText")
+    w: $data.currentMethod.includes("positionText")
   }, $data.currentMethod.includes("positionText") ? {
-    v: $data.formData.positionText,
-    w: common_vendor.o(($event) => $data.formData.positionText = $event.detail.value)
+    x: $data.formData.positionText,
+    y: common_vendor.o(($event) => $data.formData.positionText = $event.detail.value)
   } : {}, {
-    x: common_vendor.t($data.isStarting ? "\u542F\u52A8\u4E2D..." : "\u5F00\u59CB\u9762\u8BD5"),
-    y: common_vendor.o((...args) => $options.startInterview && $options.startInterview(...args)),
-    z: $data.isStarting
+    z: common_vendor.t($data.isStarting ? "\u542F\u52A8\u4E2D..." : "\u5F00\u59CB\u9762\u8BD5"),
+    A: common_vendor.o((...args) => $options.startInterview && $options.startInterview(...args)),
+    B: $data.isStarting
   }) : common_vendor.e({
-    A: common_vendor.t($data.currentQuestion),
-    B: common_vendor.t($data.totalQuestions),
-    C: $options.progressPercent + "%",
-    D: common_vendor.t($data.currentStage),
-    E: $data.isSpeaking
+    C: common_vendor.t($data.currentQuestion),
+    D: common_vendor.t($data.totalQuestions),
+    E: $options.progressPercent + "%",
+    F: common_vendor.t($data.currentStage),
+    G: $data.isSpeaking
   }, $data.isSpeaking ? {
-    F: common_vendor.f(5, (i, k0, i0) => {
+    H: common_vendor.f(5, (i, k0, i0) => {
       return {
         a: i,
         b: i * 0.1 + "s"
       };
     }),
-    G: common_vendor.n({
+    I: common_vendor.n({
       active: $data.voiceWaveActive
     })
   } : {}, {
-    H: common_vendor.t($options.getInterviewerStatus()),
-    I: common_vendor.f($data.interviewMessages, (message, index, i0) => {
+    J: common_vendor.t($options.getInterviewerStatus()),
+    K: common_vendor.f($data.interviewMessages, (message, index, i0) => {
       return {
         a: common_vendor.t(message.content),
         b: common_vendor.t($options.formatTime(message.timestamp)),
@@ -723,67 +794,67 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.n(message.sender)
       };
     }),
-    J: $data.isAIThinking
+    L: $data.isAIThinking
   }, $data.isAIThinking ? {
-    K: common_vendor.f(3, (i, k0, i0) => {
+    M: common_vendor.f(3, (i, k0, i0) => {
       return {
         a: i,
         b: i * 0.2 + "s"
       };
     })
   } : {}, {
-    L: $data.chatScrollTop,
-    M: common_vendor.n({
+    N: $data.chatScrollTop,
+    O: common_vendor.n({
       rotated: $data.tipsCollapsed
     }),
-    N: common_vendor.o((...args) => $options.toggleTips && $options.toggleTips(...args)),
-    O: !$data.tipsCollapsed
+    P: common_vendor.o((...args) => $options.toggleTips && $options.toggleTips(...args)),
+    Q: !$data.tipsCollapsed
   }, !$data.tipsCollapsed ? {
-    P: common_vendor.f($data.currentTips, (tip, index, i0) => {
+    R: common_vendor.f($data.currentTips, (tip, index, i0) => {
       return {
         a: common_vendor.t(tip),
         b: index
       };
     })
   } : {}, {
-    Q: $data.tipsCollapsed ? 1 : "",
-    R: common_vendor.o((...args) => $options.replayQuestion && $options.replayQuestion(...args)),
-    S: !$data.currentAudioUrl,
-    T: $data.isRecording ? "/static/ai/recording.png" : "/static/ai/mic.png",
-    U: common_vendor.t($data.isRecording ? "\u5F55\u97F3\u4E2D..." : $data.isProcessing ? "\u5904\u7406\u4E2D..." : "\u6309\u4F4F\u8BF4\u8BDD"),
-    V: $data.isRecording ? 1 : "",
-    W: $data.isProcessing ? 1 : "",
-    X: common_vendor.o((...args) => $options.startRecording && $options.startRecording(...args)),
-    Y: common_vendor.o((...args) => $options.stopRecording && $options.stopRecording(...args)),
-    Z: $data.isProcessing,
-    aa: $data.isRecording
+    S: $data.tipsCollapsed ? 1 : "",
+    T: common_vendor.o((...args) => $options.replayQuestion && $options.replayQuestion(...args)),
+    U: !$data.currentAudioUrl,
+    V: $data.isRecording ? "/static/ai/recording.png" : "/static/ai/mic.png",
+    W: common_vendor.t($data.isRecording ? "\u5F55\u97F3\u4E2D..." : $data.isProcessing ? "\u5904\u7406\u4E2D..." : "\u6309\u4F4F\u8BF4\u8BDD"),
+    X: $data.isRecording ? 1 : "",
+    Y: $data.isProcessing ? 1 : "",
+    Z: common_vendor.o((...args) => $options.startRecording && $options.startRecording(...args)),
+    aa: common_vendor.o((...args) => $options.stopRecording && $options.stopRecording(...args)),
+    ab: $data.isProcessing,
+    ac: $data.isRecording
   }, $data.isRecording ? {
-    ab: common_vendor.t($data.recordingTime)
+    ad: common_vendor.t($data.recordingTime)
   } : {}, {
-    ac: common_vendor.o((...args) => $options.confirmEndInterview && $options.confirmEndInterview(...args))
+    ae: common_vendor.o((...args) => $options.confirmEndInterview && $options.confirmEndInterview(...args))
   }), {
-    ad: $data.showReport
+    af: $data.showReport
   }, $data.showReport ? {
-    ae: common_vendor.o((...args) => $options.closeReport && $options.closeReport(...args)),
-    af: common_vendor.t($data.overallScore),
-    ag: common_vendor.f($data.evaluationItems, (item, index, i0) => {
+    ag: common_vendor.o((...args) => $options.closeReport && $options.closeReport(...args)),
+    ah: common_vendor.t($data.overallScore),
+    ai: common_vendor.f($data.evaluationItems, (item, index, i0) => {
       return {
         a: common_vendor.t(item.title),
         b: common_vendor.t(item.content),
         c: index
       };
     }),
-    ah: common_vendor.f($data.suggestions, (suggestion, index, i0) => {
+    aj: common_vendor.f($data.suggestions, (suggestion, index, i0) => {
       return {
         a: common_vendor.t(suggestion),
         b: index
       };
     }),
-    ai: common_vendor.o((...args) => $options.restartInterview && $options.restartInterview(...args)),
-    aj: common_vendor.o((...args) => $options.exportReport && $options.exportReport(...args)),
-    ak: common_vendor.o(() => {
+    ak: common_vendor.o((...args) => $options.restartInterview && $options.restartInterview(...args)),
+    al: common_vendor.o((...args) => $options.exportReport && $options.exportReport(...args)),
+    am: common_vendor.o(() => {
     }),
-    al: common_vendor.o((...args) => $options.closeReport && $options.closeReport(...args))
+    an: common_vendor.o((...args) => $options.closeReport && $options.closeReport(...args))
   } : {});
 }
 var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-638c375a"], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/AI/interview.vue"]]);

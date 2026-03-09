@@ -10,9 +10,6 @@
   page-break-inside: avoid;
   position: relative;
 }
-.card-content.data-v-0b59c612 {
-  /* 卡片内容区域 */
-}
 .favorite-btn.data-v-0b59c612 {
   position: absolute;
   top: 30rpx;

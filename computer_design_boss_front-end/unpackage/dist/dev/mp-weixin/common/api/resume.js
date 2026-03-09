@@ -23,7 +23,7 @@ const resumeApi = {
   },
   getIntention() {
     return common_api_request.requestWithRetry({
-      url: "/api/resume/complete",
+      url: "/api/resume/job-intention",
       method: "GET"
     });
   },
@@ -50,6 +50,19 @@ const resumeApi = {
   getCampus() {
     return common_api_request.requestWithRetry({
       url: "/api/resume/campus-experience",
+      method: "GET"
+    });
+  },
+  saveCertificates(data) {
+    return common_api_request.requestWithRetry({
+      url: "/api/resume/certificates",
+      method: "POST",
+      data
+    });
+  },
+  getCertificates() {
+    return common_api_request.requestWithRetry({
+      url: "/api/resume/certificates",
       method: "GET"
     });
   }

@@ -1,75 +1,158 @@
 "use strict";
 var common_vendor = require("../../../common/vendor.js");
 var common_api_job = require("../../../common/api/job.js");
+var common_api_user = require("../../../common/api/user.js");
+var common_api_favorite = require("../../../common/api/favorite.js");
+var common_api_deliver = require("../../../common/api/deliver.js");
 require("../../../common/api/request.js");
 require("../../../common/config.js");
 const _sfc_main = {
   data() {
     return {
       jobId: "",
-      jobDetail: {}
+      jobDetail: {},
+      userProfile: null,
+      isApplied: false,
+      isFavorited: false
     };
   },
-  onLoad(options) {
-    if (options.id) {
-      this.jobId = options.id;
-      this.getJobDetail();
-    }
+  async onLoad(options) {
+    if (!options.id)
+      return;
+    this.jobId = options.id;
+    await this.getJobDetail();
+    await this.getUserProfile();
+    await this.checkFavoriteStatus();
+    await this.checkDeliverStatus();
   },
   methods: {
     async getJobDetail() {
       try {
         const res = await common_api_job.jobApi.getJobDetail(this.jobId);
-        console.log("\u804C\u4F4D\u8BE6\u60C5\u8FD4\u56DE\u6570\u636E:", res);
+        console.log("\u8F6C\u6362\u540E\u7684delivers:", res);
+        this.jobDetail = res;
         if (Array.isArray(res) && res.length > 0) {
           this.jobDetail = res[0];
-        } else if (res && typeof res === "object" && Object.keys(res).length > 0) {
+        } else if (res && typeof res === "object") {
           this.jobDetail = res;
         } else {
           this.jobDetail = {};
         }
-        try {
-          if (this.jobDetail.require_list && typeof this.jobDetail.require_list === "string") {
-            this.jobDetail.require_list = JSON.parse(this.jobDetail.require_list);
-          }
-          if (this.jobDetail.welfare_list && typeof this.jobDetail.welfare_list === "string") {
-            this.jobDetail.welfare_list = JSON.parse(this.jobDetail.welfare_list);
-          }
-        } catch (error) {
-          console.error("JSON\u89E3\u6790\u5931\u8D25:", error);
+        if (typeof this.jobDetail.require_list === "string") {
+          this.jobDetail.require_list = JSON.parse(this.jobDetail.require_list);
+        }
+        if (typeof this.jobDetail.welfare_list === "string") {
+          this.jobDetail.welfare_list = JSON.parse(this.jobDetail.welfare_list);
         }
       } catch (error) {
         console.error("\u83B7\u53D6\u804C\u4F4D\u8BE6\u60C5\u5931\u8D25:", error);
+        common_vendor.index.showToast({ title: "\u83B7\u53D6\u8BE6\u60C5\u5931\u8D25", icon: "none" });
+      }
+    },
+    async getUserProfile() {
+      try {
+        const user = await common_api_user.userApi.getUserProfile();
+      } catch (error) {
+        console.error("\u83B7\u53D6\u7528\u6237\u4FE1\u606F\u5931\u8D25:", error);
+      }
+    },
+    async applyForJob() {
+      var _a, _b;
+      if (this.isApplied)
+        return;
+      if (!((_a = this.jobDetail) == null ? void 0 : _a.boss_job_id)) {
+        common_vendor.index.showToast({ title: "\u804C\u4F4D\u4FE1\u606F\u4E0D\u5B8C\u6574", icon: "none" });
+        return;
+      }
+      try {
+        await common_api_deliver.deliverApi.addDeliver({
+          job_id: this.jobDetail.boss_job_id
+        });
+        this.isApplied = true;
         common_vendor.index.showToast({
-          title: "\u83B7\u53D6\u8BE6\u60C5\u5931\u8D25",
+          title: "\u6295\u9012\u6210\u529F",
+          icon: "success"
+        });
+      } catch (error) {
+        console.error("\u6295\u9012\u5931\u8D25:", error);
+        common_vendor.index.showToast({
+          title: ((_b = error == null ? void 0 : error.data) == null ? void 0 : _b.message) || "\u6295\u9012\u5931\u8D25",
           icon: "none"
         });
-        this.jobDetail = {};
+      }
+    },
+    async favoriteJob() {
+      var _a, _b;
+      if (this.isFavorited)
+        return;
+      if (!((_a = this.jobDetail) == null ? void 0 : _a.boss_job_id)) {
+        common_vendor.index.showToast({ title: "\u804C\u4F4D\u4FE1\u606F\u4E0D\u5B8C\u6574", icon: "none" });
+        return;
+      }
+      try {
+        await common_api_favorite.favoriteApi.addFavorite({
+          job_id: this.jobDetail.boss_job_id
+        });
+        this.isFavorited = true;
+        common_vendor.index.showToast({
+          title: "\u6536\u85CF\u6210\u529F",
+          icon: "success"
+        });
+      } catch (error) {
+        console.log("\u8F6C\u6362\u540E\u7684collections:", this.jobDetail.boss_job_id);
+        console.error("\u6536\u85CF\u5931\u8D25:", error);
+        common_vendor.index.showToast({
+          title: ((_b = error == null ? void 0 : error.data) == null ? void 0 : _b.message) || "\u6536\u85CF\u5931\u8D25",
+          icon: "none"
+        });
+      }
+    },
+    async checkFavoriteStatus() {
+      var _a;
+      if (!((_a = this.jobDetail) == null ? void 0 : _a.boss_job_id))
+        return;
+      try {
+        const res = await common_api_favorite.favoriteApi.checkFavorite({
+          boss_job_id: this.jobDetail.boss_job_id
+        });
+        this.isFavorited = res.is_favorite;
+        console.log("\u8F6C\u6362\u540E\u7684collections:");
+      } catch (error) {
+        console.log("\u8F6C\u6362\u540E\u7684collections:", this.jobDetail.boss_job_id);
+        console.error("\u68C0\u67E5\u6536\u85CF\u72B6\u6001\u5931\u8D25:", error);
+      }
+    },
+    async checkDeliverStatus() {
+      var _a;
+      if (!((_a = this.jobDetail) == null ? void 0 : _a.boss_job_id))
+        return;
+      try {
+        const res = await common_api_deliver.deliverApi.checkDeliver({
+          boss_job_id: this.jobDetail.boss_job_id
+        });
+        this.isApplied = res.is_deliver;
+      } catch (error) {
+        console.error("\u68C0\u67E5\u6295\u9012\u72B6\u6001\u5931\u8D25:", error);
       }
     },
     getEmpTypeText(type) {
-      const typeMap = {
+      const map = {
         "1": "\u5168\u804C",
         "2": "\u517C\u804C",
         "3": "\u5B9E\u4E60"
       };
-      return typeMap[type] || "\u5168\u804C";
+      return map[type] || "\u5168\u804C";
     },
     formatDate(dateString) {
       if (!dateString)
         return "";
-      try {
-        const date = new Date(dateString);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        const hours = String(date.getHours()).padStart(2, "0");
-        const minutes = String(date.getMinutes()).padStart(2, "0");
-        return `${year}-${month}-${day} ${hours}:${minutes}`;
-      } catch (error) {
-        console.error("\u65E5\u671F\u683C\u5F0F\u5316\u5931\u8D25:", error);
-        return dateString;
-      }
+      const date = new Date(dateString);
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      const h = String(date.getHours()).padStart(2, "0");
+      const min = String(date.getMinutes()).padStart(2, "0");
+      return `${y}-${m}-${d} ${h}:${min}`;
     }
   }
 };
@@ -119,7 +202,20 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     s: (_t = $data.jobDetail) == null ? void 0 : _t.publish_time
   }, ((_u = $data.jobDetail) == null ? void 0 : _u.publish_time) ? {
     t: common_vendor.t($options.formatDate($data.jobDetail.publish_time))
-  } : {});
+  } : {}, {
+    v: common_vendor.t($data.isApplied ? "\u5DF2\u52A0\u5165\u6295\u9012\u5217\u8868" : "\u6295\u9012"),
+    w: $data.isApplied,
+    x: common_vendor.n({
+      "disabled": $data.isApplied
+    }),
+    y: common_vendor.o((...args) => $options.applyForJob && $options.applyForJob(...args)),
+    z: common_vendor.t($data.isFavorited ? "\u5DF2\u6536\u85CF" : "\u6536\u85CF"),
+    A: $data.isFavorited,
+    B: common_vendor.n({
+      "disabled": $data.isFavorited
+    }),
+    C: common_vendor.o((...args) => $options.favoriteJob && $options.favoriteJob(...args))
+  });
 }
 var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/job/detail/job_detail_index.vue"]]);
 wx.createPage(MiniProgramPage);

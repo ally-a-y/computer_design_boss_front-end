@@ -1,6 +1,7 @@
 "use strict";
 var common_vendor = require("../../../common/vendor.js");
 var common_api_favorite = require("../../../common/api/favorite.js");
+var common_api_job = require("../../../common/api/job.js");
 require("../../../common/api/request.js");
 require("../../../common/config.js");
 const _sfc_main = {
@@ -30,10 +31,13 @@ const _sfc_main = {
       try {
         this.loading = true;
         const res = await common_api_favorite.favoriteApi.getFavoriteList(this.userId);
+        console.log("\u8F6C\u6362\u540E\u7684collections:", res);
+        const job = await common_api_job.jobApi.getAllJobs();
         const rawList = Array.isArray(res) ? res : [];
         this.collections = rawList.map((item) => {
           const snapshot = JSON.parse(item.job_snapshot || "{}");
           return {
+            id: item.id,
             jobTitle: snapshot.title || "",
             company: snapshot.location || "",
             salary: snapshot.salary || "",
@@ -50,6 +54,18 @@ const _sfc_main = {
       } finally {
         this.loading = false;
       }
+    },
+    viewDetails(item) {
+      if (!item.id) {
+        common_vendor.index.showToast({
+          title: "\u804C\u4F4DID\u4E0D\u5B58\u5728",
+          icon: "none"
+        });
+        return;
+      }
+      common_vendor.index.navigateTo({
+        url: `/pages/job/detail/job_detail_index?id=${item.id}`
+      });
     },
     async cancelCollection(index) {
       const item = this.collections[index];
@@ -130,7 +146,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         c: common_vendor.t(item.salary),
         d: common_vendor.t(item.collectionTime),
         e: common_vendor.o(($event) => $options.cancelCollection(index)),
-        f: common_vendor.o(($event) => _ctx.viewDetails(item)),
+        f: common_vendor.o(($event) => $options.viewDetails(item)),
         g: index
       };
     }),

@@ -450,6 +450,68 @@
 .panel-overlay .function-panel .panel-content .input-fields .input-group .input-field.data-v-6fa74974::placeholder {
   color: #adb5bd;
 }
+.panel-overlay .function-panel .panel-content .input-fields .input-group .picker-field.data-v-6fa74974 {
+  width: 100%;
+  padding: 24rpx 28rpx;
+  border: 2rpx solid #e9ecef;
+  border-radius: 16rpx;
+  font-size: 30rpx;
+  background-color: #fff;
+  transition: all 0.3s ease;
+}
+.panel-overlay .function-panel .panel-content .input-fields .input-group .picker-text.data-v-6fa74974 {
+  color: #495057;
+}
+.panel-overlay .function-panel .panel-content .input-fields .input-group .user-id-display.data-v-6fa74974 {
+  width: 100%;
+  padding: 24rpx 28rpx;
+  border: 2rpx solid #e9ecef;
+  border-radius: 16rpx;
+  background-color: #f8f9fa;
+  transition: all 0.3s ease;
+}
+.panel-overlay .function-panel .panel-content .input-fields .input-group .user-id-display.loading.data-v-6fa74974 {
+  background-color: #fffbeb;
+  border-color: #f59e0b;
+}
+.panel-overlay .function-panel .panel-content .input-fields .input-group .user-id-display.error.data-v-6fa74974 {
+  background-color: #fef2f2;
+  border-color: #ef4444;
+}
+.panel-overlay .function-panel .panel-content .input-fields .input-group .user-id-display .loading-text.data-v-6fa74974 {
+  font-size: 30rpx;
+  color: #d97706;
+}
+.panel-overlay .function-panel .panel-content .input-fields .input-group .user-id-display .user-id-text.data-v-6fa74974 {
+  font-size: 30rpx;
+  color: #007aff;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+.panel-overlay .function-panel .panel-content .input-fields .input-group .user-id-display .user-id-text .auto-tag.data-v-6fa74974 {
+  display: inline-block;
+  font-size: 22rpx;
+  color: #fff;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  font-weight: 500;
+}
+.panel-overlay .function-panel .panel-content .input-fields .input-group .user-id-display .error-text.data-v-6fa74974 {
+  font-size: 30rpx;
+  color: #dc2626;
+}
+.panel-overlay .function-panel .panel-content .input-fields .input-group .user-id-display .error-text .retry-link.data-v-6fa74974 {
+  color: #007aff;
+  text-decoration: underline;
+  font-weight: 500;
+}
+.panel-overlay .function-panel .panel-content .input-fields .input-group .user-id-display .error-text .retry-link.data-v-6fa74974:active {
+  opacity: 0.7;
+}
 .panel-overlay .function-panel .panel-content .input-fields .input-group .file-upload.data-v-6fa74974 {
   padding: 40rpx;
   border: 2rpx dashed #007aff;

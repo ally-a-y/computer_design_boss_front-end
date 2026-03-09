@@ -44,18 +44,21 @@
             </view>
           </view>
           
-          <!-- 只有当没有自动获取到用户ID时才显示输入框 -->
-          <view v-if="currentMethod.includes('user') && !formData.userId" class="form-group">
+           <!-- 用户ID显示区域：当选择包含user的方式时显示 -->
+          <view v-if="currentMethod.includes('user')" class="form-group">
             <text class="form-label">用户ID</text>
-            <input class="form-input" v-model="formData.userId" placeholder="请输入用户ID" />
-          </view>
-          
-          <!-- 显示已获取的用户ID（只读） -->
-          <view v-else-if="currentMethod.includes('user')" class="form-group">
-            <text class="form-label">用户ID</text>
-            <text class="form-input" style="background-color: #f5f5f5; color: #999;">
-              {{ formData.userId }}（已自动填充）
-            </text>
+            <view class="user-id-display" :class="{ 'loading': isLoadingUser, 'error': !formData.userId }">
+              <text v-if="isLoadingUser" class="loading-text">获取用户信息中...</text>
+              <text v-else-if="formData.userId" class="user-id-text">
+                {{ formData.userId }}
+                <text class="auto-tag"></text>
+              </text>
+              <text v-else class="error-text">
+                未获取到用户信息，请
+                <text class="retry-link" @click="fetchUserInfo">点击重试</text>
+                或重新登录
+              </text>
+            </view>
           </view>
 
           
@@ -223,7 +226,7 @@
 </template>
 
 <script>
-import { getStaticUrl,interviewApi } from '@/common/api/ai.js'
+import { getStaticUrl, interviewApi } from '@/common/api/ai.js'
 const BASE_URL = 'http://localhost:5000'
 // 录音管理器
 const recorderManager = uni.getRecorderManager()
@@ -240,10 +243,14 @@ export default {
       formData: {
         resumeText: '',
         resumePdf: null,
-        userId: '',
+        userId: '', 
         positionId: '',
         positionText: ''
       },
+      
+      // 用户信息
+      userInfo: null,
+      isLoadingUser: false,
       
       // 面试配置
       interviewMethods: [
@@ -303,12 +310,19 @@ export default {
   computed: {
     progressPercent() {
       return Math.min((this.currentQuestion / this.totalQuestions) * 100, 100)
+    },
+    
+    // 判断是否已获取到用户信息
+    hasUserInfo() {
+      return !!this.formData.userId
     }
   },
   
   onLoad() {
     this.initializeInterview()
     this.initRecorder()
+    // 页面加载时自动获取用户信息
+    this.fetchUserInfo()
   },
   
   onUnload() {
@@ -316,6 +330,71 @@ export default {
   },
   
   methods: {
+    // 获取用户信息（从本地存储或后端）
+    async fetchUserInfo() {
+      this.isLoadingUser = true
+      
+      try {
+        //从本地存储获取token，然后请求用户信息
+        const token = uni.getStorageSync('token')
+        
+        if (!token) {
+          console.log('未找到登录token，需要用户登录')
+          // 跳转到登录页面
+          // uni.navigateTo({ url: '/pages/login/login' })
+          return
+        }
+        
+        // 从本地存储获取缓存的用户信息
+        const cachedUserInfo = uni.getStorageSync('userInfo')
+        if (cachedUserInfo && cachedUserInfo.user_id) {
+          this.userInfo = cachedUserInfo
+          this.formData.userId = String(cachedUserInfo.user_id)
+          console.log('从缓存获取用户ID:', this.formData.userId)
+          return
+        }
+        
+        // 如果本地没有，请求后端API获取用户信息
+        const res = await this.getUserProfile()
+        
+        if (res.code === 200 && res.data) {
+          this.userInfo = res.data
+          this.formData.userId = String(res.data.user_id || res.data.userId || res.data.id)
+          // 缓存到本地
+          uni.setStorageSync('userInfo', res.data)
+          console.log('从后端获取用户ID:', this.formData.userId)
+        }
+      } catch (error) {
+        console.error('获取用户信息失败:', error)
+        uni.showToast({
+          title: '获取用户信息失败',
+          icon: 'none',
+          duration: 2000
+        })
+      } finally {
+        this.isLoadingUser = false
+      }
+    },
+    
+    // 请求后端获取用户信息的API
+    getUserProfile() {
+      return new Promise((resolve, reject) => {
+        uni.request({
+          url: `${BASE_URL}/api/user/profile`,
+          method: 'GET',
+          header: {
+            'Authorization': `Bearer ${uni.getStorageSync('token')}`
+          },
+          success: (res) => {
+            resolve(res.data)
+          },
+          fail: (err) => {
+            reject(err)
+          }
+        })
+      })
+    },
+    
     // 初始化录音器
     initRecorder() {
       recorderManager.onStart(() => {
@@ -399,71 +478,75 @@ export default {
     selectMethod(method) {
       this.currentMethod = method
       this.resetForm()
+      // 重新填充userId
+      if (this.userInfo) {
+        this.formData.userId = String(this.userInfo.user_id || this.userInfo.userId || this.userInfo.id)
+      }
     },
     
-   // 选择PDF文件并转为Base64
-   chooseResumeFile() {
-     // #ifdef MP-WEIXIN
-     // 微信小程序：使用 chooseMessageFile 从聊天会话中选择文件
-     wx.chooseMessageFile({
-       count: 1,
-       type: 'file',
-       extension: ['pdf'],
-       success: (res) => {
-         const file = res.tempFiles[0]
-         const fs = uni.getFileSystemManager()
-         fs.readFile({
-           filePath: file.path,
-           encoding: 'base64',
-           success: (readRes) => {
-             this.formData.resumePdf = {
-               name: file.name,
-               path: file.path,
-               base64: readRes.data
-             }
-           },
-           fail: (err) => {
-             console.error('读取文件失败', err)
-             uni.showToast({ title: '文件读取失败', icon: 'none' })
-           }
-         })
-       },
-       fail: (err) => {
-         console.log('选择文件取消或失败', err)
-       }
-     })
-     // #endif
-	 
-     // #ifdef APP || H5
-     uni.chooseFile({
-       count: 1,
-       type: 'file',
-       extension: ['pdf'],
-       success: (res) => {
-         const file = res.tempFiles[0]
-         const fs = uni.getFileSystemManager()
-         fs.readFile({
-           filePath: file.path,
-           encoding: 'base64',
-           success: (readRes) => {
-             this.formData.resumePdf = {
-               name: file.name,
-               path: file.path,
-               base64: readRes.data
-             }
-           },
-           fail: (err) => {
-             console.error('读取文件失败', err)
-             uni.showToast({ title: '文件读取失败', icon: 'none' })
-           }
-         })
-       },
-       fail: (err) => {
-         console.log('选择文件取消或失败', err)
-       }
-     })
-     // #endif
-   },
+    // 选择PDF文件并转为Base64
+    chooseResumeFile() {
+      // #ifdef MP-WEIXIN
+      // 微信小程序：使用 chooseMessageFile 从聊天会话中选择文件
+      wx.chooseMessageFile({
+        count: 1,
+        type: 'file',
+        extension: ['pdf'],
+        success: (res) => {
+          const file = res.tempFiles[0]
+          const fs = uni.getFileSystemManager()
+          fs.readFile({
+            filePath: file.path,
+            encoding: 'base64',
+            success: (readRes) => {
+              this.formData.resumePdf = {
+                name: file.name,
+                path: file.path,
+                base64: readRes.data
+              }
+            },
+            fail: (err) => {
+              console.error('读取文件失败', err)
+              uni.showToast({ title: '文件读取失败', icon: 'none' })
+            }
+          })
+        },
+        fail: (err) => {
+          console.log('选择文件取消或失败', err)
+        }
+      })
+      // #endif
+      
+      // #ifdef APP || H5
+      uni.chooseFile({
+        count: 1,
+        type: 'file',
+        extension: ['pdf'],
+        success: (res) => {
+          const file = res.tempFiles[0]
+          const fs = uni.getFileSystemManager()
+          fs.readFile({
+            filePath: file.path,
+            encoding: 'base64',
+            success: (readRes) => {
+              this.formData.resumePdf = {
+                name: file.name,
+                path: file.path,
+                base64: readRes.data
+              }
+            },
+            fail: (err) => {
+              console.error('读取文件失败', err)
+              uni.showToast({ title: '文件读取失败', icon: 'none' })
+            }
+          })
+        },
+        fail: (err) => {
+          console.log('选择文件取消或失败', err)
+        }
+      })
+      // #endif
+    },
     
     // 开始面试
     async startInterview() {
@@ -506,13 +589,15 @@ export default {
             break
             
           case 'user+position':
+            // userId已从后端自动获取
             res = await interviewApi.startUserIdJobId(
-              this.formData.userId,
+              null, 
               this.formData.positionId
             )
             break
             
           case 'user+positionText':
+            // userId已从后端自动获取，但API设计需要传入，使用formData中的
             res = await interviewApi.startUserIdText(
               this.formData.userId,
               this.formData.positionText
@@ -584,9 +669,18 @@ export default {
         return false
       }
       
-      if (method.includes('user') && !this.formData.userId.trim()) {
-        uni.showToast({ title: '请输入用户ID', icon: 'none' })
-        return false
+      // 对于需要userId的方式，检查是否已自动获取
+      if (method.includes('user')) {
+        if (!this.formData.userId) {
+          uni.showToast({ 
+            title: '未获取到用户信息，请重新登录', 
+            icon: 'none',
+            duration: 3000
+          })
+          // 可以在这里触发重新获取用户信息或跳转登录
+          this.fetchUserInfo()
+          return false
+        }
       }
       
       if (method.includes('position') && !this.formData.positionId.trim()) {
@@ -726,8 +820,8 @@ export default {
       }
     },
     
-   // 播放音频
-playAudio(url) {
+    // 播放音频
+    playAudio(url) {
       if (!this.innerAudioContext) return
       
       this.isSpeaking = true
@@ -762,7 +856,6 @@ playAudio(url) {
       this.innerAudioContext.src = fullUrl
       this.innerAudioContext.play()
     },
-
     
     // 重听问题
     replayQuestion() {
@@ -1069,7 +1162,7 @@ playAudio(url) {
       this.formData = {
         resumeText: '',
         resumePdf: null,
-        userId: '',
+        userId: this.userInfo ? String(this.userInfo.user_id || this.userInfo.userId || this.userInfo.id) : '',
         positionId: '',
         positionText: ''
       }
