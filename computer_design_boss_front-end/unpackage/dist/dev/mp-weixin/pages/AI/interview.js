@@ -255,16 +255,16 @@ const __default__ = {
             if (!((_b = this.formData.resumePdf) == null ? void 0 : _b.base64)) {
               throw new Error("PDF\u6587\u4EF6\u672A\u51C6\u5907\u597D");
             }
-            res = await common_api_ai.interviewApi.startPdfJobId(this.formData.resumePdf.base64, this.formData.positionId);
+            res = await common_api_ai.interviewApi.startPdfJobName(this.formData.resumePdf.base64, this.formData.positionId);
             break;
           case "user+position":
-            res = await common_api_ai.interviewApi.startUserIdJobId(null, this.formData.positionId);
+            res = await common_api_ai.interviewApi.startUserIdJobName(null, this.formData.positionId);
             break;
           case "user+positionText":
             res = await common_api_ai.interviewApi.startUserIdText(this.formData.userId, this.formData.positionText);
             break;
           case "resumeText+position":
-            res = await common_api_ai.interviewApi.startTextJobId(this.formData.resumeText, this.formData.positionId);
+            res = await common_api_ai.interviewApi.startTextJobName(this.formData.resumeText, this.formData.positionId);
             break;
           default:
             throw new Error("\u672A\u77E5\u7684\u9762\u8BD5\u65B9\u5F0F");

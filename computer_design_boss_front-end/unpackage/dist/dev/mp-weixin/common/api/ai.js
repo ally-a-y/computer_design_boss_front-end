@@ -70,18 +70,18 @@ const uploadPdf = async (url, fileData, formData = {}) => {
   });
 };
 const aiApi = {
-  askByUserJobId: (jobId) => common_api_request.requestWithRetry({
-    url: "/ai/ask_by_user_job_id",
+  askByUserJobName: (jobName) => common_api_request.requestWithRetry({
+    url: "/ai/ask_by_user_job_name",
     method: "GET",
-    params: { job_id: jobId }
+    params: { job_name: jobName }
   }),
   askByUserJobText: (jobText) => common_api_request.requestWithRetry({
     url: "/ai/ask_by_user_job_text",
     method: "POST",
     data: { job_text: jobText }
   }),
-  askByPdfJobId: (fileData, jobId) => {
-    return uploadPdf("/ai/ask_by_pdf_job_id", fileData, { job_id: jobId });
+  askByPdfJobName: (fileData, jobName) => {
+    return uploadPdf("/ai/ask_by_pdf_job_name", fileData, { job_name: jobName });
   },
   askByPdfJobText: (fileData, jobText) => {
     return uploadPdf("/ai/ask_by_pdf_job_text", fileData, { job_text: jobText });
@@ -93,35 +93,35 @@ const aiApi = {
   resumeEvaluationByPdf: (fileData) => {
     return uploadPdf("/ai/resume_evaluation_text", fileData);
   },
-  successRateByUserJobId: (jobId) => common_api_request.requestWithRetry({
-    url: "/ai/success_rate_user_job_id",
+  successRateByUserJobName: (jobName) => common_api_request.requestWithRetry({
+    url: "/ai/success_rate_user_job_name",
     method: "GET",
-    params: { job_id: jobId }
+    params: { job_name: jobName }
   }),
   successRateByUserJobText: (jobText) => common_api_request.requestWithRetry({
     url: "/ai/success_rate_user_job_text",
     method: "POST",
     data: { job_text: jobText }
   }),
-  successRateByPdfJobId: (fileData, jobId) => {
-    return uploadPdf("/ai/success_rate_pdf_job_id", fileData, { job_id: jobId });
+  successRateByPdfJobName: (fileData, jobName) => {
+    return uploadPdf("/ai/success_rate_pdf_job_name", fileData, { job_name: jobName });
   },
   successRateByPdfJobText: (fileData, jobText) => {
     return uploadPdf("/ai/success_rate_pdf_job_text", fileData, { job_text: jobText });
   },
-  universityPlanByUserJobId: (jobId, userGrade) => common_api_request.requestWithRetry({
-    url: "/ai/university_plan_user_job_id",
+  universityPlanByUserJobName: (jobName, userGrade) => common_api_request.requestWithRetry({
+    url: "/ai/university_plan_user_job_name",
     method: "GET",
-    params: { job_id: jobId, user_grade: userGrade }
+    params: { job_name: jobName, user_grade: userGrade }
   }),
   universityPlanByUserJobText: (jobText, userGrade) => common_api_request.requestWithRetry({
     url: "/ai/university_plan_user_job_text",
     method: "POST",
     data: { job_text: jobText, user_grade: userGrade }
   }),
-  universityPlanByPdfJobId: (fileData, jobId, userGrade) => {
-    return uploadPdf("/ai/university_plan_pdf_job_id", fileData, {
-      job_id: jobId,
+  universityPlanByPdfJobName: (fileData, jobName, userGrade) => {
+    return uploadPdf("/ai/university_plan_pdf_job_name", fileData, {
+      job_name: jobName,
       user_grade: userGrade
     });
   },
@@ -154,20 +154,20 @@ const interviewApi = {
       job_text: jobText
     }
   }),
-  startPdfJobId: (pdfBase64, jobId) => common_api_request.requestWithRetry({
-    url: "/ai/interview/start/pdf-jobid",
+  startPdfJobName: (pdfBase64, jobName) => common_api_request.requestWithRetry({
+    url: "/ai/interview/start/pdf-job_name",
     method: "POST",
     data: {
       resume_file: pdfBase64,
-      job_id: jobId
+      job_name: jobName
     }
   }),
-  startUserIdJobId: (userId, jobId) => common_api_request.requestWithRetry({
-    url: "/ai/interview/start/userid-jobid",
+  startUserIdJobName: (userId, jobName) => common_api_request.requestWithRetry({
+    url: "/ai/interview/start/userid-job_name",
     method: "POST",
     data: {
       user_id: userId,
-      job_id: jobId
+      job_name: jobName
     }
   }),
   startUserIdText: (userId, jobText) => common_api_request.requestWithRetry({
@@ -178,12 +178,12 @@ const interviewApi = {
       job_text: jobText
     }
   }),
-  startTextJobId: (resumeText, jobId) => common_api_request.requestWithRetry({
-    url: "/ai/interview/start/text-jobid",
+  startTextJobName: (resumeText, jobName) => common_api_request.requestWithRetry({
+    url: "/ai/interview/start/text-job_name",
     method: "POST",
     data: {
       resume_text: resumeText,
-      job_id: jobId
+      job_name: jobName
     }
   }),
   transcribe: (sessionId, filePath) => {

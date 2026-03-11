@@ -582,7 +582,7 @@ export default {
             if (!this.formData.resumePdf?.base64) {
               throw new Error('PDF文件未准备好')
             }
-            res = await interviewApi.startPdfJobId(
+            res = await interviewApi.startPdfJobName(
               this.formData.resumePdf.base64,
               this.formData.positionId
             )
@@ -590,7 +590,7 @@ export default {
             
           case 'user+position':
             // userId已从后端自动获取
-            res = await interviewApi.startUserIdJobId(
+            res = await interviewApi.startUserIdJobName(
               null, 
               this.formData.positionId
             )
@@ -605,7 +605,7 @@ export default {
             break
             
           case 'resumeText+position':
-            res = await interviewApi.startTextJobId(
+            res = await interviewApi.startTextJobName(
               this.formData.resumeText,
               this.formData.positionId
             )

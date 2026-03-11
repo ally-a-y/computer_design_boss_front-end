@@ -450,18 +450,6 @@
 .panel-overlay .function-panel .panel-content .input-fields .input-group .input-field.data-v-6fa74974::placeholder {
   color: #adb5bd;
 }
-.panel-overlay .function-panel .panel-content .input-fields .input-group .picker-field.data-v-6fa74974 {
-  width: 100%;
-  padding: 24rpx 28rpx;
-  border: 2rpx solid #e9ecef;
-  border-radius: 16rpx;
-  font-size: 30rpx;
-  background-color: #fff;
-  transition: all 0.3s ease;
-}
-.panel-overlay .function-panel .panel-content .input-fields .input-group .picker-text.data-v-6fa74974 {
-  color: #495057;
-}
 .panel-overlay .function-panel .panel-content .input-fields .input-group .user-id-display.data-v-6fa74974 {
   width: 100%;
   padding: 24rpx 28rpx;

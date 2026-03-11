@@ -120,10 +120,8 @@
               </view>
               
               <view v-show="currentMethod.includes('position')" class="input-group">
-                <text class="input-label">职位类型</text>
-                <picker @change="onPositionChange" :range="categories" range-key="name" class="picker-field">
-                  <view class="picker-text">{{ formData.positionId ? categories.find(c => c.id === formData.positionId)?.name || '请选择职位类型' : '请选择职位类型' }}</view>
-                </picker>
+                <text class="input-label">职位ID</text>
+                <input class="input-field" v-model="formData.positionId" placeholder="请输入职位ID" />
               </view>
               
               <view v-show="currentMethod.includes('text')" class="input-group">
@@ -184,7 +182,7 @@
               <radio-group :value="currentMethod" @change="onMethodChange">
                 <label class="radio-item">
                   <radio value="pdf+position" />
-                  <text>PDF+职位类型</text>
+                  <text>PDF+职位ID</text>
                 </label>
                 <label class="radio-item">
                   <radio value="user+text" />
@@ -210,10 +208,8 @@
               </view>
               
               <view v-show="currentMethod.includes('position')" class="input-group" key="position-group">
-                <text class="input-label">职位类型</text>
-                <picker @change="onPositionChange" :range="categories" range-key="name" class="picker-field">
-                  <view class="picker-text">{{ formData.positionId ? categories.find(c => c.id === formData.positionId)?.name || '请选择职位类型' : '请选择职位类型' }}</view>
-                </picker>
+                <text class="input-label">职位ID</text>
+                <input class="input-field" v-model="formData.positionId" placeholder="请输入职位ID" />
               </view>
               
               <view v-show="currentMethod.includes('text')" class="input-group" key="text-group">
@@ -235,7 +231,7 @@
               <radio-group :value="currentMethod" @change="onMethodChange">
                 <label class="radio-item">
                   <radio value="pdf+position" />
-                  <text>PDF+职位类型</text>
+                  <text>PDF+职位ID</text>
                 </label>
                 <label class="radio-item">
                   <radio value="user+text" />
@@ -261,10 +257,8 @@
               </view>
               
               <view v-show="currentMethod.includes('position')" class="input-group" key="position-group">
-                <text class="input-label">职位类型</text>
-                <picker @change="onPositionChange" :range="categories" range-key="name" class="picker-field">
-                  <view class="picker-text">{{ formData.positionId ? categories.find(c => c.id === formData.positionId)?.name || '请选择职位类型' : '请选择职位类型' }}</view>
-                </picker>
+                <text class="input-label">职位ID</text>
+                <input class="input-field" v-model="formData.positionId" placeholder="请输入职位ID" />
               </view>
               
               <view v-show="currentMethod.includes('text')" class="input-group" key="text-group">
@@ -323,24 +317,10 @@ export default {
       gradeIndex: 0,
       gradeOptions: ['大一', '大二', '大三', '大四', '研一', '研二', '研三'],
       
-      // 职位分类列表
-      categories: [ 
-        { id: '101', name: '前端开发' }, 
-        { id: '102', name: '后端开发' }, 
-        { id: '103', name: '移动端开发' }, 
-        { id: '104', name: '数据与AI' }, 
-        { id: '105', name: '运维与测试' }, 
-        { id: '106', name: '产品设计' }, 
-        { id: '107', name: '网络安全' }, 
-        { id: '108', name: '嵌入式开发' }, 
-        { id: '200', name: '产品与设计类' }, 
-        { id: '300', name: '技术管理类' } 
-      ],
-      
       analysisMethods: [
-        { value: 'user+position', label: '我的简历+职位类型' },
+        { value: 'user+position', label: '我的简历+职位ID' },
         { value: 'user+text', label: '我的简历+职位文本' },
-        { value: 'pdf+position', label: 'PDF+职位类型' },
+        { value: 'pdf+position', label: 'PDF+职位ID' },
         { value: 'pdf+text', label: 'PDF+职位文本' }
       ]
     }
@@ -541,13 +521,6 @@ export default {
     
     onGradeChange(e) {
       this.gradeIndex = parseInt(e.detail.value)
-    },
-    
-    onPositionChange(e) {
-      const index = parseInt(e.detail.value)
-      if (index >= 0 && index < this.categories.length) {
-        this.formData.positionId = this.categories[index].id
-      }
     },
 
   // 预处理内容：处理 JSON 转义字符和清理残留
@@ -877,15 +850,15 @@ export default {
         let res;
         
         if (method === 'user+position') {
-          const jobId = String(formData.positionId || '').trim()
-          if (!jobId) {
+          const jobName = String(formData.positionId || '').trim()
+          if (!jobName) {
             throw new Error('职位ID不能为空')
           }
 		  // 使用当前用户ID（已从formData自动填充）
           if (!formData.userId) {
             throw new Error('用户未登录')
           }
-           res = await aiApi.askByUserJobId(jobId)
+           res = await aiApi.askByUserJobName(jobName)
                 return res?.analysis || res?.data?.analysis || res?.data || res
           
         } else if (method === 'user+text') {
@@ -902,13 +875,13 @@ export default {
           if (!formData.pdfFile?.base64) {
             throw new Error('PDF 文件没有 base64 数据')
           }
-          const jobId = String(formData.positionId || '').trim()
-          if (!jobId) {
+          const jobName = String(formData.positionId || '').trim()
+          if (!jobName) {
             throw new Error('职位ID不能为空')
           }
-          res = await aiApi.askByPdfJobId(
+          res = await aiApi.askByPdfJobName(
             { name: formData.pdfFile.name, base64: formData.pdfFile.base64 },
-            jobId
+            jobName
           )
           
         } else if (method === 'pdf+text') {
@@ -961,7 +934,7 @@ export default {
         if (!formData.pdfFile?.base64) {
           throw new Error('PDF 文件没有 base64 数据')
         }
-        const res = await aiApi.successRateByPdfJobId(
+        const res = await aiApi.successRateByPdfJobName(
           { name: formData.pdfFile.name, base64: formData.pdfFile.base64 },
           formData.positionId
         )
@@ -978,7 +951,7 @@ export default {
         return res?.data?.analysis || res?.analysis || res?.data || res
         
       } else if (method === 'user+position') {
-        const res = await aiApi.successRateByUserJobId(formData.positionId)
+        const res = await aiApi.successRateByUserJobName(formData.positionId)
         return res?.data?.analysis || res?.analysis || res?.data || res
         
       } else if (method === 'user+text') {
@@ -998,7 +971,7 @@ export default {
         if (!formData.pdfFile?.base64) {
           throw new Error('PDF 文件没有 base64 数据')
         }
-        const res = await aiApi.universityPlanByPdfJobId(
+        const res = await aiApi.universityPlanByPdfJobName(
           { name: formData.pdfFile.name, base64: formData.pdfFile.base64 },
           formData.positionId,
           userGrade
@@ -1017,7 +990,7 @@ export default {
         return res?.data?.plan || res?.plan || res?.data || res
         
       } else if (method === 'user+position') {
-        const res = await aiApi.universityPlanByUserJobId(
+        const res = await aiApi.universityPlanByUserJobName(
           formData.positionId,
           userGrade
         )
@@ -1067,7 +1040,7 @@ export default {
       }
 	  
       if (method.includes('position') && !this.formData.positionId.trim()) {
-        uni.showToast({ title: '请选择职位类型', icon: 'none' })
+        uni.showToast({ title: '请输入职位ID', icon: 'none' })
         return false
       }
       
@@ -1619,20 +1592,6 @@ export default {
             &::placeholder {
               color: #adb5bd;
             }
-          }
-          
-          .picker-field {
-            width: 100%;
-            padding: 24rpx 28rpx;
-            border: 2rpx solid #e9ecef;
-            border-radius: 16rpx;
-            font-size: 30rpx;
-            background-color: #fff;
-            transition: all 0.3s ease;
-          }
-          
-          .picker-text {
-            color: #495057;
           }
 		  
 		  // 用户信息展示样式（参照interview.vue）

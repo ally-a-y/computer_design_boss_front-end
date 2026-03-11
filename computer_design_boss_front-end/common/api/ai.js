@@ -126,10 +126,10 @@ const uploadPdf = async (url, fileData, formData = {}) => {
 // AI求职助手API
 export const aiApi = {
   // 简历分析
-  askByUserJobId: (jobId) => request({
-    url: '/ai/ask_by_user_job_id',
+  askByUserJobName: (jobName) => request({
+    url: '/ai/ask_by_user_job_name',
     method: 'GET',
-    params: { job_id: jobId }
+    params: { job_name: jobName }
   }),
   
   askByUserJobText: (jobText) => request({
@@ -141,10 +141,10 @@ export const aiApi = {
   /**
    * PDF + 职位ID 分析
    * @param {Object} fileData - { name, base64 } base64 编码的PDF
-   * @param {String} jobId - 职位ID
+   * @param {String} jobName - 职位ID
    */
-  askByPdfJobId: (fileData, jobId) => {
-    return uploadPdf('/ai/ask_by_pdf_job_id', fileData, { job_id: jobId })
+  askByPdfJobName: (fileData, jobName) => {
+    return uploadPdf('/ai/ask_by_pdf_job_name', fileData, { job_name: jobName })
   },
   
   /**
@@ -171,10 +171,10 @@ export const aiApi = {
   },
   
   // 成功率分析
-  successRateByUserJobId: (jobId) => request({
-    url: '/ai/success_rate_user_job_id',
+  successRateByUserJobName: (jobName) => request({
+    url: '/ai/success_rate_user_job_name',
     method: 'GET',
-    params: { job_id: jobId }
+    params: { job_name: jobName }
   }),
   
   successRateByUserJobText: (jobText) => request({
@@ -186,10 +186,10 @@ export const aiApi = {
   /**
    * PDF + 职位ID 成功率分析
    * @param {Object} fileData - { name, base64 } base64 编码的PDF
-   * @param {String} jobId - 职位ID
+   * @param {String} jobName - 职位ID
    */
-  successRateByPdfJobId: (fileData, jobId) => {
-    return uploadPdf('/ai/success_rate_pdf_job_id', fileData, { job_id: jobId })
+  successRateByPdfJobName: (fileData, jobName) => {
+    return uploadPdf('/ai/success_rate_pdf_job_name', fileData, { job_name: jobName })
   },
   
   /**
@@ -202,10 +202,10 @@ export const aiApi = {
   },
   
   // 大学生活规划
-  universityPlanByUserJobId: (jobId, userGrade) => request({
-    url: '/ai/university_plan_user_job_id',
+  universityPlanByUserJobName: (jobName, userGrade) => request({
+    url: '/ai/university_plan_user_job_name',
     method: 'GET',
-    params: { job_id: jobId, user_grade: userGrade }
+    params: { job_name: jobName, user_grade: userGrade }
   }),
   
   universityPlanByUserJobText: (jobText, userGrade) => request({
@@ -217,12 +217,12 @@ export const aiApi = {
   /**
    * PDF + 职位ID 大学生活规划
    * @param {Object} fileData - { name, base64 } base64 编码的PDF
-   * @param {String} jobId - 职位ID
+   * @param {String} jobName - 职位ID
    * @param {String} userGrade - 学生年级
    */
-  universityPlanByPdfJobId: (fileData, jobId, userGrade) => {
-    return uploadPdf('/ai/university_plan_pdf_job_id', fileData, { 
-      job_id: jobId, 
+  universityPlanByPdfJobName: (fileData, jobName, userGrade) => {
+    return uploadPdf('/ai/university_plan_pdf_job_name', fileData, { 
+      job_name: jobName, 
       user_grade: userGrade 
     })
   },
@@ -268,21 +268,21 @@ export const interviewApi = {
     }
   }),
   
-  startPdfJobId: (pdfBase64, jobId) => request({
-    url: '/ai/interview/start/pdf-jobid',
+  startPdfJobName: (pdfBase64, jobName) => request({
+    url: '/ai/interview/start/pdf-job_name',
     method: 'POST',
     data: { 
       resume_file: pdfBase64, 
-      job_id: jobId 
+      job_name: jobName 
     }
   }),
   
-  startUserIdJobId: (userId, jobId) => request({
-    url: '/ai/interview/start/userid-jobid',
+  startUserIdJobName: (userId, jobName) => request({
+    url: '/ai/interview/start/userid-job_name',
     method: 'POST',
     data: { 
       user_id: userId,      
-      job_id: jobId 
+      job_name: jobName 
     }
   }),
   
@@ -295,12 +295,12 @@ export const interviewApi = {
     }
   }),
   
-  startTextJobId: (resumeText, jobId) => request({
-    url: '/ai/interview/start/text-jobid',
+  startTextJobName: (resumeText, jobName) => request({
+    url: '/ai/interview/start/text-job_name',
     method: 'POST',
     data: { 
       resume_text: resumeText, 
-      job_id: jobId 
+      job_name: jobName 
     }
   }),
   

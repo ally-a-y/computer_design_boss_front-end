@@ -6,15 +6,15 @@
     },
     "setting": {
         "urlCheck": false,
-        "ignoreUploadUnusedFiles": true,
         "babelSetting": {
             "ignore": [],
             "disablePlugins": [],
             "outputPath": ""
-        }
+        },
+        "ignoreUploadUnusedFiles": true
     },
     "compileType": "miniprogram",
-    "libVersion": "3.14.2",
+    "libVersion": "3.14.3",
     "appid": "touristappid",
     "projectname": "computer_design_boss_front-end",
     "condition": {},
