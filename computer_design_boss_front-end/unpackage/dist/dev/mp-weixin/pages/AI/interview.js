@@ -16,10 +16,101 @@ const __default__ = {
         resumePdf: null,
         userId: "",
         positionId: "",
-        positionText: ""
+        positionText: "",
+        positionName: ""
       },
       userInfo: null,
       isLoadingUser: false,
+      mainCategories: [
+        { id: "101", name: "\u524D\u7AEF\u5F00\u53D1" },
+        { id: "102", name: "\u540E\u7AEF\u5F00\u53D1" },
+        { id: "103", name: "\u79FB\u52A8\u7AEF\u5F00\u53D1" },
+        { id: "104", name: "\u6570\u636E\u4E0EAI" },
+        { id: "105", name: "\u8FD0\u7EF4\u4E0E\u6D4B\u8BD5" },
+        { id: "106", name: "\u4EA7\u54C1\u8BBE\u8BA1" },
+        { id: "107", name: "\u7F51\u7EDC\u5B89\u5168" },
+        { id: "108", name: "\u5D4C\u5165\u5F0F\u5F00\u53D1" },
+        { id: "200", name: "\u4EA7\u54C1\u4E0E\u8BBE\u8BA1\u7C7B" },
+        { id: "300", name: "\u6280\u672F\u7BA1\u7406\u7C7B" }
+      ],
+      positionDetails: {
+        "101": [
+          { id: "1", name: "Web\u524D\u7AEF\u5DE5\u7A0B\u5E08" },
+          { id: "2", name: "\u79FB\u52A8\u7AEF\u524D\u7AEF\u5DE5\u7A0B\u5E08" },
+          { id: "3", name: "\u5C0F\u7A0B\u5E8F\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "4", name: "\u8DE8\u5E73\u53F0\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "5", name: "\u524D\u7AEF\u67B6\u6784\u5E08" },
+          { id: "6", name: "Node.js\u5168\u6808\u5DE5\u7A0B\u5E08" }
+        ],
+        "102": [
+          { id: "7", name: "Java\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "8", name: "Python\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "9", name: "PHP\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "10", name: "Go\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "11", name: "C++\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "12", name: "C#\u5F00\u53D1\u5DE5\u7A0B\u5E08" }
+        ],
+        "103": [
+          { id: "13", name: "Android\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "14", name: "iOS\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "15", name: "React Native\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "16", name: "Flutter\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "17", name: "\u79FB\u52A8\u5E94\u7528\u67B6\u6784\u5E08" },
+          { id: "18", name: "Unity\u5F00\u53D1\u5DE5\u7A0B\u5E08" }
+        ],
+        "104": [
+          { id: "19", name: "\u6570\u636E\u5206\u6790\u5E08" },
+          { id: "20", name: "\u6570\u636E\u79D1\u5B66\u5BB6" },
+          { id: "21", name: "\u673A\u5668\u5B66\u4E60\u5DE5\u7A0B\u5E08" },
+          { id: "22", name: "\u6DF1\u5EA6\u5B66\u4E60\u5DE5\u7A0B\u5E08" },
+          { id: "23", name: "\u7B97\u6CD5\u5DE5\u7A0B\u5E08" },
+          { id: "24", name: "\u5927\u6570\u636E\u5DE5\u7A0B\u5E08" }
+        ],
+        "105": [
+          { id: "25", name: "\u8FD0\u7EF4\u5DE5\u7A0B\u5E08" },
+          { id: "26", name: "DevOps\u5DE5\u7A0B\u5E08" },
+          { id: "27", name: "\u6D4B\u8BD5\u5DE5\u7A0B\u5E08" },
+          { id: "28", name: "\u81EA\u52A8\u5316\u6D4B\u8BD5\u5DE5\u7A0B\u5E08" },
+          { id: "29", name: "\u6027\u80FD\u6D4B\u8BD5\u5DE5\u7A0B\u5E08" },
+          { id: "30", name: "\u5B89\u5168\u6D4B\u8BD5\u5DE5\u7A0B\u5E08" }
+        ],
+        "106": [
+          { id: "31", name: "UI\u8BBE\u8BA1\u5E08" },
+          { id: "32", name: "UX\u8BBE\u8BA1\u5E08" },
+          { id: "33", name: "\u4EA7\u54C1\u7ECF\u7406" },
+          { id: "34", name: "\u4EA4\u4E92\u8BBE\u8BA1\u5E08" },
+          { id: "35", name: "\u89C6\u89C9\u8BBE\u8BA1\u5E08" },
+          { id: "36", name: "\u7528\u6237\u7814\u7A76\u5458" }
+        ],
+        "107": [
+          { id: "37", name: "\u7F51\u7EDC\u5B89\u5168\u5DE5\u7A0B\u5E08" },
+          { id: "38", name: "\u4FE1\u606F\u5B89\u5168\u5DE5\u7A0B\u5E08" },
+          { id: "39", name: "\u6E17\u900F\u6D4B\u8BD5\u5DE5\u7A0B\u5E08" },
+          { id: "40", name: "\u5B89\u5168\u8FD0\u7EF4\u5DE5\u7A0B\u5E08" },
+          { id: "41", name: "\u5B89\u5168\u67B6\u6784\u5E08" },
+          { id: "42", name: "\u98CE\u63A7\u5DE5\u7A0B\u5E08" }
+        ],
+        "108": [
+          { id: "43", name: "\u5D4C\u5165\u5F0F\u8F6F\u4EF6\u5DE5\u7A0B\u5E08" },
+          { id: "44", name: "\u5D4C\u5165\u5F0F\u786C\u4EF6\u5DE5\u7A0B\u5E08" },
+          { id: "45", name: "\u7269\u8054\u7F51\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "46", name: "\u5355\u7247\u673A\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "47", name: "\u9A71\u52A8\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "48", name: "RTOS\u5F00\u53D1\u5DE5\u7A0B\u5E08" }
+        ],
+        "200": [
+          { id: "49", name: "\u9AD8\u7EA7\u4EA7\u54C1\u7ECF\u7406" },
+          { id: "50", name: "\u4EA7\u54C1\u603B\u76D1" },
+          { id: "51", name: "\u8BBE\u8BA1\u603B\u76D1" },
+          { id: "52", name: "\u7528\u6237\u4F53\u9A8C\u603B\u76D1" }
+        ],
+        "300": [
+          { id: "53", name: "\u6280\u672F\u603B\u76D1" },
+          { id: "54", name: "\u6280\u672F\u7ECF\u7406" },
+          { id: "55", name: "\u9879\u76EE\u7ECF\u7406" },
+          { id: "56", name: "\u7814\u53D1\u603B\u76D1" }
+        ]
+      },
       interviewMethods: [
         { value: "resumeText+positionText", label: "\u7B80\u5386\u6587\u672C+\u5C97\u4F4D\u6587\u672C" },
         { value: "pdf+positionText", label: "PDF\u7B80\u5386+\u5C97\u4F4D\u6587\u672C" },
@@ -73,11 +164,81 @@ const __default__ = {
     this.initializeInterview();
     this.initRecorder();
     this.fetchUserInfo();
+    this.initializePositionSelection();
   },
   onUnload() {
     this.cleanupInterview();
   },
   methods: {
+    onMainCategoryChange(e) {
+      const index = parseInt(e.detail.value);
+      if (index >= 0 && index < this.mainCategories.length) {
+        const selectedCategory = this.mainCategories[index];
+        const detailPositions = this.positionDetails[selectedCategory.id];
+        if (detailPositions && detailPositions.length > 0) {
+          this.formData.positionId = detailPositions[0].id;
+          this.formData.positionName = detailPositions[0].name;
+        } else {
+          this.formData.positionId = "";
+          this.formData.positionName = "";
+        }
+      }
+    },
+    onDetailPositionChange(e) {
+      const index = parseInt(e.detail.value);
+      const positions = this.getCurrentDetailPositions();
+      if (index >= 0 && index < positions.length) {
+        const selectedPosition = positions[index];
+        this.formData.positionId = selectedPosition.id;
+        this.formData.positionName = selectedPosition.name;
+      }
+    },
+    getCurrentDetailPositions() {
+      if (!this.formData.positionId)
+        return [];
+      for (const category of this.mainCategories) {
+        const positions = this.positionDetails[category.id];
+        if (positions && positions.some((p) => p.id === this.formData.positionId)) {
+          return positions;
+        }
+      }
+      return [];
+    },
+    getCurrentMainCategory() {
+      if (!this.formData.positionId)
+        return null;
+      for (const category of this.mainCategories) {
+        const positions = this.positionDetails[category.id];
+        if (positions && positions.some((p) => p.id === this.formData.positionId)) {
+          return category;
+        }
+      }
+      return null;
+    },
+    getMainCategoryName() {
+      const category = this.getCurrentMainCategory();
+      return category ? category.name : "\u8BF7\u9009\u62E9\u804C\u4F4D\u5206\u7C7B";
+    },
+    getSelectedPositionName() {
+      if (!this.formData.positionId)
+        return "\u8BF7\u9009\u62E9\u5177\u4F53\u804C\u4F4D";
+      const positions = this.getCurrentDetailPositions();
+      const position = positions.find((p) => p.id === this.formData.positionId);
+      return position ? position.name : "\u8BF7\u9009\u62E9\u5177\u4F53\u804C\u4F4D";
+    },
+    hasSelectedMainCategory() {
+      return this.getCurrentMainCategory() !== null;
+    },
+    initializePositionSelection() {
+      if (this.mainCategories.length > 0) {
+        const firstCategory = this.mainCategories[0];
+        const firstPositions = this.positionDetails[firstCategory.id];
+        if (firstPositions && firstPositions.length > 0) {
+          this.formData.positionId = firstPositions[0].id;
+          this.formData.positionName = firstPositions[0].name;
+        }
+      }
+    },
     async fetchUserInfo() {
       this.isLoadingUser = true;
       try {
@@ -203,6 +364,9 @@ const __default__ = {
       if (this.userInfo) {
         this.formData.userId = String(this.userInfo.user_id || this.userInfo.userId || this.userInfo.id);
       }
+      if (method.includes("position")) {
+        this.initializePositionSelection();
+      }
     },
     chooseResumeFile() {
       wx.chooseMessageFile({
@@ -255,16 +419,28 @@ const __default__ = {
             if (!((_b = this.formData.resumePdf) == null ? void 0 : _b.base64)) {
               throw new Error("PDF\u6587\u4EF6\u672A\u51C6\u5907\u597D");
             }
-            res = await common_api_ai.interviewApi.startPdfJobName(this.formData.resumePdf.base64, this.formData.positionId);
+            const jobName = (this.formData.positionName || "").trim();
+            if (!jobName) {
+              throw new Error("\u8BF7\u9009\u62E9\u6709\u6548\u7684\u804C\u4F4D");
+            }
+            res = await common_api_ai.interviewApi.startPdfJobName(this.formData.resumePdf.base64, jobName);
             break;
           case "user+position":
-            res = await common_api_ai.interviewApi.startUserIdJobName(null, this.formData.positionId);
+            const userJobName = (this.formData.positionName || "").trim();
+            if (!userJobName) {
+              throw new Error("\u8BF7\u9009\u62E9\u6709\u6548\u7684\u804C\u4F4D");
+            }
+            res = await common_api_ai.interviewApi.startUserIdJobName(null, userJobName);
             break;
           case "user+positionText":
             res = await common_api_ai.interviewApi.startUserIdText(this.formData.userId, this.formData.positionText);
             break;
           case "resumeText+position":
-            res = await common_api_ai.interviewApi.startTextJobName(this.formData.resumeText, this.formData.positionId);
+            const textJobName = (this.formData.positionName || "").trim();
+            if (!textJobName) {
+              throw new Error("\u8BF7\u9009\u62E9\u6709\u6548\u7684\u804C\u4F4D");
+            }
+            res = await common_api_ai.interviewApi.startTextJobName(this.formData.resumeText, textJobName);
             break;
           default:
             throw new Error("\u672A\u77E5\u7684\u9762\u8BD5\u65B9\u5F0F");
@@ -319,9 +495,14 @@ const __default__ = {
           return false;
         }
       }
-      if (method.includes("position") && !this.formData.positionId.trim()) {
-        common_vendor.index.showToast({ title: "\u8BF7\u8F93\u5165\u804C\u4F4DID", icon: "none" });
-        return false;
+      if (method.includes("position")) {
+        if (!this.formData.positionName || !this.formData.positionName.trim()) {
+          this.initializePositionSelection();
+          if (!this.formData.positionName || !this.formData.positionName.trim()) {
+            common_vendor.index.showToast({ title: "\u8BF7\u9009\u62E9\u804C\u4F4D", icon: "none" });
+            return false;
+          }
+        }
       }
       if (method.includes("positionText") && !this.formData.positionText.trim()) {
         common_vendor.index.showToast({ title: "\u8BF7\u8F93\u5165\u5C97\u4F4D\u63CF\u8FF0", icon: "none" });
@@ -697,7 +878,8 @@ const __default__ = {
         resumePdf: null,
         userId: this.userInfo ? String(this.userInfo.user_id || this.userInfo.userId || this.userInfo.id) : "",
         positionId: "",
-        positionText: ""
+        positionText: "",
+        positionName: ""
       };
     }
   }
@@ -757,36 +939,41 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   }) : {}, {
     s: $data.currentMethod.includes("position")
   }, $data.currentMethod.includes("position") ? {
-    t: $data.formData.positionId,
-    v: common_vendor.o(($event) => $data.formData.positionId = $event.detail.value)
+    t: common_vendor.t($options.getMainCategoryName()),
+    v: common_vendor.o((...args) => $options.onMainCategoryChange && $options.onMainCategoryChange(...args)),
+    w: $data.mainCategories,
+    x: common_vendor.t($options.getSelectedPositionName()),
+    y: common_vendor.o((...args) => $options.onDetailPositionChange && $options.onDetailPositionChange(...args)),
+    z: $options.getCurrentDetailPositions(),
+    A: !$options.hasSelectedMainCategory()
   } : {}, {
-    w: $data.currentMethod.includes("positionText")
+    B: $data.currentMethod.includes("positionText")
   }, $data.currentMethod.includes("positionText") ? {
-    x: $data.formData.positionText,
-    y: common_vendor.o(($event) => $data.formData.positionText = $event.detail.value)
+    C: $data.formData.positionText,
+    D: common_vendor.o(($event) => $data.formData.positionText = $event.detail.value)
   } : {}, {
-    z: common_vendor.t($data.isStarting ? "\u542F\u52A8\u4E2D..." : "\u5F00\u59CB\u9762\u8BD5"),
-    A: common_vendor.o((...args) => $options.startInterview && $options.startInterview(...args)),
-    B: $data.isStarting
+    E: common_vendor.t($data.isStarting ? "\u542F\u52A8\u4E2D..." : "\u5F00\u59CB\u9762\u8BD5"),
+    F: common_vendor.o((...args) => $options.startInterview && $options.startInterview(...args)),
+    G: $data.isStarting
   }) : common_vendor.e({
-    C: common_vendor.t($data.currentQuestion),
-    D: common_vendor.t($data.totalQuestions),
-    E: $options.progressPercent + "%",
-    F: common_vendor.t($data.currentStage),
-    G: $data.isSpeaking
+    H: common_vendor.t($data.currentQuestion),
+    I: common_vendor.t($data.totalQuestions),
+    J: $options.progressPercent + "%",
+    K: common_vendor.t($data.currentStage),
+    L: $data.isSpeaking
   }, $data.isSpeaking ? {
-    H: common_vendor.f(5, (i, k0, i0) => {
+    M: common_vendor.f(5, (i, k0, i0) => {
       return {
         a: i,
         b: i * 0.1 + "s"
       };
     }),
-    I: common_vendor.n({
+    N: common_vendor.n({
       active: $data.voiceWaveActive
     })
   } : {}, {
-    J: common_vendor.t($options.getInterviewerStatus()),
-    K: common_vendor.f($data.interviewMessages, (message, index, i0) => {
+    O: common_vendor.t($options.getInterviewerStatus()),
+    P: common_vendor.f($data.interviewMessages, (message, index, i0) => {
       return {
         a: common_vendor.t(message.content),
         b: common_vendor.t($options.formatTime(message.timestamp)),
@@ -794,67 +981,67 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.n(message.sender)
       };
     }),
-    L: $data.isAIThinking
+    Q: $data.isAIThinking
   }, $data.isAIThinking ? {
-    M: common_vendor.f(3, (i, k0, i0) => {
+    R: common_vendor.f(3, (i, k0, i0) => {
       return {
         a: i,
         b: i * 0.2 + "s"
       };
     })
   } : {}, {
-    N: $data.chatScrollTop,
-    O: common_vendor.n({
+    S: $data.chatScrollTop,
+    T: common_vendor.n({
       rotated: $data.tipsCollapsed
     }),
-    P: common_vendor.o((...args) => $options.toggleTips && $options.toggleTips(...args)),
-    Q: !$data.tipsCollapsed
+    U: common_vendor.o((...args) => $options.toggleTips && $options.toggleTips(...args)),
+    V: !$data.tipsCollapsed
   }, !$data.tipsCollapsed ? {
-    R: common_vendor.f($data.currentTips, (tip, index, i0) => {
+    W: common_vendor.f($data.currentTips, (tip, index, i0) => {
       return {
         a: common_vendor.t(tip),
         b: index
       };
     })
   } : {}, {
-    S: $data.tipsCollapsed ? 1 : "",
-    T: common_vendor.o((...args) => $options.replayQuestion && $options.replayQuestion(...args)),
-    U: !$data.currentAudioUrl,
-    V: $data.isRecording ? "/static/ai/recording.png" : "/static/ai/mic.png",
-    W: common_vendor.t($data.isRecording ? "\u5F55\u97F3\u4E2D..." : $data.isProcessing ? "\u5904\u7406\u4E2D..." : "\u6309\u4F4F\u8BF4\u8BDD"),
-    X: $data.isRecording ? 1 : "",
-    Y: $data.isProcessing ? 1 : "",
-    Z: common_vendor.o((...args) => $options.startRecording && $options.startRecording(...args)),
-    aa: common_vendor.o((...args) => $options.stopRecording && $options.stopRecording(...args)),
-    ab: $data.isProcessing,
-    ac: $data.isRecording
+    X: $data.tipsCollapsed ? 1 : "",
+    Y: common_vendor.o((...args) => $options.replayQuestion && $options.replayQuestion(...args)),
+    Z: !$data.currentAudioUrl,
+    aa: $data.isRecording ? "/static/ai/recording.png" : "/static/ai/mic.png",
+    ab: common_vendor.t($data.isRecording ? "\u5F55\u97F3\u4E2D..." : $data.isProcessing ? "\u5904\u7406\u4E2D..." : "\u6309\u4F4F\u8BF4\u8BDD"),
+    ac: $data.isRecording ? 1 : "",
+    ad: $data.isProcessing ? 1 : "",
+    ae: common_vendor.o((...args) => $options.startRecording && $options.startRecording(...args)),
+    af: common_vendor.o((...args) => $options.stopRecording && $options.stopRecording(...args)),
+    ag: $data.isProcessing,
+    ah: $data.isRecording
   }, $data.isRecording ? {
-    ad: common_vendor.t($data.recordingTime)
+    ai: common_vendor.t($data.recordingTime)
   } : {}, {
-    ae: common_vendor.o((...args) => $options.confirmEndInterview && $options.confirmEndInterview(...args))
+    aj: common_vendor.o((...args) => $options.confirmEndInterview && $options.confirmEndInterview(...args))
   }), {
-    af: $data.showReport
+    ak: $data.showReport
   }, $data.showReport ? {
-    ag: common_vendor.o((...args) => $options.closeReport && $options.closeReport(...args)),
-    ah: common_vendor.t($data.overallScore),
-    ai: common_vendor.f($data.evaluationItems, (item, index, i0) => {
+    al: common_vendor.o((...args) => $options.closeReport && $options.closeReport(...args)),
+    am: common_vendor.t($data.overallScore),
+    an: common_vendor.f($data.evaluationItems, (item, index, i0) => {
       return {
         a: common_vendor.t(item.title),
         b: common_vendor.t(item.content),
         c: index
       };
     }),
-    aj: common_vendor.f($data.suggestions, (suggestion, index, i0) => {
+    ao: common_vendor.f($data.suggestions, (suggestion, index, i0) => {
       return {
         a: common_vendor.t(suggestion),
         b: index
       };
     }),
-    ak: common_vendor.o((...args) => $options.restartInterview && $options.restartInterview(...args)),
-    al: common_vendor.o((...args) => $options.exportReport && $options.exportReport(...args)),
-    am: common_vendor.o(() => {
+    ap: common_vendor.o((...args) => $options.restartInterview && $options.restartInterview(...args)),
+    aq: common_vendor.o((...args) => $options.exportReport && $options.exportReport(...args)),
+    ar: common_vendor.o(() => {
     }),
-    an: common_vendor.o((...args) => $options.closeReport && $options.closeReport(...args))
+    as: common_vendor.o((...args) => $options.closeReport && $options.closeReport(...args))
   } : {});
 }
 var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-638c375a"], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/AI/interview.vue"]]);

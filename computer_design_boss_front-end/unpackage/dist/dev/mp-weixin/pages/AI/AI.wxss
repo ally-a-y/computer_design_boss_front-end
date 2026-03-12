@@ -533,6 +533,53 @@
   height: 32rpx;
   transition: transform 0.3s ease;
 }
+.panel-overlay .function-panel .dual-picker-container.data-v-6fa74974 {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 16rpx;
+}
+.panel-overlay .function-panel .dual-picker-container .dual-picker.data-v-6fa74974 {
+  flex: 1;
+  position: relative;
+  cursor: pointer;
+}
+.panel-overlay .function-panel .dual-picker-container .dual-picker .picker-text.data-v-6fa74974 {
+  padding: 16rpx 20rpx;
+  background: #f8f9fa;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  color: #333;
+  border: 2rpx solid #e1e8ed;
+  min-height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+.panel-overlay .function-panel .dual-picker-container .dual-picker .picker-text.data-v-6fa74974:active {
+  background: #e9ecef;
+}
+.panel-overlay .function-panel .dual-picker-container .dual-picker .picker-text.data-v-6fa74974::after {
+  content: "";
+  position: absolute;
+  right: 20rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8rpx solid transparent;
+  border-right: 8rpx solid transparent;
+  border-top: 12rpx solid #666;
+}
+.panel-overlay .function-panel .dual-picker-container picker[disabled] .picker-text.data-v-6fa74974 {
+  background: #f1f3f4;
+  color: #999;
+  border-color: #e1e8ed;
+  cursor: not-allowed;
+}
+.panel-overlay .function-panel .dual-picker-container picker[disabled] .picker-text.data-v-6fa74974::after {
+  border-top-color: #999;
+}
 .panel-overlay .function-panel .panel-footer.data-v-6fa74974 {
   display: flex;
   padding: 32rpx 36rpx;

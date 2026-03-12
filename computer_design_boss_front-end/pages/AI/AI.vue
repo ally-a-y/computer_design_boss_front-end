@@ -120,8 +120,15 @@
               </view>
               
               <view v-show="currentMethod.includes('position')" class="input-group">
-                <text class="input-label">职位ID</text>
-                <input class="input-field" v-model="formData.positionId" placeholder="请输入职位ID" />
+                <text class="input-label">职位选择</text>
+                <view class="dual-picker-container">
+                  <picker @change="onMainCategoryChange" :range="mainCategories" range-key="name" class="picker-field dual-picker">
+                    <view class="picker-text">{{ getMainCategoryName() }}</view>
+                  </picker>
+                  <picker @change="onDetailPositionChange" :range="getCurrentDetailPositions()" range-key="name" class="picker-field dual-picker" :disabled="!hasSelectedMainCategory()">
+                    <view class="picker-text">{{ getSelectedPositionName() }}</view>
+                  </picker>
+                </view>
               </view>
               
               <view v-show="currentMethod.includes('text')" class="input-group">
@@ -208,8 +215,15 @@
               </view>
               
               <view v-show="currentMethod.includes('position')" class="input-group" key="position-group">
-                <text class="input-label">职位ID</text>
-                <input class="input-field" v-model="formData.positionId" placeholder="请输入职位ID" />
+                <text class="input-label">职位选择</text>
+                <view class="dual-picker-container">
+                  <picker @change="onMainCategoryChange" :range="mainCategories" range-key="name" class="picker-field dual-picker">
+                    <view class="picker-text">{{ getMainCategoryName() }}</view>
+                  </picker>
+                  <picker @change="onDetailPositionChange" :range="getCurrentDetailPositions()" range-key="name" class="picker-field dual-picker" :disabled="!hasSelectedMainCategory()">
+                    <view class="picker-text">{{ getSelectedPositionName() }}</view>
+                  </picker>
+                </view>
               </view>
               
               <view v-show="currentMethod.includes('text')" class="input-group" key="text-group">
@@ -257,8 +271,15 @@
               </view>
               
               <view v-show="currentMethod.includes('position')" class="input-group" key="position-group">
-                <text class="input-label">职位ID</text>
-                <input class="input-field" v-model="formData.positionId" placeholder="请输入职位ID" />
+                <text class="input-label">职位选择</text>
+                <view class="dual-picker-container">
+                  <picker @change="onMainCategoryChange" :range="mainCategories" range-key="name" class="picker-field dual-picker">
+                    <view class="picker-text">{{ getMainCategoryName() }}</view>
+                  </picker>
+                  <picker @change="onDetailPositionChange" :range="getCurrentDetailPositions()" range-key="name" class="picker-field dual-picker" :disabled="!hasSelectedMainCategory()">
+                    <view class="picker-text">{{ getSelectedPositionName() }}</view>
+                  </picker>
+                </view>
               </view>
               
               <view v-show="currentMethod.includes('text')" class="input-group" key="text-group">
@@ -312,15 +333,74 @@ export default {
       formData: {
         positionId: '',
         positionText: '',
-        pdfFile: null  
+        pdfFile: null,
+        positionName: '' // 新增：存储选择的职位名称
       },
       gradeIndex: 0,
       gradeOptions: ['大一', '大二', '大三', '大四', '研一', '研二', '研三'],
       
+      // 双滚轮职位选择数据
+      mainCategories: [
+        { id: '101', name: '前端开发' }, 
+        { id: '102', name: '后端开发' }, 
+        { id: '103', name: '移动端开发' }, 
+        { id: '104', name: '数据与AI' }, 
+        { id: '105', name: '运维与测试' }, 
+        { id: '106', name: '产品设计' }, 
+        { id: '107', name: '网络安全' }, 
+        { id: '108', name: '嵌入式开发' }, 
+        { id: '200', name: '产品与设计类' }, 
+        { id: '300', name: '技术管理类' }
+      ],
+      
+      positionDetails: {
+        '101': [
+          { id: '1', name: 'Web前端工程师' }, { id: '2', name: '移动端前端工程师' }, { id: '3', name: '小程序开发工程师' },
+          { id: '4', name: '跨平台开发工程师' }, { id: '5', name: '前端架构师' }, { id: '6', name: 'Node.js全栈工程师' }
+        ],
+        '102': [
+          { id: '7', name: 'Java开发工程师' }, { id: '8', name: 'Python开发工程师' }, { id: '9', name: 'Go开发工程师' },
+          { id: '10', name: 'C++开发工程师' }, { id: '11', name: 'PHP开发工程师' }, { id: '12', name: '微服务架构师' }
+        ],
+        '103': [
+          { id: '13', name: 'Android开发工程师' }, { id: '14', name: 'iOS开发工程师' }, { id: '15', name: '鸿蒙开发工程师' },
+          { id: '16', name: '移动游戏开发工程师' }
+        ],
+        '104': [
+          { id: '17', name: '大数据开发工程师' }, { id: '18', name: '数据仓库工程师' }, { id: '19', name: '机器学习工程师' },
+          { id: '20', name: '深度学习工程师' }, { id: '21', name: '算法工程师（推荐/广告）' }, { id: '22', name: '自然语言处理工程师' },
+          { id: '23', name: '计算机视觉工程师' }, { id: '24', name: '数据分析师' }, { id: '25', name: '数据产品经理' }
+        ],
+        '105': [
+          { id: '26', name: '测试工程师' }, { id: '27', name: '自动化测试工程师' }, { id: '28', name: '性能测试工程师' },
+          { id: '29', name: '测试开发工程师' }, { id: '30', name: '安全测试工程师' }
+        ],
+        '106': [
+          { id: '31', name: '运维工程师' }, { id: '32', name: 'DevOps工程师' }, { id: '33', name: 'SRE工程师' },
+          { id: '34', name: '云原生工程师' }, { id: '35', name: '数据库管理员(DBA)' }, { id: '36', name: '网络工程师' }
+        ],
+        '107': [
+          { id: '37', name: '网络安全工程师' }, { id: '38', name: '渗透测试工程师' }, { id: '39', name: '安全运维工程师' },
+          { id: '40', name: '逆向工程师' }, { id: '41', name: '安全架构师' }
+        ],
+        '108': [
+          { id: '42', name: '嵌入式软件工程师' }, { id: '43', name: 'Linux驱动工程师' }, { id: '44', name: '物联网(IoT)工程师' },
+          { id: '45', name: 'FPGA工程师' }
+        ],
+        '200': [
+          { id: '46', name: '产品经理（技术型）' }, { id: '47', name: 'UI设计师' }, { id: '48', name: '交互设计师(IXD)' },
+          { id: '49', name: 'UX研究员' }
+        ],
+        '300': [
+          { id: '50', name: '技术经理/组长' }, { id: '51', name: '架构师' }, { id: '52', name: '研发总监' },
+          { id: '53', name: 'CTO/技术VP' }
+        ]
+      },
+      
       analysisMethods: [
-        { value: 'user+position', label: '我的简历+职位ID' },
+        { value: 'user+position', label: '我的简历+职位' },
         { value: 'user+text', label: '我的简历+职位文本' },
-        { value: 'pdf+position', label: 'PDF+职位ID' },
+        { value: 'pdf+position', label: 'PDF+职位' },
         { value: 'pdf+text', label: 'PDF+职位文本' }
       ]
     }
@@ -341,6 +421,11 @@ export default {
   onLoad() {
     this.initializeChat()
 	this.fetchUserInfo()
+	
+	// 延迟初始化，确保数据完全加载
+	setTimeout(() => {
+		this.initializePositionSelection()
+	}, 100)
   },
   
   onUnload() {
@@ -349,6 +434,25 @@ export default {
   
   methods: {
       initializeChat() {
+      },
+      
+      // 初始化职位选择
+      initializePositionSelection() {
+        // 确保数据存在
+        if (!this.mainCategories || !this.positionDetails) {
+          return
+        }
+        
+        // 设置默认职位为第一个分类的第一个职位
+        if (this.mainCategories.length > 0) {
+          const firstCategory = this.mainCategories[0]
+          const firstPositions = this.positionDetails[firstCategory.id]
+          
+          if (firstPositions && firstPositions.length > 0) {
+            this.formData.positionId = firstPositions[0].id
+            this.formData.positionName = firstPositions[0].name
+          }
+        }
       },
       
       // 获取用户信息
@@ -497,6 +601,30 @@ export default {
 	  // 打开面板时确保用户信息已加载
       if (!this.currentUserId && !this.isLoadingUser) {
         this.fetchUserInfo()
+      }
+      // 确保职位选择器初始化
+      this.ensurePositionSelection()
+      
+      // 强制初始化职位选择
+      if (this.currentMethod.includes('position') && !this.formData.positionName) {
+        setTimeout(() => {
+          this.initializePositionSelection()
+        }, 200)
+      }
+    },
+    
+    // 确保职位选择器有正确的状态
+    ensurePositionSelection() {
+      if (this.currentMethod.includes('position')) {
+        if (!this.formData.positionName && this.mainCategories && this.mainCategories.length > 0) {
+          // 如果没有选择职位，使用默认的第一个
+          const firstCategory = this.mainCategories[0]
+          const firstPositions = this.positionDetails[firstCategory.id]
+          if (firstPositions && firstPositions.length > 0) {
+            this.formData.positionId = firstPositions[0].id
+            this.formData.positionName = firstPositions[0].name
+          }
+        }
       }
     },
     
@@ -780,6 +908,7 @@ export default {
         positionId: this.formData.positionId,
         positionText: this.formData.positionText,
         pdfFile: this.formData.pdfFile ? { ...this.formData.pdfFile } : null,
+		positionName: this.formData.positionName, // 添加职位名称
 		userId: this.currentUserId
       }
       const savedMethod = this.currentMethod
@@ -850,15 +979,16 @@ export default {
         let res;
         
         if (method === 'user+position') {
-          const jobName = String(formData.positionId || '').trim()
+          // 直接使用存储的职位名称
+          const jobName = (formData.positionName || '').trim()
           if (!jobName) {
-            throw new Error('职位ID不能为空')
+            throw new Error('请选择有效的职位')
           }
 		  // 使用当前用户ID（已从formData自动填充）
           if (!formData.userId) {
             throw new Error('用户未登录')
           }
-           res = await aiApi.askByUserJobName(jobName)
+          res = await aiApi.askByUserJobName(jobName)
                 return res?.analysis || res?.data?.analysis || res?.data || res
           
         } else if (method === 'user+text') {
@@ -875,9 +1005,10 @@ export default {
           if (!formData.pdfFile?.base64) {
             throw new Error('PDF 文件没有 base64 数据')
           }
-          const jobName = String(formData.positionId || '').trim()
+          // 直接使用存储的职位名称
+          const jobName = (formData.positionName || '').trim()
           if (!jobName) {
-            throw new Error('职位ID不能为空')
+            throw new Error('请选择有效的职位')
           }
           res = await aiApi.askByPdfJobName(
             { name: formData.pdfFile.name, base64: formData.pdfFile.base64 },
@@ -934,9 +1065,15 @@ export default {
         if (!formData.pdfFile?.base64) {
           throw new Error('PDF 文件没有 base64 数据')
         }
+        // 使用职位名称而不是ID
+        const jobName = (formData.positionName || '').trim()
+        if (!jobName) {
+          throw new Error('请选择有效的职位')
+        }
+        console.log('调用成功率分析，职位名称:', jobName)
         const res = await aiApi.successRateByPdfJobName(
           { name: formData.pdfFile.name, base64: formData.pdfFile.base64 },
-          formData.positionId
+          jobName
         )
         return res?.data?.analysis || res?.analysis || res?.data || res
         
@@ -951,7 +1088,12 @@ export default {
         return res?.data?.analysis || res?.analysis || res?.data || res
         
       } else if (method === 'user+position') {
-        const res = await aiApi.successRateByUserJobName(formData.positionId)
+        // 使用职位名称而不是ID
+        const jobName = (formData.positionName || '').trim()
+        if (!jobName) {
+          throw new Error('请选择有效的职位')
+        }
+        const res = await aiApi.successRateByUserJobName(jobName)
         return res?.data?.analysis || res?.analysis || res?.data || res
         
       } else if (method === 'user+text') {
@@ -971,9 +1113,14 @@ export default {
         if (!formData.pdfFile?.base64) {
           throw new Error('PDF 文件没有 base64 数据')
         }
+        // 使用职位名称而不是ID
+        const jobName = (formData.positionName || '').trim()
+        if (!jobName) {
+          throw new Error('请选择有效的职位')
+        }
         const res = await aiApi.universityPlanByPdfJobName(
           { name: formData.pdfFile.name, base64: formData.pdfFile.base64 },
-          formData.positionId,
+          jobName,
           userGrade
         )
         return res?.data?.plan || res?.plan || res?.data || res
@@ -990,8 +1137,13 @@ export default {
         return res?.data?.plan || res?.plan || res?.data || res
         
       } else if (method === 'user+position') {
+        // 使用职位名称而不是ID
+        const jobName = (formData.positionName || '').trim()
+        if (!jobName) {
+          throw new Error('请选择有效的职位')
+        }
         const res = await aiApi.universityPlanByUserJobName(
-          formData.positionId,
+          jobName,
           userGrade
         )
         return res?.data?.plan || res?.plan || res?.data || res
@@ -1016,6 +1168,19 @@ export default {
         studentPlan: '请为我制定大学生活规划'
       }
       let text = texts[this.currentPanel] || '提交分析'
+      
+      // 添加职位信息
+      if (this.currentMethod.includes('position') && this.formData.positionId) {
+        const mainCategory = this.getCurrentMainCategory()
+        const positions = this.getCurrentDetailPositions()
+        const detailPosition = positions.find(p => p.id === this.formData.positionId)
+        if (mainCategory && detailPosition) {
+          text += ` [${mainCategory.name} - ${detailPosition.name}]`
+        }
+      } else if (this.currentMethod.includes('text') && this.formData.positionText) {
+        text += ` [${this.formData.positionText}]`
+      }
+      
       if (this.formData.pdfFile) {
         text += `：[${this.formData.pdfFile.name}]`
       }
@@ -1039,9 +1204,17 @@ export default {
         }
       }
 	  
-      if (method.includes('position') && !this.formData.positionId.trim()) {
-        uni.showToast({ title: '请输入职位ID', icon: 'none' })
-        return false
+      if (method.includes('position')) {
+        if (!this.formData.positionName || !this.formData.positionName.trim()) {
+          // 尝试自动初始化
+          this.initializePositionSelection()
+          
+          // 再次检查
+          if (!this.formData.positionName || !this.formData.positionName.trim()) {
+            uni.showToast({ title: '请选择职位', icon: 'none' })
+            return false
+          }
+        }
       }
       
       if (method.includes('text') && !this.formData.positionText.trim()) {
@@ -1083,11 +1256,86 @@ export default {
       return date.toLocaleTimeString()
     },
     
+    // 双滚轮职位选择方法
+    onMainCategoryChange(e) {
+      const index = parseInt(e.detail.value)
+      if (index >= 0 && index < this.mainCategories.length) {
+        const selectedCategory = this.mainCategories[index]
+        // 自动选择第一个具体职位
+        const detailPositions = this.positionDetails[selectedCategory.id]
+        if (detailPositions && detailPositions.length > 0) {
+          // 存储职位ID和名称
+          this.formData.positionId = detailPositions[0].id
+          this.formData.positionName = detailPositions[0].name
+        } else {
+          this.formData.positionId = ''
+          this.formData.positionName = ''
+        }
+      }
+    },
+    
+    // 具体职位选择
+    onDetailPositionChange(e) {
+      const index = parseInt(e.detail.value)
+      const positions = this.getCurrentDetailPositions()
+      if (index >= 0 && index < positions.length) {
+        const selectedPosition = positions[index]
+        // 存储职位ID和名称
+        this.formData.positionId = selectedPosition.id
+        this.formData.positionName = selectedPosition.name
+      }
+    },
+    
+    // 获取当前主分类下的具体职位
+    getCurrentDetailPositions() {
+      if (!this.formData.positionId) return []
+      // 找到当前positionId对应的主分类
+      for (const category of this.mainCategories) {
+        const positions = this.positionDetails[category.id]
+        if (positions && positions.some(p => p.id === this.formData.positionId)) {
+          return positions
+        }
+      }
+      return []
+    },
+    
+    // 获取当前主分类
+    getCurrentMainCategory() {
+      if (!this.formData.positionId) return null
+      for (const category of this.mainCategories) {
+        const positions = this.positionDetails[category.id]
+        if (positions && positions.some(p => p.id === this.formData.positionId)) {
+          return category
+        }
+      }
+      return null
+    },
+    
+    // 获取主分类名称（用于显示）
+    getMainCategoryName() {
+      const category = this.getCurrentMainCategory()
+      return category ? category.name : '请选择职位分类'
+    },
+    
+    // 获取选中的职位名称（用于显示）
+    getSelectedPositionName() {
+      if (!this.formData.positionId) return '请选择具体职位'
+      const positions = this.getCurrentDetailPositions()
+      const position = positions.find(p => p.id === this.formData.positionId)
+      return position ? position.name : '请选择具体职位'
+    },
+    
+    // 检查是否已选择主分类
+    hasSelectedMainCategory() {
+      return this.getCurrentMainCategory() !== null
+    },
+    
     resetForm() {
       this.formData = {
         positionId: '',
         positionText: '',
-        pdfFile: null
+        pdfFile: null,
+        positionName: ''
       }
       this.gradeIndex = 0
     }
@@ -1691,6 +1939,60 @@ export default {
               transition: transform 0.3s ease;
             }
           }
+        }
+      }
+    }
+    
+    .dual-picker-container {
+      display: flex;
+      gap: 20rpx;
+      margin-top: 16rpx;
+      
+      .dual-picker {
+        flex: 1;
+        position: relative;
+        cursor: pointer;
+        
+        .picker-text {
+          padding: 16rpx 20rpx;
+          background: #f8f9fa;
+          border-radius: 8rpx;
+          font-size: 28rpx;
+          color: #333;
+          border: 2rpx solid #e1e8ed;
+          min-height: 80rpx;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          position: relative;
+          
+          &:active {
+            background: #e9ecef;
+          }
+          
+          &::after {
+            content: '';
+            position: absolute;
+            right: 20rpx;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-left: 8rpx solid transparent;
+            border-right: 8rpx solid transparent;
+            border-top: 12rpx solid #666;
+          }
+        }
+      }
+      
+      picker[disabled] .picker-text {
+        background: #f1f3f4;
+        color: #999;
+        border-color: #e1e8ed;
+        cursor: not-allowed;
+        
+        &::after {
+          border-top-color: #999;
         }
       }
     }
