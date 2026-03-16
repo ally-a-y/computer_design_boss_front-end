@@ -34,19 +34,6 @@
       </view>
     </view>
     
-    <!-- 就业类型筛选区域 -->
-    <view class="emp-type-section">
-      <view
-        class="emp-type-item"
-        v-for="type in empTypeList"
-        :key="type.id"
-        @click="selectEmpType(type.id)"
-        :class="{ active: selectedEmpType === type.id }"
-      >
-        <text>{{ type.name }}</text>
-      </view>
-    </view>
-    
     <!-- 推荐职位区域 -->
     <view class="job-section">
       <view class="section-header">
@@ -99,14 +86,7 @@ export default {
       currentEmpType: '',
       keyword: '',
       selectedSubCategories: [],
-      selectedEmpType: 0,
-      showCategoryTabs: false,
-      empTypeList: [
-        { id: 0, name: '全部' },
-        { id: 1, name: '全职' },
-        { id: 2, name: '兼职' },
-        { id: 3, name: '实习' }
-      ]
+      showCategoryTabs: false
     }
   },
   onLoad() {
@@ -232,13 +212,20 @@ export default {
     goToCategory(categoryId) {
         this.currentCategory = categoryId
         
-        // 检查是否为技术开发类（ID为100）
-        if (categoryId === '100' || categoryId === 100) {
+        // 根据实际数据库结构重新定义大类映射
+        // 101-108: 技术开发类, 200系列: 产品与设计类, 300系列: 技术管理类
+        const techCategories = [101, 102, 103, 104, 105, 106, 107, 108]
+        const designCategories = [200, 201, 202, 203, 204, 205] // 根据数据库实际数据
+        const manageCategories = [300, 301, 302, 303] // 根据数据库实际数据
+        
+        // 检查是否为技术开发类（包括主分类101）
+        if (categoryId === '101' || techCategories.includes(Number(categoryId))) {
             this.showCategoryTabs = true
-            // 获取技术开发的子分类
+            // 获取技术开发的子分类（实际数据库中的具体分类）
             this.subCategoryList = this.allCategories.filter(category => 
-                category.parent_id && (category.parent_id.toString() === '100' || category.parent_id === 100)
+                techCategories.includes(Number(category.id))
             )
+            console.log('技术开发子分类:', this.subCategoryList)
         } else {
             this.showCategoryTabs = false
             this.subCategoryList = []
@@ -246,11 +233,98 @@ export default {
         
         // 重置筛选条件
         this.selectedSubCategories = []
-        this.selectedEmpType = 0
         this.keyword = ''
         
-        // 应用筛选
-        this.applyFilters()
+        // 调用后端API获取对应分类的职位数据
+        this.getJobsByCategory(categoryId)
+    },
+    
+    // 根据分类获取职位数据
+    async getJobsByCategory(categoryId) {
+        try {
+            // 检查网络状态
+            const networkType = await new Promise((resolve) => {
+                uni.getNetworkType({
+                    success: (res) => resolve(res.networkType)
+                })
+            })
+            
+            if (networkType === 'none') {
+                uni.showToast({
+                    title: '当前无网络连接',
+                    icon: 'none'
+                })
+                return
+            }
+            
+            // 直接调用后端API获取职位数据
+            const res = await jobApi.getJobsByCategory(categoryId)
+            
+            let jobsData = []
+            
+            if (res !== null && res !== undefined) {
+                if (Array.isArray(res)) {
+                    // 如果是数组，直接使用
+                    jobsData = res
+                } else if (typeof res === 'object' && Object.keys(res).length > 0) {
+                    // 如果是对象，尝试提取其中的数组数据
+                    if (res.list && Array.isArray(res.list)) {
+                        jobsData = res.list
+                    } else if (res.data && Array.isArray(res.data)) {
+                        jobsData = res.data
+                    } else if (res.jobs && Array.isArray(res.jobs)) {
+                        jobsData = res.jobs
+                    } else {
+                        // 如果无法提取数组数据，显示错误信息
+                        uni.showToast({
+                            title: '获取职位失败: 数据格式错误',
+                            icon: 'none'
+                        })
+                        jobsData = []
+                    }
+                } else {
+                    // 其他情况显示错误信息
+                    uni.showToast({
+                        title: '获取职位失败: 数据格式错误',
+                        icon: 'none'
+                    })
+                    jobsData = []
+                }
+            } else {
+                // 没有数据返回，显示错误信息
+                uni.showToast({
+                    title: '获取职位失败: 后端无数据返回',
+                    icon: 'none'
+                })
+                jobsData = []
+            }
+            
+            // 处理职位数据，确保category_id为数字类型
+            jobsData = jobsData.map(job => ({
+                ...job,
+                category_id: job.category_id && job.category_id !== '' ? Number(job.category_id) : null
+            }))
+            
+            // 存储所有职位数据，用于本地搜索和筛选
+            this.allJobs = jobsData
+            this.jobList = jobsData
+            
+            console.log('获取到的职位数据:', jobsData.length, '条')
+            if (jobsData.length > 0) {
+                console.log('示例职位:', jobsData[0])
+            }
+            
+        } catch (error) {
+            this.allJobs = []
+            this.jobList = []
+            console.error('获取职位失败:', error)
+            
+            // 显示错误信息
+            uni.showToast({
+                title: '获取职位失败',
+                icon: 'none'
+            })
+        }
     },
     
     // 选择子分类
@@ -270,14 +344,6 @@ export default {
       this.applyFilters()
     },
     
-    // 选择就业类型
-    selectEmpType(typeId) {
-      this.selectedEmpType = typeId
-      
-      // 应用筛选
-      this.applyFilters()
-    },
-    
     // 搜索输入事件
     onSearchInput() {
       this.applyFilters()
@@ -289,44 +355,40 @@ export default {
       
       // 应用分类筛选
       if (this.currentCategory) {
-        // 将当前分类ID统一转换为数字类型进行比较
+        // 根据实际数据库结构处理分类筛选
         const currentCatNum = Number(this.currentCategory)
         
+        // 定义实际的大类分组（基于数据库中的真实分类ID）
+        const techCategories = [101, 102, 103, 104, 105, 106, 107, 108] // 技术开发类
+        const designCategories = [200, 201, 202, 203, 204, 205] // 产品与设计类  
+        const manageCategories = [300, 301, 302, 303] // 技术管理类
+        
         filteredJobs = filteredJobs.filter(job => {
-            // 确保job存在且有有效的category_id
-            if (!job || job.category_id === null) {
-                return false
-            }
-            
-            // 职位分类ID已经在getRecommendJobs中转换为数字
-            const jobCategoryId = job.category_id
-            
-            // 如果选择了技术开发类且有子分类筛选
-            if (currentCatNum === 100 && this.selectedSubCategories.length > 0) {
-                return this.selectedSubCategories.includes(jobCategoryId)
+          // 确保job存在且有有效的category_id
+          if (!job || job.category_id === null) {
+            return false
+          }
+          
+          const jobCategoryId = job.category_id
+          
+          // 如果选择了技术开发类且有子分类筛选
+          if (techCategories.includes(currentCatNum) && this.selectedSubCategories.length > 0) {
+            return this.selectedSubCategories.includes(jobCategoryId)
+          } else {
+            // 检查是否是大类ID或其子分类ID
+            // 对于大类分组，检查职位分类是否属于该分组
+            if (techCategories.includes(currentCatNum)) {
+              return techCategories.includes(jobCategoryId)
+            } else if (designCategories.includes(currentCatNum)) {
+              return designCategories.includes(jobCategoryId)
+            } else if (manageCategories.includes(currentCatNum)) {
+              return manageCategories.includes(jobCategoryId)
             } else {
-                // 检查是否是大类ID或其子分类ID
-                // 对于大类ID（如100, 200, 300），直接匹配
-                // 对于子分类ID（如101, 201），检查其是否以大类ID开头
-                const jobCatStr = jobCategoryId.toString()
-                const currentCatStr = this.currentCategory.toString()
-                
-                return jobCategoryId === currentCatNum || jobCatStr.startsWith(currentCatStr)
+              // 对于具体分类ID，直接匹配
+              return jobCategoryId === currentCatNum
             }
+          }
         })
-      }
-      
-      // 应用就业类型筛选
-      console.log('=== 应用就业类型筛选 ===')
-      console.log('当前就业类型筛选:', this.selectedEmpType)
-      if (this.selectedEmpType !== 0) {
-        const beforeCount = filteredJobs.length
-        filteredJobs = filteredJobs.filter(job => {
-          const empTypeMatch = job.emp_type && Number(job.emp_type) === Number(this.selectedEmpType)
-          console.log('职位:', job.title, 'emp_type:', job.emp_type, '匹配结果:', empTypeMatch)
-          return empTypeMatch
-        })
-        console.log(`就业类型筛选后职位数: ${beforeCount} → ${filteredJobs.length}`)
       }
       
       // 应用关键词搜索
@@ -383,9 +445,10 @@ export default {
     },
     
     getJobCategories() {
-      // 直接使用固定的大类数据，确保图标正确显示
+      // 根据实际数据库结构定义主分类
+      // 注意：数据库中的分类是扁平的，我们需要将相关的分类组合成大类
       const mainCategories = [
-        { id: '100', name: '技术开发', icon: '/static/category/tech.png' },
+        { id: '101', name: '技术开发', icon: '/static/category/tech.png' },
         { id: '200', name: '产品与设计', icon: '/static/category/design.png' },
         { id: '300', name: '技术管理', icon: '/static/category/product.png' }
       ]
@@ -397,24 +460,11 @@ export default {
             // 存储所有分类数据
             this.allCategories = res
             
-            // 过滤出大类（parent_id为null或不存在的分类）
-            const parentCategories = res.filter(category => 
-              !category.parent_id || category.parent_id === null
-            )
+            // 由于数据库中的分类是扁平的，我们直接使用主分类
+            this.categoryList = mainCategories
             
-            if (parentCategories.length > 0) {
-              // 使用后端返回的大类数据，但确保图标正确
-              this.categoryList = parentCategories.map(category => ({
-                ...category,
-                icon: `/static/category/${this.getCategoryIcon(category.id)}.png`
-              }))
-            } else {
-              // 如果后端没有返回大类数据，使用固定数据
-              this.categoryList = mainCategories
-              
-              // 生成模拟的子分类数据
-              this.generateMockSubCategories()
-            }
+            // 确保allCategories包含技术开发的子分类
+            this.ensureTechSubCategories()
           } else {
             // 如果后端API有问题，使用固定数据
             this.categoryList = mainCategories
@@ -433,30 +483,79 @@ export default {
         })
     },
     
+    // 确保allCategories包含技术开发的子分类
+    ensureTechSubCategories() {
+      // 技术开发的子分类
+      const techSubCategories = [
+        { id: 101, name: '前端开发', parent_id: null },
+        { id: 102, name: '后端开发', parent_id: null },
+        { id: 103, name: '移动开发', parent_id: null },
+        { id: 104, name: '人工智能', parent_id: null },
+        { id: 105, name: '大数据', parent_id: null },
+        { id: 106, name: '云计算', parent_id: null },
+        { id: 107, name: '网络安全', parent_id: null },
+        { id: 108, name: '嵌入式开发', parent_id: null }
+      ]
+      
+      // 检查是否已包含这些分类
+      const existingIds = this.allCategories.map(cat => Number(cat.id))
+      
+      // 添加缺失的技术开发子分类
+      techSubCategories.forEach(subCat => {
+        if (!existingIds.includes(subCat.id)) {
+          this.allCategories.push(subCat)
+        }
+      })
+    },
+    
     // 生成模拟的子分类数据（当后端没有返回时使用）
     generateMockSubCategories() {
+      // 根据实际数据库结构生成模拟数据
       this.allCategories = [
-        { id: 100, name: '技术开发', parent_id: null },
-        { id: 200, name: '产品与设计', parent_id: null },
-        { id: 300, name: '技术管理', parent_id: null },
-        { id: 101, name: '前端开发', parent_id: 100 },
-        { id: 102, name: '后端开发', parent_id: 100 },
-        { id: 103, name: '移动开发', parent_id: 100 },
-        { id: 104, name: '测试开发', parent_id: 100 },
-        { id: 105, name: '人工智能', parent_id: 100 },
-        { id: 106, name: '大数据', parent_id: 100 },
-        { id: 107, name: '云计算', parent_id: 100 },
-        { id: 108, name: '运维开发', parent_id: 100 }
+        // 技术开发类（101-108）
+        { id: 101, name: '前端开发', parent_id: null },
+        { id: 102, name: '后端开发', parent_id: null },
+        { id: 103, name: '移动开发', parent_id: null },
+        { id: 104, name: '人工智能', parent_id: null },
+        { id: 105, name: '大数据', parent_id: null },
+        { id: 106, name: '云计算', parent_id: null },
+        { id: 107, name: '网络安全', parent_id: null },
+        { id: 108, name: '嵌入式开发', parent_id: null },
+        // 产品与设计类（200系列）
+        { id: 200, name: '产品经理', parent_id: null },
+        { id: 201, name: 'UI设计师', parent_id: null },
+        { id: 202, name: '交互设计师', parent_id: null },
+        { id: 203, name: 'UX研究员', parent_id: null },
+        // 技术管理类（300系列）
+        { id: 300, name: '技术经理', parent_id: null },
+        { id: 301, name: '架构师', parent_id: null },
+        { id: 302, name: '研发总监', parent_id: null },
+        { id: 303, name: 'CTO', parent_id: null }
       ]
     },
     
     getCategoryIcon(categoryId) {
-      // 根据分类ID返回对应的图标名称
+      // 根据实际分类ID返回对应的图标名称
       const iconMap = {
-        // 大类图标映射
-        '100': 'tech',     // 技术开发大类
-        '200': 'design',   // 产品与设计大类
-        '300': 'product',  // 技术管理大类
+        // 技术开发类（101-108）
+        '101': 'tech',     // 前端开发
+        '102': 'tech',     // 后端开发  
+        '103': 'tech',     // 移动开发
+        '104': 'tech',     // 人工智能
+        '105': 'tech',     // 大数据
+        '106': 'tech',     // 云计算
+        '107': 'tech',     // 网络安全
+        '108': 'tech',     // 嵌入式开发
+        // 产品与设计类（200系列）
+        '200': 'design',   // 产品经理
+        '201': 'design',   // UI设计师
+        '202': 'design',   // 交互设计师
+        '203': 'design',   // UX研究员
+        // 技术管理类（300系列）
+        '300': 'product',  // 技术经理
+        '301': 'product',  // 架构师
+        '302': 'product',  // 研发总监
+        '303': 'product',  // CTO
         // 兼容旧的小类ID
         '1001': 'tech',    // 技术小类
         '1002': 'design',  // 设计小类
@@ -469,16 +568,25 @@ export default {
     getMockJobsData() {
       console.log('调用getMockJobsData方法')
       const mockData = [
+        // 技术开发类（101-108）
         { id: 1, title: '前端开发工程师', company: '科技有限公司', category_id: 101, emp_type: 1, description: '负责公司网站前端开发，使用Vue框架' },
         { id: 2, title: '后端开发工程师', company: '互联网科技', category_id: 102, emp_type: 1, description: '负责Java后端开发，熟悉Spring框架' },
-        { id: 3, title: 'UI设计师', company: '设计工作室', category_id: 201, emp_type: 2, description: '负责产品UI设计，熟悉Figma工具' },
-        { id: 4, title: '产品经理', company: '创新科技', category_id: 301, emp_type: 1, description: '负责产品规划和需求分析' },
-        { id: 5, title: '移动端开发', company: '移动科技', category_id: 103, emp_type: 3, description: '负责React Native移动应用开发' },
-        { id: 6, title: '测试工程师', company: '软件测试', category_id: 104, emp_type: 1, description: '负责自动化测试和性能测试' },
-        { id: 7, title: '数据分析师', company: '数据分析', category_id: 106, emp_type: 2, description: '负责业务数据分析和可视化' },
-        { id: 8, title: '运维工程师', company: '云服务', category_id: 108, emp_type: 1, description: '负责服务器运维和监控' },
-        { id: 9, title: 'AI工程师', company: '人工智能', category_id: 105, emp_type: 3, description: '负责机器学习模型开发' },
-        { id: 10, title: '云计算工程师', company: '云计算', category_id: 107, emp_type: 1, description: '负责云平台架构设计' }
+        { id: 3, title: '移动端开发工程师', company: '移动科技', category_id: 103, emp_type: 1, description: '负责React Native移动应用开发' },
+        { id: 4, title: '人工智能工程师', company: 'AI科技', category_id: 104, emp_type: 1, description: '负责机器学习模型开发' },
+        { id: 5, title: '大数据工程师', company: '数据科技', category_id: 105, emp_type: 1, description: '负责大数据平台开发' },
+        { id: 6, title: '云计算工程师', company: '云服务', category_id: 106, emp_type: 1, description: '负责云平台架构设计' },
+        { id: 7, title: '网络安全工程师', company: '安全科技', category_id: 107, emp_type: 1, description: '负责网络安全防护' },
+        { id: 8, title: '嵌入式开发工程师', company: '硬件科技', category_id: 108, emp_type: 1, description: '负责嵌入式系统开发' },
+        // 产品与设计类（200系列）
+        { id: 9, title: '产品经理', company: '产品科技', category_id: 200, emp_type: 1, description: '负责产品规划和需求分析' },
+        { id: 10, title: 'UI设计师', company: '设计工作室', category_id: 201, emp_type: 2, description: '负责产品UI设计，熟悉Figma工具' },
+        { id: 11, title: '交互设计师', company: '用户体验', category_id: 202, emp_type: 1, description: '负责交互设计和原型制作' },
+        { id: 12, title: 'UX研究员', company: '用户研究', category_id: 203, emp_type: 2, description: '负责用户调研和数据分析' },
+        // 技术管理类（300系列）
+        { id: 13, title: '技术经理', company: '管理团队', category_id: 300, emp_type: 1, description: '负责技术团队管理' },
+        { id: 14, title: '架构师', company: '架构团队', category_id: 301, emp_type: 1, description: '负责系统架构设计' },
+        { id: 15, title: '研发总监', company: '研发管理', category_id: 302, emp_type: 1, description: '负责研发部门管理' },
+        { id: 16, title: 'CTO', company: '技术领导', category_id: 303, emp_type: 1, description: '负责公司技术战略' }
       ]
       console.log('模拟数据生成成功，长度:', mockData.length)
       console.log('模拟数据:', mockData)

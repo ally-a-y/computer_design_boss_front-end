@@ -46,14 +46,7 @@ const _sfc_main = {
       currentEmpType: "",
       keyword: "",
       selectedSubCategories: [],
-      selectedEmpType: 0,
-      showCategoryTabs: false,
-      empTypeList: [
-        { id: 0, name: "\u5168\u90E8" },
-        { id: 1, name: "\u5168\u804C" },
-        { id: 2, name: "\u517C\u804C" },
-        { id: 3, name: "\u5B9E\u4E60" }
-      ]
+      showCategoryTabs: false
     };
   },
   onLoad() {
@@ -153,17 +146,99 @@ const _sfc_main = {
     },
     goToCategory(categoryId) {
       this.currentCategory = categoryId;
-      if (categoryId === "100" || categoryId === 100) {
+      const techCategories = [101, 102, 103, 104, 105, 106, 107, 108];
+      if (categoryId === "101" || techCategories.includes(Number(categoryId))) {
         this.showCategoryTabs = true;
-        this.subCategoryList = this.allCategories.filter((category) => category.parent_id && (category.parent_id.toString() === "100" || category.parent_id === 100));
+        this.subCategoryList = this.allCategories.filter((category) => techCategories.includes(Number(category.id)));
+        console.log("\u6280\u672F\u5F00\u53D1\u5B50\u5206\u7C7B:", this.subCategoryList);
       } else {
         this.showCategoryTabs = false;
         this.subCategoryList = [];
       }
       this.selectedSubCategories = [];
-      this.selectedEmpType = 0;
       this.keyword = "";
-      this.applyFilters();
+      this.getJobsByCategory(categoryId);
+    },
+    async getJobsByCategory(categoryId) {
+      try {
+        const networkType = await new Promise((resolve) => {
+          common_vendor.index.getNetworkType({
+            success: (res2) => resolve(res2.networkType)
+          });
+        });
+        if (networkType === "none") {
+          common_vendor.index.showToast({
+            title: "\u5F53\u524D\u65E0\u7F51\u7EDC\u8FDE\u63A5",
+            icon: "none"
+          });
+          return;
+        }
+        const techMainCategoryId = "101";
+        let res;
+        if (categoryId === techMainCategoryId) {
+          console.log("\u83B7\u53D6\u6240\u6709\u6280\u672F\u5F00\u53D1\u7C7B\u804C\u4F4D");
+          res = this.getMockJobsData().filter((job) => [101, 102, 103, 104, 105, 106, 107, 108].includes(job.category_id));
+        } else {
+          res = await common_api_job.jobApi.getJobsByCategory(categoryId);
+        }
+        let jobsData = [];
+        if (res !== null && res !== void 0) {
+          if (Array.isArray(res)) {
+            jobsData = res;
+          } else if (typeof res === "object" && Object.keys(res).length > 0) {
+            if (res.list && Array.isArray(res.list)) {
+              jobsData = res.list;
+            } else if (res.data && Array.isArray(res.data)) {
+              jobsData = res.data;
+            } else if (res.jobs && Array.isArray(res.jobs)) {
+              jobsData = res.jobs;
+            } else {
+              common_vendor.index.showToast({
+                title: "\u83B7\u53D6\u804C\u4F4D\u5931\u8D25: \u6570\u636E\u683C\u5F0F\u9519\u8BEF",
+                icon: "none"
+              });
+              jobsData = [];
+            }
+          } else {
+            common_vendor.index.showToast({
+              title: "\u83B7\u53D6\u804C\u4F4D\u5931\u8D25: \u6570\u636E\u683C\u5F0F\u9519\u8BEF",
+              icon: "none"
+            });
+            jobsData = [];
+          }
+        } else {
+          common_vendor.index.showToast({
+            title: "\u83B7\u53D6\u804C\u4F4D\u5931\u8D25: \u540E\u7AEF\u65E0\u6570\u636E\u8FD4\u56DE",
+            icon: "none"
+          });
+          jobsData = [];
+        }
+        if (jobsData.length === 0) {
+          console.log("\u4ECE\u540E\u7AEF\u83B7\u53D6\u7684\u6570\u636E\u4E3A\u7A7A\uFF0C\u4F7F\u7528\u6A21\u62DF\u6570\u636E");
+          if (categoryId === techMainCategoryId) {
+            jobsData = this.getMockJobsData().filter((job) => [101, 102, 103, 104, 105, 106, 107, 108].includes(job.category_id));
+          } else {
+            jobsData = this.getMockJobsData().filter((job) => job.category_id === Number(categoryId));
+          }
+        }
+        jobsData = jobsData.map((job) => __spreadProps(__spreadValues({}, job), {
+          category_id: job.category_id && job.category_id !== "" ? Number(job.category_id) : null
+        }));
+        this.allJobs = jobsData;
+        this.jobList = jobsData;
+        console.log("\u83B7\u53D6\u5230\u7684\u804C\u4F4D\u6570\u636E:", jobsData.length, "\u6761");
+        if (jobsData.length > 0) {
+          console.log("\u793A\u4F8B\u804C\u4F4D:", jobsData[0]);
+        }
+      } catch (error) {
+        this.allJobs = [];
+        this.jobList = [];
+        console.error("\u83B7\u53D6\u804C\u4F4D\u5931\u8D25:", error);
+        common_vendor.index.showToast({
+          title: "\u83B7\u53D6\u804C\u4F4D\u5931\u8D25",
+          icon: "none"
+        });
+      }
     },
     selectSubCategory(categoryId) {
       const numCategoryId = Number(categoryId);
@@ -176,10 +251,6 @@ const _sfc_main = {
       console.log("\u9009\u62E9\u7684\u5B50\u5206\u7C7B:", this.selectedSubCategories);
       this.applyFilters();
     },
-    selectEmpType(typeId) {
-      this.selectedEmpType = typeId;
-      this.applyFilters();
-    },
     onSearchInput() {
       this.applyFilters();
     },
@@ -187,30 +258,28 @@ const _sfc_main = {
       let filteredJobs = [...this.allJobs];
       if (this.currentCategory) {
         const currentCatNum = Number(this.currentCategory);
+        const techCategories = [101, 102, 103, 104, 105, 106, 107, 108];
+        const designCategories = [200, 201, 202, 203, 204, 205];
+        const manageCategories = [300, 301, 302, 303];
         filteredJobs = filteredJobs.filter((job) => {
           if (!job || job.category_id === null) {
             return false;
           }
           const jobCategoryId = job.category_id;
-          if (currentCatNum === 100 && this.selectedSubCategories.length > 0) {
+          if (techCategories.includes(currentCatNum) && this.selectedSubCategories.length > 0) {
             return this.selectedSubCategories.includes(jobCategoryId);
           } else {
-            const jobCatStr = jobCategoryId.toString();
-            const currentCatStr = this.currentCategory.toString();
-            return jobCategoryId === currentCatNum || jobCatStr.startsWith(currentCatStr);
+            if (techCategories.includes(currentCatNum)) {
+              return techCategories.includes(jobCategoryId);
+            } else if (designCategories.includes(currentCatNum)) {
+              return designCategories.includes(jobCategoryId);
+            } else if (manageCategories.includes(currentCatNum)) {
+              return manageCategories.includes(jobCategoryId);
+            } else {
+              return jobCategoryId === currentCatNum;
+            }
           }
         });
-      }
-      console.log("=== \u5E94\u7528\u5C31\u4E1A\u7C7B\u578B\u7B5B\u9009 ===");
-      console.log("\u5F53\u524D\u5C31\u4E1A\u7C7B\u578B\u7B5B\u9009:", this.selectedEmpType);
-      if (this.selectedEmpType !== 0) {
-        const beforeCount = filteredJobs.length;
-        filteredJobs = filteredJobs.filter((job) => {
-          const empTypeMatch = job.emp_type && Number(job.emp_type) === Number(this.selectedEmpType);
-          console.log("\u804C\u4F4D:", job.title, "emp_type:", job.emp_type, "\u5339\u914D\u7ED3\u679C:", empTypeMatch);
-          return empTypeMatch;
-        });
-        console.log(`\u5C31\u4E1A\u7C7B\u578B\u7B5B\u9009\u540E\u804C\u4F4D\u6570: ${beforeCount} \u2192 ${filteredJobs.length}`);
       }
       console.log("=== \u5E94\u7528\u5173\u952E\u8BCD\u641C\u7D22 ===");
       console.log("\u5F53\u524D\u5173\u952E\u8BCD:", this.keyword);
@@ -255,22 +324,15 @@ const _sfc_main = {
     },
     getJobCategories() {
       const mainCategories = [
-        { id: "100", name: "\u6280\u672F\u5F00\u53D1", icon: "/static/category/tech.png" },
+        { id: "101", name: "\u6280\u672F\u5F00\u53D1", icon: "/static/category/tech.png" },
         { id: "200", name: "\u4EA7\u54C1\u4E0E\u8BBE\u8BA1", icon: "/static/category/design.png" },
         { id: "300", name: "\u6280\u672F\u7BA1\u7406", icon: "/static/category/product.png" }
       ];
       common_api_job.jobApi.getJobCategories().then((res) => {
         if (res && Array.isArray(res)) {
           this.allCategories = res;
-          const parentCategories = res.filter((category) => !category.parent_id || category.parent_id === null);
-          if (parentCategories.length > 0) {
-            this.categoryList = parentCategories.map((category) => __spreadProps(__spreadValues({}, category), {
-              icon: `/static/category/${this.getCategoryIcon(category.id)}.png`
-            }));
-          } else {
-            this.categoryList = mainCategories;
-            this.generateMockSubCategories();
-          }
+          this.categoryList = mainCategories;
+          this.ensureTechSubCategories();
         } else {
           this.categoryList = mainCategories;
           this.generateMockSubCategories();
@@ -281,26 +343,62 @@ const _sfc_main = {
         this.generateMockSubCategories();
       });
     },
+    ensureTechSubCategories() {
+      const techSubCategories = [
+        { id: 101, name: "\u524D\u7AEF\u5F00\u53D1", parent_id: null },
+        { id: 102, name: "\u540E\u7AEF\u5F00\u53D1", parent_id: null },
+        { id: 103, name: "\u79FB\u52A8\u5F00\u53D1", parent_id: null },
+        { id: 104, name: "\u4EBA\u5DE5\u667A\u80FD", parent_id: null },
+        { id: 105, name: "\u5927\u6570\u636E", parent_id: null },
+        { id: 106, name: "\u4E91\u8BA1\u7B97", parent_id: null },
+        { id: 107, name: "\u7F51\u7EDC\u5B89\u5168", parent_id: null },
+        { id: 108, name: "\u5D4C\u5165\u5F0F\u5F00\u53D1", parent_id: null }
+      ];
+      const existingIds = this.allCategories.map((cat) => Number(cat.id));
+      techSubCategories.forEach((subCat) => {
+        if (!existingIds.includes(subCat.id)) {
+          this.allCategories.push(subCat);
+        }
+      });
+    },
     generateMockSubCategories() {
       this.allCategories = [
-        { id: 100, name: "\u6280\u672F\u5F00\u53D1", parent_id: null },
-        { id: 200, name: "\u4EA7\u54C1\u4E0E\u8BBE\u8BA1", parent_id: null },
-        { id: 300, name: "\u6280\u672F\u7BA1\u7406", parent_id: null },
-        { id: 101, name: "\u524D\u7AEF\u5F00\u53D1", parent_id: 100 },
-        { id: 102, name: "\u540E\u7AEF\u5F00\u53D1", parent_id: 100 },
-        { id: 103, name: "\u79FB\u52A8\u5F00\u53D1", parent_id: 100 },
-        { id: 104, name: "\u6D4B\u8BD5\u5F00\u53D1", parent_id: 100 },
-        { id: 105, name: "\u4EBA\u5DE5\u667A\u80FD", parent_id: 100 },
-        { id: 106, name: "\u5927\u6570\u636E", parent_id: 100 },
-        { id: 107, name: "\u4E91\u8BA1\u7B97", parent_id: 100 },
-        { id: 108, name: "\u8FD0\u7EF4\u5F00\u53D1", parent_id: 100 }
+        { id: 101, name: "\u524D\u7AEF\u5F00\u53D1", parent_id: null },
+        { id: 102, name: "\u540E\u7AEF\u5F00\u53D1", parent_id: null },
+        { id: 103, name: "\u79FB\u52A8\u5F00\u53D1", parent_id: null },
+        { id: 104, name: "\u4EBA\u5DE5\u667A\u80FD", parent_id: null },
+        { id: 105, name: "\u5927\u6570\u636E", parent_id: null },
+        { id: 106, name: "\u4E91\u8BA1\u7B97", parent_id: null },
+        { id: 107, name: "\u7F51\u7EDC\u5B89\u5168", parent_id: null },
+        { id: 108, name: "\u5D4C\u5165\u5F0F\u5F00\u53D1", parent_id: null },
+        { id: 200, name: "\u4EA7\u54C1\u7ECF\u7406", parent_id: null },
+        { id: 201, name: "UI\u8BBE\u8BA1\u5E08", parent_id: null },
+        { id: 202, name: "\u4EA4\u4E92\u8BBE\u8BA1\u5E08", parent_id: null },
+        { id: 203, name: "UX\u7814\u7A76\u5458", parent_id: null },
+        { id: 300, name: "\u6280\u672F\u7ECF\u7406", parent_id: null },
+        { id: 301, name: "\u67B6\u6784\u5E08", parent_id: null },
+        { id: 302, name: "\u7814\u53D1\u603B\u76D1", parent_id: null },
+        { id: 303, name: "CTO", parent_id: null }
       ];
     },
     getCategoryIcon(categoryId) {
       const iconMap = {
-        "100": "tech",
+        "101": "tech",
+        "102": "tech",
+        "103": "tech",
+        "104": "tech",
+        "105": "tech",
+        "106": "tech",
+        "107": "tech",
+        "108": "tech",
         "200": "design",
+        "201": "design",
+        "202": "design",
+        "203": "design",
         "300": "product",
+        "301": "product",
+        "302": "product",
+        "303": "product",
         "1001": "tech",
         "1002": "design",
         "1003": "market"
@@ -312,14 +410,20 @@ const _sfc_main = {
       const mockData = [
         { id: 1, title: "\u524D\u7AEF\u5F00\u53D1\u5DE5\u7A0B\u5E08", company: "\u79D1\u6280\u6709\u9650\u516C\u53F8", category_id: 101, emp_type: 1, description: "\u8D1F\u8D23\u516C\u53F8\u7F51\u7AD9\u524D\u7AEF\u5F00\u53D1\uFF0C\u4F7F\u7528Vue\u6846\u67B6" },
         { id: 2, title: "\u540E\u7AEF\u5F00\u53D1\u5DE5\u7A0B\u5E08", company: "\u4E92\u8054\u7F51\u79D1\u6280", category_id: 102, emp_type: 1, description: "\u8D1F\u8D23Java\u540E\u7AEF\u5F00\u53D1\uFF0C\u719F\u6089Spring\u6846\u67B6" },
-        { id: 3, title: "UI\u8BBE\u8BA1\u5E08", company: "\u8BBE\u8BA1\u5DE5\u4F5C\u5BA4", category_id: 201, emp_type: 2, description: "\u8D1F\u8D23\u4EA7\u54C1UI\u8BBE\u8BA1\uFF0C\u719F\u6089Figma\u5DE5\u5177" },
-        { id: 4, title: "\u4EA7\u54C1\u7ECF\u7406", company: "\u521B\u65B0\u79D1\u6280", category_id: 301, emp_type: 1, description: "\u8D1F\u8D23\u4EA7\u54C1\u89C4\u5212\u548C\u9700\u6C42\u5206\u6790" },
-        { id: 5, title: "\u79FB\u52A8\u7AEF\u5F00\u53D1", company: "\u79FB\u52A8\u79D1\u6280", category_id: 103, emp_type: 3, description: "\u8D1F\u8D23React Native\u79FB\u52A8\u5E94\u7528\u5F00\u53D1" },
-        { id: 6, title: "\u6D4B\u8BD5\u5DE5\u7A0B\u5E08", company: "\u8F6F\u4EF6\u6D4B\u8BD5", category_id: 104, emp_type: 1, description: "\u8D1F\u8D23\u81EA\u52A8\u5316\u6D4B\u8BD5\u548C\u6027\u80FD\u6D4B\u8BD5" },
-        { id: 7, title: "\u6570\u636E\u5206\u6790\u5E08", company: "\u6570\u636E\u5206\u6790", category_id: 106, emp_type: 2, description: "\u8D1F\u8D23\u4E1A\u52A1\u6570\u636E\u5206\u6790\u548C\u53EF\u89C6\u5316" },
-        { id: 8, title: "\u8FD0\u7EF4\u5DE5\u7A0B\u5E08", company: "\u4E91\u670D\u52A1", category_id: 108, emp_type: 1, description: "\u8D1F\u8D23\u670D\u52A1\u5668\u8FD0\u7EF4\u548C\u76D1\u63A7" },
-        { id: 9, title: "AI\u5DE5\u7A0B\u5E08", company: "\u4EBA\u5DE5\u667A\u80FD", category_id: 105, emp_type: 3, description: "\u8D1F\u8D23\u673A\u5668\u5B66\u4E60\u6A21\u578B\u5F00\u53D1" },
-        { id: 10, title: "\u4E91\u8BA1\u7B97\u5DE5\u7A0B\u5E08", company: "\u4E91\u8BA1\u7B97", category_id: 107, emp_type: 1, description: "\u8D1F\u8D23\u4E91\u5E73\u53F0\u67B6\u6784\u8BBE\u8BA1" }
+        { id: 3, title: "\u79FB\u52A8\u7AEF\u5F00\u53D1\u5DE5\u7A0B\u5E08", company: "\u79FB\u52A8\u79D1\u6280", category_id: 103, emp_type: 1, description: "\u8D1F\u8D23React Native\u79FB\u52A8\u5E94\u7528\u5F00\u53D1" },
+        { id: 4, title: "\u4EBA\u5DE5\u667A\u80FD\u5DE5\u7A0B\u5E08", company: "AI\u79D1\u6280", category_id: 104, emp_type: 1, description: "\u8D1F\u8D23\u673A\u5668\u5B66\u4E60\u6A21\u578B\u5F00\u53D1" },
+        { id: 5, title: "\u5927\u6570\u636E\u5DE5\u7A0B\u5E08", company: "\u6570\u636E\u79D1\u6280", category_id: 105, emp_type: 1, description: "\u8D1F\u8D23\u5927\u6570\u636E\u5E73\u53F0\u5F00\u53D1" },
+        { id: 6, title: "\u4E91\u8BA1\u7B97\u5DE5\u7A0B\u5E08", company: "\u4E91\u670D\u52A1", category_id: 106, emp_type: 1, description: "\u8D1F\u8D23\u4E91\u5E73\u53F0\u67B6\u6784\u8BBE\u8BA1" },
+        { id: 7, title: "\u7F51\u7EDC\u5B89\u5168\u5DE5\u7A0B\u5E08", company: "\u5B89\u5168\u79D1\u6280", category_id: 107, emp_type: 1, description: "\u8D1F\u8D23\u7F51\u7EDC\u5B89\u5168\u9632\u62A4" },
+        { id: 8, title: "\u5D4C\u5165\u5F0F\u5F00\u53D1\u5DE5\u7A0B\u5E08", company: "\u786C\u4EF6\u79D1\u6280", category_id: 108, emp_type: 1, description: "\u8D1F\u8D23\u5D4C\u5165\u5F0F\u7CFB\u7EDF\u5F00\u53D1" },
+        { id: 9, title: "\u4EA7\u54C1\u7ECF\u7406", company: "\u4EA7\u54C1\u79D1\u6280", category_id: 200, emp_type: 1, description: "\u8D1F\u8D23\u4EA7\u54C1\u89C4\u5212\u548C\u9700\u6C42\u5206\u6790" },
+        { id: 10, title: "UI\u8BBE\u8BA1\u5E08", company: "\u8BBE\u8BA1\u5DE5\u4F5C\u5BA4", category_id: 201, emp_type: 2, description: "\u8D1F\u8D23\u4EA7\u54C1UI\u8BBE\u8BA1\uFF0C\u719F\u6089Figma\u5DE5\u5177" },
+        { id: 11, title: "\u4EA4\u4E92\u8BBE\u8BA1\u5E08", company: "\u7528\u6237\u4F53\u9A8C", category_id: 202, emp_type: 1, description: "\u8D1F\u8D23\u4EA4\u4E92\u8BBE\u8BA1\u548C\u539F\u578B\u5236\u4F5C" },
+        { id: 12, title: "UX\u7814\u7A76\u5458", company: "\u7528\u6237\u7814\u7A76", category_id: 203, emp_type: 2, description: "\u8D1F\u8D23\u7528\u6237\u8C03\u7814\u548C\u6570\u636E\u5206\u6790" },
+        { id: 13, title: "\u6280\u672F\u7ECF\u7406", company: "\u7BA1\u7406\u56E2\u961F", category_id: 300, emp_type: 1, description: "\u8D1F\u8D23\u6280\u672F\u56E2\u961F\u7BA1\u7406" },
+        { id: 14, title: "\u67B6\u6784\u5E08", company: "\u67B6\u6784\u56E2\u961F", category_id: 301, emp_type: 1, description: "\u8D1F\u8D23\u7CFB\u7EDF\u67B6\u6784\u8BBE\u8BA1" },
+        { id: 15, title: "\u7814\u53D1\u603B\u76D1", company: "\u7814\u53D1\u7BA1\u7406", category_id: 302, emp_type: 1, description: "\u8D1F\u8D23\u7814\u53D1\u90E8\u95E8\u7BA1\u7406" },
+        { id: 16, title: "CTO", company: "\u6280\u672F\u9886\u5BFC", category_id: 303, emp_type: 1, description: "\u8D1F\u8D23\u516C\u53F8\u6280\u672F\u6218\u7565" }
       ];
       console.log("\u6A21\u62DF\u6570\u636E\u751F\u6210\u6210\u529F\uFF0C\u957F\u5EA6:", mockData.length);
       console.log("\u6A21\u62DF\u6570\u636E:", mockData);
@@ -366,16 +470,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       };
     })
   } : {}, {
-    h: common_vendor.f($data.empTypeList, (type, k0, i0) => {
-      return {
-        a: common_vendor.t(type.name),
-        b: type.id,
-        c: common_vendor.o(($event) => $options.selectEmpType(type.id), type.id),
-        d: $data.selectedEmpType === type.id ? 1 : ""
-      };
-    }),
-    i: common_vendor.o((...args) => $options.scrollToJobList && $options.scrollToJobList(...args)),
-    j: common_vendor.f($data.jobList, (job, k0, i0) => {
+    h: common_vendor.o((...args) => $options.scrollToJobList && $options.scrollToJobList(...args)),
+    i: common_vendor.f($data.jobList, (job, k0, i0) => {
       return {
         a: job.id,
         b: "fd2dfda4-1-" + i0,
@@ -384,11 +480,11 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       };
     }),
-    k: $data.hasMore
+    j: $data.hasMore
   }, $data.hasMore ? {
-    l: common_vendor.o((...args) => $options.loadMore && $options.loadMore(...args))
+    k: common_vendor.o((...args) => $options.loadMore && $options.loadMore(...args))
   } : {}, {
-    m: common_vendor.o((...args) => $options.goToAddJob && $options.goToAddJob(...args))
+    l: common_vendor.o((...args) => $options.goToAddJob && $options.goToAddJob(...args))
   });
 }
 var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/index/index_index.vue"]]);
