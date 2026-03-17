@@ -28,6 +28,9 @@ const _sfc_main = {
     jobCard
   },
   data() {
+    const techCategories = [101, 102, 103, 104, 105, 106, 107, 108];
+    const designCategories = [200, 201, 202, 203, 204, 205];
+    const manageCategories = [300, 301, 302, 303];
     return {
       bannerList: [
         { id: 1, imageUrl: "/static/banner1.png" },
@@ -46,7 +49,10 @@ const _sfc_main = {
       currentEmpType: "",
       keyword: "",
       selectedSubCategories: [],
-      showCategoryTabs: false
+      showCategoryTabs: false,
+      techCategories,
+      designCategories,
+      manageCategories
     };
   },
   onLoad() {
@@ -105,27 +111,13 @@ const _sfc_main = {
           jobsData = [];
         }
         if (jobsData.length === 0) {
-          console.log("\u4ECE\u540E\u7AEF\u83B7\u53D6\u7684\u6570\u636E\u4E3A\u7A7A\uFF0C\u4F7F\u7528\u6A21\u62DF\u6570\u636E");
           jobsData = this.getMockJobsData();
         }
-        console.log("jobsData\u7684\u7C7B\u578B:", typeof jobsData);
-        console.log("jobsData\u662F\u5426\u4E3A\u6570\u7EC4:", Array.isArray(jobsData));
-        console.log("jobsData\u7684\u957F\u5EA6:", jobsData.length);
         jobsData = jobsData.map((job) => __spreadProps(__spreadValues({}, job), {
           category_id: job.category_id && job.category_id !== "" ? Number(job.category_id) : null
         }));
         this.allJobs = jobsData;
         this.jobList = jobsData;
-        console.log("\u5B58\u50A8\u7684\u6240\u6709\u804C\u4F4D:", this.allJobs);
-        console.log("allJobs\u7684\u7C7B\u578B:", typeof this.allJobs);
-        console.log("allJobs\u662F\u5426\u4E3A\u6570\u7EC4:", Array.isArray(this.allJobs));
-        console.log("allJobs\u7684\u957F\u5EA6:", this.allJobs.length);
-        console.log("jobList\u7684\u957F\u5EA6:", this.jobList.length);
-        if (this.allJobs.length > 0) {
-          console.log("\u7B2C\u4E00\u4E2A\u804C\u4F4D\u7684\u6570\u636E\u7ED3\u6784:", this.allJobs[0]);
-          console.log("\u7B2C\u4E00\u4E2A\u804C\u4F4D\u7684\u5206\u7C7BID:", this.allJobs[0].category_id);
-          console.log("\u5206\u7C7BID\u7C7B\u578B:", typeof this.allJobs[0].category_id);
-        }
       } catch (error) {
         this.allJobs = [];
         this.jobList = [];
@@ -145,19 +137,26 @@ const _sfc_main = {
       }
     },
     goToCategory(categoryId) {
-      this.currentCategory = categoryId;
-      const techCategories = [101, 102, 103, 104, 105, 106, 107, 108];
-      if (categoryId === "101" || techCategories.includes(Number(categoryId))) {
+      if (this.techCategories.includes(Number(categoryId))) {
+        this.currentCategory = "100";
+      } else {
+        this.currentCategory = categoryId;
+      }
+      if (this.currentCategory === "100" || this.techCategories.includes(Number(categoryId))) {
         this.showCategoryTabs = true;
-        this.subCategoryList = this.allCategories.filter((category) => techCategories.includes(Number(category.id)));
-        console.log("\u6280\u672F\u5F00\u53D1\u5B50\u5206\u7C7B:", this.subCategoryList);
+        this.subCategoryList = this.allCategories.filter((category) => this.techCategories.includes(Number(category.id)));
       } else {
         this.showCategoryTabs = false;
         this.subCategoryList = [];
       }
       this.selectedSubCategories = [];
       this.keyword = "";
-      this.getJobsByCategory(categoryId);
+      if (categoryId === "100" || !this.techCategories.includes(Number(categoryId))) {
+        this.getJobsByCategory(categoryId);
+      } else {
+        this.selectedSubCategories = [Number(categoryId)];
+        this.applyFilters();
+      }
     },
     async getJobsByCategory(categoryId) {
       try {
@@ -173,14 +172,7 @@ const _sfc_main = {
           });
           return;
         }
-        const techMainCategoryId = "101";
-        let res;
-        if (categoryId === techMainCategoryId) {
-          console.log("\u83B7\u53D6\u6240\u6709\u6280\u672F\u5F00\u53D1\u7C7B\u804C\u4F4D");
-          res = this.getMockJobsData().filter((job) => [101, 102, 103, 104, 105, 106, 107, 108].includes(job.category_id));
-        } else {
-          res = await common_api_job.jobApi.getJobsByCategory(categoryId);
-        }
+        const res = await common_api_job.jobApi.getJobsByCategory(categoryId);
         let jobsData = [];
         if (res !== null && res !== void 0) {
           if (Array.isArray(res)) {
@@ -213,23 +205,11 @@ const _sfc_main = {
           });
           jobsData = [];
         }
-        if (jobsData.length === 0) {
-          console.log("\u4ECE\u540E\u7AEF\u83B7\u53D6\u7684\u6570\u636E\u4E3A\u7A7A\uFF0C\u4F7F\u7528\u6A21\u62DF\u6570\u636E");
-          if (categoryId === techMainCategoryId) {
-            jobsData = this.getMockJobsData().filter((job) => [101, 102, 103, 104, 105, 106, 107, 108].includes(job.category_id));
-          } else {
-            jobsData = this.getMockJobsData().filter((job) => job.category_id === Number(categoryId));
-          }
-        }
         jobsData = jobsData.map((job) => __spreadProps(__spreadValues({}, job), {
           category_id: job.category_id && job.category_id !== "" ? Number(job.category_id) : null
         }));
         this.allJobs = jobsData;
         this.jobList = jobsData;
-        console.log("\u83B7\u53D6\u5230\u7684\u804C\u4F4D\u6570\u636E:", jobsData.length, "\u6761");
-        if (jobsData.length > 0) {
-          console.log("\u793A\u4F8B\u804C\u4F4D:", jobsData[0]);
-        }
       } catch (error) {
         this.allJobs = [];
         this.jobList = [];
@@ -248,7 +228,6 @@ const _sfc_main = {
       } else {
         this.selectedSubCategories.splice(index, 1);
       }
-      console.log("\u9009\u62E9\u7684\u5B50\u5206\u7C7B:", this.selectedSubCategories);
       this.applyFilters();
     },
     onSearchInput() {
@@ -258,49 +237,40 @@ const _sfc_main = {
       let filteredJobs = [...this.allJobs];
       if (this.currentCategory) {
         const currentCatNum = Number(this.currentCategory);
-        const techCategories = [101, 102, 103, 104, 105, 106, 107, 108];
-        const designCategories = [200, 201, 202, 203, 204, 205];
-        const manageCategories = [300, 301, 302, 303];
+        const selectedSubCats = Array.from(this.selectedSubCategories).map((id) => Number(id));
         filteredJobs = filteredJobs.filter((job) => {
           if (!job || job.category_id === null) {
             return false;
           }
-          const jobCategoryId = job.category_id;
-          if (techCategories.includes(currentCatNum) && this.selectedSubCategories.length > 0) {
-            return this.selectedSubCategories.includes(jobCategoryId);
-          } else {
-            if (techCategories.includes(currentCatNum)) {
-              return techCategories.includes(jobCategoryId);
-            } else if (designCategories.includes(currentCatNum)) {
-              return designCategories.includes(jobCategoryId);
-            } else if (manageCategories.includes(currentCatNum)) {
-              return manageCategories.includes(jobCategoryId);
+          const jobCategoryId = Number(job.category_id);
+          if (currentCatNum === 100) {
+            if (selectedSubCats.length > 0) {
+              return selectedSubCats.some((catId) => catId === jobCategoryId);
             } else {
-              return jobCategoryId === currentCatNum;
+              return this.techCategories.includes(jobCategoryId);
             }
+          } else if (this.techCategories.includes(currentCatNum)) {
+            return jobCategoryId === currentCatNum;
+          } else if (this.designCategories.includes(currentCatNum)) {
+            return this.designCategories.includes(jobCategoryId);
+          } else if (this.manageCategories.includes(currentCatNum)) {
+            return this.manageCategories.includes(jobCategoryId);
+          } else {
+            return jobCategoryId === currentCatNum;
           }
         });
       }
-      console.log("=== \u5E94\u7528\u5173\u952E\u8BCD\u641C\u7D22 ===");
-      console.log("\u5F53\u524D\u5173\u952E\u8BCD:", this.keyword);
-      if (this.keyword) {
-        const beforeCount = filteredJobs.length;
-        const keywordLower = this.keyword.toLowerCase();
+      if (this.keyword && this.keyword.trim() !== "") {
+        const keywordLower = this.keyword.toLowerCase().trim();
         filteredJobs = filteredJobs.filter((job) => {
           const titleMatch = job.title && job.title.toLowerCase().includes(keywordLower);
           const companyMatch = job.company && job.company.toLowerCase().includes(keywordLower);
           const descriptionMatch = job.description && job.description.toLowerCase().includes(keywordLower);
           const isMatch = titleMatch || companyMatch || descriptionMatch;
-          console.log("\u804C\u4F4D:", job.title, "\u5339\u914D\u7ED3\u679C:", isMatch);
           return isMatch;
         });
-        console.log(`\u5173\u952E\u8BCD\u641C\u7D22\u540E\u804C\u4F4D\u6570: ${beforeCount} \u2192 ${filteredJobs.length}`);
       }
-      console.log("=== \u66F4\u65B0\u804C\u4F4D\u5217\u8868 ===");
-      console.log("\u6700\u7EC8\u7B5B\u9009\u7ED3\u679C:", filteredJobs.length);
       this.jobList = filteredJobs;
-      console.log("jobList\u957F\u5EA6:", this.jobList.length);
-      console.log("=== \u5E94\u7528\u7B5B\u9009\u7ED3\u675F ===");
     },
     scrollToJobList() {
       common_vendor.index.pageScrollTo({
@@ -324,7 +294,7 @@ const _sfc_main = {
     },
     getJobCategories() {
       const mainCategories = [
-        { id: "101", name: "\u6280\u672F\u5F00\u53D1", icon: "/static/category/tech.png" },
+        { id: "100", name: "\u6280\u672F\u5F00\u53D1", icon: "/static/category/tech.png" },
         { id: "200", name: "\u4EA7\u54C1\u4E0E\u8BBE\u8BA1", icon: "/static/category/design.png" },
         { id: "300", name: "\u6280\u672F\u7BA1\u7406", icon: "/static/category/product.png" }
       ];
@@ -343,17 +313,25 @@ const _sfc_main = {
         this.generateMockSubCategories();
       });
     },
+    getTechSubCategoryName(categoryId) {
+      const nameMap = {
+        101: "\u524D\u7AEF\u5F00\u53D1",
+        102: "\u540E\u7AEF\u5F00\u53D1",
+        103: "\u79FB\u52A8\u5F00\u53D1",
+        104: "\u4EBA\u5DE5\u667A\u80FD",
+        105: "\u5927\u6570\u636E",
+        106: "\u4E91\u8BA1\u7B97",
+        107: "\u7F51\u7EDC\u5B89\u5168",
+        108: "\u5D4C\u5165\u5F0F\u5F00\u53D1"
+      };
+      return nameMap[categoryId] || "\u672A\u77E5\u5206\u7C7B";
+    },
     ensureTechSubCategories() {
-      const techSubCategories = [
-        { id: 101, name: "\u524D\u7AEF\u5F00\u53D1", parent_id: null },
-        { id: 102, name: "\u540E\u7AEF\u5F00\u53D1", parent_id: null },
-        { id: 103, name: "\u79FB\u52A8\u5F00\u53D1", parent_id: null },
-        { id: 104, name: "\u4EBA\u5DE5\u667A\u80FD", parent_id: null },
-        { id: 105, name: "\u5927\u6570\u636E", parent_id: null },
-        { id: 106, name: "\u4E91\u8BA1\u7B97", parent_id: null },
-        { id: 107, name: "\u7F51\u7EDC\u5B89\u5168", parent_id: null },
-        { id: 108, name: "\u5D4C\u5165\u5F0F\u5F00\u53D1", parent_id: null }
-      ];
+      const techSubCategories = this.techCategories.map((id) => ({
+        id,
+        name: this.getTechSubCategoryName(id),
+        parent_id: null
+      }));
       const existingIds = this.allCategories.map((cat) => Number(cat.id));
       techSubCategories.forEach((subCat) => {
         if (!existingIds.includes(subCat.id)) {
@@ -381,32 +359,7 @@ const _sfc_main = {
         { id: 303, name: "CTO", parent_id: null }
       ];
     },
-    getCategoryIcon(categoryId) {
-      const iconMap = {
-        "101": "tech",
-        "102": "tech",
-        "103": "tech",
-        "104": "tech",
-        "105": "tech",
-        "106": "tech",
-        "107": "tech",
-        "108": "tech",
-        "200": "design",
-        "201": "design",
-        "202": "design",
-        "203": "design",
-        "300": "product",
-        "301": "product",
-        "302": "product",
-        "303": "product",
-        "1001": "tech",
-        "1002": "design",
-        "1003": "market"
-      };
-      return iconMap[categoryId] || "tech";
-    },
     getMockJobsData() {
-      console.log("\u8C03\u7528getMockJobsData\u65B9\u6CD5");
       const mockData = [
         { id: 1, title: "\u524D\u7AEF\u5F00\u53D1\u5DE5\u7A0B\u5E08", company: "\u79D1\u6280\u6709\u9650\u516C\u53F8", category_id: 101, emp_type: 1, description: "\u8D1F\u8D23\u516C\u53F8\u7F51\u7AD9\u524D\u7AEF\u5F00\u53D1\uFF0C\u4F7F\u7528Vue\u6846\u67B6" },
         { id: 2, title: "\u540E\u7AEF\u5F00\u53D1\u5DE5\u7A0B\u5E08", company: "\u4E92\u8054\u7F51\u79D1\u6280", category_id: 102, emp_type: 1, description: "\u8D1F\u8D23Java\u540E\u7AEF\u5F00\u53D1\uFF0C\u719F\u6089Spring\u6846\u67B6" },
@@ -425,8 +378,6 @@ const _sfc_main = {
         { id: 15, title: "\u7814\u53D1\u603B\u76D1", company: "\u7814\u53D1\u7BA1\u7406", category_id: 302, emp_type: 1, description: "\u8D1F\u8D23\u7814\u53D1\u90E8\u95E8\u7BA1\u7406" },
         { id: 16, title: "CTO", company: "\u6280\u672F\u9886\u5BFC", category_id: 303, emp_type: 1, description: "\u8D1F\u8D23\u516C\u53F8\u6280\u672F\u6218\u7565" }
       ];
-      console.log("\u6A21\u62DF\u6570\u636E\u751F\u6210\u6210\u529F\uFF0C\u957F\u5EA6:", mockData.length);
-      console.log("\u6A21\u62DF\u6570\u636E:", mockData);
       return mockData;
     }
   }
