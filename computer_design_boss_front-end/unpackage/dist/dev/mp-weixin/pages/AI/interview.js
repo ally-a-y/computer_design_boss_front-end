@@ -45,72 +45,74 @@ const __default__ = {
         "102": [
           { id: "7", name: "Java\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
           { id: "8", name: "Python\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
-          { id: "9", name: "PHP\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
-          { id: "10", name: "Go\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
-          { id: "11", name: "C++\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
-          { id: "12", name: "C#\u5F00\u53D1\u5DE5\u7A0B\u5E08" }
+          { id: "9", name: "Go\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "10", name: "C++\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "11", name: "PHP\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "12", name: "\u5FAE\u670D\u52A1\u67B6\u6784\u5E08" }
         ],
         "103": [
           { id: "13", name: "Android\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
           { id: "14", name: "iOS\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
-          { id: "15", name: "React Native\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
-          { id: "16", name: "Flutter\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
-          { id: "17", name: "\u79FB\u52A8\u5E94\u7528\u67B6\u6784\u5E08" },
-          { id: "18", name: "Unity\u5F00\u53D1\u5DE5\u7A0B\u5E08" }
+          { id: "15", name: "\u9E3F\u8499\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "16", name: "\u79FB\u52A8\u6E38\u620F\u5F00\u53D1\u5DE5\u7A0B\u5E08" }
         ],
         "104": [
-          { id: "19", name: "\u6570\u636E\u5206\u6790\u5E08" },
-          { id: "20", name: "\u6570\u636E\u79D1\u5B66\u5BB6" },
-          { id: "21", name: "\u673A\u5668\u5B66\u4E60\u5DE5\u7A0B\u5E08" },
-          { id: "22", name: "\u6DF1\u5EA6\u5B66\u4E60\u5DE5\u7A0B\u5E08" },
-          { id: "23", name: "\u7B97\u6CD5\u5DE5\u7A0B\u5E08" },
-          { id: "24", name: "\u5927\u6570\u636E\u5DE5\u7A0B\u5E08" }
+          { id: "17", name: "\u5927\u6570\u636E\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "18", name: "\u6570\u636E\u4ED3\u5E93\u5DE5\u7A0B\u5E08" },
+          { id: "19", name: "\u673A\u5668\u5B66\u4E60\u5DE5\u7A0B\u5E08" },
+          { id: "20", name: "\u6DF1\u5EA6\u5B66\u4E60\u5DE5\u7A0B\u5E08" },
+          { id: "21", name: "\u7B97\u6CD5\u5DE5\u7A0B\u5E08\uFF08\u63A8\u8350/\u5E7F\u544A\uFF09" },
+          { id: "22", name: "\u81EA\u7136\u8BED\u8A00\u5904\u7406\u5DE5\u7A0B\u5E08" },
+          { id: "23", name: "\u8BA1\u7B97\u673A\u89C6\u89C9\u5DE5\u7A0B\u5E08" },
+          { id: "24", name: "\u6570\u636E\u5206\u6790\u5E08" },
+          { id: "25", name: "\u6570\u636E\u4EA7\u54C1\u7ECF\u7406" }
         ],
         "105": [
-          { id: "25", name: "\u8FD0\u7EF4\u5DE5\u7A0B\u5E08" },
-          { id: "26", name: "DevOps\u5DE5\u7A0B\u5E08" },
-          { id: "27", name: "\u6D4B\u8BD5\u5DE5\u7A0B\u5E08" },
-          { id: "28", name: "\u81EA\u52A8\u5316\u6D4B\u8BD5\u5DE5\u7A0B\u5E08" },
-          { id: "29", name: "\u6027\u80FD\u6D4B\u8BD5\u5DE5\u7A0B\u5E08" },
+          { id: "26", name: "\u6D4B\u8BD5\u5DE5\u7A0B\u5E08" },
+          { id: "27", name: "\u81EA\u52A8\u5316\u6D4B\u8BD5\u5DE5\u7A0B\u5E08" },
+          { id: "28", name: "\u6027\u80FD\u6D4B\u8BD5\u5DE5\u7A0B\u5E08" },
+          { id: "29", name: "\u6D4B\u8BD5\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
           { id: "30", name: "\u5B89\u5168\u6D4B\u8BD5\u5DE5\u7A0B\u5E08" }
         ],
         "106": [
-          { id: "31", name: "UI\u8BBE\u8BA1\u5E08" },
-          { id: "32", name: "UX\u8BBE\u8BA1\u5E08" },
-          { id: "33", name: "\u4EA7\u54C1\u7ECF\u7406" },
-          { id: "34", name: "\u4EA4\u4E92\u8BBE\u8BA1\u5E08" },
-          { id: "35", name: "\u89C6\u89C9\u8BBE\u8BA1\u5E08" },
-          { id: "36", name: "\u7528\u6237\u7814\u7A76\u5458" }
+          { id: "31", name: "\u8FD0\u7EF4\u5DE5\u7A0B\u5E08" },
+          { id: "32", name: "DevOps\u5DE5\u7A0B\u5E08" },
+          { id: "33", name: "SRE\u5DE5\u7A0B\u5E08" },
+          { id: "34", name: "\u4E91\u539F\u751F\u5DE5\u7A0B\u5E08" },
+          { id: "35", name: "\u6570\u636E\u5E93\u7BA1\u7406\u5458(DBA)" },
+          { id: "36", name: "\u7F51\u7EDC\u5DE5\u7A0B\u5E08" }
         ],
         "107": [
           { id: "37", name: "\u7F51\u7EDC\u5B89\u5168\u5DE5\u7A0B\u5E08" },
-          { id: "38", name: "\u4FE1\u606F\u5B89\u5168\u5DE5\u7A0B\u5E08" },
-          { id: "39", name: "\u6E17\u900F\u6D4B\u8BD5\u5DE5\u7A0B\u5E08" },
-          { id: "40", name: "\u5B89\u5168\u8FD0\u7EF4\u5DE5\u7A0B\u5E08" },
-          { id: "41", name: "\u5B89\u5168\u67B6\u6784\u5E08" },
-          { id: "42", name: "\u98CE\u63A7\u5DE5\u7A0B\u5E08" }
+          { id: "38", name: "\u6E17\u900F\u6D4B\u8BD5\u5DE5\u7A0B\u5E08" },
+          { id: "39", name: "\u5B89\u5168\u8FD0\u7EF4\u5DE5\u7A0B\u5E08" },
+          { id: "40", name: "\u9006\u5411\u5DE5\u7A0B\u5E08" },
+          { id: "41", name: "\u5B89\u5168\u67B6\u6784\u5E08" }
         ],
         "108": [
-          { id: "43", name: "\u5D4C\u5165\u5F0F\u8F6F\u4EF6\u5DE5\u7A0B\u5E08" },
-          { id: "44", name: "\u5D4C\u5165\u5F0F\u786C\u4EF6\u5DE5\u7A0B\u5E08" },
-          { id: "45", name: "\u7269\u8054\u7F51\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
-          { id: "46", name: "\u5355\u7247\u673A\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
-          { id: "47", name: "\u9A71\u52A8\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
-          { id: "48", name: "RTOS\u5F00\u53D1\u5DE5\u7A0B\u5E08" }
+          { id: "42", name: "\u5D4C\u5165\u5F0F\u8F6F\u4EF6\u5DE5\u7A0B\u5E08" },
+          { id: "43", name: "Linux\u9A71\u52A8\u5DE5\u7A0B\u5E08" },
+          { id: "44", name: "\u7269\u8054\u7F51(IoT)\u5DE5\u7A0B\u5E08" },
+          { id: "45", name: "FPGA\u5DE5\u7A0B\u5E08" }
         ],
         "200": [
-          { id: "49", name: "\u9AD8\u7EA7\u4EA7\u54C1\u7ECF\u7406" },
-          { id: "50", name: "\u4EA7\u54C1\u603B\u76D1" },
-          { id: "51", name: "\u8BBE\u8BA1\u603B\u76D1" },
-          { id: "52", name: "\u7528\u6237\u4F53\u9A8C\u603B\u76D1" }
+          { id: "46", name: "\u4EA7\u54C1\u7ECF\u7406\uFF08\u6280\u672F\u578B\uFF09" },
+          { id: "47", name: "UI\u8BBE\u8BA1\u5E08" },
+          { id: "48", name: "\u4EA4\u4E92\u8BBE\u8BA1\u5E08(IXD)" },
+          { id: "49", name: "UX\u7814\u7A76\u5458" }
         ],
         "300": [
-          { id: "53", name: "\u6280\u672F\u603B\u76D1" },
-          { id: "54", name: "\u6280\u672F\u7ECF\u7406" },
-          { id: "55", name: "\u9879\u76EE\u7ECF\u7406" },
-          { id: "56", name: "\u7814\u53D1\u603B\u76D1" }
+          { id: "50", name: "\u6280\u672F\u7ECF\u7406/\u7EC4\u957F" },
+          { id: "51", name: "\u67B6\u6784\u5E08" },
+          { id: "52", name: "\u7814\u53D1\u603B\u76D1" },
+          { id: "53", name: "CTO/\u6280\u672FVP" }
         ]
       },
+      showCascadePicker: false,
+      selectedCategoryId: "",
+      selectedCategoryName: "",
+      selectedPositionId: "",
+      selectedPositionName: "",
       interviewMethods: [
         { value: "resumeText+positionText", label: "\u7B80\u5386\u6587\u672C+\u5C97\u4F4D\u6587\u672C" },
         { value: "pdf+positionText", label: "PDF\u7B80\u5386+\u5C97\u4F4D\u6587\u672C" },
@@ -156,6 +158,11 @@ const __default__ = {
     progressPercent() {
       return Math.min(this.currentQuestion / this.totalQuestions * 100, 100);
     },
+    currentPositions() {
+      if (!this.selectedCategoryId)
+        return [];
+      return this.positionDetails[this.selectedCategoryId] || [];
+    },
     hasUserInfo() {
       return !!this.formData.userId;
     }
@@ -164,80 +171,91 @@ const __default__ = {
     this.initializeInterview();
     this.initRecorder();
     this.fetchUserInfo();
-    this.initializePositionSelection();
+    this.resetPositionSelection();
   },
   onUnload() {
     this.cleanupInterview();
   },
   methods: {
-    onMainCategoryChange(e) {
-      const index = parseInt(e.detail.value);
-      if (index >= 0 && index < this.mainCategories.length) {
-        const selectedCategory = this.mainCategories[index];
-        const detailPositions = this.positionDetails[selectedCategory.id];
-        if (detailPositions && detailPositions.length > 0) {
-          this.formData.positionId = detailPositions[0].id;
-          this.formData.positionName = detailPositions[0].name;
-        } else {
-          this.formData.positionId = "";
-          this.formData.positionName = "";
+    openCascadePicker() {
+      var _a;
+      this.showCascadePicker = true;
+      if (this.formData.positionId) {
+        let foundCategoryId = null;
+        let foundCategoryName = null;
+        let foundPositionName = null;
+        for (const [catId, positions] of Object.entries(this.positionDetails)) {
+          const pos = positions.find((p) => p.id === this.formData.positionId);
+          if (pos) {
+            foundCategoryId = catId;
+            foundCategoryName = ((_a = this.mainCategories.find((c) => c.id === catId)) == null ? void 0 : _a.name) || "";
+            foundPositionName = pos.name;
+            break;
+          }
+        }
+        if (foundCategoryId) {
+          this.selectedCategoryId = foundCategoryId;
+          this.selectedCategoryName = foundCategoryName;
+          this.selectedPositionId = this.formData.positionId;
+          this.selectedPositionName = foundPositionName;
+          return;
         }
       }
-    },
-    onDetailPositionChange(e) {
-      const index = parseInt(e.detail.value);
-      const positions = this.getCurrentDetailPositions();
-      if (index >= 0 && index < positions.length) {
-        const selectedPosition = positions[index];
-        this.formData.positionId = selectedPosition.id;
-        this.formData.positionName = selectedPosition.name;
-      }
-    },
-    getCurrentDetailPositions() {
-      if (!this.formData.positionId)
-        return [];
-      for (const category of this.mainCategories) {
-        const positions = this.positionDetails[category.id];
-        if (positions && positions.some((p) => p.id === this.formData.positionId)) {
-          return positions;
-        }
-      }
-      return [];
-    },
-    getCurrentMainCategory() {
-      if (!this.formData.positionId)
-        return null;
-      for (const category of this.mainCategories) {
-        const positions = this.positionDetails[category.id];
-        if (positions && positions.some((p) => p.id === this.formData.positionId)) {
-          return category;
-        }
-      }
-      return null;
-    },
-    getMainCategoryName() {
-      const category = this.getCurrentMainCategory();
-      return category ? category.name : "\u8BF7\u9009\u62E9\u804C\u4F4D\u5206\u7C7B";
-    },
-    getSelectedPositionName() {
-      if (!this.formData.positionId)
-        return "\u8BF7\u9009\u62E9\u5177\u4F53\u804C\u4F4D";
-      const positions = this.getCurrentDetailPositions();
-      const position = positions.find((p) => p.id === this.formData.positionId);
-      return position ? position.name : "\u8BF7\u9009\u62E9\u5177\u4F53\u804C\u4F4D";
-    },
-    hasSelectedMainCategory() {
-      return this.getCurrentMainCategory() !== null;
-    },
-    initializePositionSelection() {
-      if (this.mainCategories.length > 0) {
+      if (!this.selectedCategoryId) {
         const firstCategory = this.mainCategories[0];
-        const firstPositions = this.positionDetails[firstCategory.id];
-        if (firstPositions && firstPositions.length > 0) {
-          this.formData.positionId = firstPositions[0].id;
-          this.formData.positionName = firstPositions[0].name;
+        if (firstCategory) {
+          this.selectedCategoryId = firstCategory.id;
+          this.selectedCategoryName = firstCategory.name;
+          const positions = this.positionDetails[firstCategory.id] || [];
+          if (positions.length > 0) {
+            const firstPosition = positions[0];
+            this.selectedPositionId = firstPosition.id;
+            this.selectedPositionName = firstPosition.name;
+          }
         }
       }
+    },
+    closeCascadePicker() {
+      this.showCascadePicker = false;
+    },
+    selectCategory(category) {
+      this.selectedCategoryId = category.id;
+      this.selectedCategoryName = category.name;
+      const positions = this.positionDetails[category.id] || [];
+      if (positions.length > 0) {
+        const firstPosition = positions[0];
+        this.selectedPositionId = firstPosition.id;
+        this.selectedPositionName = firstPosition.name;
+      } else {
+        this.selectedPositionId = "";
+        this.selectedPositionName = "";
+      }
+    },
+    selectPosition(position) {
+      this.selectedPositionId = position.id;
+      this.selectedPositionName = position.name;
+    },
+    confirmCascadeSelection() {
+      if (!this.selectedPositionId) {
+        common_vendor.index.showToast({ title: "\u8BF7\u9009\u62E9\u804C\u4F4D", icon: "none" });
+        return;
+      }
+      this.formData.positionId = this.selectedPositionId;
+      this.formData.positionName = this.selectedPositionName;
+      this.showCascadePicker = false;
+      common_vendor.index.showToast({
+        title: `\u5DF2\u9009\u62E9: ${this.selectedCategoryName} - ${this.selectedPositionName}`,
+        icon: "none",
+        duration: 1500
+      });
+    },
+    resetPositionSelection() {
+      this.selectedCategoryId = "";
+      this.selectedCategoryName = "";
+      this.selectedPositionId = "";
+      this.selectedPositionName = "";
+      this.formData.positionId = "";
+      this.formData.positionName = "";
     },
     async fetchUserInfo() {
       this.isLoadingUser = true;
@@ -245,6 +263,7 @@ const __default__ = {
         const token = common_vendor.index.getStorageSync("token");
         if (!token) {
           console.log("\u672A\u627E\u5230\u767B\u5F55token\uFF0C\u9700\u8981\u7528\u6237\u767B\u5F55");
+          this.formData.userId = null;
           return;
         }
         const cachedUserInfo = common_vendor.index.getStorageSync("userInfo");
@@ -263,11 +282,8 @@ const __default__ = {
         }
       } catch (error) {
         console.error("\u83B7\u53D6\u7528\u6237\u4FE1\u606F\u5931\u8D25:", error);
-        common_vendor.index.showToast({
-          title: "\u83B7\u53D6\u7528\u6237\u4FE1\u606F\u5931\u8D25",
-          icon: "none",
-          duration: 2e3
-        });
+        common_vendor.index.showToast({ title: "\u83B7\u53D6\u7528\u6237\u4FE1\u606F\u5931\u8D25", icon: "none", duration: 2e3 });
+        this.formData.userId = null;
       } finally {
         this.isLoadingUser = false;
       }
@@ -277,16 +293,22 @@ const __default__ = {
         common_vendor.index.request({
           url: `${BASE_URL}/api/user/profile`,
           method: "GET",
-          header: {
-            "Authorization": `Bearer ${common_vendor.index.getStorageSync("token")}`
-          },
-          success: (res) => {
-            resolve(res.data);
-          },
-          fail: (err) => {
-            reject(err);
-          }
+          header: { "Authorization": `Bearer ${common_vendor.index.getStorageSync("token")}` },
+          success: (res) => resolve(res.data),
+          fail: (err) => reject(err)
         });
+      });
+    },
+    initializeInterview() {
+      this.innerAudioContext = common_vendor.index.createInnerAudioContext();
+      this.innerAudioContext.onEnded(() => {
+        this.isSpeaking = false;
+        this.voiceWaveActive = false;
+      });
+      this.innerAudioContext.onError((err) => {
+        console.error("\u97F3\u9891\u64AD\u653E\u9519\u8BEF", err);
+        this.isSpeaking = false;
+        this.voiceWaveActive = false;
       });
     },
     initRecorder() {
@@ -309,27 +331,6 @@ const __default__ = {
         common_vendor.index.showToast({ title: "\u5F55\u97F3\u5931\u8D25: " + err.message, icon: "none" });
       });
     },
-    getInterviewerStatus() {
-      if (this.isAIThinking)
-        return "\u601D\u8003\u4E2D...";
-      if (this.isSpeaking)
-        return "\u8BF4\u8BDD\u4E2D...";
-      if (this.isProcessing)
-        return "\u5904\u7406\u4E2D...";
-      return "\u7B49\u5F85\u4E2D";
-    },
-    initializeInterview() {
-      this.innerAudioContext = common_vendor.index.createInnerAudioContext();
-      this.innerAudioContext.onEnded(() => {
-        this.isSpeaking = false;
-        this.voiceWaveActive = false;
-      });
-      this.innerAudioContext.onError((err) => {
-        console.error("\u97F3\u9891\u64AD\u653E\u9519\u8BEF", err);
-        this.isSpeaking = false;
-        this.voiceWaveActive = false;
-      });
-    },
     cleanupInterview() {
       this.resetInterview();
       this.clearRecordingTimer();
@@ -340,6 +341,15 @@ const __default__ = {
       if (this.isRecording) {
         recorderManager.stop();
       }
+    },
+    getInterviewerStatus() {
+      if (this.isAIThinking)
+        return "\u601D\u8003\u4E2D...";
+      if (this.isSpeaking)
+        return "\u8BF4\u8BDD\u4E2D...";
+      if (this.isProcessing)
+        return "\u5904\u7406\u4E2D...";
+      return "\u7B49\u5F85\u4E2D";
     },
     goBack() {
       if (this.interviewStarted) {
@@ -365,7 +375,7 @@ const __default__ = {
         this.formData.userId = String(this.userInfo.user_id || this.userInfo.userId || this.userInfo.id);
       }
       if (method.includes("position")) {
-        this.initializePositionSelection();
+        this.resetPositionSelection();
       }
     },
     chooseResumeFile() {
@@ -397,11 +407,39 @@ const __default__ = {
         }
       });
     },
+    validateForm() {
+      const method = this.currentMethod;
+      if (method.includes("resumeText") && !this.formData.resumeText.trim()) {
+        common_vendor.index.showToast({ title: "\u8BF7\u8F93\u5165\u7B80\u5386\u6587\u672C", icon: "none" });
+        return false;
+      }
+      if (method.includes("pdf") && !this.formData.resumePdf) {
+        common_vendor.index.showToast({ title: "\u8BF7\u4E0A\u4F20PDF\u7B80\u5386", icon: "none" });
+        return false;
+      }
+      if (method.includes("user")) {
+        if (!this.formData.userId) {
+          common_vendor.index.showToast({ title: "\u672A\u83B7\u53D6\u5230\u7528\u6237\u4FE1\u606F\uFF0C\u8BF7\u91CD\u65B0\u767B\u5F55", icon: "none", duration: 3e3 });
+          this.fetchUserInfo();
+          return false;
+        }
+      }
+      if (method.includes("position")) {
+        if (!this.selectedPositionId) {
+          common_vendor.index.showToast({ title: "\u8BF7\u9009\u62E9\u804C\u4F4D", icon: "none" });
+          return false;
+        }
+      }
+      if (method.includes("positionText") && !this.formData.positionText.trim()) {
+        common_vendor.index.showToast({ title: "\u8BF7\u8F93\u5165\u5C97\u4F4D\u63CF\u8FF0", icon: "none" });
+        return false;
+      }
+      return true;
+    },
     async startInterview() {
       var _a, _b, _c, _d, _e, _f, _g, _h, _i;
-      if (!this.validateForm()) {
+      if (!this.validateForm())
         return;
-      }
       this.isStarting = true;
       try {
         let res;
@@ -410,37 +448,29 @@ const __default__ = {
             res = await common_api_ai.interviewApi.startText(this.formData.resumeText, this.formData.positionText);
             break;
           case "pdf+positionText":
-            if (!((_a = this.formData.resumePdf) == null ? void 0 : _a.base64)) {
+            if (!((_a = this.formData.resumePdf) == null ? void 0 : _a.base64))
               throw new Error("PDF\u6587\u4EF6\u672A\u51C6\u5907\u597D");
-            }
             res = await common_api_ai.interviewApi.startPdfText(this.formData.resumePdf.base64, this.formData.positionText);
             break;
           case "pdf+position":
-            if (!((_b = this.formData.resumePdf) == null ? void 0 : _b.base64)) {
+            if (!((_b = this.formData.resumePdf) == null ? void 0 : _b.base64))
               throw new Error("PDF\u6587\u4EF6\u672A\u51C6\u5907\u597D");
-            }
-            const jobName = (this.formData.positionName || "").trim();
-            if (!jobName) {
+            if (!this.formData.positionName)
               throw new Error("\u8BF7\u9009\u62E9\u6709\u6548\u7684\u804C\u4F4D");
-            }
-            res = await common_api_ai.interviewApi.startPdfJobName(this.formData.resumePdf.base64, jobName);
+            res = await common_api_ai.interviewApi.startPdfJobName(this.formData.resumePdf.base64, this.formData.positionName);
             break;
           case "user+position":
-            const userJobName = (this.formData.positionName || "").trim();
-            if (!userJobName) {
+            if (!this.formData.positionName)
               throw new Error("\u8BF7\u9009\u62E9\u6709\u6548\u7684\u804C\u4F4D");
-            }
-            res = await common_api_ai.interviewApi.startUserIdJobName(null, userJobName);
+            res = await common_api_ai.interviewApi.startUserIdJobName(this.formData.userId, this.formData.positionName);
             break;
           case "user+positionText":
             res = await common_api_ai.interviewApi.startUserIdText(this.formData.userId, this.formData.positionText);
             break;
           case "resumeText+position":
-            const textJobName = (this.formData.positionName || "").trim();
-            if (!textJobName) {
+            if (!this.formData.positionName)
               throw new Error("\u8BF7\u9009\u62E9\u6709\u6548\u7684\u804C\u4F4D");
-            }
-            res = await common_api_ai.interviewApi.startTextJobName(this.formData.resumeText, textJobName);
+            res = await common_api_ai.interviewApi.startTextJobName(this.formData.resumeText, this.formData.positionName);
             break;
           default:
             throw new Error("\u672A\u77E5\u7684\u9762\u8BD5\u65B9\u5F0F");
@@ -465,63 +495,17 @@ const __default__ = {
         }
       } catch (error) {
         console.error("\u542F\u52A8\u9762\u8BD5\u5931\u8D25", error);
-        common_vendor.index.showToast({
-          title: error.message || "\u542F\u52A8\u9762\u8BD5\u5931\u8D25\uFF0C\u8BF7\u91CD\u8BD5",
-          icon: "none",
-          duration: 3e3
-        });
+        common_vendor.index.showToast({ title: error.message || "\u542F\u52A8\u9762\u8BD5\u5931\u8D25\uFF0C\u8BF7\u91CD\u8BD5", icon: "none", duration: 3e3 });
       } finally {
         this.isStarting = false;
       }
-    },
-    validateForm() {
-      const method = this.currentMethod;
-      if (method.includes("resumeText") && !this.formData.resumeText.trim()) {
-        common_vendor.index.showToast({ title: "\u8BF7\u8F93\u5165\u7B80\u5386\u6587\u672C", icon: "none" });
-        return false;
-      }
-      if (method.includes("pdf") && !this.formData.resumePdf) {
-        common_vendor.index.showToast({ title: "\u8BF7\u4E0A\u4F20PDF\u7B80\u5386", icon: "none" });
-        return false;
-      }
-      if (method.includes("user")) {
-        if (!this.formData.userId) {
-          common_vendor.index.showToast({
-            title: "\u672A\u83B7\u53D6\u5230\u7528\u6237\u4FE1\u606F\uFF0C\u8BF7\u91CD\u65B0\u767B\u5F55",
-            icon: "none",
-            duration: 3e3
-          });
-          this.fetchUserInfo();
-          return false;
-        }
-      }
-      if (method.includes("position")) {
-        if (!this.formData.positionName || !this.formData.positionName.trim()) {
-          this.initializePositionSelection();
-          if (!this.formData.positionName || !this.formData.positionName.trim()) {
-            common_vendor.index.showToast({ title: "\u8BF7\u9009\u62E9\u804C\u4F4D", icon: "none" });
-            return false;
-          }
-        }
-      }
-      if (method.includes("positionText") && !this.formData.positionText.trim()) {
-        common_vendor.index.showToast({ title: "\u8BF7\u8F93\u5165\u5C97\u4F4D\u63CF\u8FF0", icon: "none" });
-        return false;
-      }
-      return true;
     },
     startRecording() {
       if (this.isProcessing || this.isAIThinking) {
         common_vendor.index.showToast({ title: "\u8BF7\u7B49\u5F85AI\u54CD\u5E94", icon: "none" });
         return;
       }
-      recorderManager.start({
-        duration: 6e4,
-        sampleRate: 16e3,
-        numberOfChannels: 1,
-        encodeBitRate: 96e3,
-        format: "mp3"
-      });
+      recorderManager.start({ duration: 6e4, sampleRate: 16e3, numberOfChannels: 1, encodeBitRate: 96e3, format: "mp3" });
     },
     stopRecording() {
       if (!this.isRecording)
@@ -532,10 +516,15 @@ const __default__ = {
       this.recordingTime = 0;
       this.recordingTimer = setInterval(() => {
         this.recordingTime++;
-        if (this.recordingTime >= 60) {
+        if (this.recordingTime >= 60)
           this.stopRecording();
-        }
       }, 1e3);
+    },
+    clearRecordingTimer() {
+      if (this.recordingTimer) {
+        clearInterval(this.recordingTimer);
+        this.recordingTimer = null;
+      }
     },
     async processAudio(filePath) {
       if (!this.sessionId) {
@@ -545,7 +534,6 @@ const __default__ = {
       this.isProcessing = true;
       try {
         const uploadRes = await common_api_ai.interviewApi.transcribe(this.sessionId, filePath);
-        console.log("\u8BED\u97F3\u8BC6\u522B\u7ED3\u679C", uploadRes);
         let transcribeData;
         if (typeof uploadRes.data === "string") {
           transcribeData = JSON.parse(uploadRes.data);
@@ -613,11 +601,7 @@ const __default__ = {
         console.error("\u97F3\u9891\u64AD\u653E\u9519\u8BEF", err);
         this.isSpeaking = false;
         this.voiceWaveActive = false;
-        common_vendor.index.showToast({
-          title: "\u8BED\u97F3\u52A0\u8F7D\u5931\u8D25\uFF0C\u8BF7\u9605\u8BFB\u6587\u5B57",
-          icon: "none",
-          duration: 3e3
-        });
+        common_vendor.index.showToast({ title: "\u8BED\u97F3\u52A0\u8F7D\u5931\u8D25\uFF0C\u8BF7\u9605\u8BFB\u6587\u5B57", icon: "none", duration: 3e3 });
       });
       this.innerAudioContext.onEnded(() => {
         this.isSpeaking = false;
@@ -627,16 +611,11 @@ const __default__ = {
       this.innerAudioContext.play();
     },
     replayQuestion() {
-      if (this.currentAudioUrl) {
+      if (this.currentAudioUrl)
         this.playAudio(this.currentAudioUrl);
-      }
     },
     addMessage(sender, content) {
-      this.interviewMessages.push({
-        sender,
-        content,
-        timestamp: Date.now()
-      });
+      this.interviewMessages.push({ sender, content, timestamp: Date.now() });
       this.scrollToBottom();
     },
     updateInterviewStage() {
@@ -644,14 +623,22 @@ const __default__ = {
       const stageIndex = Math.floor((this.currentQuestion - 1) / (this.totalQuestions / stages.length));
       this.currentStage = stages[stageIndex] || "\u7EFC\u5408\u8BC4\u4F30";
     },
+    scrollToBottom() {
+      this.$nextTick(() => {
+        this.chatScrollTop = this.interviewMessages.length * 1e3;
+      });
+    },
+    formatTime(timestamp) {
+      const date = new Date(timestamp);
+      return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+    },
     confirmEndInterview() {
       common_vendor.index.showModal({
         title: "\u7ED3\u675F\u9762\u8BD5",
         content: "\u786E\u5B9A\u8981\u7ED3\u675F\u9762\u8BD5\u5417\uFF1F\u5C06\u751F\u6210\u9762\u8BD5\u62A5\u544A\u3002",
         success: (res) => {
-          if (res.confirm) {
+          if (res.confirm)
             this.endInterview();
-          }
         }
       });
     },
@@ -698,18 +685,9 @@ const __default__ = {
     parseReportData(data) {
       this.overallScore = data.overall_score || data.score || 85;
       this.evaluationItems = [
-        {
-          title: "\u6280\u672F\u80FD\u529B",
-          content: data.tech_evaluation || "\u57FA\u7840\u624E\u5B9E\uFF0C\u80FD\u591F\u6E05\u6670\u5730\u89E3\u91CA\u6280\u672F\u6982\u5FF5\u3002"
-        },
-        {
-          title: "\u6C9F\u901A\u80FD\u529B",
-          content: data.comm_evaluation || "\u8868\u8FBE\u6E05\u6670\uFF0C\u903B\u8F91\u6027\u5F3A\u3002"
-        },
-        {
-          title: "\u9879\u76EE\u7ECF\u9A8C",
-          content: data.project_evaluation || "\u9879\u76EE\u7ECF\u5386\u4E30\u5BCC\uFF0C\u80FD\u591F\u8BE6\u7EC6\u63CF\u8FF0\u9879\u76EE\u7EC6\u8282\u3002"
-        }
+        { title: "\u6280\u672F\u80FD\u529B", content: data.tech_evaluation || "\u57FA\u7840\u624E\u5B9E\uFF0C\u80FD\u591F\u6E05\u6670\u5730\u89E3\u91CA\u6280\u672F\u6982\u5FF5\u3002" },
+        { title: "\u6C9F\u901A\u80FD\u529B", content: data.comm_evaluation || "\u8868\u8FBE\u6E05\u6670\uFF0C\u903B\u8F91\u6027\u5F3A\u3002" },
+        { title: "\u9879\u76EE\u7ECF\u9A8C", content: data.project_evaluation || "\u9879\u76EE\u7ECF\u5386\u4E30\u5BCC\uFF0C\u80FD\u591F\u8BE6\u7EC6\u63CF\u8FF0\u9879\u76EE\u7EC6\u8282\u3002" }
       ];
       this.suggestions = data.suggestions || [
         "\u5EFA\u8BAE\u5728\u6280\u672F\u6DF1\u5EA6\u65B9\u9762\u7EE7\u7EED\u52A0\u5F3A\u5B66\u4E60",
@@ -719,18 +697,9 @@ const __default__ = {
     generateMockReport() {
       this.overallScore = Math.floor(Math.random() * 20) + 75;
       this.evaluationItems = [
-        {
-          title: "\u6280\u672F\u80FD\u529B",
-          content: "\u57FA\u7840\u624E\u5B9E\uFF0C\u80FD\u591F\u6E05\u6670\u5730\u89E3\u91CA\u6280\u672F\u6982\u5FF5\uFF0C\u4F46\u5728\u67D0\u4E9B\u6DF1\u5EA6\u95EE\u9898\u4E0A\u7565\u663E\u4E0D\u8DB3\u3002"
-        },
-        {
-          title: "\u6C9F\u901A\u80FD\u529B",
-          content: "\u8868\u8FBE\u6E05\u6670\uFF0C\u903B\u8F91\u6027\u5F3A\uFF0C\u80FD\u591F\u5F88\u597D\u5730\u7406\u89E3\u95EE\u9898\u5E76\u7ED9\u51FA\u5408\u9002\u7684\u56DE\u7B54\u3002"
-        },
-        {
-          title: "\u9879\u76EE\u7ECF\u9A8C",
-          content: "\u9879\u76EE\u7ECF\u5386\u4E30\u5BCC\uFF0C\u80FD\u591F\u8BE6\u7EC6\u63CF\u8FF0\u9879\u76EE\u7EC6\u8282\u548C\u4E2A\u4EBA\u8D21\u732E\u3002"
-        }
+        { title: "\u6280\u672F\u80FD\u529B", content: "\u57FA\u7840\u624E\u5B9E\uFF0C\u80FD\u591F\u6E05\u6670\u5730\u89E3\u91CA\u6280\u672F\u6982\u5FF5\uFF0C\u4F46\u5728\u67D0\u4E9B\u6DF1\u5EA6\u95EE\u9898\u4E0A\u7565\u663E\u4E0D\u8DB3\u3002" },
+        { title: "\u6C9F\u901A\u80FD\u529B", content: "\u8868\u8FBE\u6E05\u6670\uFF0C\u903B\u8F91\u6027\u5F3A\uFF0C\u80FD\u591F\u5F88\u597D\u5730\u7406\u89E3\u95EE\u9898\u5E76\u7ED9\u51FA\u5408\u9002\u7684\u56DE\u7B54\u3002" },
+        { title: "\u9879\u76EE\u7ECF\u9A8C", content: "\u9879\u76EE\u7ECF\u5386\u4E30\u5BCC\uFF0C\u80FD\u591F\u8BE6\u7EC6\u63CF\u8FF0\u9879\u76EE\u7EC6\u8282\u548C\u4E2A\u4EBA\u8D21\u732E\u3002" }
       ];
       this.suggestions = [
         "\u5EFA\u8BAE\u5728\u6280\u672F\u6DF1\u5EA6\u65B9\u9762\u7EE7\u7EED\u52A0\u5F3A\u5B66\u4E60",
@@ -741,15 +710,6 @@ const __default__ = {
     },
     toggleTips() {
       this.tipsCollapsed = !this.tipsCollapsed;
-    },
-    scrollToBottom() {
-      this.$nextTick(() => {
-        this.chatScrollTop = this.interviewMessages.length * 1e3;
-      });
-    },
-    formatTime(timestamp) {
-      const date = new Date(timestamp);
-      return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
     },
     closeReport() {
       this.showReport = false;
@@ -764,9 +724,8 @@ const __default__ = {
         title: "\u5BFC\u51FA\u62A5\u544A",
         content: "\u662F\u5426\u5C06\u9762\u8BD5\u62A5\u544A\u4FDD\u5B58\u5230\u672C\u5730\uFF1F",
         success: (res) => {
-          if (res.confirm) {
+          if (res.confirm)
             common_vendor.index.showToast({ title: "\u62A5\u544A\u5DF2\u4FDD\u5B58", icon: "success" });
-          }
         }
       });
     },
@@ -814,14 +773,7 @@ const __default__ = {
       const centerX = 150, centerY = 150, radius = 100, points = 6;
       const angleStep = Math.PI * 2 / points;
       const score = this.overallScore / 100;
-      const data = [
-        0.8 * score,
-        0.85 * score,
-        0.75 * score,
-        0.9 * score,
-        0.8 * score,
-        0.85 * score
-      ];
+      const data = [0.8 * score, 0.85 * score, 0.75 * score, 0.9 * score, 0.8 * score, 0.85 * score];
       ctx.setFillStyle("rgba(0, 122, 255, 0.3)");
       ctx.setStrokeStyle("#007aff");
       ctx.setLineWidth(2);
@@ -862,15 +814,8 @@ const __default__ = {
       this.reportData = null;
       this.showReport = false;
       this.clearRecordingTimer();
-      if (this.innerAudioContext) {
+      if (this.innerAudioContext)
         this.innerAudioContext.stop();
-      }
-    },
-    clearRecordingTimer() {
-      if (this.recordingTimer) {
-        clearInterval(this.recordingTimer);
-        this.recordingTimer = null;
-      }
     },
     resetForm() {
       this.formData = {
@@ -881,6 +826,7 @@ const __default__ = {
         positionText: "",
         positionName: ""
       };
+      this.resetPositionSelection();
     }
   }
 };
@@ -935,45 +881,45 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   }, {
     n: $data.formData.userId,
     q: $data.isLoadingUser ? 1 : "",
-    r: !$data.formData.userId ? 1 : ""
+    r: !$data.formData.userId && !$data.isLoadingUser ? 1 : ""
   }) : {}, {
     s: $data.currentMethod.includes("position")
-  }, $data.currentMethod.includes("position") ? {
-    t: common_vendor.t($options.getMainCategoryName()),
-    v: common_vendor.o((...args) => $options.onMainCategoryChange && $options.onMainCategoryChange(...args)),
-    w: $data.mainCategories,
-    x: common_vendor.t($options.getSelectedPositionName()),
-    y: common_vendor.o((...args) => $options.onDetailPositionChange && $options.onDetailPositionChange(...args)),
-    z: $options.getCurrentDetailPositions(),
-    A: !$options.hasSelectedMainCategory()
+  }, $data.currentMethod.includes("position") ? common_vendor.e({
+    t: $data.selectedPositionId
+  }, $data.selectedPositionId ? {
+    v: common_vendor.t($data.selectedCategoryName),
+    w: common_vendor.t($data.selectedPositionName)
   } : {}, {
-    B: $data.currentMethod.includes("positionText")
+    x: !$data.selectedPositionId ? 1 : "",
+    y: common_vendor.o((...args) => $options.openCascadePicker && $options.openCascadePicker(...args))
+  }) : {}, {
+    z: $data.currentMethod.includes("positionText")
   }, $data.currentMethod.includes("positionText") ? {
-    C: $data.formData.positionText,
-    D: common_vendor.o(($event) => $data.formData.positionText = $event.detail.value)
+    A: $data.formData.positionText,
+    B: common_vendor.o(($event) => $data.formData.positionText = $event.detail.value)
   } : {}, {
-    E: common_vendor.t($data.isStarting ? "\u542F\u52A8\u4E2D..." : "\u5F00\u59CB\u9762\u8BD5"),
-    F: common_vendor.o((...args) => $options.startInterview && $options.startInterview(...args)),
-    G: $data.isStarting
+    C: common_vendor.t($data.isStarting ? "\u542F\u52A8\u4E2D..." : "\u5F00\u59CB\u9762\u8BD5"),
+    D: common_vendor.o((...args) => $options.startInterview && $options.startInterview(...args)),
+    E: $data.isStarting
   }) : common_vendor.e({
-    H: common_vendor.t($data.currentQuestion),
-    I: common_vendor.t($data.totalQuestions),
-    J: $options.progressPercent + "%",
-    K: common_vendor.t($data.currentStage),
-    L: $data.isSpeaking
+    F: common_vendor.t($data.currentQuestion),
+    G: common_vendor.t($data.totalQuestions),
+    H: $options.progressPercent + "%",
+    I: common_vendor.t($data.currentStage),
+    J: $data.isSpeaking
   }, $data.isSpeaking ? {
-    M: common_vendor.f(5, (i, k0, i0) => {
+    K: common_vendor.f(5, (i, k0, i0) => {
       return {
         a: i,
         b: i * 0.1 + "s"
       };
     }),
-    N: common_vendor.n({
+    L: common_vendor.n({
       active: $data.voiceWaveActive
     })
   } : {}, {
-    O: common_vendor.t($options.getInterviewerStatus()),
-    P: common_vendor.f($data.interviewMessages, (message, index, i0) => {
+    M: common_vendor.t($options.getInterviewerStatus()),
+    N: common_vendor.f($data.interviewMessages, (message, index, i0) => {
       return {
         a: common_vendor.t(message.content),
         b: common_vendor.t($options.formatTime(message.timestamp)),
@@ -981,67 +927,92 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.n(message.sender)
       };
     }),
-    Q: $data.isAIThinking
+    O: $data.isAIThinking
   }, $data.isAIThinking ? {
-    R: common_vendor.f(3, (i, k0, i0) => {
+    P: common_vendor.f(3, (i, k0, i0) => {
       return {
         a: i,
         b: i * 0.2 + "s"
       };
     })
   } : {}, {
-    S: $data.chatScrollTop,
-    T: common_vendor.n({
+    Q: $data.chatScrollTop,
+    R: common_vendor.n({
       rotated: $data.tipsCollapsed
     }),
-    U: common_vendor.o((...args) => $options.toggleTips && $options.toggleTips(...args)),
-    V: !$data.tipsCollapsed
+    S: common_vendor.o((...args) => $options.toggleTips && $options.toggleTips(...args)),
+    T: !$data.tipsCollapsed
   }, !$data.tipsCollapsed ? {
-    W: common_vendor.f($data.currentTips, (tip, index, i0) => {
+    U: common_vendor.f($data.currentTips, (tip, index, i0) => {
       return {
         a: common_vendor.t(tip),
         b: index
       };
     })
   } : {}, {
-    X: $data.tipsCollapsed ? 1 : "",
-    Y: common_vendor.o((...args) => $options.replayQuestion && $options.replayQuestion(...args)),
-    Z: !$data.currentAudioUrl,
-    aa: $data.isRecording ? "/static/ai/recording.png" : "/static/ai/mic.png",
-    ab: common_vendor.t($data.isRecording ? "\u5F55\u97F3\u4E2D..." : $data.isProcessing ? "\u5904\u7406\u4E2D..." : "\u6309\u4F4F\u8BF4\u8BDD"),
-    ac: $data.isRecording ? 1 : "",
-    ad: $data.isProcessing ? 1 : "",
-    ae: common_vendor.o((...args) => $options.startRecording && $options.startRecording(...args)),
-    af: common_vendor.o((...args) => $options.stopRecording && $options.stopRecording(...args)),
-    ag: $data.isProcessing,
-    ah: $data.isRecording
+    V: $data.tipsCollapsed ? 1 : "",
+    W: common_vendor.o((...args) => $options.replayQuestion && $options.replayQuestion(...args)),
+    X: !$data.currentAudioUrl,
+    Y: $data.isRecording ? "/static/ai/recording.png" : "/static/ai/mic.png",
+    Z: common_vendor.t($data.isRecording ? "\u5F55\u97F3\u4E2D..." : $data.isProcessing ? "\u5904\u7406\u4E2D..." : "\u6309\u4F4F\u8BF4\u8BDD"),
+    aa: $data.isRecording ? 1 : "",
+    ab: $data.isProcessing ? 1 : "",
+    ac: common_vendor.o((...args) => $options.startRecording && $options.startRecording(...args)),
+    ad: common_vendor.o((...args) => $options.stopRecording && $options.stopRecording(...args)),
+    ae: $data.isProcessing,
+    af: $data.isRecording
   }, $data.isRecording ? {
-    ai: common_vendor.t($data.recordingTime)
+    ag: common_vendor.t($data.recordingTime)
   } : {}, {
-    aj: common_vendor.o((...args) => $options.confirmEndInterview && $options.confirmEndInterview(...args))
+    ah: common_vendor.o((...args) => $options.confirmEndInterview && $options.confirmEndInterview(...args))
   }), {
-    ak: $data.showReport
+    ai: $data.showReport
   }, $data.showReport ? {
-    al: common_vendor.o((...args) => $options.closeReport && $options.closeReport(...args)),
-    am: common_vendor.t($data.overallScore),
-    an: common_vendor.f($data.evaluationItems, (item, index, i0) => {
+    aj: common_vendor.o((...args) => $options.closeReport && $options.closeReport(...args)),
+    ak: common_vendor.t($data.overallScore),
+    al: common_vendor.f($data.evaluationItems, (item, index, i0) => {
       return {
         a: common_vendor.t(item.title),
         b: common_vendor.t(item.content),
         c: index
       };
     }),
-    ao: common_vendor.f($data.suggestions, (suggestion, index, i0) => {
+    am: common_vendor.f($data.suggestions, (suggestion, index, i0) => {
       return {
         a: common_vendor.t(suggestion),
         b: index
       };
     }),
-    ap: common_vendor.o((...args) => $options.restartInterview && $options.restartInterview(...args)),
-    aq: common_vendor.o((...args) => $options.exportReport && $options.exportReport(...args)),
-    ar: common_vendor.o(() => {
+    an: common_vendor.o((...args) => $options.restartInterview && $options.restartInterview(...args)),
+    ao: common_vendor.o((...args) => $options.exportReport && $options.exportReport(...args)),
+    ap: common_vendor.o(() => {
     }),
-    as: common_vendor.o((...args) => $options.closeReport && $options.closeReport(...args))
+    aq: common_vendor.o((...args) => $options.closeReport && $options.closeReport(...args))
+  } : {}, {
+    ar: $data.showCascadePicker
+  }, $data.showCascadePicker ? {
+    as: common_vendor.o((...args) => $options.confirmCascadeSelection && $options.confirmCascadeSelection(...args)),
+    at: common_vendor.f($data.mainCategories, (category, k0, i0) => {
+      return {
+        a: common_vendor.t(category.name),
+        b: category.id,
+        c: common_vendor.n($data.selectedCategoryId === category.id ? "active" : ""),
+        d: common_vendor.o(($event) => $options.selectCategory(category), category.id)
+      };
+    }),
+    av: common_vendor.f($options.currentPositions, (position, k0, i0) => {
+      return common_vendor.e({
+        a: common_vendor.t(position.name),
+        b: $data.selectedPositionId === position.id
+      }, $data.selectedPositionId === position.id ? {} : {}, {
+        c: position.id,
+        d: common_vendor.n($data.selectedPositionId === position.id ? "active" : ""),
+        e: common_vendor.o(($event) => $options.selectPosition(position), position.id)
+      });
+    }),
+    aw: common_vendor.o(() => {
+    }),
+    ax: common_vendor.o((...args) => $options.closeCascadePicker && $options.closeCascadePicker(...args))
   } : {});
 }
 var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-638c375a"], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/AI/interview.vue"]]);

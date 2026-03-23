@@ -1,4 +1,5 @@
 {
   "navigationBarTitleText": "修改邮箱",
+  "navigationStyle": "custom",
   "usingComponents": {}
 }

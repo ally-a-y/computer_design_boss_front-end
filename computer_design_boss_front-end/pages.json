@@ -1,11 +1,19 @@
 {
   "pages": [
     {
+      "path": "pages/splash/splash",
+      "style": {
+        "navigationBarTitleText": "启动中",
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/login/login",
       "style": {
         "navigationBarTitleText": "登录",
         "navigationBarBackgroundColor": "#007AFF",
-        "navigationBarTextStyle": "white"
+        "navigationBarTextStyle": "white",
+        "navigationStyle": "custom"
       }
     },
     {
@@ -13,7 +21,8 @@
       "style": {
         "navigationBarTitleText": "新用户注册",
         "navigationBarBackgroundColor": "#007AFF",
-        "navigationBarTextStyle": "white"
+        "navigationBarTextStyle": "white",
+        "navigationStyle": "custom"
       }
     },
     {
@@ -21,104 +30,121 @@
       "style": {
         "navigationBarTitleText": "忘记密码",
         "navigationBarBackgroundColor": "#007AFF",
-        "navigationBarTextStyle": "white"
+        "navigationBarTextStyle": "white",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/index/index_index",
       "style": {
-        "navigationBarTitleText": "职位首页"
+        "navigationBarTitleText": "职位首页",
+        "navigationStyle": "custom"
       }
     },
 
     {
       "path": "pages/job/detail/job_detail_index",
       "style": {
-        "navigationBarTitleText": "职位详情"
+        "navigationBarTitleText": "职位详情",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/job/add/job_add_index",
       "style": {
-        "navigationBarTitleText": "发布职位"
+        "navigationBarTitleText": "发布职位",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/user/user",
       "style": {
-        "navigationBarTitleText": "个人中心"
+        "navigationBarTitleText": "个人中心",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/user/resume/user_resume",
       "style": {
-        "navigationBarTitleText": "我的简历"
+        "navigationBarTitleText": "我的简历",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/user/collection/user_collection",
       "style": {
-        "navigationBarTitleText": "收藏职位"
+        "navigationBarTitleText": "收藏职位",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/user/deliver/user_deliver",
       "style": {
-        "navigationBarTitleText": "投递职位"
+        "navigationBarTitleText": "投递职位",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/user/feedback/user_feedback",
       "style": {
-        "navigationBarTitleText": "投诉反馈"
+        "navigationBarTitleText": "投诉反馈",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/user/account/user_account",
       "style": {
-        "navigationBarTitleText": "我的账号"
+        "navigationBarTitleText": "我的账号",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/user/device/user_device",
       "style": {
-        "navigationBarTitleText": "登录设备管理"
+        "navigationBarTitleText": "登录设备管理",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/user/display/user_display",
       "style": {
-        "navigationBarTitleText": "显示设置"
+        "navigationBarTitleText": "显示设置",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/user/account/number/account_number",
       "style": {
-        "navigationBarTitleText": "修改手机"
+        "navigationBarTitleText": "修改手机",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/user/account/number/number_change",
       "style": {
-        "navigationBarTitleText": "修改手机号"
+        "navigationBarTitleText": "修改手机号",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/user/account/email/account_email",
       "style": {
-        "navigationBarTitleText": "邮箱设置"
+        "navigationBarTitleText": "邮箱设置",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/user/account/email/email_change",
       "style": {
-        "navigationBarTitleText": "修改邮箱"
+        "navigationBarTitleText": "修改邮箱",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/user/account/code/account_code",
       "style": {
-        "navigationBarTitleText": "密码设置"
+        "navigationBarTitleText": "密码设置",
+        "navigationStyle": "custom"
       }
     },
     {
@@ -145,13 +171,22 @@
     {
       "path": "pages/forum/details/forum_detail",
       "style": {
-        "navigationBarTitleText": "帖子详情"
+        "navigationBarTitleText": "帖子详情",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/forum/post",
       "style": {
-        "navigationBarTitleText": "发布话题"
+        "navigationBarTitleText": "发布话题",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/chart",
+      "style": {
+        "navigationBarTitleText": "竞争力分析",
+        "navigationStyle": "custom"
       }
     }
   ],

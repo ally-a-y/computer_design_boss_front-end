@@ -615,39 +615,42 @@ export default {
 <style lang="scss" scoped>
 .forum-detail-container {
   min-height: 100vh;
-  background: #f5f5f5;
+  background-color: #F8FAFD;
   display: flex;
   flex-direction: column;
+  font-family: -apple-system, Helvetica, Roboto, sans-serif;
 }
 
 /* 帖子详情样式 */
 .post-detail {
   background: white;
-  padding: 30rpx;
-  margin-bottom: 20rpx;
+  padding: 16px;
+  margin: 12px 0;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .post-header {
   display: flex;
   align-items: flex-start;
-  gap: 20rpx;
-  margin-bottom: 30rpx;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .avatar {
-  width: 80rpx;
-  height: 80rpx;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  margin-top: 5rpx;
-  background: #667eea;
+  margin-top: 4px;
+  background: #f0f0f0;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .avatar-text {
-  color: white;
-  font-size: 36rpx;
+  color: #666666;
+  font-size: 14px;
   font-weight: 600;
 }
 
@@ -655,126 +658,126 @@ export default {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 10rpx;
+  gap: 8px;
 }
 
 .user-main-info {
   display: flex;
   align-items: center;
-  gap: 10rpx;
+  gap: 8px;
 }
 
 .username {
-  font-size: 28rpx;
+  font-size: 12px;
   font-weight: 600;
-  color: #333;
+  color: #1E1E1E;
 }
 
 .user-badge {
-  background: #667eea;
-  color: white;
-  padding: 5rpx 15rpx;
-  border-radius: 15rpx;
-  font-size: 20rpx;
+  background: rgba(0, 122, 255, 0.1);
+  color: #007aff;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 10px;
   font-weight: 500;
 }
 
 .user-badge.best-answer {
-  background: #52c41a;
+  background: rgba(82, 196, 26, 0.1);
+  color: #52c41a;
 }
 
 .time-info {
   display: flex;
-  gap: 20rpx;
-  font-size: 24rpx;
-  color: #999;
+  gap: 16px;
+  font-size: 11px;
+  color: #999999;
 }
 
 .time {
-  font-size: 24rpx;
-  color: #999;
+  font-size: 11px;
+  color: #999999;
 }
 
 .edit-time {
-  font-size: 22rpx;
-  color: #999;
+  font-size: 10px;
+  color: #999999;
   opacity: 0.8;
 }
 
 .category {
-  background: #f0f8ff;
-  color: #1890ff;
-  padding: 8rpx 16rpx;
-  border-radius: 20rpx;
-  font-size: 22rpx;
-  border: 2rpx solid #91d5ff;
-  margin-top: 10rpx;
+  background: #F0F4FF;
+  color: #007aff;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  margin-top: 8px;
 }
 
 .post-title-section {
-  margin-bottom: 30rpx;
+  margin-bottom: 16px;
 }
 
 .post-title {
-  font-size: 36rpx;
-  font-weight: 700;
-  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1E1E1E;
   line-height: 1.4;
 }
 
 .post-content {
-  margin-bottom: 30rpx;
-  padding: 20rpx;
+  margin-bottom: 16px;
+  padding: 16px;
   background: #f9f9f9;
-  border-radius: 15rpx;
+  border-radius: 12px;
 }
 
 .content {
-  font-size: 32rpx;
+  font-size: 14px;
   line-height: 1.6;
   color: #333;
 }
 
 .post-stats {
   display: flex;
-  gap: 40rpx;
-  padding: 20rpx;
+  gap: 24px;
+  padding: 12px;
   background: #f5f5f5;
-  border-radius: 15rpx;
-  margin-bottom: 30rpx;
+  border-radius: 12px;
+  margin-bottom: 16px;
 }
 
 .stat-item {
   display: flex;
   align-items: center;
-  gap: 8rpx;
-  font-size: 24rpx;
-  color: #666;
+  gap: 6px;
+  font-size: 12px;
+  color: #6C757D;
 }
 
 .stat-icon {
-  font-size: 24rpx;
+  font-size: 12px;
 }
 
 .post-actions {
   display: flex;
-  gap: 40rpx;
-  padding-top: 30rpx;
-  border-top: 2rpx solid #f0f0f0;
+  gap: 24px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
 }
 
 .action-btn {
   display: flex;
   align-items: center;
-  gap: 8rpx;
+  gap: 6px;
   background: none;
   border: none;
-  font-size: 24rpx;
-  color: #666;
+  font-size: 12px;
+  color: #6C757D;
   transition: all 0.3s ease;
   
   &.active {
-    color: #667eea;
+    color: #007aff;
   }
   
   &:active {
@@ -783,47 +786,55 @@ export default {
 }
 
 .icon {
-  font-size: 24rpx;
+  font-size: 12px;
 }
 
 /* 回复列表样式 */
 .replies-section {
   flex: 1;
   background: white;
-  padding: 30rpx;
+  padding: 16px;
+  margin: 12px 0;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30rpx;
-  padding-bottom: 20rpx;
-  border-bottom: 2rpx solid #f0f0f0;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .section-title {
-  font-size: 32rpx;
+  font-size: 16px;
   font-weight: 600;
-  color: #333;
+  color: #1E1E1E;
 }
 
 .sort-options {
   display: flex;
-  gap: 15rpx;
+  gap: 8px;
 }
 
 .sort-option {
-  padding: 10rpx 20rpx;
-  background: #f0f0f0;
-  border-radius: 20rpx;
-  font-size: 22rpx;
-  color: #666;
+  padding: 6px 12px;
+  background: #F0F4FF;
+  border-radius: 24px;
+  font-size: 12px;
+  color: #007aff;
   transition: all 0.3s ease;
   
   &.active {
-    background: #667eea;
-    color: white;
+    background: #E0E9FF;
+    color: #007aff;
+  }
+  
+  &:active {
+    transform: scale(0.95);
+    background: #E0E9FF;
   }
 }
 
@@ -832,11 +843,11 @@ export default {
 }
 
 .reply-item {
-  padding: 30rpx 0;
-  border-bottom: 2rpx solid #f8f8f8;
+  padding: 16px 0;
+  border-bottom: 1px solid #f8f8f8;
   transition: all 0.3s ease;
   
-  &:hover {
+  &:active {
     background: #f9f9f9;
   }
 }
@@ -844,100 +855,110 @@ export default {
 .reply-header {
   display: flex;
   align-items: flex-start;
-  gap: 20rpx;
-  margin-bottom: 20rpx;
+  gap: 16px;
+  margin-bottom: 12px;
 }
 
 .floor {
-  font-size: 24rpx;
-  color: #999;
+  font-size: 11px;
+  color: #999999;
   margin-left: auto;
-  margin-top: 10rpx;
+  margin-top: 8px;
 }
 
 .reply-content {
-  margin-bottom: 20rpx;
-  padding-left: 100rpx;
+  margin-bottom: 12px;
+  padding-left: 64px;
 }
 
 .reply-content .content {
-  font-size: 28rpx;
+  font-size: 14px;
   line-height: 1.5;
   color: #333;
 }
 
 .reply-actions {
   display: flex;
-  gap: 40rpx;
-  padding-left: 100rpx;
+  gap: 24px;
+  padding-left: 64px;
 }
 
 .no-replies {
   text-align: center;
-  padding: 100rpx 0;
-  color: #999;
-  font-size: 28rpx;
+  padding: 40px 0;
+  color: #999999;
+  font-size: 14px;
 }
 
 /* 回复输入框样式 */
 .reply-input-section {
   background: white;
-  padding: 30rpx;
-  border-top: 2rpx solid #f0f0f0;
+  padding: 16px;
+  margin: 12px 0;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .input-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20rpx;
+  margin-bottom: 12px;
 }
 
 .input-title {
-  font-size: 28rpx;
+  font-size: 14px;
   font-weight: 600;
-  color: #333;
+  color: #1E1E1E;
 }
 
 .advanced-btn {
   display: flex;
   align-items: center;
-  gap: 8rpx;
+  gap: 6px;
   background: none;
   border: none;
-  font-size: 24rpx;
-  color: #667eea;
+  font-size: 12px;
+  color: #007aff;
 }
 
 .input-area {
   display: flex;
-  gap: 20rpx;
+  gap: 12px;
   align-items: flex-end;
-  margin-bottom: 20rpx;
+  margin-bottom: 12px;
 }
 
 .reply-textarea {
   flex: 1;
-  background: #f8f9fa;
-  border: 2rpx solid #e9ecef;
-  border-radius: 20rpx;
-  padding: 20rpx;
-  font-size: 28rpx;
-  min-height: 80rpx;
-  max-height: 200rpx;
+  background: #F2F5F9;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 14px;
+  min-height: 80px;
+  max-height: 200px;
+  transition: all 0.3s ease;
+}
+
+.reply-textarea:focus {
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+  outline: none;
 }
 
 .submit-btn {
-  background: #667eea;
+  background: #007aff;
   color: white;
   border: none;
-  padding: 20rpx 40rpx;
-  border-radius: 20rpx;
-  font-size: 28rpx;
+  padding: 12px 24px;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 500;
   transition: all 0.3s ease;
   
   &:active {
-    transform: scale(0.95);
+    background-color: #0056b3;
+    transform: scale(0.98);
   }
 }
 
@@ -947,14 +968,14 @@ export default {
 
 /* 高级编辑器样式 */
 .advanced-editor {
-  margin-top: 20rpx;
-  padding-top: 20rpx;
-  border-top: 2rpx solid #f0f0f0;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
 }
 
 .editor-tools {
   display: flex;
-  gap: 15rpx;
+  gap: 12px;
   justify-content: center;
 }
 
@@ -962,12 +983,12 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 60rpx;
-  height: 60rpx;
+  width: 48px;
+  height: 48px;
   background: #f0f0f0;
   border: none;
-  border-radius: 10rpx;
-  font-size: 28rpx;
+  border-radius: 8px;
+  font-size: 14px;
   color: #666;
   transition: all 0.3s ease;
   
@@ -978,6 +999,6 @@ export default {
 }
 
 .tool-btn .icon {
-  font-size: 28rpx;
+  font-size: 14px;
 }
 </style>

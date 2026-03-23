@@ -1,47 +1,52 @@
 <template>
-  <view class="forum-container">
+  <view class="forum-container" :style="{ backgroundColor: isDarkMode ? '#1a1a1a' : '#F8FAFD' }">
     <!-- 顶部导航 -->
-    <view class="header">
-      <text class="title" @longpress="toggleDebugMode">技术论坛</text>
+    <view class="nav-bar forum-nav" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
+      <view class="nav-bar-left">
+        <!-- 取消返回按钮 -->
+      </view>
+      <view class="nav-bar-center">
+        <text class="nav-bar-title forum-title" @longpress="toggleDebugMode" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">技术论坛</text>
+      </view>
+      <view class="nav-bar-right">
+        <!-- 移除搜索图标 -->
+      </view>
     </view>
     
     <!-- 智能筛选器组 -->
-    <view class="filter-section">
+    <view class="filter-section" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
       <!-- 搜索框 -->
-      <view class="search-bar">
-        <input class="forum-input" placeholder="搜索话题..." v-model="keyword" @confirm="search" />
-        <button class="forum-btn forum-btn-primary" @click="search">搜索</button>
+      <view class="search-bar" :style="{ backgroundColor: isDarkMode ? '#3a3a3a' : '#F2F5F9' }">
+        <input class="forum-input" placeholder="搜索话题..." v-model="keyword" @confirm="search" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }" />
+        
       </view>
       
       <!-- 筛选器组 -->
       <view class="filter-group">
         <!-- 岗位分类筛选 -->
         <view class="filter-item">
-          <text class="filter-label">分类</text>
+          <text class="filter-label" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">分类</text>
           <view class="filter-options">
-            <text 
-              class="filter-option" 
-              :class="{active: currentCategory === 'all'}"
-              @click="switchCategory('all')"
-            >全部</text>
             <text 
               class="filter-option" 
               v-for="category in categories.filter(c => c.level === 1)" 
               :key="category.id"
-              :class="{active: currentCategory === category.id}"
+              :class="{active: currentCategory === category.id || (currentCategory === 'all' && categories.filter(c => c.level === 1).indexOf(category) === 0)}"
               @click="switchCategory(category.id)"
+              :style="{ backgroundColor: isDarkMode ? '#3a3a3a' : '#F0F4FF', color: '#007aff' }"
             >{{category.name}}</text>
           </view>
         </view>
         
         <!-- 子分类筛选（当选择技术开发类时显示） -->
         <view class="filter-item" v-if="showCategoryTabs && subCategoryList.length > 0">
-          <text class="filter-label">技术方向</text>
+          <text class="filter-label" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">技术方向</text>
           <view class="filter-options">
             <text 
               class="filter-option" 
               :class="{active: selectedSubCategories.length === 0}"
               @click="clearSubCategories"
+              :style="{ backgroundColor: isDarkMode ? '#3a3a3a' : '#F0F4FF', color: '#007aff' }"
             >全部</text>
             <text 
               class="filter-option" 
@@ -49,6 +54,7 @@
               :key="category.id"
               :class="{active: selectedSubCategories.includes(Number(category.next_category_id || category.id))}"
               @click="toggleSubCategory(category.id)"
+              :style="{ backgroundColor: isDarkMode ? '#3a3a3a' : '#F0F4FF', color: '#007aff' }"
             >{{category.name}}</text>
           </view>
         </view>
@@ -57,33 +63,33 @@
     
     <!-- 帖子列表 -->
     <scroll-view class="post-list" scroll-y @scrolltolower="loadMore" refresher-enabled @refresherrefresh="onRefresh" :refresher-triggered="isRefreshing">
-      <view class="forum-card forum-mb-md" v-for="post in posts" :key="post.id" @click="goToDetail(post)">
+      <view class="forum-card forum-mb-md" v-for="post in posts" :key="post.id" @click="goToDetail(post)" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
         <view class="post-main">
           <!-- 左侧：用户信息区 -->
           <view class="user-section">
-            <view class="forum-avatar forum-avatar-md"><text class="avatar-text">U</text></view>
-            <text class="username">用户{{post.user_id}}</text>
+            <view class="forum-avatar forum-avatar-md" :style="{ backgroundColor: isDarkMode ? '#3a3a3a' : '#f0f0f0' }"><text class="avatar-text" :style="{ color: isDarkMode ? '#999' : '#666666' }">U</text></view>
+            <text class="username" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">用户{{post.user_id}}</text>
             <text class="user-level">L1</text>
           </view>
           
           <!-- 中部：内容核心区 -->
           <view class="content-section">
-            <text class="post-title">{{post.title || post.content}}</text>
-            <text class="post-summary" v-if="post.content.length > 100">{{post.content.substring(0, 100)}}...</text>
-            <text class="post-summary" v-else-if="post.content !== post.title">{{post.content}}</text>
+            <text class="post-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">{{post.title || post.content}}</text>
+            <text class="post-summary" v-if="post.content.length > 100" :style="{ color: isDarkMode ? '#999' : '#6C757D' }">{{post.content.substring(0, 100)}}...</text>
+            <text class="post-summary" v-else-if="post.content !== post.title" :style="{ color: isDarkMode ? '#999' : '#6C757D' }">{{post.content}}</text>
             <view class="post-tags">
-              <text class="forum-tag forum-tag-primary">{{getCategoryName(post.category_id)}}</text>
+              <text class="forum-tag forum-tag-primary" :style="{ backgroundColor: isDarkMode ? '#3a3a3a' : '#F0F4FF', color: '#007aff' }">{{getCategoryName(post.category_id)}}</text>
             </view>
-            <view class="post-stats">
-              <text class="stat">
+            <view class="post-stats" :style="{ borderTop: isDarkMode ? '1px solid #404040' : '1px solid #f0f0f0' }">
+              <text class="stat" :style="{ color: isDarkMode ? '#999' : '#6C757D' }">
                 <text class="icon">💬</text>
                 {{post.reply_count || 0}}
               </text>
-              <text class="stat">
+              <text class="stat" :style="{ color: isDarkMode ? '#999' : '#6C757D' }">
                 <text class="icon">👁</text>
                 {{post.view_count || 0}}
               </text>
-              <text class="stat">
+              <text class="stat" :style="{ color: isDarkMode ? '#999' : '#6C757D' }">
                 <text class="icon">👍</text>
                 {{post.like_count || 0}}
               </text>
@@ -92,15 +98,15 @@
           
           <!-- 右侧：时间信息 -->
           <view class="time-section">
-            <text class="post-time">{{formatTime(post.created_at)}}</text>
-            <text class="reply-time" v-if="post.last_reply_time">最后回复: {{formatTime(post.last_reply_time)}}</text>
+            <text class="post-time" :style="{ color: isDarkMode ? '#999' : '#999999' }">{{formatTime(post.created_at)}}</text>
+            <text class="reply-time" v-if="post.last_reply_time" :style="{ color: isDarkMode ? '#999' : '#999999' }">最后回复: {{formatTime(post.last_reply_time)}}</text>
           </view>
         </view>
       </view>
       
-      <view class="load-more" v-if="loading">加载中...</view>
-      <view class="no-more" v-if="!hasMore && posts.length > 0">没有更多了</view>
-      <view class="no-data" v-if="posts.length === 0 && !loading">
+      <view class="load-more" v-if="loading" :style="{ color: isDarkMode ? '#999' : '#999999' }">加载中...</view>
+      <view class="no-more" v-if="!hasMore && posts.length > 0" :style="{ color: isDarkMode ? '#999' : '#999999' }">没有更多了</view>
+      <view class="no-data" v-if="posts.length === 0 && !loading" :style="{ color: isDarkMode ? '#999' : '#999999' }">
         <text>暂无帖子，快来发布第一个话题吧！</text>
       </view>
     </scroll-view>
@@ -112,18 +118,18 @@
     
     <!-- 快速操作菜单 -->
     <view class="quick-menu" v-if="showQuickMenu" @click="hideQuickMenu">
-      <view class="menu-content" @click.stop>
-        <view class="forum-card forum-mb-sm" @click="goToPost">
+      <view class="menu-content" @click.stop :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff' }">
+        <view class="forum-card forum-mb-sm" @click="goToPost" :style="{ backgroundColor: isDarkMode ? '#3a3a3a' : '#ffffff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
             <text class="menu-icon">✍️</text>
-            <text class="menu-text">发布话题</text>
+            <text class="menu-text" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">发布话题</text>
           </view>
-          <view class="forum-card forum-mb-sm" @click="goToAsk">
+          <view class="forum-card forum-mb-sm" @click="goToAsk" :style="{ backgroundColor: isDarkMode ? '#3a3a3a' : '#ffffff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
             <text class="menu-icon">❓</text>
-            <text class="menu-text">发布提问</text>
+            <text class="menu-text" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">发布提问</text>
           </view>
-          <view class="forum-card" @click="goToShare">
+          <view class="forum-card" @click="goToShare" :style="{ backgroundColor: isDarkMode ? '#3a3a3a' : '#ffffff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
             <text class="menu-icon">📤</text>
-            <text class="menu-text">分享资源</text>
+            <text class="menu-text" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">分享资源</text>
           </view>
       </view>
     </view>
@@ -132,6 +138,7 @@
 
 <script>
 import { forumApi } from '@/common/api/forum.js'
+import { themeManager } from '@/common/utils/theme-simple.js'
 
 export default {
   data() {
@@ -177,14 +184,18 @@ export default {
         '108': '嵌入式',
         '200': '产品设计',
         '300': '技术管理'
-      }
+      },
+      // 主题相关
+      currentTheme: 'light',
+      isDarkMode: false
     }
   },
   
   onLoad() {
     this.loadUserInfo()
     this.loadUserPostCount()
-    this.loadPosts()
+    this.initDefaultCategory()
+    this.initTheme()
   },
   
   onShow() {
@@ -198,6 +209,8 @@ export default {
     if (this.loadMoreTimer) {
       clearTimeout(this.loadMoreTimer)
     }
+    // 清理主题监听
+    uni.$off('globalThemeChange', this.handleGlobalThemeChange)
   },
   
   // 切换调试模式 - 长按标题5次开启/关闭
@@ -211,6 +224,26 @@ export default {
   },
   
   methods: {
+    /**
+     * 初始化主题
+     */
+    initTheme() {
+      // 获取当前主题
+      this.currentTheme = themeManager.getCurrentTheme()
+      this.isDarkMode = this.currentTheme === 'dark'
+      
+      // 监听全局主题变化
+      uni.$on('globalThemeChange', this.handleGlobalThemeChange)
+    },
+    
+    /**
+     * 处理全局主题变化
+     */
+    handleGlobalThemeChange(data) {
+      this.currentTheme = data.theme
+      this.isDarkMode = data.isDark
+    },
+    
     // 加载帖子数据
     async loadPosts(reset = false) {
       if (reset) {
@@ -232,29 +265,8 @@ export default {
         const currentCategoryNum = Number(this.currentCategory)
         const isTopLevelCategory = this.categories.some(c => Number(c.id) === currentCategoryNum && c.level === 1)
         
-        if (this.currentCategory === 'all') {
-          // 获取所有帖子
-          res = await forumApi.getAllFirstComments()
-        } else if (isTopLevelCategory) {
-          // 一级分类，需要获取所有子分类的帖子
-          // 获取所有帖子，然后在前端筛选
-          res = await forumApi.getAllFirstComments()
-        } else {
-          // 获取特定分类的帖子
-          try {
-            res = await forumApi.getCommentsByCategory(this.currentCategory)
-            // 如果分类查询返回null或空，尝试获取所有数据然后前端筛选
-            if (!res || res.length === 0) {
-              res = await forumApi.getAllFirstComments()
-            }
-          } catch (error) {
-            // 只在调试模式下显示错误
-            if (this.debugMode) {
-              console.log('分类查询失败，使用所有数据:', error)
-            }
-            res = await forumApi.getAllFirstComments()
-          }
-        }
+        // 直接获取所有帖子，然后在前端进行筛选
+        res = await forumApi.getAllFirstComments()
         
         // 减少日志输出，只在调试模式下显示
         if (this.debugMode) {
@@ -359,6 +371,16 @@ export default {
                 return post.category_id === targetCategoryId
               })
             }
+          }
+          
+          // 应用关键词搜索筛选
+          if (this.keyword && this.keyword.trim() !== '') {
+            const keywordLower = this.keyword.toLowerCase().trim()
+            filteredPosts = filteredPosts.filter(post => {
+              const titleMatch = post.title && post.title.toLowerCase().includes(keywordLower)
+              const contentMatch = post.content && post.content.toLowerCase().includes(keywordLower)
+              return titleMatch || contentMatch
+            })
           }
           
           // 为每个帖子添加回复数量统计 - 延迟获取，减少初始加载压力
@@ -473,32 +495,34 @@ export default {
       const isTopLevelCategory = this.categories.some(c => Number(c.id) === categoryNum && c.level === 1)
       
       if (isTopLevelCategory) {
-        this.showCategoryTabs = true
-        
-        // 获取该一级分类的子分类
-        this.subCategoryList = this.categories.filter(c => {
-          // 处理200和300分类（没有子分类）
-          if ([200, 300].includes(categoryNum)) {
-            return false
-          }
-          return c.parent_id && (c.parent_id.toString() === category || c.parent_id === categoryNum)
-        })
-        
-        // 如果是200或300分类，直接使用当前分类ID
+        // 检查是否为产品设计(200)或项目管理(300)分类
         if ([200, 300].includes(categoryNum)) {
-          this.subCategoryList = [{ 
-            id: category, 
-            name: this.categories.find(c => c.id === category)?.name || category 
-          }]
+          // 这两个分类没有子分类，不显示子分类标签
+          this.showCategoryTabs = false
+        } else {
+          // 其他一级分类显示子分类标签
+          this.showCategoryTabs = true
+          
+          // 获取该一级分类的子分类
+          this.subCategoryList = this.categories.filter(c => {
+            return c.parent_id && (c.parent_id.toString() === category || c.parent_id === categoryNum)
+          })
         }
-        
-        // 移除日志输出
       } else {
         this.showCategoryTabs = false
       }
       
       this.page = 1
       this.loadPosts(true)
+    },
+    
+    // 初始化默认分类
+    initDefaultCategory() {
+      const topLevelCategories = this.categories.filter(c => c.level === 1)
+      if (topLevelCategories.length > 0) {
+        this.currentCategory = topLevelCategories[0].id
+        this.switchCategory(this.currentCategory)
+      }
     },
     
     // 切换子分类
@@ -551,6 +575,11 @@ export default {
       uni.navigateTo({
         url: `/pages/forum/details/forum_detail?id=${post.id}`
       })
+    },
+    
+    // 返回上一页
+    goBack() {
+      uni.navigateBack()
     },
     
     
@@ -672,12 +701,78 @@ export default {
 
 <style lang="scss" scoped>
 @import '@/common/styles/theme.css';
-@import '@/common/styles/forum.scss';
 .forum-container {
   min-height: 100vh;
-  background: var(--bg-secondary, #f5f5f5);
+  background-color: #F8FAFD;
   display: flex;
   flex-direction: column;
+  font-family: -apple-system, Helvetica, Roboto, sans-serif;
+}
+
+/* 导航栏样式 */
+.nav-bar {
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  height: 40px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.nav-bar-left {
+  flex: 0 0 auto;
+  padding: 8px;
+}
+
+.nav-bar-center {
+  flex: 1;
+  text-align: center;
+}
+
+.nav-bar-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1E1E1E;
+}
+
+.nav-bar-right {
+  flex: 0 0 auto;
+  padding: 8px;
+}
+
+.nav-back-icon {
+  color: #1E1E1E;
+  transition: all 0.3s ease;
+}
+
+.nav-back-icon:active {
+  color: #007aff;
+}
+
+/* 论坛导航栏样式 */
+.forum-nav {
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  height: 40px;
+  padding: 0 16px;
+}
+
+.forum-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1E1E1E;
+  text-align: center;
+}
+
+.nav-icon {
+  transition: all 0.3s ease;
+}
+
+.nav-icon:active {
+  color: #007aff;
+  transform: scale(0.95);
 }
 
 /* 侧边栏样式 */
@@ -689,8 +784,8 @@ export default {
 
 .drawer-header {
   padding: 20rpx 30rpx;
-  border-bottom: 2rpx solid var(--border-color, #eeeeee);
-  background: var(--bg-card, #ffffff);
+  border-bottom: 2rpx solid #eeeeee;
+  background: #ffffff;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -711,14 +806,8 @@ export default {
 .drawer-title {
   font-size: 26rpx;
   font-weight: 600;
-  color: var(--text-primary, #333333);
+  color: #333333;
   flex: 1;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 20rpx;
 }
 
 .user-details {
@@ -729,19 +818,19 @@ export default {
   font-size: 22rpx;
   opacity: 0.9;
   margin-top: 10rpx;
-  color: var(--text-secondary, #666666);
+  color: #666666;
 }
 
 .login-prompt {
   text-align: center;
   padding: 20rpx;
-  color: var(--text-secondary, #666666);
+  color: #666666;
 }
 
 .nav-title {
   font-size: 28rpx;
   font-weight: 600;
-  color: var(--text-primary, #333333);
+  color: #333333;
   margin-bottom: 20rpx;
   display: block;
 }
@@ -754,7 +843,7 @@ export default {
 
 .category-name {
   font-size: 26rpx;
-  color: var(--text-primary, #333333);
+  color: #333333;
 }
 
 .action-item {
@@ -774,196 +863,307 @@ export default {
   margin-right: 20rpx;
 }
 
-.action-text {
-  font-size: 26rpx;
-  color: var(--text-primary, #333333);
-}
-
 .rule-text {
   font-size: 24rpx;
-  color: var(--text-secondary, #666666);
+  color: #666666;
   line-height: 1.5;
   margin-bottom: 20rpx;
 }
 
-/* 顶部导航样式 */
-.header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 60rpx 30rpx 30rpx;
-  background: var(--primary-color, #007aff);
-  color: white;
-}
-
-.title {
-  font-size: 36rpx;
-  font-weight: bold;
-  text-align: center;
-  color: white;
-}
-
 /* 智能筛选器样式 */
 .filter-section {
-  background: var(--bg-card, #ffffff);
-  border-bottom: 2rpx solid var(--border-color, #eeeeee);
+  background-color: #ffffff;
+  margin: 12px 0;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .search-bar {
   display: flex;
-  gap: 20rpx;
-  padding: 20rpx;
-  background: var(--bg-card, #ffffff);
+  align-items: center;
+  background-color: #F2F5F9;
+  border-radius: 30px;
+  height: 44px;
+  padding: 0 16px;
+  gap: 12px;
+  transition: all 0.3s ease;
 }
 
+.search-bar:focus-within {
+  box-shadow: 0 0 0 2px #007aff;
+}
+
+.forum-input {
+  flex: 1;
+  font-size: 15px;
+  color: #1E1E1E;
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+.forum-input::placeholder {
+  color: #ADB5BD;
+}
+
+.forum-btn {
+  background-color: #007aff;
+  color: #ffffff;
+  border: none;
+  border-radius: 24px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.forum-btn:active {
+  background-color: #0056b3;
+  transform: scale(0.98);
+}
+
+/* 分类筛选样式 */
 .filter-group {
-  padding: 0 20rpx 20rpx;
-  display: flex;
-  flex-direction: column;
-  gap: 20rpx;
+  margin-top: 16px;
 }
 
 .filter-item {
-  display: flex;
-  flex-direction: column;
-  gap: 10rpx;
+  margin-bottom: 16px;
 }
 
 .filter-label {
-  font-size: 24rpx;
+  font-size: 14px;
   font-weight: 600;
-  color: var(--text-primary, #333333);
+  color: #1E1E1E;
+  margin-bottom: 12px;
+  display: block;
 }
 
 .filter-options {
   display: flex;
-  gap: 15rpx;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 .filter-option {
-  padding: 15rpx 25rpx;
-  background: var(--bg-secondary, #f5f5f5);
-  border-radius: 50rpx;
-  font-size: 24rpx;
-  color: var(--text-secondary, #666666);
+  padding: 6px 12px;
+  background-color: #F0F4FF;
+  border-radius: 24px;
+  font-size: 12px;
+  color: #007aff;
   transition: all 0.3s ease;
-  
-  &.active {
-    background: var(--primary-color, #007aff);
-    color: white;
-  }
+  position: relative;
+  margin-right: 8px;
+  margin-bottom: 8px;
+}
+
+.filter-option.active {
+  background-color: #E0E9FF;
+  color: #007aff;
+}
+
+.filter-option:active {
+  transform: scale(0.95);
+  background-color: #E0E9FF;
 }
 
 /* 帖子列表样式 */
 .post-list {
   flex: 1;
-  padding: 20rpx;
+  padding: 0;
+}
+
+.forum-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 16px;
+  margin: 12px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+}
+
+.forum-card:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.forum-mb-md {
+  margin-bottom: 16px;
+}
+
+.forum-mb-sm {
+  margin-bottom: 12px;
 }
 
 .post-main {
   display: flex;
-  padding: 30rpx;
-  gap: 20rpx;
+  gap: 16px;
 }
 
 .user-section {
-  width: 100rpx;
+  width: 64px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10rpx;
+  gap: 8px;
+}
+
+.forum-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.forum-avatar-md {
+  width: 48px;
+  height: 48px;
+}
+
+.avatar-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #666666;
 }
 
 .username {
-  font-size: 24rpx;
+  font-size: 12px;
   font-weight: 600;
-  color: var(--text-primary, #333333);
+  color: #1E1E1E;
   text-align: center;
 }
 
 .user-level {
-  font-size: 20rpx;
-  color: var(--primary-color, #007aff);
+  font-size: 10px;
+  color: #007aff;
   background: rgba(0, 122, 255, 0.1);
-  padding: 5rpx 10rpx;
-  border-radius: 10rpx;
+  padding: 4px 8px;
+  border-radius: 8px;
 }
 
 .content-section {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 15rpx;
+  gap: 12px;
 }
 
 .post-title {
-  font-size: 32rpx;
+  font-size: 16px;
   font-weight: 600;
-  color: var(--text-primary, #333333);
+  color: #1E1E1E;
   line-height: 1.4;
 }
 
 .post-summary {
-  font-size: 26rpx;
-  color: var(--text-secondary, #666666);
+  font-size: 13px;
+  color: #6C757D;
   line-height: 1.5;
 }
 
 .post-tags {
   display: flex;
-  gap: 10rpx;
+  gap: 8px;
   flex-wrap: wrap;
+}
+
+.forum-tag {
+  background-color: #F0F4FF;
+  color: #007aff;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 12px;
+}
+
+.forum-tag-primary {
+  background-color: #F0F4FF;
+  color: #007aff;
 }
 
 .post-stats {
   display: flex;
-  gap: 30rpx;
-  padding-top: 15rpx;
-  border-top: 2rpx solid var(--border-color-light, #f0f0f0);
+  gap: 24px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
 }
 
 .stat {
   display: flex;
   align-items: center;
-  gap: 8rpx;
-  font-size: 24rpx;
-  color: var(--text-secondary, #666666);
+  gap: 6px;
+  font-size: 12px;
+  color: #6C757D;
+  transition: all 0.3s ease;
+}
+
+.stat:active {
+  color: #007aff;
 }
 
 .icon {
-  font-size: 24rpx;
+  font-size: 12px;
 }
 
 .time-section {
-  width: 120rpx;
+  width: 96px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 10rpx;
+  gap: 8px;
 }
 
 .post-time {
-  font-size: 22rpx;
-  color: var(--text-tertiary, #999999);
+  font-size: 11px;
+  color: #999999;
 }
 
 .reply-time {
-  font-size: 20rpx;
-  color: var(--text-tertiary, #999999);
+  font-size: 10px;
+  color: #999999;
   opacity: 0.8;
 }
 
 /* 加载状态样式 */
 .load-more, .no-more, .no-data {
   text-align: center;
-  padding: 40rpx;
-  color: var(--text-tertiary, #999999);
-  font-size: 28rpx;
+  padding: 40px;
+  color: #999999;
+  font-size: 14px;
 }
 
 .no-data {
-  margin-top: 200rpx;
+  margin-top: 200px;
+}
+
+/* 悬浮发帖按钮 */
+.forum-btn.forum-btn-primary {
+  position: fixed;
+  bottom: 100px;
+  right: 40px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.forum-btn.forum-btn-primary:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+}
+
+.plus {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
 }
 
 /* 快速操作菜单样式 */
@@ -981,27 +1181,21 @@ export default {
 }
 
 .menu-content {
-  background-color: var(--bg-card, #ffffff);
-  border-radius: 30rpx 30rpx 0 0;
-  padding: 40rpx 20rpx;
+  background-color: #ffffff;
+  border-radius: 30px 30px 0 0;
+  padding: 40px 20px;
   width: 100%;
-  max-width: 600rpx;
+  max-width: 600px;
 }
 
 .menu-icon {
-  font-size: 40rpx;
-  margin-right: 20rpx;
+  font-size: 20px;
+  margin-right: 20px;
 }
 
 .menu-text {
-  font-size: 28rpx;
-  color: var(--text-primary, #333333);
+  font-size: 14px;
+  color: #1E1E1E;
   font-weight: 500;
-}
-
-.plus {
-  color: white;
-  font-size: 48rpx;
-  font-weight: bold;
 }
 </style>

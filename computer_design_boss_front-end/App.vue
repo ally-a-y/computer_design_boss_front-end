@@ -6,9 +6,13 @@
 			console.log('App Launch')
 			// 初始化应用主题
 			this.initAppTheme()
+			// 监听系统主题变化
+			this.listenSystemThemeChange()
 		},
 		onShow: function() {
 			console.log('App Show')
+			// 重新检查主题设置
+			this.initAppTheme()
 		},
 		onHide: function() {
 			console.log('App Hide')
@@ -25,12 +29,46 @@
 					
 					console.log('当前主题:', currentTheme, '主题模式:', themeMode)
 					
+					// 应用主题到全局
+					this.applyGlobalTheme(currentTheme)
+					
 					// 通知所有页面更新主题
 					themeManager.notifyThemeChange(currentTheme)
 					
 				} catch (error) {
 					console.error('初始化主题失败:', error)
 				}
+			},
+			
+			/**
+			 * 应用全局主题
+			 */
+			applyGlobalTheme(theme) {
+				// 移除所有主题类
+				uni.removeClass(document.body, 'light-theme')
+				uni.removeClass(document.body, 'dark-theme')
+				
+				// 添加当前主题类
+				uni.addClass(document.body, theme === 'dark' ? 'dark-theme' : 'light-theme')
+				
+				// 设置页面背景色
+				if (theme === 'dark') {
+					document.body.style.backgroundColor = '#1a1a1a'
+					document.body.style.color = '#ffffff'
+				} else {
+					document.body.style.backgroundColor = '#f5f5f5'
+					document.body.style.color = '#333333'
+				}
+			},
+			
+			/**
+			 * 监听系统主题变化
+			 */
+			listenSystemThemeChange() {
+				themeManager.onSystemThemeChange((newTheme) => {
+					console.log('系统主题变化:', newTheme)
+					this.applyGlobalTheme(newTheme)
+				})
 			}
 		}
 	}

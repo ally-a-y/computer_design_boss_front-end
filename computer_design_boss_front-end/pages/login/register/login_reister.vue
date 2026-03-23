@@ -1,9 +1,19 @@
 <template>
-  <view class="register-container">
-    <!-- 页面标题 -->
-    <view class="register-header">
-      <text class="register-title">新用户注册</text>
+  <view class="register-page">
+    <!-- 顶部导航栏 -->
+    <view class="nav-bar">
+      <view class="nav-bar-left">
+        <uni-icons type="back" size="24" color="#1E1E1E" @click="prevRegisterStep" @touchstart="$event.target.style.color = '#007aff'" @touchend="$event.target.style.color = '#1E1E1E'" @touchcancel="$event.target.style.color = '#1E1E1E'" />
+      </view>
+      <view class="nav-bar-center">
+        <text class="nav-bar-title">{{ registerStep === 2 ? '完善个人信息' : registerStep === 3 ? '教育经历' : '求职意向' }}</text>
+      </view>
+      <view class="nav-bar-right">
+        <!-- 右侧预留空间 -->
+      </view>
     </view>
+    
+    <view class="register-container">
     
     <!-- 注册表单 -->
     <view class="register-form">
@@ -307,6 +317,7 @@
           </button>
         </view>
       </view>
+    </view>
     </view>
   </view>
 </template>
@@ -686,50 +697,104 @@ export default {
 </script>
 
 <style scoped>
-.register-container {
+/* 全局样式 */
+.register-page {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #f5f5f5;
-  padding: 40rpx;
+  background-color: #F8FAFD;
+  font-family: -apple-system, Helvetica, Roboto, sans-serif;
 }
 
-.register-header {
-  margin: 80rpx 0 60rpx 0;
+.register-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 16px;
+}
+
+/* 导航栏样式 */
+.nav-bar {
+  background-color: #ffffff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.nav-bar-left {
+  flex: 0 0 auto;
+  padding: 8px;
+}
+
+.nav-bar-center {
+  flex: 1;
   text-align: center;
 }
 
-.register-title {
-  font-size: 48rpx;
-  font-weight: bold;
-  color: #333;
+.nav-bar-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #1E1E1E;
 }
 
+.nav-bar-right {
+  flex: 0 0 auto;
+  padding: 8px;
+}
+
+/* 注册表单 */
 .register-form {
   background-color: #fff;
-  border-radius: 16rpx;
-  padding: 40rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+  padding: 24px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 12px;
 }
 
+/* 步骤标题 */
+.step-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1E1E1E;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.optional-tag {
+  font-size: 14px;
+  color: #007aff;
+  font-weight: normal;
+  margin-left: 8px;
+}
+
+/* 表单样式 */
 .form-item {
-  margin-bottom: 40rpx;
+  margin-bottom: 16px;
 }
 
 .form-label {
-  font-size: 28rpx;
-  color: #333;
-  margin-bottom: 16rpx;
+  font-size: 14px;
+  color: #6C757D;
+  margin-bottom: 8px;
   display: block;
 }
 
 .form-input-wrapper {
   display: flex;
   align-items: center;
-  border: 2rpx solid #e5e5e5;
-  border-radius: 8rpx;
-  padding: 0 20rpx;
-  background-color: #fafafa;
+  border-radius: 12px;
+  padding: 0 12px;
+  background-color: #F2F5F9;
+  height: 48px;
+  transition: all 0.3s ease;
+}
+
+.form-input-wrapper:focus-within {
+  box-shadow: 0 0 0 2px rgba(0,122,255,0.2);
 }
 
 /* picker包装器样式 */
@@ -744,160 +809,186 @@ picker {
 
 .form-input {
   flex: 1;
-  height: 88rpx;
-  font-size: 32rpx;
-  color: #333;
-  padding-left: 16rpx;
+  font-size: 15px;
+  color: #1E1E1E;
+  padding-left: 12px;
   background-color: transparent;
+  border: none;
+  outline: none;
+}
+
+.form-input::placeholder {
+  color: #ADB5BD;
 }
 
 .form-input:disabled {
-  color: #333;
+  color: #1E1E1E;
   opacity: 1;
-  -webkit-text-fill-color: #333;
+  -webkit-text-fill-color: #1E1E1E;
 }
 
+/* 错误提示 */
 .error-text {
-  font-size: 24rpx;
+  font-size: 13px;
   color: #e54d42;
-  margin-top: 12rpx;
+  margin-top: 8px;
   display: block;
 }
 
-.register-btn {
-  width: 100%;
-  height: 96rpx;
-  background-color: #007aff;
-  color: #fff;
-  font-size: 32rpx;
-  border-radius: 48rpx;
-  margin: 40rpx 0;
-}
-
-.register-btn:disabled {
-  background-color: #ccc;
-}
-
-.step-title {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 40rpx;
-  text-align: center;
-}
-
-.register-step {
-  display: block;
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-.optional-tag {
-  font-size: 24rpx;
-  color: #007aff;
-  font-weight: normal;
-  margin-left: 10rpx;
-}
-
-.skip-btn {
-  flex: 1;
-  height: 96rpx;
-  background-color: #f5f5f5;
-  color: #333;
-  font-size: 32rpx;
-  border-radius: 48rpx;
-  border: 2rpx solid #e5e5e5;
-  margin: 40rpx 10rpx;
-}
-
-.salary-range {
-  display: flex;
-  align-items: center;
-  gap: 10rpx;
-  padding: 0 20rpx;
-  background-color: #fafafa;
-  border: 2rpx solid #e5e5e5;
-  border-radius: 8rpx;
-}
-
-.salary-input {
-  flex: 1;
-  height: 88rpx;
-  font-size: 32rpx;
-  color: #333;
-}
-
-.salary-separator {
-  font-size: 32rpx;
-  color: #999;
-}
-
-.salary-unit {
-  font-size: 28rpx;
-  color: #999;
-}
-
+/* 性别选择器 */
 .gender-selector {
   display: flex;
-  gap: 20rpx;
+  gap: 12px;
 }
 
 .gender-item {
   flex: 1;
   text-align: center;
-  padding: 20rpx;
-  border: 2rpx solid #e5e5e5;
-  border-radius: 8rpx;
-  background-color: #fafafa;
+  padding: 0 16px;
+  background-color: #F2F5F9;
+  border-radius: 30px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.gender-item:active {
+  transform: scale(0.95);
 }
 
 .gender-item.active {
-  border-color: #007aff;
-  background-color: #e6f2ff;
+  background-color: #007aff;
 }
 
 .gender-text {
-  font-size: 32rpx;
-  color: #333;
+  font-size: 14px;
+  color: #1E1E1E;
+  transition: all 0.3s ease;
 }
 
 .gender-item.active .gender-text {
-  color: #007aff;
-  font-weight: bold;
+  color: #fff;
+  font-weight: 600;
 }
 
+/* 薪资范围 */
+.salary-range {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 12px;
+  background-color: #F2F5F9;
+  border-radius: 12px;
+  height: 48px;
+}
+
+.salary-input {
+  flex: 1;
+  font-size: 15px;
+  color: #1E1E1E;
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+.salary-input::placeholder {
+  color: #ADB5BD;
+}
+
+.salary-separator {
+  font-size: 15px;
+  color: #6C757D;
+}
+
+.salary-unit {
+  font-size: 13px;
+  color: #6C757D;
+}
+
+/* 按钮区域 */
 .register-buttons {
   display: flex;
-  gap: 20rpx;
-  margin: 40rpx 0;
+  gap: 12px;
+  margin: 32px 0 16px;
 }
 
 .back-btn {
   flex: 1;
-  height: 96rpx;
-  background-color: #f5f5f5;
-  color: #333;
-  font-size: 32rpx;
-  border-radius: 48rpx;
-  border: 2rpx solid #e5e5e5;
+  height: 48px;
+  background-color: #F2F5F9;
+  color: #6C757D;
+  font-size: 16px;
+  border-radius: 30px;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.back-btn:active {
+  background-color: #E9ECEF;
+  transform: scale(0.98);
 }
 
 .register-btn {
   flex: 1;
-  height: 96rpx;
+  height: 48px;
   background-color: #007aff;
   color: #fff;
-  font-size: 32rpx;
-  border-radius: 48rpx;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 30px;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.register-btn:active {
+  background-color: #0056b3;
+  transform: scale(0.98);
 }
 
 .register-btn:disabled {
-  background-color: #ccc;
+  background-color: #E9ECEF;
+  color: #ADB5BD;
 }
 
+/* 跳过按钮 */
+.skip-btn {
+  flex: 1;
+  height: 48px;
+  background-color: #F2F5F9;
+  color: #6C757D;
+  font-size: 16px;
+  border-radius: 30px;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.skip-btn:active {
+  background-color: #E9ECEF;
+  transform: scale(0.98);
+}
+
+/* 注册步骤 */
+.register-step {
+  display: none;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.register-step.active {
+  display: block;
+}
+
+.register-step.optional {
+  display: block;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* 动画效果 */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20rpx);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;

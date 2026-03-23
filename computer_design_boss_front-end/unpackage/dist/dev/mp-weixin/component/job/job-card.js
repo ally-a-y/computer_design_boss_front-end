@@ -6,20 +6,34 @@ const _sfc_main = {
     data: {
       type: Object,
       default: () => ({})
+    },
+    isDark: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
     return {
-      isFavorite: false
+      isFavorite: false,
+      isApplied: false
     };
   },
   mounted() {
     this.checkIsFavorite();
+    this.checkIsApplied();
+  },
+  onShow() {
+    this.checkIsFavorite();
+    this.checkIsApplied();
   },
   methods: {
     checkIsFavorite() {
       const collections = common_vendor.index.getStorageSync("collections") || [];
       this.isFavorite = collections.some((item) => item.id === this.data.id);
+    },
+    checkIsApplied() {
+      const delivers = common_vendor.index.getStorageSync("delivers") || [];
+      this.isApplied = delivers.some((item) => item.id === this.data.id);
     },
     toggleFavorite() {
       let collections = common_vendor.index.getStorageSync("collections") || [];
@@ -46,6 +60,35 @@ const _sfc_main = {
         });
       }
       common_vendor.index.setStorageSync("collections", collections);
+    },
+    applyForJob() {
+      let delivers = common_vendor.index.getStorageSync("delivers") || [];
+      const isApplied = delivers.some((item) => item.id === this.data.id);
+      if (isApplied) {
+        delivers = delivers.filter((item) => item.id !== this.data.id);
+        this.isApplied = false;
+        common_vendor.index.showToast({
+          title: "\u5DF2\u53D6\u6D88\u6295\u9012",
+          icon: "success"
+        });
+      } else {
+        const newDeliver = {
+          id: this.data.id,
+          jobTitle: this.data.title,
+          company: this.data.company || "\u672A\u77E5\u516C\u53F8",
+          salary: this.formatSalary(this.data.salary_min, this.data.salary_max),
+          deliverTime: new Date().toLocaleString(),
+          status: "pending",
+          statusText: "\u5F85\u5904\u7406"
+        };
+        delivers.push(newDeliver);
+        this.isApplied = true;
+        common_vendor.index.showToast({
+          title: "\u6295\u9012\u6210\u529F",
+          icon: "success"
+        });
+      }
+      common_vendor.index.setStorageSync("delivers", delivers);
     },
     formatSalary(min, max) {
       if (min && max) {
@@ -109,25 +152,41 @@ if (!Array) {
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return {
     a: common_vendor.t($props.data.title),
-    b: common_vendor.t($options.formatSalary($props.data.salary_min, $props.data.salary_max)),
-    c: common_vendor.t($props.data.company || "\u672A\u77E5\u516C\u53F8"),
-    d: common_vendor.t($props.data.exp_req || "\u7ECF\u9A8C\u4E0D\u9650"),
-    e: common_vendor.t($props.data.edu_req || "\u5B66\u5386\u4E0D\u9650"),
-    f: common_vendor.f($options.getJobTags($props.data), (tag, k0, i0) => {
+    b: $props.isDark ? "#ffffff" : "#1E1E1E",
+    c: common_vendor.t($options.formatSalary($props.data.salary_min, $props.data.salary_max)),
+    d: common_vendor.t($props.data.company || "\u672A\u77E5\u516C\u53F8"),
+    e: $props.isDark ? "#ffffff" : "#1E1E1E",
+    f: common_vendor.t($props.data.exp_req || "\u7ECF\u9A8C\u4E0D\u9650"),
+    g: common_vendor.t($props.data.edu_req || "\u5B66\u5386\u4E0D\u9650"),
+    h: $props.isDark ? "#999" : "#6C757D",
+    i: common_vendor.f($options.getJobTags($props.data), (tag, k0, i0) => {
       return {
         a: common_vendor.t(tag),
         b: tag
       };
     }),
-    g: common_vendor.t($props.data.city || "\u57CE\u5E02"),
-    h: common_vendor.t($options.formatTime($props.data.publish_time)),
-    i: common_vendor.o(($event) => $options.goToDetail($props.data)),
-    j: common_vendor.p({
+    j: $props.isDark ? "#3a3a3a" : "#F2F5F9",
+    k: $props.isDark ? "#ccc" : "#6C757D",
+    l: common_vendor.t($props.data.city || "\u57CE\u5E02"),
+    m: $props.isDark ? "#ffffff" : "#1E1E1E",
+    n: common_vendor.t($options.formatTime($props.data.publish_time)),
+    o: $props.isDark ? "#999" : "#6C757D",
+    p: $props.isDark ? "1px solid #404040" : "1px solid #F0F2F5",
+    q: common_vendor.o(($event) => $options.goToDetail($props.data)),
+    r: common_vendor.p({
       type: $data.isFavorite ? "star-filled" : "star",
       size: 30,
-      color: $data.isFavorite ? "#ff9500" : "#ccc"
+      color: $data.isFavorite ? "#ff9500" : $props.isDark ? "#666" : "#ccc"
     }),
-    k: common_vendor.o((...args) => $options.toggleFavorite && $options.toggleFavorite(...args))
+    s: common_vendor.o((...args) => $options.toggleFavorite && $options.toggleFavorite(...args)),
+    t: $props.isDark ? "rgba(42, 42, 42, 0.8)" : "rgba(255, 255, 255, 0.8)",
+    v: common_vendor.t($data.isApplied ? "\u5DF2\u6295\u9012" : "\u6295\u9012"),
+    w: $data.isApplied ? 1 : "",
+    x: common_vendor.o((...args) => $options.applyForJob && $options.applyForJob(...args)),
+    y: $data.isApplied ? $props.isDark ? "#3a3a3a" : "#F2F5F9" : "#007aff",
+    z: $data.isApplied ? $props.isDark ? "#999" : "#6C757D" : "white",
+    A: $props.isDark ? "#2c2c2c" : "#fff",
+    B: $props.isDark ? "0 2px 8px rgba(0,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.05)"
   };
 }
 var Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-0b59c612"], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/component/job/job-card.vue"]]);

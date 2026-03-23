@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/splash/splash",
     "pages/login/login",
     "pages/login/register/login_reister",
     "pages/login/forget/login_forget",
@@ -23,7 +24,8 @@
     "pages/AI/interview",
     "pages/forum/forum",
     "pages/forum/details/forum_detail",
-    "pages/forum/post"
+    "pages/forum/post",
+    "pages/chart"
   ],
   "window": {
     "navigationBarTextStyle": "black",

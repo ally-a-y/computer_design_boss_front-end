@@ -1,33 +1,41 @@
 <template>
-  <view class="job-card">
+  <view class="job-card" :style="{ backgroundColor: isDark ? '#2c2c2c' : '#fff', boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
     <view class="card-content" @click="goToDetail(data)">
       <view class="card-header">
-        <text class="job-title">{{ data.title }}</text>
+        <text class="job-title" :style="{ color: isDark ? '#ffffff' : '#1E1E1E' }">{{ data.title }}</text>
         <text class="salary">{{ formatSalary(data.salary_min, data.salary_max) }}</text>
       </view>
       
       <view class="company-info">
-        <text class="company-name">{{ data.company || '未知公司' }}</text>
-        <text class="company-tag">{{ data.exp_req || '经验不限' }} | {{ data.edu_req || '学历不限' }}</text>
+        <text class="company-name" :style="{ color: isDark ? '#ffffff' : '#1E1E1E' }">{{ data.company || '未知公司' }}</text>
+        <text class="company-tag" :style="{ color: isDark ? '#999' : '#6C757D' }">{{ data.exp_req || '经验不限' }} | {{ data.edu_req || '学历不限' }}</text>
       </view>
       
       <view class="job-tags">
-        <text v-for="tag in getJobTags(data)" :key="tag" class="tag">{{ tag }}</text>
+        <text v-for="tag in getJobTags(data)" :key="tag" class="tag" :style="{ backgroundColor: isDark ? '#3a3a3a' : '#F2F5F9', color: isDark ? '#ccc' : '#6C757D' }">{{ tag }}</text>
       </view>
       
-      <view class="card-footer">
-        <text class="location">{{ data.city || '城市' }}</text>
-        <text class="time">{{ formatTime(data.publish_time) }}</text>
+      <view class="card-footer" :style="{ borderTop: isDark ? '1px solid #404040' : '1px solid #F0F2F5' }">
+        <text class="location" :style="{ color: isDark ? '#ffffff' : '#1E1E1E' }">{{ data.city || '城市' }}</text>
+        <text class="time" :style="{ color: isDark ? '#999' : '#6C757D' }">{{ formatTime(data.publish_time) }}</text>
       </view>
     </view>
     
-    <!-- 收藏按钮 -->
-    <view class="favorite-btn" @click.stop="toggleFavorite">
-      <uni-icons 
-        :type="isFavorite ? 'star-filled' : 'star'" 
-        :size="30" 
-        :color="isFavorite ? '#ff9500' : '#ccc'"
-      ></uni-icons>
+    <!-- 右侧按钮组 -->
+    <view class="right-buttons">
+      <!-- 收藏按钮 -->
+      <view class="favorite-btn" @click.stop="toggleFavorite" :style="{ backgroundColor: isDark ? 'rgba(42, 42, 42, 0.8)' : 'rgba(255, 255, 255, 0.8)' }">
+        <uni-icons 
+          :type="isFavorite ? 'star-filled' : 'star'" 
+          :size="30" 
+          :color="isFavorite ? '#ff9500' : isDark ? '#666' : '#ccc'"
+        ></uni-icons>
+      </view>
+      
+      <!-- 投递按钮 -->
+      <view class="apply-btn" :class="{ 'applied': isApplied }" @click.stop="applyForJob" :style="{ backgroundColor: isApplied ? (isDark ? '#3a3a3a' : '#F2F5F9') : '#007aff', color: isApplied ? (isDark ? '#999' : '#6C757D') : 'white' }">
+        {{ isApplied ? '已投递' : '投递' }}
+      </view>
     </view>
   </view>
 </template>
@@ -39,22 +47,40 @@ export default {
     data: {
       type: Object,
       default: () => ({})
+    },
+    isDark: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
     return {
-      isFavorite: false
+      isFavorite: false,
+      isApplied: false
     }
   },
   mounted() {
     // 检查职位是否已收藏
     this.checkIsFavorite()
+    // 检查职位是否已投递
+    this.checkIsApplied()
+  },
+  onShow() {
+    // 页面显示时检查收藏状态
+    this.checkIsFavorite()
+    // 页面显示时检查投递状态
+    this.checkIsApplied()
   },
   methods: {
     checkIsFavorite() {
       // 从本地存储获取收藏列表
       const collections = uni.getStorageSync('collections') || []
       this.isFavorite = collections.some(item => item.id === this.data.id)
+    },
+    checkIsApplied() {
+      // 从本地存储获取投递列表
+      const delivers = uni.getStorageSync('delivers') || []
+      this.isApplied = delivers.some(item => item.id === this.data.id)
     },
     toggleFavorite() {
       // 获取当前收藏列表
@@ -87,6 +113,44 @@ export default {
       
       // 保存收藏列表
       uni.setStorageSync('collections', collections)
+    },
+    
+    applyForJob() {
+      // 获取当前投递列表
+      let delivers = uni.getStorageSync('delivers') || []
+      
+      // 检查是否已经投递
+      const isApplied = delivers.some(item => item.id === this.data.id)
+      
+      if (isApplied) {
+        // 取消投递
+        delivers = delivers.filter(item => item.id !== this.data.id)
+        this.isApplied = false
+        uni.showToast({
+          title: '已取消投递',
+          icon: 'success'
+        })
+      } else {
+        // 添加投递
+        const newDeliver = {
+          id: this.data.id,
+          jobTitle: this.data.title,
+          company: this.data.company || '未知公司',
+          salary: this.formatSalary(this.data.salary_min, this.data.salary_max),
+          deliverTime: new Date().toLocaleString(),
+          status: 'pending',
+          statusText: '待处理'
+        }
+        delivers.push(newDeliver)
+        this.isApplied = true
+        uni.showToast({
+          title: '投递成功',
+          icon: 'success'
+        })
+      }
+      
+      // 保存投递列表
+      uni.setStorageSync('delivers', delivers)
     },
     // 格式化薪资
     formatSalary(min, max) {
@@ -164,95 +228,151 @@ export default {
 <style scoped>
 .job-card {
   background-color: #fff;
-  margin: 10rpx 0;
-  padding: 30rpx;
-  border-radius: 16rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
-  /* 防止卡片内容被分割到不同列 */
-  break-inside: avoid;
-  -webkit-column-break-inside: avoid;
-  page-break-inside: avoid;
+  margin: 0;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   position: relative;
+  transition: all 0.3s ease;
 }
 
+.job-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.right-buttons {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  z-index: 10;
+}
 
 .favorite-btn {
-  position: absolute;
-  top: 30rpx;
-  right: 30rpx;
-  z-index: 10;
   background-color: rgba(255, 255, 255, 0.8);
-  padding: 10rpx;
+  padding: 8px;
   border-radius: 50%;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.favorite-btn:active {
+  transform: scale(0.9);
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20rpx;
+  margin-bottom: 12px;
+  padding-right: 80px;
 }
 
 .job-title {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
+  font-size: 17px;
+  font-weight: 600;
+  color: #1E1E1E;
   flex: 1;
 }
 
 .salary {
-  font-size: 32rpx;
-  color: #ff6b35;
-  font-weight: bold;
+  font-size: 16px;
+  font-weight: 500;
+  color: #007aff;
 }
 
 .company-info {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20rpx;
+  margin-bottom: 12px;
+  padding-right: 80px;
 }
 
 .company-name {
-  font-size: 28rpx;
-  color: #666;
-  margin-right: 20rpx;
-}
-
-.company-tag {
-  font-size: 24rpx;
-  color: #999;
-  background-color: #f5f5f5;
-  padding: 4rpx 12rpx;
-  border-radius: 6rpx;
+  font-size: 15px;
+  font-weight: 500;
+  color: #1E1E1E;
+  margin-bottom: 8px;
+  display: block;
 }
 
 .job-tags {
   display: flex;
   flex-wrap: wrap;
-  margin-bottom: 20rpx;
+  margin-bottom: 8px;
+  gap: 6px;
+  padding-right: 80px;
 }
 
 .tag {
-  font-size: 24rpx;
-  color: #007aff;
-  background-color: rgba(0, 122, 255, 0.1);
-  padding: 6rpx 16rpx;
-  border-radius: 20rpx;
-  margin-right: 10rpx;
-  margin-bottom: 10rpx;
+  font-size: 12px;
+  color: #6C757D;
+  background-color: #F2F5F9;
+  padding: 4px 8px;
+  border-radius: 8px;
+  margin-right: 6px;
+  margin-bottom: 6px;
 }
 
 .card-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 20rpx;
-  border-top: 1rpx solid #f0f0f0;
+  padding-top: 12px;
+  border-top: 1px solid #F0F2F5;
+  margin-top: 8px;
+  padding-right: 80px;
 }
 
-.location,
+.location {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  color: #1E1E1E;
+}
+
+.location::before {
+  content: "📍";
+  margin-right: 4px;
+  color: #007aff;
+}
+
 .time {
-  font-size: 24rpx;
-  color: #999;
+  font-size: 13px;
+  color: #6C757D;
+}
+
+/* 投递按钮 */
+.apply-btn {
+  background-color: #007aff;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 6px 16px;
+  border-radius: 20px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.apply-btn.applied {
+  background-color: #F2F5F9;
+  color: #6C757D;
+}
+
+.apply-btn:active {
+  background-color: #0056b3;
+  transform: scale(0.95);
+}
+
+.apply-btn.applied:active {
+  background-color: #E3E8F0;
+  transform: scale(0.95);
 }
 </style>

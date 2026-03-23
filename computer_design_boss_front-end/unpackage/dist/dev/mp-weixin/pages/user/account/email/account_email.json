@@ -1,4 +1,5 @@
 {
   "navigationBarTitleText": "邮箱设置",
+  "navigationStyle": "custom",
   "usingComponents": {}
 }

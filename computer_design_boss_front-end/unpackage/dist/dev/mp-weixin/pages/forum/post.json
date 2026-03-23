@@ -1,4 +1,5 @@
 {
   "navigationBarTitleText": "发布话题",
+  "navigationStyle": "custom",
   "usingComponents": {}
 }

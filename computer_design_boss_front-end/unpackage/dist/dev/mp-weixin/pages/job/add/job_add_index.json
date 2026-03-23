@@ -1,4 +1,5 @@
 {
   "navigationBarTitleText": "发布职位",
+  "navigationStyle": "custom",
   "usingComponents": {}
 }

@@ -1,9 +1,22 @@
 <template>
-  <view class="container">
+  <view class="container" :style="{ backgroundColor: isDarkMode ? '#1a1a1a' : '#F8FAFD' }">
+    <!-- 顶部导航 -->
+    <view class="nav-bar" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
+      <view class="nav-bar-left">
+        <!-- 左侧预留空间 -->
+      </view>
+      <view class="nav-bar-center">
+        <text class="nav-bar-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">首页</text>
+      </view>
+      <view class="nav-bar-right">
+        <!-- 右侧预留空间 -->
+      </view>
+    </view>
+    
     <!-- 顶部搜索栏 -->
-    <view class="search-bar">
-      <uni-icons type="search" size="30" color="#999"></uni-icons>
-      <input type="text" placeholder="搜索职位、公司名称" v-model="keyword" @input="onSearchInput" />
+    <view class="search-bar" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#F2F5F9' }">
+      <uni-icons type="search" size="30" :color="isDarkMode ? '#999' : '#999'"></uni-icons>
+      <input type="text" placeholder="搜索职位、公司名称" v-model="keyword" @input="onSearchInput" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }" />
     </view>
     
     <!-- 轮播图 -->
@@ -14,10 +27,10 @@
     </swiper>
     
     <!-- 分类入口 -->
-    <view class="category-section">
+    <view class="category-section" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#fff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
       <view class="category-item" v-for="category in categoryList" :key="category.id" @click="goToCategory(category.id)">
         <image :src="category.icon" class="category-icon"></image>
-        <text class="category-name">{{ category.name }}</text>
+        <text class="category-name" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">{{ category.name }}</text>
       </view>
     </view>
     
@@ -29,39 +42,38 @@
         :key="category.id"
         @click="selectSubCategory(category.id)"
         :class="{ active: selectedSubCategories.includes(category.id) }"
+        :style="{ backgroundColor: isDarkMode ? '#3a3a3a' : '#F0F4FF', color: '#007aff' }"
       >
         <text>{{ category.name }}</text>
       </view>
     </view>
     
     <!-- 推荐职位区域 -->
-    <view class="job-section">
+    <view class="job-section" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#fff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
       <view class="section-header">
-        <text class="section-title">推荐职位</text>
-        <text class="more-btn" @click="scrollToJobList">查看更多</text>
+        <text class="section-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">{{ categoryName || '推荐职位' }}</text>
+        <text class="more-btn" @click="scrollToJobList" :style="{ color: '#007aff' }">查看更多</text>
       </view>
       
       <!-- 职位列表 -->
       <view class="job-list" ref="jobList">
-        <job-card v-for="job in jobList" :key="job.id" :data="job"></job-card>
+        <job-card v-for="job in jobList" :key="job.id" :data="job" :is-dark="isDarkMode"></job-card>
       </view>
       
       <!-- 加载更多 -->
-      <view class="load-more" v-if="hasMore" @click="loadMore">
+      <view class="load-more" v-if="hasMore" @click="loadMore" :style="{ color: isDarkMode ? '#999' : '#999' }">
         <text>加载更多</text>
       </view>
     </view>
     
-    <!-- 发布职位按钮 -->
-    <view class="add-job-btn" @click="goToAddJob">
-      <text>+</text>
-    </view>
+    
   </view>
 </template>
 
 <script>
 import jobCard from '@/component/job/job-card.vue'
 import { jobApi } from '@/common/api/job.js'
+import { themeManager } from '@/common/utils/theme-simple.js'
 
 export default {
   components: {
@@ -95,17 +107,44 @@ export default {
       // 分类常量
       techCategories,
       designCategories,
-      manageCategories
+      manageCategories,
+      // 主题相关
+      currentTheme: 'light',
+      isDarkMode: false
     }
   },
   onLoad() {
     this.getRecommendJobs()
     this.getJobCategories()
+    this.initTheme()
+  },
+  onUnload() {
+    // 清理主题监听
+    uni.$off('globalThemeChange', this.handleGlobalThemeChange)
   },
   onPullDownRefresh() {
     this.onRefresh()
   },
   methods: {
+    /**
+     * 初始化主题
+     */
+    initTheme() {
+      // 获取当前主题
+      this.currentTheme = themeManager.getCurrentTheme()
+      this.isDarkMode = this.currentTheme === 'dark'
+      
+      // 监听全局主题变化
+      uni.$on('globalThemeChange', this.handleGlobalThemeChange)
+    },
+    
+    /**
+     * 处理全局主题变化
+     */
+    handleGlobalThemeChange(data) {
+      this.currentTheme = data.theme
+      this.isDarkMode = data.isDark
+    },
     async getRecommendJobs() {
       try {
         // 检查网络状态
@@ -422,12 +461,7 @@ export default {
       uni.stopPullDownRefresh()
     },
     
-    // 跳转到发布职位页面
-    goToAddJob() {
-      uni.navigateTo({
-        url: '/pages/job/add/job_add_index'
-      })
-    },
+    
     
     getJobCategories() {
       // 根据实际数据库结构定义主分类
@@ -562,30 +596,88 @@ export default {
 
 <style>
 .container {
-  padding: 0 20rpx;
-  background-color: #f5f5f5;
+  background-color: #F8FAFD;
   min-height: 100vh;
+  padding: 0 16px;
+  font-family: -apple-system, Helvetica, Roboto, sans-serif;
+}
+
+/* 导航栏样式 */
+.nav-bar {
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  height: 40px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  position: relative;
+  margin-bottom: 12rpx;
+}
+
+.nav-bar-left {
+  flex: 0 0 auto;
+  padding: 8px;
+}
+
+.nav-bar-center {
+  flex: 1;
+  text-align: center;
+}
+
+.nav-bar-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1E1E1E;
+}
+
+.nav-bar-right {
+  flex: 0 0 auto;
+  padding: 8px;
+}
+
+.nav-back-icon {
+  color: #1E1E1E;
+  transition: all 0.3s ease;
+}
+
+.nav-back-icon:active {
+  color: #007aff;
 }
 
 .search-bar {
   display: flex;
   align-items: center;
-  background-color: #fff;
-  padding: 15rpx 20rpx;
-  border-radius: 8rpx;
-  margin: 20rpx 0;
+  background-color: #F2F5F9;
+  border-radius: 30px;
+  height: 44px;
+  padding: 0 16px;
+  margin: 12px 0;
+  transition: all 0.3s ease;
 }
 
-.search-text {
-  margin-left: 15rpx;
-  color: #999;
-  font-size: 28rpx;
+.search-bar:focus-within {
+  box-shadow: 0 0 0 2px #007aff;
+}
+
+.search-bar input {
+  flex: 1;
+  margin-left: 12px;
+  font-size: 15px;
+  color: #1E1E1E;
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+.search-bar input::placeholder {
+  color: #ADB5BD;
 }
 
 .banner-img {
   width: 100%;
   height: 300rpx;
-  border-radius: 10rpx;
+  border-radius: 16px;
+  margin: 12px 0;
 }
 
 .category-section {
@@ -593,100 +685,135 @@ export default {
   justify-content: space-around;
   background-color: #fff;
   padding: 30rpx 0;
-  margin: 20rpx 0;
-  border-radius: 10rpx;
+  margin: 16rpx 0;
+  border-radius: 16rpx;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .category-item {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 16rpx;
+  transition: all 0.3s ease;
+}
+
+.category-item:active {
+  transform: scale(0.95);
 }
 
 .category-icon {
   width: 80rpx;
   height: 80rpx;
   margin-bottom: 10rpx;
+  display: block;
 }
 
 .category-name {
   font-size: 26rpx;
-  color: #333;
+  color: #1E1E1E;
 }
 
 .job-section {
   background-color: #fff;
-  padding: 20rpx;
-  border-radius: 10rpx;
-  margin-bottom: 20rpx;
+  padding: 16px;
+  border-radius: 16px;
+  margin: 12px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20rpx;
+  margin-bottom: 16px;
+  padding: 8px 0;
 }
 
 .section-title {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1E1E1E;
 }
 
 .more-btn {
-  font-size: 26rpx;
-  color: #999;
+  font-size: 13px;
+  color: #007aff;
+  transition: all 0.3s ease;
+}
+
+.more-btn:active {
+  color: #007aff;
+  opacity: 0.7;
 }
 
 .job-list {
-  margin-bottom: 20rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 .load-more {
   text-align: center;
   padding: 20rpx;
-  color: #999;
+  color: #999999;
+  font-size: 28rpx;
 }
 
 /* 子分类标签区域 */
 .sub-category-tabs {
-  background-color: #fff;
-  padding: 20rpx;
-  margin-bottom: 20rpx;
-  border-radius: 10rpx;
+  background: transparent;
+  padding: 12px 0;
+  margin: 0;
+  border-radius: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 20rpx;
+  gap: 8px;
+  box-shadow: none;
 }
 
 .sub-category-tab {
-  padding: 15rpx 30rpx;
-  background-color: #f5f5f5;
-  border-radius: 20rpx;
-  font-size: 28rpx;
-  color: #333;
+  padding: 8px 16px;
+  background-color: #F0F4FF;
+  border-radius: 30px;
+  font-size: 14px;
+  color: #007aff;
+  transition: all 0.3s ease;
+  margin-right: 8px;
+  margin-bottom: 8px;
 }
 
 .sub-category-tab.active {
-  background-color: #007aff;
-  color: #fff;
+  background-color: #E0E9FF;
+  color: #007aff;
+}
+
+.sub-category-tab:active {
+  transform: scale(0.95);
+  background-color: #E0E9FF;
+}
+
+.sub-category-tab:active {
+  opacity: 0.8;
 }
 
 /* 就业类型筛选区域 */
 .emp-type-section {
   background-color: #fff;
   padding: 20rpx;
-  margin-bottom: 20rpx;
-  border-radius: 10rpx;
+  margin: 0 16rpx 16rpx;
+  border-radius: 16rpx;
   display: flex;
   justify-content: space-around;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .emp-type-item {
   padding: 15rpx 30rpx;
   font-size: 28rpx;
-  color: #333;
+  color: #6C757D;
+  transition: all 0.3s ease;
 }
 
 .emp-type-item.active {
@@ -694,43 +821,9 @@ export default {
   border-bottom: 2rpx solid #007aff;
 }
 
-/* 搜索栏样式 */
-.search-bar {
-  display: flex;
-  align-items: center;
-  background-color: #fff;
-  padding: 15rpx 20rpx;
-  border-radius: 8rpx;
-  margin: 20rpx 0;
+.emp-type-item:active {
+  color: #007aff;
 }
 
-.search-bar input {
-  flex: 1;
-  margin-left: 15rpx;
-  font-size: 28rpx;
-}
 
-/* 发布职位按钮 */
-.add-job-btn {
-  position: fixed;
-  bottom: 80rpx;
-  right: 40rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 120rpx;
-  height: 120rpx;
-  background-color: #007aff;
-  color: #fff;
-  font-size: 60rpx;
-  border-radius: 50%;
-  box-shadow: 0 4rpx 20rpx rgba(0, 122, 255, 0.3);
-  z-index: 999;
-}
-
-.btn-text {
-  font-size: 20rpx;
-  position: absolute;
-  bottom: 15rpx;
-}
 </style>

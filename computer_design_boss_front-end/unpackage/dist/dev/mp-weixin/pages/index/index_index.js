@@ -20,6 +20,7 @@ var __spreadValues = (a, b) => {
 var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
 var common_vendor = require("../../common/vendor.js");
 var common_api_job = require("../../common/api/job.js");
+var common_utils_themeSimple = require("../../common/utils/theme-simple.js");
 require("../../common/api/request.js");
 require("../../common/config.js");
 const jobCard = () => "../../component/job/job-card.js";
@@ -52,17 +53,32 @@ const _sfc_main = {
       showCategoryTabs: false,
       techCategories,
       designCategories,
-      manageCategories
+      manageCategories,
+      currentTheme: "light",
+      isDarkMode: false
     };
   },
   onLoad() {
     this.getRecommendJobs();
     this.getJobCategories();
+    this.initTheme();
+  },
+  onUnload() {
+    common_vendor.index.$off("globalThemeChange", this.handleGlobalThemeChange);
   },
   onPullDownRefresh() {
     this.onRefresh();
   },
   methods: {
+    initTheme() {
+      this.currentTheme = common_utils_themeSimple.themeManager.getCurrentTheme();
+      this.isDarkMode = this.currentTheme === "dark";
+      common_vendor.index.$on("globalThemeChange", this.handleGlobalThemeChange);
+    },
+    handleGlobalThemeChange(data) {
+      this.currentTheme = data.theme;
+      this.isDarkMode = data.isDark;
+    },
     async getRecommendJobs() {
       try {
         const networkType = await new Promise((resolve) => {
@@ -287,11 +303,6 @@ const _sfc_main = {
       this.getJobCategories();
       common_vendor.index.stopPullDownRefresh();
     },
-    goToAddJob() {
-      common_vendor.index.navigateTo({
-        url: "/pages/job/add/job_add_index"
-      });
-    },
     getJobCategories() {
       const mainCategories = [
         { id: "100", name: "\u6280\u672F\u5F00\u53D1", icon: "/static/category/tech.png" },
@@ -389,20 +400,25 @@ if (!Array) {
 }
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: common_vendor.p({
+    a: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
+    b: $data.isDarkMode ? "#2c2c2c" : "#ffffff",
+    c: $data.isDarkMode ? "0 2px 8px rgba(0,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.05)",
+    d: common_vendor.p({
       type: "search",
       size: "30",
-      color: "#999"
+      color: $data.isDarkMode ? "#999" : "#999"
     }),
-    b: common_vendor.o([($event) => $data.keyword = $event.detail.value, (...args) => $options.onSearchInput && $options.onSearchInput(...args)]),
-    c: $data.keyword,
-    d: common_vendor.f($data.bannerList, (banner, index, i0) => {
+    e: common_vendor.o([($event) => $data.keyword = $event.detail.value, (...args) => $options.onSearchInput && $options.onSearchInput(...args)]),
+    f: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
+    g: $data.keyword,
+    h: $data.isDarkMode ? "#2c2c2c" : "#F2F5F9",
+    i: common_vendor.f($data.bannerList, (banner, index, i0) => {
       return {
         a: banner.imageUrl,
         b: index
       };
     }),
-    e: common_vendor.f($data.categoryList, (category, k0, i0) => {
+    j: common_vendor.f($data.categoryList, (category, k0, i0) => {
       return {
         a: category.icon,
         b: common_vendor.t(category.name),
@@ -410,32 +426,42 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $options.goToCategory(category.id), category.id)
       };
     }),
-    f: $data.showCategoryTabs && $data.subCategoryList.length > 0
+    k: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
+    l: $data.isDarkMode ? "#2c2c2c" : "#fff",
+    m: $data.isDarkMode ? "0 2px 8px rgba(0,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.05)",
+    n: $data.showCategoryTabs && $data.subCategoryList.length > 0
   }, $data.showCategoryTabs && $data.subCategoryList.length > 0 ? {
-    g: common_vendor.f($data.subCategoryList, (category, k0, i0) => {
+    o: common_vendor.f($data.subCategoryList, (category, k0, i0) => {
       return {
         a: common_vendor.t(category.name),
         b: category.id,
         c: common_vendor.o(($event) => $options.selectSubCategory(category.id), category.id),
         d: $data.selectedSubCategories.includes(category.id) ? 1 : ""
       };
-    })
+    }),
+    p: $data.isDarkMode ? "#3a3a3a" : "#F0F4FF"
   } : {}, {
-    h: common_vendor.o((...args) => $options.scrollToJobList && $options.scrollToJobList(...args)),
-    i: common_vendor.f($data.jobList, (job, k0, i0) => {
+    q: common_vendor.t(_ctx.categoryName || "\u63A8\u8350\u804C\u4F4D"),
+    r: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
+    s: common_vendor.o((...args) => $options.scrollToJobList && $options.scrollToJobList(...args)),
+    t: common_vendor.f($data.jobList, (job, k0, i0) => {
       return {
         a: job.id,
         b: "fd2dfda4-1-" + i0,
         c: common_vendor.p({
-          data: job
+          data: job,
+          ["is-dark"]: $data.isDarkMode
         })
       };
     }),
-    j: $data.hasMore
+    v: $data.hasMore
   }, $data.hasMore ? {
-    k: common_vendor.o((...args) => $options.loadMore && $options.loadMore(...args))
+    w: common_vendor.o((...args) => $options.loadMore && $options.loadMore(...args)),
+    x: $data.isDarkMode ? "#999" : "#999"
   } : {}, {
-    l: common_vendor.o((...args) => $options.goToAddJob && $options.goToAddJob(...args))
+    y: $data.isDarkMode ? "#2c2c2c" : "#fff",
+    z: $data.isDarkMode ? "0 2px 8px rgba(0,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.05)",
+    A: $data.isDarkMode ? "#1a1a1a" : "#F8FAFD"
   });
 }
 var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/index/index_index.vue"]]);

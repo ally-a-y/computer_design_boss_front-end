@@ -4,6 +4,7 @@ exports[Symbol.toStringTag] = "Module";
 var common_vendor = require("./common/vendor.js");
 var common_utils_themeSimple = require("./common/utils/theme-simple.js");
 if (!Math) {
+  "./pages/splash/splash.js";
   "./pages/login/login.js";
   "./pages/login/register/login_reister.js";
   "./pages/login/forget/login_forget.js";
@@ -28,14 +29,17 @@ if (!Math) {
   "./pages/forum/forum.js";
   "./pages/forum/details/forum_detail.js";
   "./pages/forum/post.js";
+  "./pages/chart.js";
 }
 const _sfc_main = {
   onLaunch: function() {
     console.log("App Launch");
     this.initAppTheme();
+    this.listenSystemThemeChange();
   },
   onShow: function() {
     console.log("App Show");
+    this.initAppTheme();
   },
   onHide: function() {
     console.log("App Hide");
@@ -46,10 +50,29 @@ const _sfc_main = {
         const currentTheme = common_utils_themeSimple.themeManager.getCurrentTheme();
         const themeMode = common_utils_themeSimple.themeManager.getThemeMode();
         console.log("\u5F53\u524D\u4E3B\u9898:", currentTheme, "\u4E3B\u9898\u6A21\u5F0F:", themeMode);
+        this.applyGlobalTheme(currentTheme);
         common_utils_themeSimple.themeManager.notifyThemeChange(currentTheme);
       } catch (error) {
         console.error("\u521D\u59CB\u5316\u4E3B\u9898\u5931\u8D25:", error);
       }
+    },
+    applyGlobalTheme(theme) {
+      common_vendor.index.removeClass(document.body, "light-theme");
+      common_vendor.index.removeClass(document.body, "dark-theme");
+      common_vendor.index.addClass(document.body, theme === "dark" ? "dark-theme" : "light-theme");
+      if (theme === "dark") {
+        document.body.style.backgroundColor = "#1a1a1a";
+        document.body.style.color = "#ffffff";
+      } else {
+        document.body.style.backgroundColor = "#f5f5f5";
+        document.body.style.color = "#333333";
+      }
+    },
+    listenSystemThemeChange() {
+      common_utils_themeSimple.themeManager.onSystemThemeChange((newTheme) => {
+        console.log("\u7CFB\u7EDF\u4E3B\u9898\u53D8\u5316:", newTheme);
+        this.applyGlobalTheme(newTheme);
+      });
     }
   }
 };

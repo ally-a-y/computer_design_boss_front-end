@@ -1,7 +1,7 @@
 <template>
   <view class="ai-chat-container">
     <!-- 顶部导航栏 -->
-    <view class="header">
+    <view class="header header-fixed">
       <view class="logo-section">
         <image class="logo" src="/static/ai/logo.png" mode="aspectFit"></image>
         <text class="app-title">AI求职助手</text>
@@ -65,7 +65,7 @@
     </scroll-view>
 
     <!-- 底部输入区域 -->
-    <view class="input-area">
+    <view class="input-area input-fixed">
       <view class="function-buttons">
         <button class="func-btn" @click="openPanel('resumeAnalysis')">简历分析</button>
         <button class="func-btn" @click="openPanel('resumeEvaluation')">简历评估</button>
@@ -121,13 +121,12 @@
               
               <view v-show="currentMethod.includes('position')" class="input-group">
                 <text class="input-label">职位选择</text>
-                <view class="dual-picker-container">
-                  <picker @change="onMainCategoryChange" :range="mainCategories" range-key="name" class="picker-field dual-picker">
-                    <view class="picker-text">{{ getMainCategoryName() }}</view>
-                  </picker>
-                  <picker @change="onDetailPositionChange" :range="getCurrentDetailPositions()" range-key="name" class="picker-field dual-picker" :disabled="!hasSelectedMainCategory()">
-                    <view class="picker-text">{{ getSelectedPositionName() }}</view>
-                  </picker>
+                <view class="cascade-selector" @click="openCascadePicker">
+                  <view class="selector-content" :class="{ 'placeholder': !selectedPositionId }">
+                    <text v-if="selectedPositionId">{{ selectedCategoryName }} - {{ selectedPositionName }}</text>
+                    <text v-else>请选择职位</text>
+                  </view>
+                  <text class="arrow-icon">›</text>
                 </view>
               </view>
               
@@ -145,7 +144,7 @@
             </view>
           </view>
           
-          <!-- 其他面板类似结构 -->
+          <!-- 简历评估面板 -->
           <view v-if="currentPanel === 'resumeEvaluation'">
             <view class="method-selector">
               <radio-group :value="currentMethod" @change="onMethodChange">
@@ -184,6 +183,7 @@
             </view>
           </view>
           
+          <!-- 成功率分析面板 -->
           <view v-if="currentPanel === 'successRate'">
             <view class="method-selector">
               <radio-group :value="currentMethod" @change="onMethodChange">
@@ -216,13 +216,12 @@
               
               <view v-show="currentMethod.includes('position')" class="input-group" key="position-group">
                 <text class="input-label">职位选择</text>
-                <view class="dual-picker-container">
-                  <picker @change="onMainCategoryChange" :range="mainCategories" range-key="name" class="picker-field dual-picker">
-                    <view class="picker-text">{{ getMainCategoryName() }}</view>
-                  </picker>
-                  <picker @change="onDetailPositionChange" :range="getCurrentDetailPositions()" range-key="name" class="picker-field dual-picker" :disabled="!hasSelectedMainCategory()">
-                    <view class="picker-text">{{ getSelectedPositionName() }}</view>
-                  </picker>
+                <view class="cascade-selector" @click="openCascadePicker">
+                  <view class="selector-content" :class="{ 'placeholder': !selectedPositionId }">
+                    <text v-if="selectedPositionId">{{ selectedCategoryName }} - {{ selectedPositionName }}</text>
+                    <text v-else>请选择职位</text>
+                  </view>
+                  <text class="arrow-icon">›</text>
                 </view>
               </view>
               
@@ -240,6 +239,7 @@
             </view>
           </view>
           
+          <!-- 大学生规划面板 -->
           <view v-if="currentPanel === 'studentPlan'">
             <view class="method-selector">
               <radio-group :value="currentMethod" @change="onMethodChange">
@@ -272,13 +272,12 @@
               
               <view v-show="currentMethod.includes('position')" class="input-group" key="position-group">
                 <text class="input-label">职位选择</text>
-                <view class="dual-picker-container">
-                  <picker @change="onMainCategoryChange" :range="mainCategories" range-key="name" class="picker-field dual-picker">
-                    <view class="picker-text">{{ getMainCategoryName() }}</view>
-                  </picker>
-                  <picker @change="onDetailPositionChange" :range="getCurrentDetailPositions()" range-key="name" class="picker-field dual-picker" :disabled="!hasSelectedMainCategory()">
-                    <view class="picker-text">{{ getSelectedPositionName() }}</view>
-                  </picker>
+                <view class="cascade-selector" @click="openCascadePicker">
+                  <view class="selector-content" :class="{ 'placeholder': !selectedPositionId }">
+                    <text v-if="selectedPositionId">{{ selectedCategoryName }} - {{ selectedPositionName }}</text>
+                    <text v-else>请选择职位</text>
+                  </view>
+                  <text class="arrow-icon">›</text>
                 </view>
               </view>
               
@@ -303,9 +302,40 @@
         </view>
       </view>
     </view>
+
+    <view v-if="showCascadePicker" class="cascade-overlay" @click="closeCascadePicker">
+      <view class="cascade-modal" @click.stop>
+        <view class="cascade-header">
+          <text class="cascade-title">选择职位</text>
+          <text class="cascade-close" @click="confirmCascadeSelection">确定</text>
+        </view>
+        <view class="cascade-body">
+          <scroll-view class="category-list" scroll-y>
+            <view 
+              v-for="category in mainCategories" 
+              :key="category.id"
+              :class="['category-item', selectedCategoryId === category.id ? 'active' : '']"
+              @click="selectCategory(category)"
+            >
+              <text>{{ category.name }}</text>
+            </view>
+          </scroll-view>
+          <scroll-view class="position-list" scroll-y>
+            <view 
+              v-for="position in currentPositions" 
+              :key="position.id"
+              :class="['position-item', selectedPositionId === position.id ? 'active' : '']"
+              @click="selectPosition(position)"
+            >
+              <text>{{ position.name }}</text>
+              <text v-if="selectedPositionId === position.id" class="check-icon">✓</text>
+            </view>
+          </scroll-view>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
-
 
 <script>
 import { aiApi } from '@/common/api/ai.js'
@@ -327,19 +357,26 @@ export default {
       isLoading: false,
       currentPanel: null,
       currentMethod: 'user+position',
-	  isLoadingUser: false,
+      isLoadingUser: false,
       userInfo: null, 
-	  currentUserId: null,
+      currentUserId: null,
       formData: {
         positionId: '',
         positionText: '',
         pdfFile: null,
-        positionName: '' // 新增：存储选择的职位名称
+        positionName: ''
       },
       gradeIndex: 0,
       gradeOptions: ['大一', '大二', '大三', '大四', '研一', '研二', '研三'],
       
-      // 双滚轮职位选择数据
+      // 级联选择
+      showCascadePicker: false,
+      selectedCategoryId: '',
+      selectedCategoryName: '',
+      selectedPositionId: '',
+      selectedPositionName: '',
+      
+      // 职位数据
       mainCategories: [
         { id: '101', name: '前端开发' }, 
         { id: '102', name: '后端开发' }, 
@@ -415,17 +452,19 @@ export default {
         studentPlan: '大学生规划'
       }
       return titles[this.currentPanel] || ''
+    },
+    
+    // 当前分类下的职位列表
+    currentPositions() {
+      if (!this.selectedCategoryId) return []
+      return this.positionDetails[this.selectedCategoryId] || []
     }
   },
   
   onLoad() {
     this.initializeChat()
-	this.fetchUserInfo()
-	
-	// 延迟初始化，确保数据完全加载
-	setTimeout(() => {
-		this.initializePositionSelection()
-	}, 100)
+    this.fetchUserInfo()
+    this.initializeDefaultSelection()
   },
   
   onUnload() {
@@ -433,97 +472,157 @@ export default {
   },
   
   methods: {
-      initializeChat() {
-      },
+    initializeChat() {
+    },
+    
+    // 修改初始化方法：不再自动选择默认职位
+    initializeDefaultSelection() {
+      this.selectedCategoryId = ''
+      this.selectedCategoryName = ''
+      this.selectedPositionId = ''
+      this.selectedPositionName = ''
+      this.formData.positionId = ''
+      this.formData.positionName = ''
+    },
+    
+    // MODIFIED: 打开级联选择器，根据表单已选职位初始化，若无则默认选中第一个分类的第一个职位
+    openCascadePicker() {
+      this.showCascadePicker = true
+      if (this.formData.positionId) {
+        let foundCategoryId = null
+        let foundCategoryName = null
+        let foundPositionName = null
+        for (const [catId, positions] of Object.entries(this.positionDetails)) {
+          const pos = positions.find(p => p.id === this.formData.positionId)
+          if (pos) {
+            foundCategoryId = catId
+            foundCategoryName = this.mainCategories.find(c => c.id === catId)?.name || ''
+            foundPositionName = pos.name
+            break
+          }
+        }
+        if (foundCategoryId) {
+          this.selectedCategoryId = foundCategoryId
+          this.selectedCategoryName = foundCategoryName
+          this.selectedPositionId = this.formData.positionId
+          this.selectedPositionName = foundPositionName
+          return
+        }
+      }
+      // 表单中无有效职位ID，且当前未选中任何分类，则默认选中第一个分类的第一个职位
+      if (!this.selectedCategoryId) {
+        const firstCategory = this.mainCategories[0]
+        if (firstCategory) {
+          this.selectedCategoryId = firstCategory.id
+          this.selectedCategoryName = firstCategory.name
+          const positions = this.positionDetails[firstCategory.id] || []
+          if (positions.length > 0) {
+            const firstPosition = positions[0]
+            this.selectedPositionId = firstPosition.id
+            this.selectedPositionName = firstPosition.name
+          }
+        }
+      }
+    },
+    
+    // MODIFIED: 选择分类时自动选中该分类下第一个职位，但不更新表单
+    selectCategory(category) {
+      this.selectedCategoryId = category.id
+      this.selectedCategoryName = category.name
+      const positions = this.positionDetails[category.id] || []
+      if (positions.length > 0) {
+        const firstPosition = positions[0]
+        this.selectedPositionId = firstPosition.id
+        this.selectedPositionName = firstPosition.name
+      } else {
+        this.selectedPositionId = ''
+        this.selectedPositionName = ''
+      }
+    },
+    
+    // MODIFIED: 选择职位时仅更新选中变量，不自动关闭弹窗，不更新表单
+    selectPosition(position) {
+      this.selectedPositionId = position.id
+      this.selectedPositionName = position.name
+    },
+    
+    // MODIFIED: 确定选择，将选中职位同步到表单并关闭弹窗
+    confirmCascadeSelection() {
+      if (!this.selectedPositionId) {
+        uni.showToast({ title: '请选择职位', icon: 'none' })
+        return
+      }
+      this.formData.positionId = this.selectedPositionId
+      this.formData.positionName = this.selectedPositionName
+      this.showCascadePicker = false
+      uni.showToast({
+        title: `已选择: ${this.selectedCategoryName} - ${this.selectedPositionName}`,
+        icon: 'none',
+        duration: 1500
+      })
+    },
+    
+    // 获取用户信息
+    async fetchUserInfo() {
+      this.isLoadingUser = true
       
-      // 初始化职位选择
-      initializePositionSelection() {
-        // 确保数据存在
-        if (!this.mainCategories || !this.positionDetails) {
+      try {
+        const token = uni.getStorageSync('token')
+        
+        if (!token) {
+          console.log('未找到登录token，需要用户登录')
+          this.currentUserId = null
           return
         }
         
-        // 设置默认职位为第一个分类的第一个职位
-        if (this.mainCategories.length > 0) {
-          const firstCategory = this.mainCategories[0]
-          const firstPositions = this.positionDetails[firstCategory.id]
-          
-          if (firstPositions && firstPositions.length > 0) {
-            this.formData.positionId = firstPositions[0].id
-            this.formData.positionName = firstPositions[0].name
-          }
+        const cachedUserInfo = uni.getStorageSync('userInfo')
+        if (cachedUserInfo && cachedUserInfo.user_id) {
+          this.userInfo = cachedUserInfo
+          this.currentUserId = String(cachedUserInfo.user_id)
+          console.log('从缓存获取用户ID:', this.currentUserId)
+          return
         }
-      },
-      
-      // 获取用户信息
-      async fetchUserInfo() {
-        this.isLoadingUser = true
         
-        try {
-          //从本地存储获取token，然后请求用户信息
-          const token = uni.getStorageSync('token')
-          
-          if (!token) {
-            console.log('未找到登录token，需要用户登录')
-            // 跳转到登录页面
-            // uni.navigateTo({ url: '/pages/login/login' })
-            this.currentUserId = null
-            return
-          }
-          
-          // 从本地存储获取缓存的用户信息
-          const cachedUserInfo = uni.getStorageSync('userInfo')
-          if (cachedUserInfo && cachedUserInfo.user_id) {
-            this.userInfo = cachedUserInfo
-            this.currentUserId = String(cachedUserInfo.user_id)
-            console.log('从缓存获取用户ID:', this.currentUserId)
-            return
-          }
-          
-          // 如果本地没有，请求后端API获取用户信息
-          const res = await this.getUserProfile()
-          
-          if (res.code === 200 && res.data) {
-            this.userInfo = res.data
-            this.currentUserId = String(res.data.user_id || res.data.userId || res.data.id)
-            // 缓存到本地
-            uni.setStorageSync('userInfo', res.data)
-            console.log('从后端获取用户ID:', this.currentUserId)
-          }
-        } catch (error) {
-          console.error('获取用户信息失败:', error)
-          uni.showToast({
-            title: '获取用户信息失败',
-            icon: 'none',
-            duration: 2000
-          })
-          this.currentUserId = null
-        } finally {
-          this.isLoadingUser = false
+        const res = await this.getUserProfile()
+        
+        if (res.code === 200 && res.data) {
+          this.userInfo = res.data
+          this.currentUserId = String(res.data.user_id || res.data.userId || res.data.id)
+          uni.setStorageSync('userInfo', res.data)
+          console.log('从后端获取用户ID:', this.currentUserId)
         }
-      },
-      
-      // 请求后端获取用户信息的API
-      getUserProfile() {
-        return new Promise((resolve, reject) => {
-          uni.request({
-            url: `${BASE_URL}/api/user/profile`,
-            method: 'GET',
-            header: {
-              'Authorization': `Bearer ${uni.getStorageSync('token')}`
-            },
-            success: (res) => {
-              resolve(res.data)
-            },
-            fail: (err) => {
-              reject(err)
-            }
-          })
+      } catch (error) {
+        console.error('获取用户信息失败:', error)
+        uni.showToast({
+          title: '获取用户信息失败',
+          icon: 'none',
+          duration: 2000
         })
-      },
+        this.currentUserId = null
+      } finally {
+        this.isLoadingUser = false
+      }
+    },
+    
+    getUserProfile() {
+      return new Promise((resolve, reject) => {
+        uni.request({
+          url: `${BASE_URL}/api/user/profile`,
+          method: 'GET',
+          header: {
+            'Authorization': `Bearer ${uni.getStorageSync('token')}`
+          },
+          success: (res) => {
+            resolve(res.data)
+          },
+          fail: (err) => {
+            reject(err)
+          }
+        })
+      })
+    },
     
     cleanup() {
-      // 清理资源
     },
     
     goToInterview() {
@@ -532,13 +631,11 @@ export default {
       })
     },
     
-    // 发送普通消息（AI对话）
     async sendMessage() {
       if (!this.inputText.trim() || this.isLoading) return
       
       const userMessage = this.inputText.trim()
       
-      // 添加用户消息
       this.messages.push({
         sender: 'user',
         content: userMessage,
@@ -598,33 +695,11 @@ export default {
     openPanel(panelType) {
       this.currentPanel = panelType
       this.currentMethod = this.getDefaultMethod(panelType)
-	  // 打开面板时确保用户信息已加载
       if (!this.currentUserId && !this.isLoadingUser) {
         this.fetchUserInfo()
       }
-      // 确保职位选择器初始化
-      this.ensurePositionSelection()
-      
-      // 强制初始化职位选择
-      if (this.currentMethod.includes('position') && !this.formData.positionName) {
-        setTimeout(() => {
-          this.initializePositionSelection()
-        }, 200)
-      }
-    },
-    
-    // 确保职位选择器有正确的状态
-    ensurePositionSelection() {
-      if (this.currentMethod.includes('position')) {
-        if (!this.formData.positionName && this.mainCategories && this.mainCategories.length > 0) {
-          // 如果没有选择职位，使用默认的第一个
-          const firstCategory = this.mainCategories[0]
-          const firstPositions = this.positionDetails[firstCategory.id]
-          if (firstPositions && firstPositions.length > 0) {
-            this.formData.positionId = firstPositions[0].id
-            this.formData.positionName = firstPositions[0].name
-          }
-        }
+      if (!this.selectedCategoryId) {
+        this.initializeDefaultSelection()
       }
     },
     
@@ -651,92 +726,82 @@ export default {
       this.gradeIndex = parseInt(e.detail.value)
     },
 
-  // 预处理内容：处理 JSON 转义字符和清理残留
-  preprocessContent(text) {
-    if (!text) return ''
-    
-    let processed = text
-    
-    // 处理 JSON 转义字符
-    processed = processed
-      .replace(/\\n/g, '\n')      // 将 \n 转为实际换行符
-      .replace(/\\"/g, '"')       // 将 \" 转为 "
-      .replace(/\\'/g, "'")       // 将 \' 转为 '
-      .replace(/\\t/g, '\t')      // 将 \t 转为制表符
-      .replace(/\\r/g, '')        // 移除 \r
-      .replace(/\\\\/g, '\\')     // 将 \\ 转为 \
-    
-    processed = processed
-      .replace(/\s*,\s*"role"\s*:\s*"assistant"\s*\]?\}?$/g, '') 
-      .replace(/\s*,\s*"role"\s*:\s*"user"\s*\]?\}?$/g, '')       
-      .replace(/\]?\}?\s*$/, '')  
-    
-    return processed
-  },
+    preprocessContent(text) {
+      if (!text) return ''
+      
+      let processed = text
+      
+      processed = processed
+        .replace(/\\n/g, '\n')
+        .replace(/\\"/g, '"')
+        .replace(/\\'/g, "'")
+        .replace(/\\t/g, '\t')
+        .replace(/\\r/g, '')
+        .replace(/\\\\/g, '\\')
+      
+      processed = processed
+        .replace(/\s*,\s*"role"\s*:\s*"assistant"\s*\]?\}?$/g, '') 
+        .replace(/\s*,\s*"role"\s*:\s*"user"\s*\]?\}?$/g, '')       
+        .replace(/\]?\}?\s*$/, '')  
+      
+      return processed
+    },
 
-  // 解析 Markdown 文本为 HTML
-  parseMarkdown(text) {
-    if (!text) return ''
-    
-    // 先预处理
-    let html = this.preprocessContent(text)
-    
-    // 清理特殊标记并转换格式
-    html = html
-      .replace(/^\s*#\s*$/gm, '')
-      .replace(/^\s*---\s*$/gm, '')
-      .replace(/\*\*([^*]+)\*\*/g, '<strong style="font-weight:600;color:#222;">$1</strong>')
-      .replace(/\*([^*\n]+)\*/g, '<em style="font-style:italic;color:#555;">$1</em>')
-      .replace(/`([^`]+)`/g, '<code style="background:#f0f0f0;padding:2rpx 8rpx;border-radius:4rpx;color:#e83e8c;font-size:28rpx;">$1</code>')
-      .replace(/###\s+([^\n]+)/g, '<strong style="font-size:32rpx;font-weight:600;display:block;margin:16rpx 0 8rpx;color:#333;">$1</strong>')
-      .replace(/##\s+([^\n]+)/g, '<strong style="font-size:34rpx;font-weight:600;display:block;margin:20rpx 0 12rpx;color:#222;border-bottom:2rpx solid #eee;padding-bottom:6rpx;">$1</strong>')
-      .replace(/#\s+([^\n]+)/g, '<strong style="font-size:36rpx;font-weight:600;display:block;margin:24rpx 0 16rpx;color:#111;">$1</strong>')
-    
-    // 先标记列表项
-    html = html.replace(/^\s*[-•]\s+([^\n]+)/gm, ':::li:::$1:::/li:::')
-    
-    // 将连续的列表项组合成 ul
-    html = html.replace(/(:::li:::.*?:::\/li:::\s*)+/g, function(match) {
-      const items = match.match(/:::li:::(.*?):::\/li:::/g)
-      if (items) {
-        const listItems = items.map(item => {
-          const content = item.replace(/:::li:::/, '').replace(/:::\/li:::/, '')
-          return '<li style="margin:2rpx 0;line-height:1.4;">' + content + '</li>'
-        }).join('')
-        return '<ul style="padding-left:28rpx;margin:6rpx 0 10rpx;list-style-type:disc;">' + listItems + '</ul>'
-      }
-      return match
-    })
-    
-    // 处理换行：段落之间保留适当间距
-    html = html
-      .replace(/\n\s*\n/g, '<br>')      
-      .replace(/\n/g, '<br>')           
-    
-    // 清理多余的 <br> 和空标签
-    html = html
-      .replace(/(<br>\s*){3,}/g, '<br><br>')     
-      .replace(/^<br\s*\/?>|<br\s*\/?>$/g, '')   
-      .replace(/<br><\/li>/g, '</li>')           
-      .replace(/<\/li><br>/g, '</li>')          
-      .replace(/<ul><br>/g, '<ul>')              
-      .replace(/<\/ul><br>/g, '</ul>')          
-      .replace(/<strong><br>/g, '<strong>')      
-      .replace(/<br><\/strong>/g, '</strong>')   
-    
-    return html
-  },
+    parseMarkdown(text) {
+      if (!text) return ''
+      
+      let html = this.preprocessContent(text)
+      
+      html = html
+        .replace(/^\s*#\s*$/gm, '')
+        .replace(/^\s*---\s*$/gm, '')
+        .replace(/\*\*([^*]+)\*\*/g, '<strong style="font-weight:600;color:#222;">$1</strong>')
+        .replace(/\*([^*\n]+)\*/g, '<em style="font-style:italic;color:#555;">$1</em>')
+        .replace(/`([^`]+)`/g, '<code style="background:#f0f0f0;padding:2rpx 8rpx;border-radius:4rpx;color:#e83e8c;font-size:28rpx;">$1</code>')
+        .replace(/###\s+([^\n]+)/g, '<strong style="font-size:32rpx;font-weight:600;display:block;margin:16rpx 0 8rpx;color:#333;">$1</strong>')
+        .replace(/##\s+([^\n]+)/g, '<strong style="font-size:34rpx;font-weight:600;display:block;margin:20rpx 0 12rpx;color:#222;border-bottom:2rpx solid #eee;padding-bottom:6rpx;">$1</strong>')
+        .replace(/#\s+([^\n]+)/g, '<strong style="font-size:36rpx;font-weight:600;display:block;margin:24rpx 0 16rpx;color:#111;">$1</strong>')
+      
+      html = html.replace(/^\s*[-•]\s+([^\n]+)/gm, ':::li:::$1:::/li:::')
+      
+      html = html.replace(/(:::li:::.*?:::\/li:::\s*)+/g, function(match) {
+        const items = match.match(/:::li:::(.*?):::\/li:::/g)
+        if (items) {
+          const listItems = items.map(item => {
+            const content = item.replace(/:::li:::/, '').replace(/:::\/li:::/, '')
+            return '<li style="margin:2rpx 0;line-height:1.4;">' + content + '</li>'
+          }).join('')
+          return '<ul style="padding-left:28rpx;margin:6rpx 0 10rpx;list-style-type:disc;">' + listItems + '</ul>'
+        }
+        return match
+      })
+      
+      html = html
+        .replace(/\n\s*\n/g, '<br>')      
+        .replace(/\n/g, '<br>')           
+      
+      html = html
+        .replace(/(<br>\s*){3,}/g, '<br><br>')     
+        .replace(/^<br\s*\/?>|<br\s*\/?>$/g, '')   
+        .replace(/<br><\/li>/g, '</li>')           
+        .replace(/<\/li><br>/g, '</li>')          
+        .replace(/<ul><br>/g, '<ul>')              
+        .replace(/<\/ul><br>/g, '</ul>')          
+        .replace(/<strong><br>/g, '<strong>')      
+        .replace(/<br><\/strong>/g, '</strong>')   
+      
+      return html
+    },
 
-  // 判断是否需要 Markdown 渲染
-  needMarkdownRender(text) {
-    if (!text) return false
-    const patterns = [
-      /\*\*[^*]+\*\*/, /\*[^*]+\*/, /`[^`]+`/,
-      /^#{1,6}\s+/m, /^[-•]\s+/m, /^\d+\.\s+/m,
-      /\\n/, /"role"/, /\\"/
-    ]
-    return patterns.some(p => p.test(text))
-  },
+    needMarkdownRender(text) {
+      if (!text) return false
+      const patterns = [
+        /\*\*[^*]+\*\*/, /\*[^*]+\*/, /`[^`]+`/,
+        /^#{1,6}\s+/m, /^[-•]\s+/m, /^\d+\.\s+/m,
+        /\\n/, /"role"/, /\\"/
+      ]
+      return patterns.some(p => p.test(text))
+    },
     
     chooseFile() {
       // #ifdef MP-WEIXIN
@@ -747,7 +812,6 @@ export default {
         success: (res) => {
           const file = res.tempFiles[0]
           
-          // 读取文件为 base64
           uni.getFileSystemManager().readFile({
             filePath: file.path,
             encoding: 'base64',
@@ -785,7 +849,6 @@ export default {
       // #endif
 
       // #ifdef H5
-      // H5：创建input元素选择文件
       const input = document.createElement('input')
       input.type = 'file'
       input.accept = '.pdf,application/pdf'
@@ -793,7 +856,6 @@ export default {
         const file = e.target.files[0]
         if (!file) return
         
-        // 检查文件类型
         if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
           uni.showToast({
             title: '请选择PDF文件',
@@ -802,7 +864,6 @@ export default {
           return
         }
 
-        // 读取为base64
         const reader = new FileReader()
         reader.onload = (event) => {
           const base64 = event.target.result.split(',')[1] 
@@ -829,18 +890,15 @@ export default {
       // #endif
 
       // #ifdef APP-PLUS
-      // App端
       uni.chooseFile({
         count: 1,
         type: 'all',
         extension: ['pdf'],
         success: (res) => {
           const filePath = res.tempFilePaths[0]
-          // 获取文件信息
           uni.getFileInfo({
             filePath: filePath,
             success: (info) => {
-              // 读取为base64
               uni.getFileSystemManager().readFile({
                 filePath: filePath,
                 encoding: 'base64',
@@ -884,14 +942,12 @@ export default {
     },
     
     async submitFunction() {
-	  // 检查用户是否已登录（仅当需要user时）
       if (this.currentMethod.includes('user') && !this.currentUserId) {
         uni.showToast({ 
           title: '请先登录', 
           icon: 'none',
           duration: 2000
         })
-        // 尝试重新获取用户信息
         this.fetchUserInfo()
         return
       }
@@ -908,12 +964,11 @@ export default {
         positionId: this.formData.positionId,
         positionText: this.formData.positionText,
         pdfFile: this.formData.pdfFile ? { ...this.formData.pdfFile } : null,
-		positionName: this.formData.positionName, // 添加职位名称
-		userId: this.currentUserId
+        positionName: this.formData.positionName,
+        userId: this.currentUserId
       }
       const savedMethod = this.currentMethod
       
-      // 添加用户消息
       const userMessage = this.getUserMessageText()
       this.messages.push({
         sender: 'user',
@@ -925,7 +980,6 @@ export default {
         } : null
       })
       
-      // 关闭面板
       this.closePanel()
       this.scrollToBottom()
       this.isLoading = true
@@ -949,7 +1003,6 @@ export default {
             throw new Error('未知操作类型: ' + panelType)
         }
         
-        // 处理成功结果，添加到消息列表
         if (result) {
           this.messages.push({
             sender: 'ai',
@@ -973,39 +1026,35 @@ export default {
       }
     },
     
-    // 简历分析
     async submitResumeAnalysis(formData, method) {
       try {
         let res;
         
         if (method === 'user+position') {
-          // 直接使用存储的职位名称
           const jobName = (formData.positionName || '').trim()
           if (!jobName) {
             throw new Error('请选择有效的职位')
           }
-		  // 使用当前用户ID（已从formData自动填充）
           if (!formData.userId) {
             throw new Error('用户未登录')
           }
           res = await aiApi.askByUserJobName(jobName)
-                return res?.analysis || res?.data?.analysis || res?.data || res
+          return res?.analysis || res?.data?.analysis || res?.data || res
           
         } else if (method === 'user+text') {
           if (!formData.positionText.trim()) {
             throw new Error('职位描述不能为空')
           }
-		  if (!formData.userId) {
+          if (!formData.userId) {
             throw new Error('用户未登录')
           }
           res = await aiApi.askByUserJobText(formData.positionText)
-                return res?.analysis || res?.data?.analysis || res?.data || res
+          return res?.analysis || res?.data?.analysis || res?.data || res
           
         } else if (method === 'pdf+position') {
           if (!formData.pdfFile?.base64) {
             throw new Error('PDF 文件没有 base64 数据')
           }
-          // 直接使用存储的职位名称
           const jobName = (formData.positionName || '').trim()
           if (!jobName) {
             throw new Error('请选择有效的职位')
@@ -1031,7 +1080,6 @@ export default {
           throw new Error(`不支持的简历分析方法: ${method}`)
         }
         
-        // 统一处理返回结果
         return res?.analysis || res?.data?.analysis || res?.data || res
         
       } catch (err) {
@@ -1040,7 +1088,6 @@ export default {
       }
     },
     
-    // 简历评估
     async submitResumeEvaluation(formData, method) {
       if (method === 'user') {
         const res = await aiApi.resumeEvaluation()
@@ -1059,13 +1106,11 @@ export default {
       }
     },
     
-    // 成功率分析
     async submitSuccessRate(formData, method) {
       if (method === 'pdf+position') {
         if (!formData.pdfFile?.base64) {
           throw new Error('PDF 文件没有 base64 数据')
         }
-        // 使用职位名称而不是ID
         const jobName = (formData.positionName || '').trim()
         if (!jobName) {
           throw new Error('请选择有效的职位')
@@ -1088,7 +1133,6 @@ export default {
         return res?.data?.analysis || res?.analysis || res?.data || res
         
       } else if (method === 'user+position') {
-        // 使用职位名称而不是ID
         const jobName = (formData.positionName || '').trim()
         if (!jobName) {
           throw new Error('请选择有效的职位')
@@ -1105,7 +1149,6 @@ export default {
       }
     },
     
-    // 大学生规划
     async submitStudentPlan(formData, method) {
       const userGrade = this.gradeOptions[this.gradeIndex]
       
@@ -1113,7 +1156,6 @@ export default {
         if (!formData.pdfFile?.base64) {
           throw new Error('PDF 文件没有 base64 数据')
         }
-        // 使用职位名称而不是ID
         const jobName = (formData.positionName || '').trim()
         if (!jobName) {
           throw new Error('请选择有效的职位')
@@ -1137,7 +1179,6 @@ export default {
         return res?.data?.plan || res?.plan || res?.data || res
         
       } else if (method === 'user+position') {
-        // 使用职位名称而不是ID
         const jobName = (formData.positionName || '').trim()
         if (!jobName) {
           throw new Error('请选择有效的职位')
@@ -1169,13 +1210,9 @@ export default {
       }
       let text = texts[this.currentPanel] || '提交分析'
       
-      // 添加职位信息
       if (this.currentMethod.includes('position') && this.formData.positionId) {
-        const mainCategory = this.getCurrentMainCategory()
-        const positions = this.getCurrentDetailPositions()
-        const detailPosition = positions.find(p => p.id === this.formData.positionId)
-        if (mainCategory && detailPosition) {
-          text += ` [${mainCategory.name} - ${detailPosition.name}]`
+        if (this.selectedCategoryName && this.selectedPositionName) {
+          text += ` [${this.selectedCategoryName} - ${this.selectedPositionName}]`
         }
       } else if (this.currentMethod.includes('text') && this.formData.positionText) {
         text += ` [${this.formData.positionText}]`
@@ -1190,7 +1227,6 @@ export default {
     validateForm() {
       const method = this.currentMethod
      
-      // 对于需要userId的方式，检查是否已自动获取
       if (method.includes('user')) {
         if (!this.currentUserId) {
           uni.showToast({ 
@@ -1198,22 +1234,15 @@ export default {
             icon: 'none',
             duration: 3000
           })
-          // 触发重新获取用户信息
           this.fetchUserInfo()
           return false
         }
       }
 	  
       if (method.includes('position')) {
-        if (!this.formData.positionName || !this.formData.positionName.trim()) {
-          // 尝试自动初始化
-          this.initializePositionSelection()
-          
-          // 再次检查
-          if (!this.formData.positionName || !this.formData.positionName.trim()) {
-            uni.showToast({ title: '请选择职位', icon: 'none' })
-            return false
-          }
+        if (!this.selectedPositionId) {
+          uni.showToast({ title: '请选择职位', icon: 'none' })
+          return false
         }
       }
       
@@ -1241,7 +1270,6 @@ export default {
     },
     
     loadMoreHistory() {
-      // TODO: 实现历史消息加载功能
     },
     
     formatFileSize(size) {
@@ -1256,80 +1284,6 @@ export default {
       return date.toLocaleTimeString()
     },
     
-    // 双滚轮职位选择方法
-    onMainCategoryChange(e) {
-      const index = parseInt(e.detail.value)
-      if (index >= 0 && index < this.mainCategories.length) {
-        const selectedCategory = this.mainCategories[index]
-        // 自动选择第一个具体职位
-        const detailPositions = this.positionDetails[selectedCategory.id]
-        if (detailPositions && detailPositions.length > 0) {
-          // 存储职位ID和名称
-          this.formData.positionId = detailPositions[0].id
-          this.formData.positionName = detailPositions[0].name
-        } else {
-          this.formData.positionId = ''
-          this.formData.positionName = ''
-        }
-      }
-    },
-    
-    // 具体职位选择
-    onDetailPositionChange(e) {
-      const index = parseInt(e.detail.value)
-      const positions = this.getCurrentDetailPositions()
-      if (index >= 0 && index < positions.length) {
-        const selectedPosition = positions[index]
-        // 存储职位ID和名称
-        this.formData.positionId = selectedPosition.id
-        this.formData.positionName = selectedPosition.name
-      }
-    },
-    
-    // 获取当前主分类下的具体职位
-    getCurrentDetailPositions() {
-      if (!this.formData.positionId) return []
-      // 找到当前positionId对应的主分类
-      for (const category of this.mainCategories) {
-        const positions = this.positionDetails[category.id]
-        if (positions && positions.some(p => p.id === this.formData.positionId)) {
-          return positions
-        }
-      }
-      return []
-    },
-    
-    // 获取当前主分类
-    getCurrentMainCategory() {
-      if (!this.formData.positionId) return null
-      for (const category of this.mainCategories) {
-        const positions = this.positionDetails[category.id]
-        if (positions && positions.some(p => p.id === this.formData.positionId)) {
-          return category
-        }
-      }
-      return null
-    },
-    
-    // 获取主分类名称（用于显示）
-    getMainCategoryName() {
-      const category = this.getCurrentMainCategory()
-      return category ? category.name : '请选择职位分类'
-    },
-    
-    // 获取选中的职位名称（用于显示）
-    getSelectedPositionName() {
-      if (!this.formData.positionId) return '请选择具体职位'
-      const positions = this.getCurrentDetailPositions()
-      const position = positions.find(p => p.id === this.formData.positionId)
-      return position ? position.name : '请选择具体职位'
-    },
-    
-    // 检查是否已选择主分类
-    hasSelectedMainCategory() {
-      return this.getCurrentMainCategory() !== null
-    },
-    
     resetForm() {
       this.formData = {
         positionId: '',
@@ -1338,6 +1292,11 @@ export default {
         positionName: ''
       }
       this.gradeIndex = 0
+      // 重置级联选择
+      this.selectedCategoryId = ''
+      this.selectedCategoryName = ''
+      this.selectedPositionId = ''
+      this.selectedPositionName = ''
     }
   }
 }
@@ -1349,18 +1308,23 @@ export default {
   display: flex;
   flex-direction: column;
   background-color: #f8f8f8;
+  position: relative;
 }
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: calc(var(--status-bar-height) + 20rpx) 30rpx 30rpx;
-    height: 120rpx;
-    background-color: #fff;
-    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
-    position: relative;
-    z-index: 100;
+.header-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background-color: #fff;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
+  
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: calc(var(--status-bar-height) + 20rpx) 30rpx 30rpx;
+  height: 120rpx;
   
   .logo-section {
     display: flex;
@@ -1401,6 +1365,10 @@ export default {
   flex: 1;
   padding: 20rpx;
   background-color: #f8f8f8;
+  // padding-bottom: 10rpx; 
+  margin-top: calc(var(--status-bar-height) + 160rpx); 
+  margin-bottom: 240; 
+  height: auto;
   
   .message-list {
     .message-item {
@@ -1540,75 +1508,74 @@ export default {
           }
         }
       }
-	  
-	  .markdown-content {
-	    font-size: 32rpx;
-	    line-height: 1.8;
-	    color: #333;
-	    
-	    // 确保 rich-text 内的样式生效
-	    ::v-deep {
-	      p {
-	        margin: 16rpx 0;
-	        line-height: 1.8;
-	      }
-	      
-	      strong {
-	        font-weight: 600;
-	        color: #222;
-	      }
-	      
-	      em {
-	        font-style: italic;
-	        color: #555;
-	      }
-	      
-	      h1, h2, h3 {
-	        font-weight: 600;
-	        margin: 24rpx 0 16rpx;
-	      }
-	      
-	      ul, ol {
-	        margin: 16rpx 0;
-	        padding-left: 40rpx;
-	      }
-	      
-	      li {
-	        margin: 12rpx 0;
-	      }
-	      
-	      pre {
-	        background: #f8f9fa;
-	        padding: 20rpx;
-	        border-radius: 12rpx;
-	        overflow-x: auto;
-	        margin: 16rpx 0;
-	      }
-	      
-	      code {
-	        font-family: monospace;
-	        font-size: 28rpx;
-	      }
-	      
-	      blockquote {
-	        border-left: 8rpx solid #007aff;
-	        padding: 16rpx 24rpx;
-	        margin: 16rpx 0;
-	        background: #f8f9fa;
-	      }
-	      
-	      a {
-	        color: #007aff;
-	        text-decoration: none;
-	      }
-	      
-	      hr {
-	        border: none;
-	        border-top: 2rpx solid #e9ecef;
-	        margin: 32rpx 0;
-	      }
-	    }
-	  }
+      
+      .markdown-content {
+        font-size: 32rpx;
+        line-height: 1.8;
+        color: #333;
+        
+        ::v-deep {
+          p {
+            margin: 16rpx 0;
+            line-height: 1.8;
+          }
+          
+          strong {
+            font-weight: 600;
+            color: #222;
+          }
+          
+          em {
+            font-style: italic;
+            color: #555;
+          }
+          
+          h1, h2, h3 {
+            font-weight: 600;
+            margin: 24rpx 0 16rpx;
+          }
+          
+          ul, ol {
+            margin: 16rpx 0;
+            padding-left: 40rpx;
+          }
+          
+          li {
+            margin: 12rpx 0;
+          }
+          
+          pre {
+            background: #f8f9fa;
+            padding: 20rpx;
+            border-radius: 12rpx;
+            overflow-x: auto;
+            margin: 16rpx 0;
+          }
+          
+          code {
+            font-family: monospace;
+            font-size: 28rpx;
+          }
+          
+          blockquote {
+            border-left: 8rpx solid #007aff;
+            padding: 16rpx 24rpx;
+            margin: 16rpx 0;
+            background: #f8f9fa;
+          }
+          
+          a {
+            color: #007aff;
+            text-decoration: none;
+          }
+          
+          hr {
+            border: none;
+            border-top: 2rpx solid #e9ecef;
+            margin: 32rpx 0;
+          }
+        }
+      }
       
       .message-time {
         font-size: 24rpx;
@@ -1669,10 +1636,9 @@ export default {
       
       &:last-child {
         margin-right: 0;
-      }
     }
   }
-  
+} 
   .input-container {
     display: flex;
     align-items: flex-end;
@@ -1841,8 +1807,7 @@ export default {
               color: #adb5bd;
             }
           }
-		  
-		  // 用户信息展示样式（参照interview.vue）
+          
           .user-id-display {
             width: 100%;
             padding: 24rpx 28rpx;
@@ -1918,81 +1883,6 @@ export default {
               transform: scale(0.98);
             }
           }
-          
-          .picker-field {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 24rpx 28rpx;
-            border: 2rpx solid #e9ecef;
-            border-radius: 16rpx;
-            background-color: #fff;
-            transition: all 0.3s ease;
-            
-            &:active {
-              background-color: #f8f9fa;
-            }
-            
-            .picker-arrow {
-              width: 32rpx;
-              height: 32rpx;
-              transition: transform 0.3s ease;
-            }
-          }
-        }
-      }
-    }
-    
-    .dual-picker-container {
-      display: flex;
-      gap: 20rpx;
-      margin-top: 16rpx;
-      
-      .dual-picker {
-        flex: 1;
-        position: relative;
-        cursor: pointer;
-        
-        .picker-text {
-          padding: 16rpx 20rpx;
-          background: #f8f9fa;
-          border-radius: 8rpx;
-          font-size: 28rpx;
-          color: #333;
-          border: 2rpx solid #e1e8ed;
-          min-height: 80rpx;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          position: relative;
-          
-          &:active {
-            background: #e9ecef;
-          }
-          
-          &::after {
-            content: '';
-            position: absolute;
-            right: 20rpx;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 0;
-            height: 0;
-            border-left: 8rpx solid transparent;
-            border-right: 8rpx solid transparent;
-            border-top: 12rpx solid #666;
-          }
-        }
-      }
-      
-      picker[disabled] .picker-text {
-        background: #f1f3f4;
-        color: #999;
-        border-color: #e1e8ed;
-        cursor: not-allowed;
-        
-        &::after {
-          border-top-color: #999;
         }
       }
     }
@@ -2041,6 +1931,169 @@ export default {
   }
 }
 
+.cascade-selector {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 28rpx;
+  border: 2rpx solid #e9ecef;
+  border-radius: 16rpx;
+  background-color: #fff;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  
+  &:active {
+    background-color: #f8f9fa;
+    transform: scale(0.98);
+  }
+  
+  .selector-content {
+    flex: 1;
+    font-size: 30rpx;
+    color: #333;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    
+    &.placeholder {
+      color: #adb5bd;
+    }
+  }
+  
+  .arrow-icon {
+    font-size: 32rpx;
+    color: #999;
+    margin-left: 16rpx;
+    font-weight: 400;
+  }
+}
+
+.cascade-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10rpx);
+  display: flex;
+  align-items: flex-end;
+  z-index: 2000;
+  
+  .cascade-modal {
+    width: 100%;
+    height: 70vh;
+    background-color: #fff;
+    border-radius: 32rpx 32rpx 0 0;
+    animation: slideUp 0.3s ease-out;
+    display: flex;
+    flex-direction: column;
+    
+    .cascade-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 32rpx 36rpx;
+      border-bottom: 1rpx solid #f0f0f0;
+      background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+      
+      .cascade-title {
+        font-size: 36rpx;
+        font-weight: 600;
+        color: #333;
+      }
+      
+      .cascade-close {
+        font-size: 30rpx;
+        color: #007aff;
+        padding: 12rpx 20rpx;
+        
+        &:active {
+          opacity: 0.7;
+        }
+      }
+    }
+    
+    .cascade-body {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      
+      .category-list {
+        width: 35%;
+        background-color: #f8f9fa;
+        border-right: 1rpx solid #e9ecef;
+        
+        .category-item {
+          padding: 28rpx 24rpx;
+          font-size: 28rpx;
+          color: #666;
+          transition: all 0.2s ease;
+          border-left: 4rpx solid transparent;
+          
+          &:active {
+            background-color: #e9ecef;
+          }
+          
+          &.active {
+            background-color: #fff;
+            color: #007aff;
+            font-weight: 600;
+            border-left-color: #007aff;
+          }
+          
+          text {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+        }
+      }
+      
+      .position-list {
+        flex: 1;
+        background-color: #fff;
+        
+        .position-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 28rpx 32rpx;
+          font-size: 30rpx;
+          color: #333;
+          border-bottom: 1rpx solid #f5f5f5;
+          transition: all 0.2s ease;
+          
+          &:active {
+            background-color: #f8f9fa;
+          }
+          
+          &.active {
+            color: #007aff;
+            font-weight: 500;
+            background-color: #f0f8ff;
+          }
+          
+          text {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+          
+          .check-icon {
+            font-size: 28rpx;
+            color: #007aff;
+            margin-left: 16rpx;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+}
+
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -2070,7 +2123,6 @@ export default {
   }
 }
 
-/* 响应式设计 */
 @media (max-width: 768px) {
   .message-bubble {
     max-width: 80%;
@@ -2085,13 +2137,11 @@ export default {
   }
 }
 
-/* iOS安全区域适配 */
 .safe-area-padding {
   padding-bottom: constant(safe-area-inset-bottom);
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* 暗黑模式支持 */
 @media (prefers-color-scheme: dark) {
   .ai-chat-container {
     background-color: #1a1a1a;
@@ -2123,6 +2173,46 @@ export default {
       background-color: #3d3d3d;
       border-color: #4d4d4d;
       color: #ffffff;
+    }
+  }
+  
+  .cascade-modal {
+    background-color: #2d2d2d;
+    
+    .cascade-header {
+      background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+      border-bottom-color: #4d4d4d;
+      
+      .cascade-title {
+        color: #ffffff;
+      }
+    }
+    
+    .category-list {
+      background-color: #1a1a1a;
+      border-right-color: #4d4d4d;
+      
+      .category-item {
+        color: #999;
+        
+        &.active {
+          background-color: #2d2d2d;
+          color: #007aff;
+        }
+      }
+    }
+    
+    .position-list {
+      background-color: #2d2d2d;
+      
+      .position-item {
+        color: #ffffff;
+        border-bottom-color: #4d4d4d;
+        
+        &.active {
+          background-color: #1a1a1a;
+        }
+      }
     }
   }
 }

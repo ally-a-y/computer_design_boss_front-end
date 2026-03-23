@@ -2,8 +2,15 @@
   <view class="collection-page">
     <!-- 顶部导航 -->
     <view class="nav-bar">
-      <text class="back-btn" @click="goBack">←</text>
-      <text class="title">收藏职位</text>
+      <view class="nav-bar-left">
+        <text class="nav-back-icon" @click="goBack">←</text>
+      </view>
+      <view class="nav-bar-center">
+        <text class="nav-bar-title">收藏职位</text>
+      </view>
+      <view class="nav-bar-right">
+        <!-- 右侧预留空间 -->
+      </view>
     </view>
     
     <!-- 收藏列表 -->
@@ -26,10 +33,9 @@
         <uni-icons 
           type="star" 
           size="80" 
-          :color="isFavorite ? '#FFD700' : '#ccc'" 
-          @click="toggleFavorite"
+          color="#ccc"
         ></uni-icons>
-        <text>{{ isFavorite ? '已收藏示例职位' : '暂无收藏职位' }}</text>
+        <text>暂无收藏职位</text>
       </view>
     </view>
   </view>
@@ -37,247 +43,215 @@
 
 
 <script>
-import {favoriteApi} from '@/common/api/favorite.js'
-import { jobApi } from '@/common/api/job.js'
 export default {
   data() {
     return {
-      collections: [],
-      userId: 1,  // 实际项目应该从登录信息里拿
-      loading: false
+      collections: []
     }
   },
 
-  async onLoad() {
-    await this.loadFavorites()
+  onLoad() {
+    this.loadFavorites()
   },
-	data() {
-	  return {
-	    collections: [],
-	    userId: 1,
-	    loading: false,
-	    isFavorite: false // 新增
-	  }
-	},
   methods: {
-	goBack() {
-	  uni.navigateBack()
-	},
-	async loadFavorites() {
-	  try {
-		this.loading = true
-		const res = await favoriteApi.getFavoriteList(this.userId)
-		console.log("转换后的collections:", res)
-		const job = await jobApi.getAllJobs()
-		const rawList = Array.isArray(res) ? res : []
+    goBack() {
+      uni.navigateBack()
+    },
+    loadFavorites() {
+      // 从本地存储获取收藏列表
+      let collections = uni.getStorageSync('collections') || []
+      // 去重，确保每个职位只出现一次
+      const uniqueCollections = []
+      const seenIds = new Set()
+      
+      for (const item of collections) {
+        if (!seenIds.has(item.id)) {
+          seenIds.add(item.id)
+          uniqueCollections.push(item)
+        }
+      }
+      
+      this.collections = uniqueCollections
+      // 保存去重后的收藏列表
+      uni.setStorageSync('collections', uniqueCollections)
+    },
+    viewDetails(item) {
+      if (!item.id) {
+        uni.showToast({
+          title: '职位ID不存在',
+          icon: 'none'
+        })
+        return
+      }
 
-		this.collections = rawList.map(item => {
-		  const snapshot = JSON.parse(item.job_snapshot || '{}')
-		  return {
-			id: item.id, 
-			jobTitle: snapshot.title || '',
-			company: snapshot.location || '',
-			salary: snapshot.salary || '',
-			collectionTime: new Date(item.created_at).toLocaleString(),
-			boss_job_id: item.boss_job_id
-		  }
-		})
-
-		console.log("转换后的collections:", this.collections)
-
-	  } catch (err) {
-		uni.showToast({
-		  title: err.message || '获取收藏失败',
-		  icon: 'none'
-		})
-	  } finally {
-		this.loading = false
-	  }
-	},
-	viewDetails(item) {
-	  if (!item.id) {
-	    uni.showToast({
-	      title: '职位ID不存在',
-	      icon: 'none'
-	    })
-	    return
-	  }
-	
-	  uni.navigateTo({
-	    url: `/pages/job/detail/job_detail_index?id=${item.id}`
-	  })
-	},
-    async cancelCollection(index) {
-      const item = this.collections[index]
-
+      uni.navigateTo({
+        url: `/pages/job/detail/job_detail_index?id=${item.id}`
+      })
+    },
+    cancelCollection(index) {
       uni.showModal({
         title: '提示',
         content: '确定取消收藏吗？',
-        success: async (res) => {
+        success: (res) => {
           if (res.confirm) {
-            try {
-              await favoriteApi.cancelFavorite({
-                user_id: this.userId,
-                boss_job_id: item.boss_job_id
-              })
-
-              this.collections.splice(index, 1)
-
-              uni.showToast({
-                title: '已取消收藏',
-                icon: 'success'
-              })
-
-            } catch (err) {
-              uni.showToast({
-                title: err.message || '取消失败',
-                icon: 'none'
-              })
-            }
+            // 从本地存储获取收藏列表
+            let collections = uni.getStorageSync('collections') || []
+            // 移除指定索引的收藏
+            collections.splice(index, 1)
+            // 保存更新后的收藏列表
+            uni.setStorageSync('collections', collections)
+            // 更新页面数据
+            this.collections = collections
+            
+            uni.showToast({
+              title: '已取消收藏',
+              icon: 'success'
+            })
           }
         }
       })
-    },
-	async addToFavorite(jobId) {
-	  try {
-	    await favoriteApi.addFavorite({
-	      user_id: this.userId,
-	      job_id: jobId
-	    })
-	
-	    uni.showToast({
-	      title: '收藏成功',
-	      icon: 'success'
-	    })
-	
-	  } catch (err) {
-	    uni.showToast({
-	      title: err.message || '收藏失败',
-	      icon: 'none'
-	    })
-	  }
-	},
-	async toggleFavorite() {
-	    if (this.isFavorite) {
-	      try {
-	        await favoriteApi.cancelFavorite({ user_id: this.userId, boss_job_id: 1 })
-	        this.isFavorite = false
-	        uni.showToast({ title: '已取消收藏', icon: 'none' })
-	      } catch (err) {
-	        uni.showToast({ title: err.message || '取消失败', icon: 'none' })
-	      }
-	    } else {
-	      try {
-	        await favoriteApi.addFavorite({ user_id: this.userId, job_id: 1 })
-	        this.isFavorite = true
-	        uni.showToast({ title: '收藏成功', icon: 'success' })
-	      } catch (err) {
-	        uni.showToast({ title: err.message || '收藏失败', icon: 'none' })
-	      }
-	    }
-	  }
-	
+    }
   }
 }
 </script>
 
 <style>
 .collection-page {
-  background-color: #f5f5f5;
+  background-color: #F8FAFD;
   min-height: 100vh;
+  font-family: -apple-system, Helvetica, Roboto, sans-serif;
 }
 
 .nav-bar {
   display: flex;
   align-items: center;
-  padding: 30rpx 20rpx;
-  background-color: #fff;
-  border-bottom: 1rpx solid #eee;
+  height: 44px;
+  margin-bottom: 12px;
+  padding: 0 16px;
 }
 
-.back-btn {
-  font-size: 36rpx;
-  color: #333;
+.nav-bar-left {
+  flex: 0 0 auto;
+  padding: 8px;
 }
 
-.title {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
-  margin-left: 20rpx;
+.nav-bar-center {
+  flex: 1;
+  text-align: center;
+}
+
+.nav-bar-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1E1E1E;
+}
+
+.nav-bar-right {
+  flex: 0 0 auto;
+  padding: 8px;
+}
+
+.nav-back-icon {
+  font-size: 24px;
+  color: #1E1E1E;
+  transition: all 0.3s ease;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.nav-back-icon:active {
+  color: #007aff;
+  background-color: #F0F4FF;
 }
 
 .collection-list {
-  padding: 20rpx;
+  padding: 16px;
 }
 
 .collection-item {
   background-color: #fff;
-  padding: 30rpx;
-  margin-bottom: 20rpx;
-  border-radius: 8rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+  padding: 16px;
+  margin-bottom: 12px;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.collection-item:active {
+  transform: scale(0.98);
 }
 
 .job-info {
-  margin-bottom: 20rpx;
+  margin-bottom: 16px;
 }
 
 .job-title {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1E1E1E;
   display: block;
-  margin-bottom: 10rpx;
+  margin-bottom: 8px;
+  line-height: 1.4;
 }
 
 .company {
-  font-size: 26rpx;
-  color: #666;
+  font-size: 14px;
+  color: #6C757D;
   display: block;
-  margin-bottom: 10rpx;
+  margin-bottom: 8px;
 }
 
 .salary {
-  font-size: 30rpx;
-  color: #ff9500;
-  font-weight: bold;
+  font-size: 16px;
+  color: #007aff;
+  font-weight: 600;
   display: block;
-  margin-bottom: 10rpx;
+  margin-bottom: 8px;
 }
 
 .collection-time {
-  font-size: 22rpx;
-  color: #999;
+  font-size: 12px;
+  color: #ADB5BD;
   display: block;
 }
 
 .actions {
   display: flex;
   justify-content: flex-end;
-  gap: 20rpx;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #F2F5F9;
 }
 
 .cancel-btn {
-  background-color: #f5f5f5;
-  color: #666;
-  border: 1rpx solid #ddd;
-  border-radius: 8rpx;
-  padding: 0 30rpx;
-  height: 60rpx;
-  line-height: 60rpx;
-  font-size: 26rpx;
+  background-color: #F2F5F9;
+  color: #6C757D;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.cancel-btn:active {
+  background-color: #E9ECEF;
+  transform: scale(0.98);
 }
 
 .detail-btn {
   background-color: #007aff;
   color: #fff;
   border: none;
-  border-radius: 8rpx;
-  padding: 0 30rpx;
-  height: 60rpx;
-  line-height: 60rpx;
-  font-size: 26rpx;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.detail-btn:active {
+  background-color: #0056b3;
+  transform: scale(0.98);
 }
 
 .empty-state {
@@ -285,12 +259,12 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 100rpx 0;
-  color: #999;
-  font-size: 28rpx;
+  padding: 80px 0;
+  color: #ADB5BD;
+  font-size: 16px;
 }
 
 .empty-state text {
-  margin-top: 20rpx;
+  margin-top: 16px;
 }
 </style>

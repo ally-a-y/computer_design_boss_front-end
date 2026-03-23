@@ -207,99 +207,104 @@ if (!Array) {
 }
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: $data.activeTab === "login" ? 1 : "",
-    b: common_vendor.o(($event) => $data.activeTab = "login"),
-    c: $data.activeTab === "register" ? 1 : "",
-    d: common_vendor.o(($event) => $data.activeTab = "register"),
-    e: $data.activeTab === "login"
+    a: common_vendor.t($data.activeTab === "login" ? "\u767B\u5F55" : "\u6CE8\u518C"),
+    b: common_vendor.t($data.activeTab === "login" ? "\u6B22\u8FCE\u56DE\u6765" : "\u521B\u5EFA\u8D26\u53F7"),
+    c: $data.activeTab === "login" ? 1 : "",
+    d: common_vendor.o(($event) => $data.activeTab = "login"),
+    e: $data.activeTab === "register" ? 1 : "",
+    f: common_vendor.o(($event) => $data.activeTab = "register"),
+    g: $data.activeTab === "login"
   }, $data.activeTab === "login" ? common_vendor.e({
-    f: $data.loginMethod === "sms" ? 1 : "",
-    g: common_vendor.o(($event) => $data.loginMethod = "sms"),
-    h: $data.loginMethod === "password" ? 1 : "",
-    i: common_vendor.o(($event) => $data.loginMethod = "password"),
-    j: common_vendor.p({
+    h: $data.loginMethod === "sms" ? 1 : "",
+    i: common_vendor.o(($event) => $data.loginMethod = "sms"),
+    j: $data.loginMethod === "password" ? 1 : "",
+    k: common_vendor.o(($event) => $data.loginMethod = "password"),
+    l: common_vendor.p({
       type: "phone",
-      size: "24",
+      size: "20",
       color: "#999"
     }),
-    k: common_vendor.o([($event) => $data.loginForm.mobile = $event.detail.value, (...args) => $options.handleMobileInput && $options.handleMobileInput(...args)]),
-    l: $data.loginForm.mobile,
-    m: $data.loginMethod === "sms"
+    m: common_vendor.o([($event) => $data.loginForm.mobile = $event.detail.value, (...args) => $options.handleMobileInput && $options.handleMobileInput(...args)]),
+    n: $data.loginForm.mobile,
+    o: $data.loginMethod === "sms"
   }, $data.loginMethod === "sms" ? {
-    n: common_vendor.p({
+    p: common_vendor.p({
       type: "chat",
-      size: "24",
+      size: "20",
       color: "#999"
     }),
-    o: $data.loginForm.sms_code,
-    p: common_vendor.o(($event) => $data.loginForm.sms_code = $event.detail.value),
-    q: common_vendor.t($options.smsBtnText),
-    r: !$data.canSendSms || $data.isSendingSms,
-    s: common_vendor.o((...args) => $options.sendSms && $options.sendSms(...args))
+    q: $data.loginForm.sms_code,
+    r: common_vendor.o(($event) => $data.loginForm.sms_code = $event.detail.value),
+    s: common_vendor.t($options.smsBtnText),
+    t: $data.isSendingSms ? 1 : "",
+    v: !$data.canSendSms || $data.isSendingSms,
+    w: common_vendor.o((...args) => $options.sendSms && $options.sendSms(...args))
   } : {}, {
-    t: $data.loginMethod === "password"
+    x: $data.loginMethod === "password"
   }, $data.loginMethod === "password" ? {
-    v: common_vendor.p({
+    y: common_vendor.p({
       type: "locked",
-      size: "24",
+      size: "20",
       color: "#999"
     }),
-    w: $data.loginForm.password,
-    x: common_vendor.o(($event) => $data.loginForm.password = $event.detail.value),
-    y: common_vendor.o($options.togglePassword),
-    z: common_vendor.p({
+    z: $data.loginForm.password,
+    A: common_vendor.o(($event) => $data.loginForm.password = $event.detail.value),
+    B: common_vendor.o($options.togglePassword),
+    C: common_vendor.p({
       type: $data.showPassword ? "eye" : "eye-slash",
-      size: "24",
+      size: "20",
       color: "#999"
-    })
+    }),
+    D: common_vendor.o((...args) => $options.goToForgetPassword && $options.goToForgetPassword(...args))
   } : {}, {
-    A: !$options.isLoginFormValid,
-    B: common_vendor.o((...args) => $options.handleLogin && $options.handleLogin(...args)),
-    C: common_vendor.o((...args) => $options.goToForgetPassword && $options.goToForgetPassword(...args))
+    E: !$options.isLoginFormValid,
+    F: common_vendor.o((...args) => $options.handleLogin && $options.handleLogin(...args))
   }) : {}, {
-    D: $data.activeTab === "register"
+    G: $data.activeTab === "register"
   }, $data.activeTab === "register" ? common_vendor.e({
-    E: common_vendor.p({
-      type: "phone",
-      size: "24",
-      color: "#999"
-    }),
-    F: common_vendor.o([($event) => $data.registerForm.mobile = $event.detail.value, (...args) => $options.handleRegisterMobileInput && $options.handleRegisterMobileInput(...args)]),
-    G: $data.registerForm.mobile,
     H: common_vendor.p({
+      type: "phone",
+      size: "20",
+      color: "#999"
+    }),
+    I: common_vendor.o([($event) => $data.registerForm.mobile = $event.detail.value, (...args) => $options.handleRegisterMobileInput && $options.handleRegisterMobileInput(...args)]),
+    J: $data.registerForm.mobile,
+    K: common_vendor.p({
       type: "chat",
-      size: "24",
+      size: "20",
       color: "#999"
     }),
-    I: $data.registerForm.sms_code,
-    J: common_vendor.o(($event) => $data.registerForm.sms_code = $event.detail.value),
-    K: common_vendor.t($options.registerSmsBtnText),
-    L: !$data.canSendRegisterSms || $data.isSendingRegisterSms,
-    M: common_vendor.o((...args) => $options.sendRegisterSms && $options.sendRegisterSms(...args)),
-    N: common_vendor.p({
-      type: "locked",
-      size: "24",
-      color: "#999"
-    }),
-    O: $data.registerForm.password,
-    P: common_vendor.o(($event) => $data.registerForm.password = $event.detail.value),
-    Q: common_vendor.o($options.togglePassword),
+    L: $data.registerForm.sms_code,
+    M: common_vendor.o(($event) => $data.registerForm.sms_code = $event.detail.value),
+    N: common_vendor.t($options.registerSmsBtnText),
+    O: $data.isSendingRegisterSms ? 1 : "",
+    P: !$data.canSendRegisterSms || $data.isSendingRegisterSms,
+    Q: common_vendor.o((...args) => $options.sendRegisterSms && $options.sendRegisterSms(...args)),
     R: common_vendor.p({
-      type: $data.showPassword ? "eye" : "eye-slash",
-      size: "24",
-      color: "#999"
-    }),
-    S: common_vendor.p({
       type: "locked",
-      size: "24",
+      size: "20",
       color: "#999"
     }),
-    T: $data.registerForm.confirm_password,
-    U: common_vendor.o(($event) => $data.registerForm.confirm_password = $event.detail.value),
-    V: $data.registerForm.confirm_password && $data.registerForm.password !== $data.registerForm.confirm_password
+    S: $data.registerForm.password,
+    T: common_vendor.o(($event) => $data.registerForm.password = $event.detail.value),
+    U: common_vendor.o($options.togglePassword),
+    V: common_vendor.p({
+      type: $data.showPassword ? "eye" : "eye-slash",
+      size: "20",
+      color: "#999"
+    }),
+    W: common_vendor.p({
+      type: "locked",
+      size: "20",
+      color: "#999"
+    }),
+    X: $data.registerForm.confirm_password,
+    Y: common_vendor.o(($event) => $data.registerForm.confirm_password = $event.detail.value),
+    Z: $data.registerForm.confirm_password && $data.registerForm.password !== $data.registerForm.confirm_password
   }, $data.registerForm.confirm_password && $data.registerForm.password !== $data.registerForm.confirm_password ? {} : {}, {
-    W: !$options.isRegisterFormValid,
-    X: common_vendor.o((...args) => $options.goToRegisterPage && $options.goToRegisterPage(...args))
+    aa: !$options.isRegisterFormValid,
+    ab: common_vendor.o((...args) => $options.goToRegisterPage && $options.goToRegisterPage(...args)),
+    ac: common_vendor.o(($event) => $data.activeTab = "login")
   }) : {});
 }
 var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-b237504c"], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/login/login.vue"]]);

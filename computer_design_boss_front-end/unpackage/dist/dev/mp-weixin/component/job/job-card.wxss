@@ -1,81 +1,132 @@
 
 .job-card.data-v-0b59c612 {
   background-color: #fff;
-  margin: 10rpx 0;
-  padding: 30rpx;
-  border-radius: 16rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
-  /* 防止卡片内容被分割到不同列 */
-  break-inside: avoid;
-  page-break-inside: avoid;
+  margin: 0;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   position: relative;
+  transition: all 0.3s ease;
+}
+.job-card.data-v-0b59c612:active {
+  transform: scale(0.98);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+.right-buttons.data-v-0b59c612 {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  z-index: 10;
 }
 .favorite-btn.data-v-0b59c612 {
-  position: absolute;
-  top: 30rpx;
-  right: 30rpx;
-  z-index: 10;
   background-color: rgba(255, 255, 255, 0.8);
-  padding: 10rpx;
+  padding: 8px;
   border-radius: 50%;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.favorite-btn.data-v-0b59c612:active {
+  transform: scale(0.9);
 }
 .card-header.data-v-0b59c612 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20rpx;
+  margin-bottom: 12px;
+  padding-right: 80px;
 }
 .job-title.data-v-0b59c612 {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
+  font-size: 17px;
+  font-weight: 600;
+  color: #1E1E1E;
   flex: 1;
 }
 .salary.data-v-0b59c612 {
-  font-size: 32rpx;
-  color: #ff6b35;
-  font-weight: bold;
+  font-size: 16px;
+  font-weight: 500;
+  color: #007aff;
 }
 .company-info.data-v-0b59c612 {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20rpx;
+  margin-bottom: 12px;
+  padding-right: 80px;
 }
 .company-name.data-v-0b59c612 {
-  font-size: 28rpx;
-  color: #666;
-  margin-right: 20rpx;
-}
-.company-tag.data-v-0b59c612 {
-  font-size: 24rpx;
-  color: #999;
-  background-color: #f5f5f5;
-  padding: 4rpx 12rpx;
-  border-radius: 6rpx;
+  font-size: 15px;
+  font-weight: 500;
+  color: #1E1E1E;
+  margin-bottom: 8px;
+  display: block;
 }
 .job-tags.data-v-0b59c612 {
   display: flex;
   flex-wrap: wrap;
-  margin-bottom: 20rpx;
+  margin-bottom: 8px;
+  gap: 6px;
+  padding-right: 80px;
 }
 .tag.data-v-0b59c612 {
-  font-size: 24rpx;
-  color: #007aff;
-  background-color: rgba(0, 122, 255, 0.1);
-  padding: 6rpx 16rpx;
-  border-radius: 20rpx;
-  margin-right: 10rpx;
-  margin-bottom: 10rpx;
+  font-size: 12px;
+  color: #6C757D;
+  background-color: #F2F5F9;
+  padding: 4px 8px;
+  border-radius: 8px;
+  margin-right: 6px;
+  margin-bottom: 6px;
 }
 .card-footer.data-v-0b59c612 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 20rpx;
-  border-top: 1rpx solid #f0f0f0;
+  padding-top: 12px;
+  border-top: 1px solid #F0F2F5;
+  margin-top: 8px;
+  padding-right: 80px;
 }
-.location.data-v-0b59c612,
+.location.data-v-0b59c612 {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  color: #1E1E1E;
+}
+.location.data-v-0b59c612::before {
+  content: "📍";
+  margin-right: 4px;
+  color: #007aff;
+}
 .time.data-v-0b59c612 {
-  font-size: 24rpx;
-  color: #999;
+  font-size: 13px;
+  color: #6C757D;
+}
+
+/* 投递按钮 */
+.apply-btn.data-v-0b59c612 {
+  background-color: #007aff;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 6px 16px;
+  border-radius: 20px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+.apply-btn.applied.data-v-0b59c612 {
+  background-color: #F2F5F9;
+  color: #6C757D;
+}
+.apply-btn.data-v-0b59c612:active {
+  background-color: #0056b3;
+  transform: scale(0.95);
+}
+.apply-btn.applied.data-v-0b59c612:active {
+  background-color: #E3E8F0;
+  transform: scale(0.95);
 }

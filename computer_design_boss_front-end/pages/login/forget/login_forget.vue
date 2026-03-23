@@ -1,9 +1,19 @@
 <template>
-  <view class="forget-container">
-    <!-- 页面标题 -->
-    <view class="forget-header">
-      <text class="forget-title">忘记密码</text>
+  <view class="forget-page">
+    <!-- 顶部导航栏 -->
+    <view class="nav-bar">
+      <view class="nav-bar-left">
+        <uni-icons type="back" size="24" color="#1E1E1E" @click="goToLogin" @touchstart="$event.target.style.color = '#007aff'" @touchend="$event.target.style.color = '#1E1E1E'" @touchcancel="$event.target.style.color = '#1E1E1E'" />
+      </view>
+      <view class="nav-bar-center">
+        <text class="nav-bar-title">忘记密码</text>
+      </view>
+      <view class="nav-bar-right">
+        <!-- 右侧预留空间 -->
+      </view>
     </view>
+    
+    <view class="forget-container">
     
     <!-- 忘记密码表单 -->
     <view class="forget-form">
@@ -152,6 +162,7 @@
         <text>返回</text>
         <text class="login-text" @click="goToLogin">立即登录</text>
       </view>
+    </view>
     </view>
   </view>
 </template>
@@ -363,169 +374,238 @@ export default {
 </script>
 
 <style scoped>
-.forget-container {
+/* 全局样式 */
+.forget-page {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #f5f5f5;
-  padding: 40rpx;
+  background-color: #F8FAFD;
+  font-family: -apple-system, Helvetica, Roboto, sans-serif;
 }
 
-.forget-header {
-  margin: 80rpx 0 60rpx 0;
+.forget-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 16px;
+}
+
+/* 导航栏样式 */
+.nav-bar {
+  background-color: #ffffff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.nav-bar-left {
+  flex: 0 0 auto;
+  padding: 8px;
+}
+
+.nav-bar-center {
+  flex: 1;
   text-align: center;
 }
 
-.forget-title {
-  font-size: 48rpx;
-  font-weight: bold;
-  color: #333;
+.nav-bar-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #1E1E1E;
 }
 
+.nav-bar-right {
+  flex: 0 0 auto;
+  padding: 8px;
+}
+
+/* 忘记密码表单 */
 .forget-form {
   background-color: #fff;
-  border-radius: 16rpx;
-  padding: 40rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+  padding: 24px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 12px;
 }
-
-
 
 /* 验证方式选择 */
 .auth-method {
   display: flex;
-  margin-bottom: 40rpx;
-  border-bottom: 2rpx solid #f0f0f0;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #F0F2F5;
 }
 
 .method-item {
   flex: 1;
   text-align: center;
-  padding: 20rpx 0;
+  padding: 12px 0;
   position: relative;
+  transition: all 0.3s ease;
 }
 
-.method-item.active {
-  color: #007aff;
+.method-item:active {
+  background-color: #F0F4FF;
 }
 
 .method-item.active::after {
   content: '';
   position: absolute;
-  bottom: -2rpx;
-  left: 30%;
-  width: 40%;
-  height: 4rpx;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 2px;
   background-color: #007aff;
-  border-radius: 2rpx;
+  border-radius: 1px;
+  transition: all 0.3s ease;
+  width: 60px;
 }
 
 .method-text {
-  font-size: 28rpx;
-  color: #666;
+  font-size: 14px;
+  color: #6C757D;
+  transition: all 0.3s ease;
 }
 
 .method-item.active .method-text {
   color: #007aff;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 /* 表单样式 */
 .form-item {
-  margin-bottom: 40rpx;
+  margin-bottom: 16px;
 }
 
 .form-label {
-  font-size: 28rpx;
-  color: #333;
-  margin-bottom: 16rpx;
+  font-size: 14px;
+  color: #6C757D;
+  margin-bottom: 8px;
   display: block;
 }
 
 .form-input-wrapper {
   display: flex;
   align-items: center;
-  border: 2rpx solid #e5e5e5;
-  border-radius: 8rpx;
-  padding: 0 20rpx;
-  background-color: #fafafa;
+  border-radius: 12px;
+  padding: 0 12px;
+  background-color: #F2F5F9;
+  height: 48px;
+  transition: all 0.3s ease;
+}
+
+.form-input-wrapper:focus-within {
+  box-shadow: 0 0 0 2px rgba(0,122,255,0.2);
 }
 
 .form-input {
   flex: 1;
-  height: 88rpx;
-  font-size: 32rpx;
-  color: #333;
-  padding-left: 16rpx;
+  font-size: 15px;
+  color: #1E1E1E;
+  padding-left: 12px;
+  background: transparent;
+  border: none;
+  outline: none;
 }
 
-.form-input:focus {
-  outline: none;
+.form-input::placeholder {
+  color: #ADB5BD;
 }
 
 /* 验证码按钮 */
 .sms-btn {
-  width: 160rpx;
-  height: 64rpx;
-  background-color: #007aff;
-  color: #fff;
-  font-size: 24rpx;
-  border-radius: 32rpx;
-  margin-left: 20rpx;
+  height: 40px;
+  background-color: #F0F4FF;
+  color: #007aff;
+  font-size: 13px;
+  border-radius: 20px;
+  margin-left: 12px;
+  padding: 0 16px;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.sms-btn:active {
+  background-color: #E0E9FF;
+  transform: scale(0.95);
 }
 
 .sms-btn:disabled {
-  background-color: #ccc;
+  background-color: #E9ECEF;
+  color: #ADB5BD;
 }
 
 /* 错误提示 */
 .error-text {
-  font-size: 24rpx;
+  font-size: 13px;
   color: #e54d42;
-  margin-top: 12rpx;
+  margin-top: 8px;
   display: block;
 }
 
 /* 按钮区域 */
 .reset-buttons {
   display: flex;
-  gap: 20rpx;
-  margin: 40rpx 0;
+  gap: 12px;
+  margin: 32px 0 16px;
 }
 
 .back-btn {
   flex: 1;
-  height: 96rpx;
-  background-color: #f5f5f5;
-  color: #333;
-  font-size: 32rpx;
-  border-radius: 48rpx;
-  border: 2rpx solid #e5e5e5;
+  height: 48px;
+  background-color: #F2F5F9;
+  color: #6C757D;
+  font-size: 16px;
+  border-radius: 30px;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.back-btn:active {
+  background-color: #E9ECEF;
+  transform: scale(0.98);
 }
 
 .confirm-btn {
   flex: 1;
-  height: 96rpx;
+  height: 48px;
   background-color: #007aff;
   color: #fff;
-  font-size: 32rpx;
-  border-radius: 48rpx;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 30px;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.confirm-btn:active {
+  background-color: #0056b3;
+  transform: scale(0.98);
 }
 
 .confirm-btn:disabled {
-  background-color: #ccc;
+  background-color: #E9ECEF;
+  color: #ADB5BD;
 }
 
 /* 登录链接 */
 .login-link {
   text-align: center;
-  font-size: 28rpx;
-  color: #666;
-  margin-top: 20rpx;
+  font-size: 13px;
+  color: #6C757D;
+  margin-top: 16px;
 }
 
 .login-text {
   color: #007aff;
-  margin-left: 10rpx;
+  margin-left: 4px;
+  transition: all 0.3s ease;
+}
+
+.login-text:active {
+  opacity: 0.7;
 }
 </style>

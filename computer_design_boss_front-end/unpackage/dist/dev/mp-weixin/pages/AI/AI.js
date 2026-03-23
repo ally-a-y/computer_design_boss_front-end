@@ -47,6 +47,11 @@ const _sfc_main = {
       },
       gradeIndex: 0,
       gradeOptions: ["\u5927\u4E00", "\u5927\u4E8C", "\u5927\u4E09", "\u5927\u56DB", "\u7814\u4E00", "\u7814\u4E8C", "\u7814\u4E09"],
+      showCascadePicker: false,
+      selectedCategoryId: "",
+      selectedCategoryName: "",
+      selectedPositionId: "",
+      selectedPositionName: "",
       mainCategories: [
         { id: "101", name: "\u524D\u7AEF\u5F00\u53D1" },
         { id: "102", name: "\u540E\u7AEF\u5F00\u53D1" },
@@ -151,14 +156,17 @@ const _sfc_main = {
         studentPlan: "\u5927\u5B66\u751F\u89C4\u5212"
       };
       return titles[this.currentPanel] || "";
+    },
+    currentPositions() {
+      if (!this.selectedCategoryId)
+        return [];
+      return this.positionDetails[this.selectedCategoryId] || [];
     }
   },
   onLoad() {
     this.initializeChat();
     this.fetchUserInfo();
-    setTimeout(() => {
-      this.initializePositionSelection();
-    }, 100);
+    this.initializeDefaultSelection();
   },
   onUnload() {
     this.cleanup();
@@ -166,18 +174,82 @@ const _sfc_main = {
   methods: {
     initializeChat() {
     },
-    initializePositionSelection() {
-      if (!this.mainCategories || !this.positionDetails) {
-        return;
-      }
-      if (this.mainCategories.length > 0) {
-        const firstCategory = this.mainCategories[0];
-        const firstPositions = this.positionDetails[firstCategory.id];
-        if (firstPositions && firstPositions.length > 0) {
-          this.formData.positionId = firstPositions[0].id;
-          this.formData.positionName = firstPositions[0].name;
+    initializeDefaultSelection() {
+      this.selectedCategoryId = "";
+      this.selectedCategoryName = "";
+      this.selectedPositionId = "";
+      this.selectedPositionName = "";
+      this.formData.positionId = "";
+      this.formData.positionName = "";
+    },
+    openCascadePicker() {
+      var _a;
+      this.showCascadePicker = true;
+      if (this.formData.positionId) {
+        let foundCategoryId = null;
+        let foundCategoryName = null;
+        let foundPositionName = null;
+        for (const [catId, positions] of Object.entries(this.positionDetails)) {
+          const pos = positions.find((p) => p.id === this.formData.positionId);
+          if (pos) {
+            foundCategoryId = catId;
+            foundCategoryName = ((_a = this.mainCategories.find((c) => c.id === catId)) == null ? void 0 : _a.name) || "";
+            foundPositionName = pos.name;
+            break;
+          }
+        }
+        if (foundCategoryId) {
+          this.selectedCategoryId = foundCategoryId;
+          this.selectedCategoryName = foundCategoryName;
+          this.selectedPositionId = this.formData.positionId;
+          this.selectedPositionName = foundPositionName;
+          return;
         }
       }
+      if (!this.selectedCategoryId) {
+        const firstCategory = this.mainCategories[0];
+        if (firstCategory) {
+          this.selectedCategoryId = firstCategory.id;
+          this.selectedCategoryName = firstCategory.name;
+          const positions = this.positionDetails[firstCategory.id] || [];
+          if (positions.length > 0) {
+            const firstPosition = positions[0];
+            this.selectedPositionId = firstPosition.id;
+            this.selectedPositionName = firstPosition.name;
+          }
+        }
+      }
+    },
+    selectCategory(category) {
+      this.selectedCategoryId = category.id;
+      this.selectedCategoryName = category.name;
+      const positions = this.positionDetails[category.id] || [];
+      if (positions.length > 0) {
+        const firstPosition = positions[0];
+        this.selectedPositionId = firstPosition.id;
+        this.selectedPositionName = firstPosition.name;
+      } else {
+        this.selectedPositionId = "";
+        this.selectedPositionName = "";
+      }
+    },
+    selectPosition(position) {
+      this.selectedPositionId = position.id;
+      this.selectedPositionName = position.name;
+    },
+    confirmCascadeSelection() {
+      if (!this.selectedPositionId) {
+        common_vendor.index.showToast({ title: "\u8BF7\u9009\u62E9\u804C\u4F4D", icon: "none" });
+        return;
+      }
+      this.formData.positionId = this.selectedPositionId;
+      this.formData.positionName = this.selectedPositionName;
+      this.showCascadePicker = false;
+      common_vendor.index.showToast({
+        title: `\u5DF2\u9009\u62E9: ${this.selectedCategoryName} - ${this.selectedPositionName}`,
+        icon: "none",
+        duration: 1500
+      });
     },
     async fetchUserInfo() {
       this.isLoadingUser = true;
@@ -291,23 +363,8 @@ const _sfc_main = {
       if (!this.currentUserId && !this.isLoadingUser) {
         this.fetchUserInfo();
       }
-      this.ensurePositionSelection();
-      if (this.currentMethod.includes("position") && !this.formData.positionName) {
-        setTimeout(() => {
-          this.initializePositionSelection();
-        }, 200);
-      }
-    },
-    ensurePositionSelection() {
-      if (this.currentMethod.includes("position")) {
-        if (!this.formData.positionName && this.mainCategories && this.mainCategories.length > 0) {
-          const firstCategory = this.mainCategories[0];
-          const firstPositions = this.positionDetails[firstCategory.id];
-          if (firstPositions && firstPositions.length > 0) {
-            this.formData.positionId = firstPositions[0].id;
-            this.formData.positionName = firstPositions[0].name;
-          }
-        }
+      if (!this.selectedCategoryId) {
+        this.initializeDefaultSelection();
       }
     },
     closePanel() {
@@ -636,11 +693,8 @@ const _sfc_main = {
       };
       let text = texts[this.currentPanel] || "\u63D0\u4EA4\u5206\u6790";
       if (this.currentMethod.includes("position") && this.formData.positionId) {
-        const mainCategory = this.getCurrentMainCategory();
-        const positions = this.getCurrentDetailPositions();
-        const detailPosition = positions.find((p) => p.id === this.formData.positionId);
-        if (mainCategory && detailPosition) {
-          text += ` [${mainCategory.name} - ${detailPosition.name}]`;
+        if (this.selectedCategoryName && this.selectedPositionName) {
+          text += ` [${this.selectedCategoryName} - ${this.selectedPositionName}]`;
         }
       } else if (this.currentMethod.includes("text") && this.formData.positionText) {
         text += ` [${this.formData.positionText}]`;
@@ -664,12 +718,9 @@ const _sfc_main = {
         }
       }
       if (method.includes("position")) {
-        if (!this.formData.positionName || !this.formData.positionName.trim()) {
-          this.initializePositionSelection();
-          if (!this.formData.positionName || !this.formData.positionName.trim()) {
-            common_vendor.index.showToast({ title: "\u8BF7\u9009\u62E9\u804C\u4F4D", icon: "none" });
-            return false;
-          }
+        if (!this.selectedPositionId) {
+          common_vendor.index.showToast({ title: "\u8BF7\u9009\u62E9\u804C\u4F4D", icon: "none" });
+          return false;
         }
       }
       if (method.includes("text") && !this.formData.positionText.trim()) {
@@ -705,65 +756,6 @@ const _sfc_main = {
       const date = new Date(timestamp);
       return date.toLocaleTimeString();
     },
-    onMainCategoryChange(e) {
-      const index = parseInt(e.detail.value);
-      if (index >= 0 && index < this.mainCategories.length) {
-        const selectedCategory = this.mainCategories[index];
-        const detailPositions = this.positionDetails[selectedCategory.id];
-        if (detailPositions && detailPositions.length > 0) {
-          this.formData.positionId = detailPositions[0].id;
-          this.formData.positionName = detailPositions[0].name;
-        } else {
-          this.formData.positionId = "";
-          this.formData.positionName = "";
-        }
-      }
-    },
-    onDetailPositionChange(e) {
-      const index = parseInt(e.detail.value);
-      const positions = this.getCurrentDetailPositions();
-      if (index >= 0 && index < positions.length) {
-        const selectedPosition = positions[index];
-        this.formData.positionId = selectedPosition.id;
-        this.formData.positionName = selectedPosition.name;
-      }
-    },
-    getCurrentDetailPositions() {
-      if (!this.formData.positionId)
-        return [];
-      for (const category of this.mainCategories) {
-        const positions = this.positionDetails[category.id];
-        if (positions && positions.some((p) => p.id === this.formData.positionId)) {
-          return positions;
-        }
-      }
-      return [];
-    },
-    getCurrentMainCategory() {
-      if (!this.formData.positionId)
-        return null;
-      for (const category of this.mainCategories) {
-        const positions = this.positionDetails[category.id];
-        if (positions && positions.some((p) => p.id === this.formData.positionId)) {
-          return category;
-        }
-      }
-      return null;
-    },
-    getMainCategoryName() {
-      const category = this.getCurrentMainCategory();
-      return category ? category.name : "\u8BF7\u9009\u62E9\u804C\u4F4D\u5206\u7C7B";
-    },
-    getSelectedPositionName() {
-      if (!this.formData.positionId)
-        return "\u8BF7\u9009\u62E9\u5177\u4F53\u804C\u4F4D";
-      const positions = this.getCurrentDetailPositions();
-      const position = positions.find((p) => p.id === this.formData.positionId);
-      return position ? position.name : "\u8BF7\u9009\u62E9\u5177\u4F53\u804C\u4F4D";
-    },
-    hasSelectedMainCategory() {
-      return this.getCurrentMainCategory() !== null;
-    },
     resetForm() {
       this.formData = {
         positionId: "",
@@ -772,6 +764,10 @@ const _sfc_main = {
         positionName: ""
       };
       this.gradeIndex = 0;
+      this.selectedCategoryId = "";
+      this.selectedCategoryName = "";
+      this.selectedPositionId = "";
+      this.selectedPositionName = "";
     }
   }
 };
@@ -850,103 +846,128 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     z: $data.isLoadingUser ? 1 : "",
     A: !$data.currentUserId && !$data.isLoadingUser ? 1 : "",
     B: $data.currentMethod.includes("user"),
-    C: common_vendor.t($options.getMainCategoryName()),
-    D: common_vendor.o((...args) => $options.onMainCategoryChange && $options.onMainCategoryChange(...args)),
-    E: $data.mainCategories,
-    F: common_vendor.t($options.getSelectedPositionName()),
-    G: common_vendor.o((...args) => $options.onDetailPositionChange && $options.onDetailPositionChange(...args)),
-    H: $options.getCurrentDetailPositions(),
-    I: !$options.hasSelectedMainCategory(),
-    J: $data.currentMethod.includes("position"),
-    K: $data.formData.positionText,
-    L: common_vendor.o(($event) => $data.formData.positionText = $event.detail.value),
-    M: $data.currentMethod.includes("text"),
-    N: common_vendor.t($data.formData.pdfFile ? $data.formData.pdfFile.name : "\u70B9\u51FB\u9009\u62E9PDF\u6587\u4EF6"),
-    O: common_vendor.o((...args) => $options.chooseFile && $options.chooseFile(...args)),
-    P: $data.currentMethod.includes("pdf")
+    C: $data.selectedPositionId
+  }, $data.selectedPositionId ? {
+    D: common_vendor.t($data.selectedCategoryName),
+    E: common_vendor.t($data.selectedPositionName)
+  } : {}, {
+    F: !$data.selectedPositionId ? 1 : "",
+    G: common_vendor.o((...args) => $options.openCascadePicker && $options.openCascadePicker(...args)),
+    H: $data.currentMethod.includes("position"),
+    I: $data.formData.positionText,
+    J: common_vendor.o(($event) => $data.formData.positionText = $event.detail.value),
+    K: $data.currentMethod.includes("text"),
+    L: common_vendor.t($data.formData.pdfFile ? $data.formData.pdfFile.name : "\u70B9\u51FB\u9009\u62E9PDF\u6587\u4EF6"),
+    M: common_vendor.o((...args) => $options.chooseFile && $options.chooseFile(...args)),
+    N: $data.currentMethod.includes("pdf")
   }) : {}, {
-    Q: $data.currentPanel === "resumeEvaluation"
+    O: $data.currentPanel === "resumeEvaluation"
   }, $data.currentPanel === "resumeEvaluation" ? common_vendor.e({
-    R: $data.currentMethod,
-    S: common_vendor.o((...args) => $options.onMethodChange && $options.onMethodChange(...args)),
-    T: $data.isLoadingUser
+    P: $data.currentMethod,
+    Q: common_vendor.o((...args) => $options.onMethodChange && $options.onMethodChange(...args)),
+    R: $data.isLoadingUser
   }, $data.isLoadingUser ? {} : $data.currentUserId ? {
-    V: common_vendor.t($data.currentUserId)
+    T: common_vendor.t($data.currentUserId)
   } : {
-    W: common_vendor.o((...args) => $options.fetchUserInfo && $options.fetchUserInfo(...args))
+    U: common_vendor.o((...args) => $options.fetchUserInfo && $options.fetchUserInfo(...args))
   }, {
-    U: $data.currentUserId,
-    X: $data.isLoadingUser ? 1 : "",
-    Y: !$data.currentUserId && !$data.isLoadingUser ? 1 : "",
-    Z: $data.currentMethod === "user",
-    aa: common_vendor.t($data.formData.pdfFile ? $data.formData.pdfFile.name : "\u70B9\u51FB\u9009\u62E9PDF\u6587\u4EF6"),
-    ab: common_vendor.o((...args) => $options.chooseFile && $options.chooseFile(...args)),
-    ac: $data.currentMethod === "pdf"
+    S: $data.currentUserId,
+    V: $data.isLoadingUser ? 1 : "",
+    W: !$data.currentUserId && !$data.isLoadingUser ? 1 : "",
+    X: $data.currentMethod === "user",
+    Y: common_vendor.t($data.formData.pdfFile ? $data.formData.pdfFile.name : "\u70B9\u51FB\u9009\u62E9PDF\u6587\u4EF6"),
+    Z: common_vendor.o((...args) => $options.chooseFile && $options.chooseFile(...args)),
+    aa: $data.currentMethod === "pdf"
   }) : {}, {
-    ad: $data.currentPanel === "successRate"
+    ab: $data.currentPanel === "successRate"
   }, $data.currentPanel === "successRate" ? common_vendor.e({
-    ae: $data.currentMethod,
-    af: common_vendor.o((...args) => $options.onMethodChange && $options.onMethodChange(...args)),
-    ag: $data.isLoadingUser
+    ac: $data.currentMethod,
+    ad: common_vendor.o((...args) => $options.onMethodChange && $options.onMethodChange(...args)),
+    ae: $data.isLoadingUser
   }, $data.isLoadingUser ? {} : $data.currentUserId ? {
-    ai: common_vendor.t($data.currentUserId)
+    ag: common_vendor.t($data.currentUserId)
   } : {
-    aj: common_vendor.o((...args) => $options.fetchUserInfo && $options.fetchUserInfo(...args))
+    ah: common_vendor.o((...args) => $options.fetchUserInfo && $options.fetchUserInfo(...args))
   }, {
-    ah: $data.currentUserId,
-    ak: $data.isLoadingUser ? 1 : "",
-    al: !$data.currentUserId && !$data.isLoadingUser ? 1 : "",
-    am: $data.currentMethod.includes("user"),
-    an: common_vendor.t($options.getMainCategoryName()),
-    ao: common_vendor.o((...args) => $options.onMainCategoryChange && $options.onMainCategoryChange(...args)),
-    ap: $data.mainCategories,
-    aq: common_vendor.t($options.getSelectedPositionName()),
-    ar: common_vendor.o((...args) => $options.onDetailPositionChange && $options.onDetailPositionChange(...args)),
-    as: $options.getCurrentDetailPositions(),
-    at: !$options.hasSelectedMainCategory(),
-    av: $data.currentMethod.includes("position"),
-    aw: $data.formData.positionText,
-    ax: common_vendor.o(($event) => $data.formData.positionText = $event.detail.value),
-    ay: $data.currentMethod.includes("text"),
-    az: common_vendor.t($data.formData.pdfFile ? $data.formData.pdfFile.name : "\u70B9\u51FB\u9009\u62E9PDF\u6587\u4EF6"),
-    aA: common_vendor.o((...args) => $options.chooseFile && $options.chooseFile(...args)),
-    aB: $data.currentMethod.includes("pdf")
+    af: $data.currentUserId,
+    ai: $data.isLoadingUser ? 1 : "",
+    aj: !$data.currentUserId && !$data.isLoadingUser ? 1 : "",
+    ak: $data.currentMethod.includes("user"),
+    al: $data.selectedPositionId
+  }, $data.selectedPositionId ? {
+    am: common_vendor.t($data.selectedCategoryName),
+    an: common_vendor.t($data.selectedPositionName)
+  } : {}, {
+    ao: !$data.selectedPositionId ? 1 : "",
+    ap: common_vendor.o((...args) => $options.openCascadePicker && $options.openCascadePicker(...args)),
+    aq: $data.currentMethod.includes("position"),
+    ar: $data.formData.positionText,
+    as: common_vendor.o(($event) => $data.formData.positionText = $event.detail.value),
+    at: $data.currentMethod.includes("text"),
+    av: common_vendor.t($data.formData.pdfFile ? $data.formData.pdfFile.name : "\u70B9\u51FB\u9009\u62E9PDF\u6587\u4EF6"),
+    aw: common_vendor.o((...args) => $options.chooseFile && $options.chooseFile(...args)),
+    ax: $data.currentMethod.includes("pdf")
   }) : {}, {
-    aC: $data.currentPanel === "studentPlan"
+    ay: $data.currentPanel === "studentPlan"
   }, $data.currentPanel === "studentPlan" ? common_vendor.e({
-    aD: $data.currentMethod,
-    aE: common_vendor.o((...args) => $options.onMethodChange && $options.onMethodChange(...args)),
-    aF: $data.isLoadingUser
+    az: $data.currentMethod,
+    aA: common_vendor.o((...args) => $options.onMethodChange && $options.onMethodChange(...args)),
+    aB: $data.isLoadingUser
   }, $data.isLoadingUser ? {} : $data.currentUserId ? {
-    aH: common_vendor.t($data.currentUserId)
+    aD: common_vendor.t($data.currentUserId)
   } : {
-    aI: common_vendor.o((...args) => $options.fetchUserInfo && $options.fetchUserInfo(...args))
+    aE: common_vendor.o((...args) => $options.fetchUserInfo && $options.fetchUserInfo(...args))
   }, {
-    aG: $data.currentUserId,
-    aJ: $data.isLoadingUser ? 1 : "",
-    aK: !$data.currentUserId && !$data.isLoadingUser ? 1 : "",
-    aL: $data.currentMethod.includes("user"),
-    aM: common_vendor.t($options.getMainCategoryName()),
-    aN: common_vendor.o((...args) => $options.onMainCategoryChange && $options.onMainCategoryChange(...args)),
-    aO: $data.mainCategories,
-    aP: common_vendor.t($options.getSelectedPositionName()),
-    aQ: common_vendor.o((...args) => $options.onDetailPositionChange && $options.onDetailPositionChange(...args)),
-    aR: $options.getCurrentDetailPositions(),
-    aS: !$options.hasSelectedMainCategory(),
-    aT: $data.currentMethod.includes("position"),
-    aU: $data.formData.positionText,
-    aV: common_vendor.o(($event) => $data.formData.positionText = $event.detail.value),
-    aW: $data.currentMethod.includes("text"),
-    aX: common_vendor.t($data.formData.pdfFile ? $data.formData.pdfFile.name : "\u70B9\u51FB\u9009\u62E9PDF\u6587\u4EF6"),
-    aY: common_vendor.o((...args) => $options.chooseFile && $options.chooseFile(...args)),
-    aZ: $data.currentMethod.includes("pdf")
+    aC: $data.currentUserId,
+    aF: $data.isLoadingUser ? 1 : "",
+    aG: !$data.currentUserId && !$data.isLoadingUser ? 1 : "",
+    aH: $data.currentMethod.includes("user"),
+    aI: $data.selectedPositionId
+  }, $data.selectedPositionId ? {
+    aJ: common_vendor.t($data.selectedCategoryName),
+    aK: common_vendor.t($data.selectedPositionName)
+  } : {}, {
+    aL: !$data.selectedPositionId ? 1 : "",
+    aM: common_vendor.o((...args) => $options.openCascadePicker && $options.openCascadePicker(...args)),
+    aN: $data.currentMethod.includes("position"),
+    aO: $data.formData.positionText,
+    aP: common_vendor.o(($event) => $data.formData.positionText = $event.detail.value),
+    aQ: $data.currentMethod.includes("text"),
+    aR: common_vendor.t($data.formData.pdfFile ? $data.formData.pdfFile.name : "\u70B9\u51FB\u9009\u62E9PDF\u6587\u4EF6"),
+    aS: common_vendor.o((...args) => $options.chooseFile && $options.chooseFile(...args)),
+    aT: $data.currentMethod.includes("pdf")
   }) : {}, {
-    ba: common_vendor.o((...args) => $options.submitFunction && $options.submitFunction(...args)),
-    bb: common_vendor.o((...args) => $options.closePanel && $options.closePanel(...args)),
+    aU: common_vendor.o((...args) => $options.submitFunction && $options.submitFunction(...args)),
+    aV: common_vendor.o((...args) => $options.closePanel && $options.closePanel(...args)),
+    aW: common_vendor.o(() => {
+    }),
+    aX: common_vendor.o((...args) => $options.closePanel && $options.closePanel(...args))
+  }) : {}, {
+    aY: $data.showCascadePicker
+  }, $data.showCascadePicker ? {
+    aZ: common_vendor.o((...args) => $options.confirmCascadeSelection && $options.confirmCascadeSelection(...args)),
+    ba: common_vendor.f($data.mainCategories, (category, k0, i0) => {
+      return {
+        a: common_vendor.t(category.name),
+        b: category.id,
+        c: common_vendor.n($data.selectedCategoryId === category.id ? "active" : ""),
+        d: common_vendor.o(($event) => $options.selectCategory(category), category.id)
+      };
+    }),
+    bb: common_vendor.f($options.currentPositions, (position, k0, i0) => {
+      return common_vendor.e({
+        a: common_vendor.t(position.name),
+        b: $data.selectedPositionId === position.id
+      }, $data.selectedPositionId === position.id ? {} : {}, {
+        c: position.id,
+        d: common_vendor.n($data.selectedPositionId === position.id ? "active" : ""),
+        e: common_vendor.o(($event) => $options.selectPosition(position), position.id)
+      });
+    }),
     bc: common_vendor.o(() => {
     }),
-    bd: common_vendor.o((...args) => $options.closePanel && $options.closePanel(...args))
-  }) : {});
+    bd: common_vendor.o((...args) => _ctx.closeCascadePicker && _ctx.closeCascadePicker(...args))
+  } : {});
 }
 var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-6fa74974"], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/AI/AI.vue"]]);
 wx.createPage(MiniProgramPage);

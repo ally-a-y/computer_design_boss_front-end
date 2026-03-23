@@ -20,6 +20,7 @@ var __spreadValues = (a, b) => {
 var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
 var common_vendor = require("../../common/vendor.js");
 var common_api_forum = require("../../common/api/forum.js");
+var common_utils_themeSimple = require("../../common/utils/theme-simple.js");
 require("../../common/api/request.js");
 require("../../common/config.js");
 const _sfc_main = {
@@ -65,13 +66,16 @@ const _sfc_main = {
         "108": "\u5D4C\u5165\u5F0F",
         "200": "\u4EA7\u54C1\u8BBE\u8BA1",
         "300": "\u6280\u672F\u7BA1\u7406"
-      }
+      },
+      currentTheme: "light",
+      isDarkMode: false
     };
   },
   onLoad() {
     this.loadUserInfo();
     this.loadUserPostCount();
-    this.loadPosts();
+    this.initDefaultCategory();
+    this.initTheme();
   },
   onShow() {
     this.loadUserInfo();
@@ -81,6 +85,7 @@ const _sfc_main = {
     if (this.loadMoreTimer) {
       clearTimeout(this.loadMoreTimer);
     }
+    common_vendor.index.$off("globalThemeChange", this.handleGlobalThemeChange);
   },
   toggleDebugMode() {
     this.debugMode = !this.debugMode;
@@ -91,6 +96,15 @@ const _sfc_main = {
     });
   },
   methods: {
+    initTheme() {
+      this.currentTheme = common_utils_themeSimple.themeManager.getCurrentTheme();
+      this.isDarkMode = this.currentTheme === "dark";
+      common_vendor.index.$on("globalThemeChange", this.handleGlobalThemeChange);
+    },
+    handleGlobalThemeChange(data) {
+      this.currentTheme = data.theme;
+      this.isDarkMode = data.isDark;
+    },
     async loadPosts(reset = false) {
       if (reset) {
         this.page = 1;
@@ -104,23 +118,7 @@ const _sfc_main = {
         let res;
         const currentCategoryNum = Number(this.currentCategory);
         const isTopLevelCategory = this.categories.some((c) => Number(c.id) === currentCategoryNum && c.level === 1);
-        if (this.currentCategory === "all") {
-          res = await common_api_forum.forumApi.getAllFirstComments();
-        } else if (isTopLevelCategory) {
-          res = await common_api_forum.forumApi.getAllFirstComments();
-        } else {
-          try {
-            res = await common_api_forum.forumApi.getCommentsByCategory(this.currentCategory);
-            if (!res || res.length === 0) {
-              res = await common_api_forum.forumApi.getAllFirstComments();
-            }
-          } catch (error) {
-            if (this.debugMode) {
-              console.log("\u5206\u7C7B\u67E5\u8BE2\u5931\u8D25\uFF0C\u4F7F\u7528\u6240\u6709\u6570\u636E:", error);
-            }
-            res = await common_api_forum.forumApi.getAllFirstComments();
-          }
-        }
+        res = await common_api_forum.forumApi.getAllFirstComments();
         if (this.debugMode) {
           console.log("\u8BBA\u575B\u6570\u636E:", res);
           console.log("\u5F53\u524D\u5206\u7C7B:", this.currentCategory);
@@ -196,6 +194,14 @@ const _sfc_main = {
                 return post.category_id === targetCategoryId;
               });
             }
+          }
+          if (this.keyword && this.keyword.trim() !== "") {
+            const keywordLower = this.keyword.toLowerCase().trim();
+            filteredPosts = filteredPosts.filter((post) => {
+              const titleMatch = post.title && post.title.toLowerCase().includes(keywordLower);
+              const contentMatch = post.content && post.content.toLowerCase().includes(keywordLower);
+              return titleMatch || contentMatch;
+            });
           }
           let postsWithReplyCount = filteredPosts.map((post) => __spreadProps(__spreadValues({}, post), {
             reply_count: 0
@@ -278,29 +284,30 @@ const _sfc_main = {
       this.loadPosts(true);
     },
     switchCategory(category) {
-      var _a;
       this.currentCategory = category;
       const categoryNum = Number(category);
       const isTopLevelCategory = this.categories.some((c) => Number(c.id) === categoryNum && c.level === 1);
       if (isTopLevelCategory) {
-        this.showCategoryTabs = true;
-        this.subCategoryList = this.categories.filter((c) => {
-          if ([200, 300].includes(categoryNum)) {
-            return false;
-          }
-          return c.parent_id && (c.parent_id.toString() === category || c.parent_id === categoryNum);
-        });
         if ([200, 300].includes(categoryNum)) {
-          this.subCategoryList = [{
-            id: category,
-            name: ((_a = this.categories.find((c) => c.id === category)) == null ? void 0 : _a.name) || category
-          }];
+          this.showCategoryTabs = false;
+        } else {
+          this.showCategoryTabs = true;
+          this.subCategoryList = this.categories.filter((c) => {
+            return c.parent_id && (c.parent_id.toString() === category || c.parent_id === categoryNum);
+          });
         }
       } else {
         this.showCategoryTabs = false;
       }
       this.page = 1;
       this.loadPosts(true);
+    },
+    initDefaultCategory() {
+      const topLevelCategories = this.categories.filter((c) => c.level === 1);
+      if (topLevelCategories.length > 0) {
+        this.currentCategory = topLevelCategories[0].id;
+        this.switchCategory(this.currentCategory);
+      }
     },
     toggleSubCategory(categoryId) {
       const category = this.categories.find((c) => c.id === categoryId);
@@ -337,6 +344,9 @@ const _sfc_main = {
       common_vendor.index.navigateTo({
         url: `/pages/forum/details/forum_detail?id=${post.id}`
       });
+    },
+    goBack() {
+      common_vendor.index.navigateBack();
     },
     goToPost() {
       common_vendor.index.navigateTo({
@@ -423,76 +433,118 @@ const _sfc_main = {
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
     a: common_vendor.o((...args) => _ctx.toggleDebugMode && _ctx.toggleDebugMode(...args)),
-    b: common_vendor.o((...args) => $options.search && $options.search(...args)),
-    c: $data.keyword,
-    d: common_vendor.o(($event) => $data.keyword = $event.detail.value),
+    b: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
+    c: $data.isDarkMode ? "#2c2c2c" : "#ffffff",
+    d: $data.isDarkMode ? "0 2px 8px rgba(0,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.05)",
     e: common_vendor.o((...args) => $options.search && $options.search(...args)),
-    f: $data.currentCategory === "all" ? 1 : "",
-    g: common_vendor.o(($event) => $options.switchCategory("all")),
-    h: common_vendor.f($data.categories.filter((c) => c.level === 1), (category, k0, i0) => {
+    f: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
+    g: $data.keyword,
+    h: common_vendor.o(($event) => $data.keyword = $event.detail.value),
+    i: $data.isDarkMode ? "#3a3a3a" : "#F2F5F9",
+    j: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
+    k: common_vendor.f($data.categories.filter((c) => c.level === 1), (category, k0, i0) => {
       return {
         a: common_vendor.t(category.name),
         b: category.id,
-        c: $data.currentCategory === category.id ? 1 : "",
+        c: $data.currentCategory === category.id || $data.currentCategory === "all" && $data.categories.filter((c) => c.level === 1).indexOf(category) === 0 ? 1 : "",
         d: common_vendor.o(($event) => $options.switchCategory(category.id), category.id)
       };
     }),
-    i: $data.showCategoryTabs && _ctx.subCategoryList.length > 0
+    l: $data.isDarkMode ? "#3a3a3a" : "#F0F4FF",
+    m: $data.showCategoryTabs && _ctx.subCategoryList.length > 0
   }, $data.showCategoryTabs && _ctx.subCategoryList.length > 0 ? {
-    j: $data.selectedSubCategories.length === 0 ? 1 : "",
-    k: common_vendor.o((...args) => $options.clearSubCategories && $options.clearSubCategories(...args)),
-    l: common_vendor.f(_ctx.subCategoryList, (category, k0, i0) => {
+    n: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
+    o: $data.selectedSubCategories.length === 0 ? 1 : "",
+    p: common_vendor.o((...args) => $options.clearSubCategories && $options.clearSubCategories(...args)),
+    q: $data.isDarkMode ? "#3a3a3a" : "#F0F4FF",
+    r: common_vendor.f(_ctx.subCategoryList, (category, k0, i0) => {
       return {
         a: common_vendor.t(category.name),
         b: category.id,
         c: $data.selectedSubCategories.includes(Number(category.next_category_id || category.id)) ? 1 : "",
         d: common_vendor.o(($event) => $options.toggleSubCategory(category.id), category.id)
       };
-    })
+    }),
+    s: $data.isDarkMode ? "#3a3a3a" : "#F0F4FF"
   } : {}, {
-    m: common_vendor.f($data.posts, (post, k0, i0) => {
+    t: $data.isDarkMode ? "#2c2c2c" : "#ffffff",
+    v: $data.isDarkMode ? "0 2px 8px rgba(0,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.05)",
+    w: common_vendor.f($data.posts, (post, k0, i0) => {
       return common_vendor.e({
         a: common_vendor.t(post.user_id),
         b: common_vendor.t(post.title || post.content),
         c: post.content.length > 100
       }, post.content.length > 100 ? {
-        d: common_vendor.t(post.content.substring(0, 100))
+        d: common_vendor.t(post.content.substring(0, 100)),
+        e: $data.isDarkMode ? "#999" : "#6C757D"
       } : post.content !== post.title ? {
-        f: common_vendor.t(post.content)
+        g: common_vendor.t(post.content),
+        h: $data.isDarkMode ? "#999" : "#6C757D"
       } : {}, {
-        e: post.content !== post.title,
-        g: common_vendor.t($options.getCategoryName(post.category_id)),
-        h: common_vendor.t(post.reply_count || 0),
-        i: common_vendor.t(post.view_count || 0),
-        j: common_vendor.t(post.like_count || 0),
-        k: common_vendor.t($options.formatTime(post.created_at)),
-        l: post.last_reply_time
+        f: post.content !== post.title,
+        i: common_vendor.t($options.getCategoryName(post.category_id)),
+        j: common_vendor.t(post.reply_count || 0),
+        k: common_vendor.t(post.view_count || 0),
+        l: common_vendor.t(post.like_count || 0),
+        m: common_vendor.t($options.formatTime(post.created_at)),
+        n: post.last_reply_time
       }, post.last_reply_time ? {
-        m: common_vendor.t($options.formatTime(post.last_reply_time))
+        o: common_vendor.t($options.formatTime(post.last_reply_time)),
+        p: $data.isDarkMode ? "#999" : "#999999"
       } : {}, {
-        n: post.id,
-        o: common_vendor.o(($event) => $options.goToDetail(post), post.id)
+        q: post.id,
+        r: common_vendor.o(($event) => $options.goToDetail(post), post.id)
       });
     }),
-    n: $data.loading
-  }, $data.loading ? {} : {}, {
-    o: !$data.hasMore && $data.posts.length > 0
-  }, !$data.hasMore && $data.posts.length > 0 ? {} : {}, {
-    p: $data.posts.length === 0 && !$data.loading
-  }, $data.posts.length === 0 && !$data.loading ? {} : {}, {
-    q: common_vendor.o((...args) => $options.loadMore && $options.loadMore(...args)),
-    r: common_vendor.o((...args) => $options.onRefresh && $options.onRefresh(...args)),
-    s: $data.isRefreshing,
-    t: common_vendor.o((...args) => $options.toggleQuickMenu && $options.toggleQuickMenu(...args)),
-    v: $data.showQuickMenu
+    x: $data.isDarkMode ? "#999" : "#666666",
+    y: $data.isDarkMode ? "#3a3a3a" : "#f0f0f0",
+    z: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
+    A: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
+    B: $data.isDarkMode ? "#3a3a3a" : "#F0F4FF",
+    C: $data.isDarkMode ? "#999" : "#6C757D",
+    D: $data.isDarkMode ? "#999" : "#6C757D",
+    E: $data.isDarkMode ? "#999" : "#6C757D",
+    F: $data.isDarkMode ? "1px solid #404040" : "1px solid #f0f0f0",
+    G: $data.isDarkMode ? "#999" : "#999999",
+    H: $data.isDarkMode ? "#2c2c2c" : "#ffffff",
+    I: $data.isDarkMode ? "0 2px 8px rgba(0,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.05)",
+    J: $data.loading
+  }, $data.loading ? {
+    K: $data.isDarkMode ? "#999" : "#999999"
+  } : {}, {
+    L: !$data.hasMore && $data.posts.length > 0
+  }, !$data.hasMore && $data.posts.length > 0 ? {
+    M: $data.isDarkMode ? "#999" : "#999999"
+  } : {}, {
+    N: $data.posts.length === 0 && !$data.loading
+  }, $data.posts.length === 0 && !$data.loading ? {
+    O: $data.isDarkMode ? "#999" : "#999999"
+  } : {}, {
+    P: common_vendor.o((...args) => $options.loadMore && $options.loadMore(...args)),
+    Q: common_vendor.o((...args) => $options.onRefresh && $options.onRefresh(...args)),
+    R: $data.isRefreshing,
+    S: common_vendor.o((...args) => $options.toggleQuickMenu && $options.toggleQuickMenu(...args)),
+    T: $data.showQuickMenu
   }, $data.showQuickMenu ? {
-    w: common_vendor.o((...args) => $options.goToPost && $options.goToPost(...args)),
-    x: common_vendor.o((...args) => $options.goToAsk && $options.goToAsk(...args)),
-    y: common_vendor.o((...args) => $options.goToShare && $options.goToShare(...args)),
-    z: common_vendor.o(() => {
+    U: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
+    V: common_vendor.o((...args) => $options.goToPost && $options.goToPost(...args)),
+    W: $data.isDarkMode ? "#3a3a3a" : "#ffffff",
+    X: $data.isDarkMode ? "0 2px 8px rgba(0,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.05)",
+    Y: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
+    Z: common_vendor.o((...args) => $options.goToAsk && $options.goToAsk(...args)),
+    aa: $data.isDarkMode ? "#3a3a3a" : "#ffffff",
+    ab: $data.isDarkMode ? "0 2px 8px rgba(0,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.05)",
+    ac: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
+    ad: common_vendor.o((...args) => $options.goToShare && $options.goToShare(...args)),
+    ae: $data.isDarkMode ? "#3a3a3a" : "#ffffff",
+    af: $data.isDarkMode ? "0 2px 8px rgba(0,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.05)",
+    ag: common_vendor.o(() => {
     }),
-    A: common_vendor.o((...args) => $options.hideQuickMenu && $options.hideQuickMenu(...args))
-  } : {});
+    ah: $data.isDarkMode ? "#2c2c2c" : "#ffffff",
+    ai: common_vendor.o((...args) => $options.hideQuickMenu && $options.hideQuickMenu(...args))
+  } : {}, {
+    aj: $data.isDarkMode ? "#1a1a1a" : "#F8FAFD"
+  });
 }
 var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-7386314a"], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/forum/forum.vue"]]);
 wx.createPage(MiniProgramPage);

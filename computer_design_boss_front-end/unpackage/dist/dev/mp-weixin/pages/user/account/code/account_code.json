@@ -1,4 +1,5 @@
 {
   "navigationBarTitleText": "密码设置",
+  "navigationStyle": "custom",
   "usingComponents": {}
 }

@@ -295,158 +295,168 @@ if (!Array) {
 }
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: $data.registerStep === 2
+    a: common_vendor.o($options.prevRegisterStep),
+    b: common_vendor.o(($event) => $event.target.style.color = "#007aff"),
+    c: common_vendor.o(($event) => $event.target.style.color = "#1E1E1E"),
+    d: common_vendor.o(($event) => $event.target.style.color = "#1E1E1E"),
+    e: common_vendor.p({
+      type: "back",
+      size: "24",
+      color: "#1E1E1E"
+    }),
+    f: common_vendor.t($data.registerStep === 2 ? "\u5B8C\u5584\u4E2A\u4EBA\u4FE1\u606F" : $data.registerStep === 3 ? "\u6559\u80B2\u7ECF\u5386" : "\u6C42\u804C\u610F\u5411"),
+    g: $data.registerStep === 2
   }, $data.registerStep === 2 ? {
-    b: common_vendor.p({
+    h: common_vendor.p({
       type: "person",
       size: "24",
       color: "#999"
     }),
-    c: $data.basicInfoForm.real_name,
-    d: common_vendor.o(($event) => $data.basicInfoForm.real_name = $event.detail.value),
-    e: $data.basicInfoForm.gender === 0 ? 1 : "",
-    f: common_vendor.o(($event) => $data.basicInfoForm.gender = 0),
-    g: $data.basicInfoForm.gender === 1 ? 1 : "",
-    h: common_vendor.o(($event) => $data.basicInfoForm.gender = 1),
-    i: $data.basicInfoForm.gender === 2 ? 1 : "",
-    j: common_vendor.o(($event) => $data.basicInfoForm.gender = 2),
-    k: common_vendor.p({
+    i: $data.basicInfoForm.real_name,
+    j: common_vendor.o(($event) => $data.basicInfoForm.real_name = $event.detail.value),
+    k: $data.basicInfoForm.gender === 0 ? 1 : "",
+    l: common_vendor.o(($event) => $data.basicInfoForm.gender = 0),
+    m: $data.basicInfoForm.gender === 1 ? 1 : "",
+    n: common_vendor.o(($event) => $data.basicInfoForm.gender = 1),
+    o: $data.basicInfoForm.gender === 2 ? 1 : "",
+    p: common_vendor.o(($event) => $data.basicInfoForm.gender = 2),
+    q: common_vendor.p({
       type: "calendar",
       size: "24",
       color: "#999"
     }),
-    l: $data.basicInfoForm.birth_date,
-    m: common_vendor.o(($event) => $data.basicInfoForm.birth_date = $event.detail.value),
-    n: common_vendor.p({
-      type: "arrowright",
-      size: "18",
-      color: "#999"
-    }),
-    o: $data.basicInfoForm.birth_date,
-    p: common_vendor.o((...args) => $options.onBirthDateChange && $options.onBirthDateChange(...args)),
-    q: common_vendor.p({
-      type: "location",
-      size: "24",
-      color: "#999"
-    }),
-    r: $data.basicInfoForm.city,
-    s: common_vendor.o(($event) => $data.basicInfoForm.city = $event.detail.value),
+    r: $data.basicInfoForm.birth_date,
+    s: common_vendor.o(($event) => $data.basicInfoForm.birth_date = $event.detail.value),
     t: common_vendor.p({
       type: "arrowright",
       size: "18",
       color: "#999"
     }),
-    v: $options.cityRange,
-    w: $data.cityIndex,
-    x: common_vendor.o((...args) => $options.onCityChange && $options.onCityChange(...args)),
-    y: common_vendor.o((...args) => $options.onCityColumnChange && $options.onCityColumnChange(...args)),
-    z: common_vendor.p({
-      type: "email",
-      size: "24",
-      color: "#999"
-    }),
-    A: $data.basicInfoForm.email,
-    B: common_vendor.o(($event) => $data.basicInfoForm.email = $event.detail.value),
-    C: common_vendor.o((...args) => $options.prevRegisterStep && $options.prevRegisterStep(...args)),
-    D: !$options.isBasicInfoFormValid,
-    E: common_vendor.o((...args) => $options.nextRegisterStep && $options.nextRegisterStep(...args))
-  } : {}, {
-    F: $data.registerStep === 3
-  }, $data.registerStep === 3 ? {
-    G: common_vendor.p({
-      type: "book",
-      size: "24",
-      color: "#999"
-    }),
-    H: $options.degreeText,
-    I: common_vendor.p({
-      type: "arrowright",
-      size: "18",
-      color: "#999"
-    }),
-    J: $data.degreeOptions,
-    K: $data.degreeIndex,
-    L: common_vendor.o((...args) => $options.onDegreeChange && $options.onDegreeChange(...args)),
-    M: common_vendor.p({
-      type: "office",
-      size: "24",
-      color: "#999"
-    }),
-    N: $data.educationForm.school_name,
-    O: common_vendor.o(($event) => $data.educationForm.school_name = $event.detail.value),
-    P: common_vendor.p({
-      type: "compose",
-      size: "24",
-      color: "#999"
-    }),
-    Q: $data.educationForm.major,
-    R: common_vendor.o(($event) => $data.educationForm.major = $event.detail.value),
-    S: common_vendor.p({
-      type: "calendar",
-      size: "24",
-      color: "#999"
-    }),
-    T: $data.educationForm.graduation_year ? $data.educationForm.graduation_year + "\u5E74" : "",
-    U: common_vendor.p({
-      type: "arrowright",
-      size: "18",
-      color: "#999"
-    }),
-    V: $data.graduationYears,
-    W: $data.yearIndex,
-    X: common_vendor.o((...args) => $options.onYearChange && $options.onYearChange(...args)),
-    Y: common_vendor.o((...args) => $options.prevRegisterStep && $options.prevRegisterStep(...args)),
-    Z: !$options.isEducationFormValid,
-    aa: common_vendor.o((...args) => $options.nextRegisterStep && $options.nextRegisterStep(...args))
-  } : {}, {
-    ab: $data.registerStep === 4
-  }, $data.registerStep === 4 ? {
-    ac: common_vendor.p({
-      type: "briefcase",
-      size: "24",
-      color: "#999"
-    }),
-    ad: $data.jobIntentForm.job_direction,
-    ae: common_vendor.o(($event) => $data.jobIntentForm.job_direction = $event.detail.value),
-    af: common_vendor.p({
+    v: $data.basicInfoForm.birth_date,
+    w: common_vendor.o((...args) => $options.onBirthDateChange && $options.onBirthDateChange(...args)),
+    x: common_vendor.p({
       type: "location",
       size: "24",
       color: "#999"
     }),
-    ag: $data.jobIntentForm.expected_city,
-    ah: common_vendor.o(($event) => $data.jobIntentForm.expected_city = $event.detail.value),
-    ai: common_vendor.p({
+    y: $data.basicInfoForm.city,
+    z: common_vendor.o(($event) => $data.basicInfoForm.city = $event.detail.value),
+    A: common_vendor.p({
       type: "arrowright",
       size: "18",
       color: "#999"
     }),
-    aj: $options.expectedCityRange,
-    ak: $data.expectedCityIndex,
-    al: common_vendor.o((...args) => $options.onExpectedCityChange && $options.onExpectedCityChange(...args)),
-    am: common_vendor.o((...args) => $options.onExpectedCityColumnChange && $options.onExpectedCityColumnChange(...args)),
-    an: $data.jobIntentForm.expected_salary_min,
-    ao: common_vendor.o(($event) => $data.jobIntentForm.expected_salary_min = $event.detail.value),
-    ap: $data.jobIntentForm.expected_salary_max,
-    aq: common_vendor.o(($event) => $data.jobIntentForm.expected_salary_max = $event.detail.value),
-    ar: common_vendor.p({
+    B: $options.cityRange,
+    C: $data.cityIndex,
+    D: common_vendor.o((...args) => $options.onCityChange && $options.onCityChange(...args)),
+    E: common_vendor.o((...args) => $options.onCityColumnChange && $options.onCityColumnChange(...args)),
+    F: common_vendor.p({
+      type: "email",
+      size: "24",
+      color: "#999"
+    }),
+    G: $data.basicInfoForm.email,
+    H: common_vendor.o(($event) => $data.basicInfoForm.email = $event.detail.value),
+    I: common_vendor.o((...args) => $options.prevRegisterStep && $options.prevRegisterStep(...args)),
+    J: !$options.isBasicInfoFormValid,
+    K: common_vendor.o((...args) => $options.nextRegisterStep && $options.nextRegisterStep(...args))
+  } : {}, {
+    L: $data.registerStep === 3
+  }, $data.registerStep === 3 ? {
+    M: common_vendor.p({
+      type: "book",
+      size: "24",
+      color: "#999"
+    }),
+    N: $options.degreeText,
+    O: common_vendor.p({
+      type: "arrowright",
+      size: "18",
+      color: "#999"
+    }),
+    P: $data.degreeOptions,
+    Q: $data.degreeIndex,
+    R: common_vendor.o((...args) => $options.onDegreeChange && $options.onDegreeChange(...args)),
+    S: common_vendor.p({
+      type: "office",
+      size: "24",
+      color: "#999"
+    }),
+    T: $data.educationForm.school_name,
+    U: common_vendor.o(($event) => $data.educationForm.school_name = $event.detail.value),
+    V: common_vendor.p({
+      type: "compose",
+      size: "24",
+      color: "#999"
+    }),
+    W: $data.educationForm.major,
+    X: common_vendor.o(($event) => $data.educationForm.major = $event.detail.value),
+    Y: common_vendor.p({
+      type: "calendar",
+      size: "24",
+      color: "#999"
+    }),
+    Z: $data.educationForm.graduation_year ? $data.educationForm.graduation_year + "\u5E74" : "",
+    aa: common_vendor.p({
+      type: "arrowright",
+      size: "18",
+      color: "#999"
+    }),
+    ab: $data.graduationYears,
+    ac: $data.yearIndex,
+    ad: common_vendor.o((...args) => $options.onYearChange && $options.onYearChange(...args)),
+    ae: common_vendor.o((...args) => $options.prevRegisterStep && $options.prevRegisterStep(...args)),
+    af: !$options.isEducationFormValid,
+    ag: common_vendor.o((...args) => $options.nextRegisterStep && $options.nextRegisterStep(...args))
+  } : {}, {
+    ah: $data.registerStep === 4
+  }, $data.registerStep === 4 ? {
+    ai: common_vendor.p({
+      type: "briefcase",
+      size: "24",
+      color: "#999"
+    }),
+    aj: $data.jobIntentForm.job_direction,
+    ak: common_vendor.o(($event) => $data.jobIntentForm.job_direction = $event.detail.value),
+    al: common_vendor.p({
+      type: "location",
+      size: "24",
+      color: "#999"
+    }),
+    am: $data.jobIntentForm.expected_city,
+    an: common_vendor.o(($event) => $data.jobIntentForm.expected_city = $event.detail.value),
+    ao: common_vendor.p({
+      type: "arrowright",
+      size: "18",
+      color: "#999"
+    }),
+    ap: $options.expectedCityRange,
+    aq: $data.expectedCityIndex,
+    ar: common_vendor.o((...args) => $options.onExpectedCityChange && $options.onExpectedCityChange(...args)),
+    as: common_vendor.o((...args) => $options.onExpectedCityColumnChange && $options.onExpectedCityColumnChange(...args)),
+    at: $data.jobIntentForm.expected_salary_min,
+    av: common_vendor.o(($event) => $data.jobIntentForm.expected_salary_min = $event.detail.value),
+    aw: $data.jobIntentForm.expected_salary_max,
+    ax: common_vendor.o(($event) => $data.jobIntentForm.expected_salary_max = $event.detail.value),
+    ay: common_vendor.p({
       type: "time",
       size: "24",
       color: "#999"
     }),
-    as: $data.jobIntentForm.available_time,
-    at: common_vendor.o(($event) => $data.jobIntentForm.available_time = $event.detail.value),
-    av: common_vendor.p({
+    az: $data.jobIntentForm.available_time,
+    aA: common_vendor.o(($event) => $data.jobIntentForm.available_time = $event.detail.value),
+    aB: common_vendor.p({
       type: "arrowright",
       size: "18",
       color: "#999"
     }),
-    aw: $data.availableTimeOptions,
-    ax: $data.timeIndex,
-    ay: common_vendor.o((...args) => $options.onTimeChange && $options.onTimeChange(...args)),
-    az: common_vendor.o((...args) => $options.prevRegisterStep && $options.prevRegisterStep(...args)),
-    aA: common_vendor.o((...args) => $options.completeRegister && $options.completeRegister(...args)),
-    aB: !$options.isJobIntentFormValid,
-    aC: common_vendor.o((...args) => $options.completeRegister && $options.completeRegister(...args))
+    aC: $data.availableTimeOptions,
+    aD: $data.timeIndex,
+    aE: common_vendor.o((...args) => $options.onTimeChange && $options.onTimeChange(...args)),
+    aF: common_vendor.o((...args) => $options.prevRegisterStep && $options.prevRegisterStep(...args)),
+    aG: common_vendor.o((...args) => $options.completeRegister && $options.completeRegister(...args)),
+    aH: !$options.isJobIntentFormValid,
+    aI: common_vendor.o((...args) => $options.completeRegister && $options.completeRegister(...args))
   } : {});
 }
 var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-1776d0fe"], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/login/register/login_reister.vue"]]);

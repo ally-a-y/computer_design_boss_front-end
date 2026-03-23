@@ -1,163 +1,303 @@
 
-.login-container.data-v-b237504c {
+/* 全局样式 */
+.login-page.data-v-b237504c {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #f5f5f5;
-  padding: 40rpx;
+  background-color: #F8FAFD;
+  font-family: -apple-system, Helvetica, Roboto, sans-serif;
 }
+.login-container.data-v-b237504c {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 16px;
+}
+
+/* 导航栏样式 */
+.nav-bar.data-v-b237504c {
+  background-color: #ffffff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  position: relative;
+  margin-bottom: 12px;
+}
+.nav-bar-left.data-v-b237504c {
+  flex: 0 0 auto;
+  padding: 8px;
+}
+.nav-bar-center.data-v-b237504c {
+  flex: 1;
+  text-align: center;
+}
+.nav-bar-title.data-v-b237504c {
+  font-size: 17px;
+  font-weight: 600;
+  color: #1E1E1E;
+}
+.nav-bar-right.data-v-b237504c {
+  flex: 0 0 auto;
+  padding: 8px;
+}
+
+/* 页面标题 */
 .login-header.data-v-b237504c {
-  margin: 80rpx 0 60rpx 0;
+  margin: 24px 0 16px 0;
   text-align: center;
 }
 .login-title.data-v-b237504c {
-  font-size: 48rpx;
+  font-size: 28px;
   font-weight: bold;
-  color: #333;
+  color: #1E1E1E;
+  margin-bottom: 8px;
+}
+.login-subtitle.data-v-b237504c {
+  font-size: 14px;
+  color: #6C757D;
 }
 
 /* 选项卡样式 */
 .tab-container.data-v-b237504c {
   display: flex;
   background-color: #fff;
-  border-radius: 16rpx;
-  margin-bottom: 40rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
 }
 .tab-item.data-v-b237504c {
   flex: 1;
   text-align: center;
-  padding: 30rpx 0;
+  padding: 16px 0;
   position: relative;
+  transition: all 0.3s ease;
 }
-.tab-item.active.data-v-b237504c {
-  color: #007aff;
+.tab-item.data-v-b237504c:active {
+  background-color: #F0F4FF;
 }
 .tab-item.active.data-v-b237504c::after {
   content: '';
   position: absolute;
   bottom: 0;
-  left: 25%;
-  width: 50%;
-  height: 4rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 2px;
   background-color: #007aff;
-  border-radius: 2rpx;
+  border-radius: 1px;
+  transition: all 0.3s ease;
+  /* 宽度与文字等宽 */
+  width: 24px;
 }
 .tab-text.data-v-b237504c {
-  font-size: 32rpx;
-  color: #666;
+  font-size: 15px;
+  color: #6C757D;
+  transition: all 0.3s ease;
 }
 .tab-item.active .tab-text.data-v-b237504c {
   color: #007aff;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 /* 表单容器 */
 .form-container.data-v-b237504c {
   background-color: #fff;
-  border-radius: 16rpx;
-  padding: 40rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+  padding: 24px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 12px;
 }
 
 /* 登录方式切换 */
 .login-method.data-v-b237504c {
   display: flex;
-  margin-bottom: 40rpx;
-  border-bottom: 2rpx solid #f0f0f0;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #F0F2F5;
 }
 .method-item.data-v-b237504c {
   flex: 1;
   text-align: center;
-  padding: 20rpx 0;
+  padding: 12px 0;
   position: relative;
+  transition: all 0.3s ease;
 }
-.method-item.active.data-v-b237504c {
-  color: #007aff;
+.method-item.data-v-b237504c:active {
+  background-color: #F0F4FF;
 }
 .method-item.active.data-v-b237504c::after {
   content: '';
   position: absolute;
-  bottom: -2rpx;
-  left: 30%;
-  width: 40%;
-  height: 4rpx;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 2px;
   background-color: #007aff;
-  border-radius: 2rpx;
+  border-radius: 1px;
+  transition: all 0.3s ease;
+  /* 宽度与文字等宽 */
+  width: 60px;
 }
 .method-text.data-v-b237504c {
-  font-size: 28rpx;
-  color: #666;
+  font-size: 14px;
+  color: #6C757D;
+  transition: all 0.3s ease;
 }
 .method-item.active .method-text.data-v-b237504c {
   color: #007aff;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 /* 表单样式 */
 .form-item.data-v-b237504c {
-  margin-bottom: 40rpx;
-}
-.form-label.data-v-b237504c {
-  font-size: 28rpx;
-  color: #333;
-  margin-bottom: 16rpx;
-  display: block;
+  margin-bottom: 16px;
 }
 .form-input-wrapper.data-v-b237504c {
   display: flex;
   align-items: center;
-  border: 2rpx solid #e5e5e5;
-  border-radius: 8rpx;
-  padding: 0 20rpx;
-  background-color: #fafafa;
+  border-radius: 12px;
+  padding: 0 12px;
+  background-color: #F2F5F9;
+  height: 48px;
+  transition: all 0.3s ease;
+}
+.form-input-wrapper.data-v-b237504c:focus-within {
+  box-shadow: 0 0 0 2px rgba(0,122,255,0.2);
 }
 .form-input.data-v-b237504c {
   flex: 1;
-  height: 88rpx;
-  font-size: 32rpx;
-  color: #333;
-  padding-left: 16rpx;
-}
-.form-input.data-v-b237504c:focus {
+  font-size: 15px;
+  color: #1E1E1E;
+  padding-left: 12px;
+  background: transparent;
+  border: none;
   outline: none;
+}
+.form-input.data-v-b237504c::-webkit-input-placeholder {
+  color: #ADB5BD;
+}
+.form-input.data-v-b237504c::placeholder {
+  color: #ADB5BD;
 }
 
 /* 验证码按钮 */
 .sms-btn.data-v-b237504c {
-  width: 160rpx;
-  height: 64rpx;
-  background-color: #007aff;
-  color: #fff;
-  font-size: 24rpx;
-  border-radius: 32rpx;
-  margin-left: 20rpx;
+  height: 40px;
+  background-color: #F0F4FF;
+  color: #007aff;
+  font-size: 13px;
+  border-radius: 20px;
+  margin-left: 12px;
+  padding: 0 16px;
+  transition: all 0.3s ease;
+  border: none;
+}
+.sms-btn.data-v-b237504c:active {
+  background-color: #E0E9FF;
+  transform: scale(0.95);
+}
+.sms-btn.counting.data-v-b237504c {
+  background-color: #E9ECEF;
+  color: #ADB5BD;
 }
 .sms-btn.data-v-b237504c:disabled {
-  background-color: #ccc;
+  background-color: #E9ECEF;
+  color: #ADB5BD;
 }
 
 /* 登录按钮 */
 .login-btn.data-v-b237504c {
   width: 100%;
-  height: 96rpx;
+  height: 48px;
   background-color: #007aff;
-  color: #fff;
-  font-size: 32rpx;
-  border-radius: 48rpx;
-  margin: 40rpx 0;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 30px;
+  margin: 24px 0 16px;
+  transition: all 0.3s ease;
+  border: none;
+}
+.login-btn.data-v-b237504c:active {
+  background-color: #0056b3;
+  transform: scale(0.98);
 }
 .login-btn.data-v-b237504c:disabled {
-  background-color: #ccc;
+  background-color: #E9ECEF;
+  color: #ADB5BD;
 }
 
-/* 步骤标题 */
-.step-title.data-v-b237504c {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 40rpx;
+/* 注册按钮 */
+.register-btn.data-v-b237504c {
+  width: 100%;
+  height: 48px;
+  background-color: #007aff;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 30px;
+  margin: 32px 0 16px;
+  transition: all 0.3s ease;
+  border: none;
+}
+.register-btn.data-v-b237504c:active {
+  background-color: #0056b3;
+  transform: scale(0.98);
+}
+.register-btn.data-v-b237504c:disabled {
+  background-color: #E9ECEF;
+  color: #ADB5BD;
+}
+
+/* 错误提示 */
+.error-text.data-v-b237504c {
+  font-size: 13px;
+  color: #e54d42;
+  margin-top: 8px;
+  display: block;
+}
+
+/* 忘记密码链接 */
+.forget-password.data-v-b237504c {
+  text-align: right;
+  margin-top: 8px;
+}
+.forget-link.data-v-b237504c {
+  font-size: 13px;
+  color: #007aff;
+  transition: all 0.3s ease;
+}
+.forget-link.data-v-b237504c:active {
+  opacity: 0.7;
+}
+
+/* 已有账号链接 */
+.have-account.data-v-b237504c {
   text-align: center;
+  margin-top: 16px;
+  font-size: 13px;
+  color: #6C757D;
+}
+.login-link.data-v-b237504c {
+  color: #007aff;
+  margin-left: 4px;
+  transition: all 0.3s ease;
+}
+.login-link.data-v-b237504c:active {
+  opacity: 0.7;
+}
+
+/* 动画效果 */
+@keyframes fadeIn-b237504c {
+from {
+    opacity: 0;
+    transform: translateY(12px);
+}
+to {
+    opacity: 1;
+    transform: translateY(0);
+}
 }
 
 /* 注册步骤 */
@@ -167,157 +307,4 @@
 }
 .register-step.active.data-v-b237504c {
   display: block;
-}
-
-/* 可选步骤标记 */
-.optional-tag.data-v-b237504c {
-  font-size: 24rpx;
-  color: #007aff;
-  font-weight: normal;
-  margin-left: 10rpx;
-}
-
-/* 注册按钮 */
-.register-btn.data-v-b237504c {
-  width: 100%;
-  height: 96rpx;
-  background-color: #007aff;
-  color: #fff;
-  font-size: 32rpx;
-  border-radius: 48rpx;
-  margin: 40rpx 0;
-}
-.register-btn.data-v-b237504c:disabled {
-  background-color: #ccc;
-}
-
-/* 跳过按钮 */
-.skip-btn.data-v-b237504c {
-  flex: 1;
-  height: 96rpx;
-  background-color: #f5f5f5;
-  color: #333;
-  font-size: 32rpx;
-  border-radius: 48rpx;
-  border: 2rpx solid #e5e5e5;
-  margin: 40rpx 10rpx;
-}
-
-/* Picker组件样式 */
-.picker-input.data-v-b237504c {
-  flex: 1;
-  padding-right: 40rpx;
-  background-color: transparent;
-  border: none;
-}
-.picker-arrow.data-v-b237504c {
-  position: absolute;
-  right: 20rpx;
-}
-
-/* 薪资范围 */
-.salary-range.data-v-b237504c {
-  display: flex;
-  align-items: center;
-  gap: 10rpx;
-  padding: 0 20rpx;
-  background-color: #fafafa;
-  border: 2rpx solid #e5e5e5;
-  border-radius: 8rpx;
-}
-.salary-input.data-v-b237504c {
-  flex: 1;
-  height: 88rpx;
-  font-size: 32rpx;
-  color: #333;
-}
-.salary-separator.data-v-b237504c {
-  font-size: 32rpx;
-  color: #999;
-}
-.salary-unit.data-v-b237504c {
-  font-size: 28rpx;
-  color: #999;
-}
-
-/* 错误提示 */
-.error-text.data-v-b237504c {
-  font-size: 24rpx;
-  color: #e54d42;
-  margin-top: 12rpx;
-  display: block;
-}
-
-/* 动画效果 */
-@keyframes fadeIn-b237504c {
-from {
-    opacity: 0;
-    transform: translateY(20rpx);
-}
-to {
-    opacity: 1;
-    transform: translateY(0);
-}
-}
-
-/* 忘记密码链接 */
-.forget-link.data-v-b237504c {
-  text-align: center;
-  font-size: 28rpx;
-  color: #007aff;
-  margin-top: 20rpx;
-  display: block;
-}
-
-/* 性别选择器 */
-.gender-selector.data-v-b237504c {
-  display: flex;
-  gap: 20rpx;
-}
-.gender-item.data-v-b237504c {
-  flex: 1;
-  text-align: center;
-  padding: 20rpx;
-  border: 2rpx solid #e5e5e5;
-  border-radius: 8rpx;
-  background-color: #fafafa;
-}
-.gender-item.active.data-v-b237504c {
-  border-color: #007aff;
-  background-color: #e6f2ff;
-}
-.gender-text.data-v-b237504c {
-  font-size: 32rpx;
-  color: #333;
-}
-.gender-item.active .gender-text.data-v-b237504c {
-  color: #007aff;
-  font-weight: bold;
-}
-
-/* 注册按钮区域 */
-.register-buttons.data-v-b237504c {
-  display: flex;
-  gap: 20rpx;
-  margin: 40rpx 0;
-}
-.back-btn.data-v-b237504c {
-  flex: 1;
-  height: 96rpx;
-  background-color: #f5f5f5;
-  color: #333;
-  font-size: 32rpx;
-  border-radius: 48rpx;
-  border: 2rpx solid #e5e5e5;
-}
-.register-btn.data-v-b237504c {
-  flex: 1;
-  height: 96rpx;
-  background-color: #007aff;
-  color: #fff;
-  font-size: 32rpx;
-  border-radius: 48rpx;
-}
-.register-btn.data-v-b237504c:disabled {
-  background-color: #ccc;
 }

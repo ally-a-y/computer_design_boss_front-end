@@ -161,19 +161,21 @@ export default {
 <style lang="scss" scoped>
 .post-container {
   min-height: 100vh;
-  background: #f5f5f5;
-  padding: 20rpx;
+  background-color: #F8FAFD;
+  padding: 16px;
+  font-family: -apple-system, Helvetica, Roboto, sans-serif;
 }
 
 .form-section {
   background: white;
-  border-radius: 20rpx;
-  padding: 30rpx;
-  margin-bottom: 20rpx;
+  border-radius: 16px;
+  padding: 16px;
+  margin: 12px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .form-item {
-  margin-bottom: 30rpx;
+  margin-bottom: 16px;
   
   &:last-child {
     margin-bottom: 0;
@@ -182,78 +184,103 @@ export default {
 
 .label {
   display: block;
-  font-size: 32rpx;
+  font-size: 14px;
   font-weight: 600;
-  color: #333;
-  margin-bottom: 20rpx;
+  color: #1E1E1E;
+  margin-bottom: 12px;
 }
 
 .content-input {
   width: 100%;
-  min-height: 200rpx;
-  background: #f8f9fa;
-  border: 2rpx solid #e9ecef;
-  border-radius: 20rpx;
-  padding: 20rpx;
-  font-size: 28rpx;
+  min-height: 200px;
+  background: #F2F5F9;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 14px;
   line-height: 1.5;
+  transition: all 0.3s ease;
+}
+
+.content-input:focus {
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+  outline: none;
 }
 
 .char-count {
   display: block;
   text-align: right;
-  font-size: 24rpx;
-  color: #999;
-  margin-top: 10rpx;
+  font-size: 12px;
+  color: #999999;
+  margin-top: 8px;
 }
 
 .picker {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f8f9fa;
-  border: 2rpx solid #e9ecef;
-  border-radius: 20rpx;
-  padding: 20rpx 30rpx;
-  font-size: 28rpx;
+  background: #F2F5F9;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.picker:focus-within {
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
 }
 
 .picker-arrow {
-  color: #999;
+  color: #999999;
 }
 
 .checkbox-item {
   display: flex;
   align-items: center;
-  gap: 20rpx;
-  font-size: 28rpx;
-  color: #333;
+  gap: 12px;
+  font-size: 14px;
+  color: #1E1E1E;
 }
 
 .action-buttons {
   display: flex;
-  gap: 20rpx;
-  padding: 0 20rpx;
+  gap: 12px;
+  margin-top: 16px;
 }
 
 .btn-secondary {
   flex: 1;
-  background: #f0f0f0;
-  color: #666;
+  background: #F2F5F9;
+  color: #6C757D;
   border: none;
-  padding: 30rpx;
-  border-radius: 20rpx;
-  font-size: 32rpx;
+  padding: 12px;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  
+  &:active {
+    background-color: #E9ECEF;
+    transform: scale(0.98);
+  }
 }
 
 .btn-primary {
   flex: 1;
-  background: #667eea;
+  background: #007aff;
   color: white;
   border: none;
-  padding: 30rpx;
-  border-radius: 20rpx;
-  font-size: 32rpx;
+  padding: 12px;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  
+  &:active {
+    background-color: #0056b3;
+    transform: scale(0.98);
+  }
   
   &:disabled {
     background: #ccc;

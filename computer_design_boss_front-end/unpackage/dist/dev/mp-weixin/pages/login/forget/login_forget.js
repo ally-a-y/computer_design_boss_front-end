@@ -172,72 +172,81 @@ if (!Array) {
 }
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: $data.resetStep === 1
+    a: common_vendor.o($options.goToLogin),
+    b: common_vendor.o(($event) => $event.target.style.color = "#007aff"),
+    c: common_vendor.o(($event) => $event.target.style.color = "#1E1E1E"),
+    d: common_vendor.o(($event) => $event.target.style.color = "#1E1E1E"),
+    e: common_vendor.p({
+      type: "back",
+      size: "24",
+      color: "#1E1E1E"
+    }),
+    f: $data.resetStep === 1
   }, $data.resetStep === 1 ? common_vendor.e({
-    b: $data.authMethod === "mobile" ? 1 : "",
-    c: common_vendor.o(($event) => $data.authMethod = "mobile"),
-    d: $data.authMethod === "email" ? 1 : "",
-    e: common_vendor.o(($event) => $data.authMethod = "email"),
-    f: $data.authMethod === "mobile"
+    g: $data.authMethod === "mobile" ? 1 : "",
+    h: common_vendor.o(($event) => $data.authMethod = "mobile"),
+    i: $data.authMethod === "email" ? 1 : "",
+    j: common_vendor.o(($event) => $data.authMethod = "email"),
+    k: $data.authMethod === "mobile"
   }, $data.authMethod === "mobile" ? {
-    g: common_vendor.p({
+    l: common_vendor.p({
       type: "phone",
       size: "24",
       color: "#999"
     }),
-    h: common_vendor.o([($event) => $data.forgetForm.mobile = $event.detail.value, (...args) => $options.handleInput && $options.handleInput(...args)]),
-    i: $data.forgetForm.mobile
+    m: common_vendor.o([($event) => $data.forgetForm.mobile = $event.detail.value, (...args) => $options.handleInput && $options.handleInput(...args)]),
+    n: $data.forgetForm.mobile
   } : {
-    j: common_vendor.p({
+    o: common_vendor.p({
       type: "email",
       size: "24",
       color: "#999"
     }),
-    k: common_vendor.o([($event) => $data.forgetForm.email = $event.detail.value, (...args) => $options.handleInput && $options.handleInput(...args)]),
-    l: $data.forgetForm.email
+    p: common_vendor.o([($event) => $data.forgetForm.email = $event.detail.value, (...args) => $options.handleInput && $options.handleInput(...args)]),
+    q: $data.forgetForm.email
   }, {
-    m: common_vendor.p({
+    r: common_vendor.p({
       type: "chat",
       size: "24",
       color: "#999"
     }),
-    n: $data.forgetForm.sms_code,
-    o: common_vendor.o(($event) => $data.forgetForm.sms_code = $event.detail.value),
-    p: common_vendor.t($options.smsBtnText),
-    q: !$data.canSendSms || $data.isSendingSms,
-    r: common_vendor.o((...args) => $options.sendSms && $options.sendSms(...args)),
-    s: !$options.isAuthFormValid,
-    t: common_vendor.o((...args) => $options.nextResetStep && $options.nextResetStep(...args))
+    s: $data.forgetForm.sms_code,
+    t: common_vendor.o(($event) => $data.forgetForm.sms_code = $event.detail.value),
+    v: common_vendor.t($options.smsBtnText),
+    w: !$data.canSendSms || $data.isSendingSms,
+    x: common_vendor.o((...args) => $options.sendSms && $options.sendSms(...args)),
+    y: !$options.isAuthFormValid,
+    z: common_vendor.o((...args) => $options.nextResetStep && $options.nextResetStep(...args))
   }) : {}, {
-    v: $data.resetStep === 2
+    A: $data.resetStep === 2
   }, $data.resetStep === 2 ? common_vendor.e({
-    w: common_vendor.p({
-      type: "locked",
-      size: "24",
-      color: "#999"
-    }),
-    x: $data.forgetForm.new_password,
-    y: common_vendor.o(($event) => $data.forgetForm.new_password = $event.detail.value),
-    z: common_vendor.o($options.togglePassword),
-    A: common_vendor.p({
-      type: $data.showPassword ? "eye" : "eye-slash",
-      size: "24",
-      color: "#999"
-    }),
     B: common_vendor.p({
       type: "locked",
       size: "24",
       color: "#999"
     }),
-    C: $data.forgetForm.confirm_password,
-    D: common_vendor.o(($event) => $data.forgetForm.confirm_password = $event.detail.value),
-    E: $data.forgetForm.confirm_password && $data.forgetForm.new_password !== $data.forgetForm.confirm_password
+    C: $data.forgetForm.new_password,
+    D: common_vendor.o(($event) => $data.forgetForm.new_password = $event.detail.value),
+    E: common_vendor.o($options.togglePassword),
+    F: common_vendor.p({
+      type: $data.showPassword ? "eye" : "eye-slash",
+      size: "24",
+      color: "#999"
+    }),
+    G: common_vendor.p({
+      type: "locked",
+      size: "24",
+      color: "#999"
+    }),
+    H: $data.forgetForm.confirm_password,
+    I: common_vendor.o(($event) => $data.forgetForm.confirm_password = $event.detail.value),
+    J: $data.forgetForm.confirm_password && $data.forgetForm.new_password !== $data.forgetForm.confirm_password
   }, $data.forgetForm.confirm_password && $data.forgetForm.new_password !== $data.forgetForm.confirm_password ? {} : {}, {
-    F: common_vendor.o((...args) => $options.prevResetStep && $options.prevResetStep(...args)),
-    G: !$options.isPasswordFormValid,
-    H: common_vendor.o((...args) => $options.handleResetPassword && $options.handleResetPassword(...args))
+    K: common_vendor.o((...args) => $options.prevResetStep && $options.prevResetStep(...args)),
+    L: !$options.isPasswordFormValid,
+    M: common_vendor.o((...args) => $options.handleResetPassword && $options.handleResetPassword(...args))
   }) : {}, {
-    I: common_vendor.o((...args) => $options.goToLogin && $options.goToLogin(...args))
+    N: common_vendor.o((...args) => $options.goToLogin && $options.goToLogin(...args))
   });
 }
 var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-93dfe9d4"], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/login/forget/login_forget.vue"]]);
