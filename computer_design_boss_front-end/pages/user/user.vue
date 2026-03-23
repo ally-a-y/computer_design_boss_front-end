@@ -56,7 +56,7 @@
       
       <view class="menu-item" @click="navigateToDisplay" :style="{ borderBottom: isDarkMode ? '1px solid #404040' : '1px solid #F2F5F9' }">
         <uni-icons type="settings" size="30" :color="isDarkMode ? '#999' : '#666'"></uni-icons>
-        <text class="menu-text" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">显示设置</text>
+        <text class="menu-text" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">可视化页面</text>
         <uni-icons type="right" size="20" :color="isDarkMode ? '#666' : '#999'"></uni-icons>
       </view>
       
