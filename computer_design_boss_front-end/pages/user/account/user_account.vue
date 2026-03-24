@@ -2,8 +2,15 @@
   <view class="account-page">
     <!-- 顶部导航 -->
     <view class="nav-bar">
-      <text class="back-btn" @click="goBack">←</text>
-      <text class="title">我的账号</text>
+      <view class="nav-bar-left">
+        <text class="nav-back-icon" @click="goBack">←</text>
+      </view>
+      <view class="nav-bar-center">
+        <text class="nav-bar-title">我的账号</text>
+      </view>
+      <view class="nav-bar-right">
+        <!-- 右侧预留空间 -->
+      </view>
     </view>
     
     <!-- 账号设置列表 -->
@@ -131,22 +138,45 @@ async getUserInfo() {
 .nav-bar {
   display: flex;
   align-items: center;
-  padding: 30rpx 20rpx;
-  background-color: #fff;
-  border-bottom: 1rpx solid #eee;
+  height: 80px;
+  margin-bottom: 12px;
+  padding: 0 16px;
 }
 
-.back-btn {
-  font-size: 36rpx;
-  color: #333;
+.nav-bar-left {
+  flex: 0 0 auto;
+  padding: 8px;
 }
 
-.title {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
-  margin-left: 20rpx;
+.nav-bar-center {
+  flex: 1;
+  text-align: center;
 }
+
+.nav-bar-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1E1E1E;
+}
+
+.nav-bar-right {
+  flex: 0 0 auto;
+  padding: 8px;
+}
+
+.nav-back-icon {
+  font-size: 24px;
+  color: #1E1E1E;
+  transition: all 0.3s ease;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.nav-back-icon:active {
+  color: #007aff;
+  background-color: #F0F4FF;
+}
+
 
 .account-list {
   background-color: #fff;

@@ -81,11 +81,17 @@ const _sfc_main = {
         content: "\u786E\u5B9A\u8981\u9000\u51FA\u767B\u5F55\u5417\uFF1F",
         success: (res) => {
           if (res.confirm) {
+            common_vendor.index.removeStorageSync("token");
             common_vendor.index.removeStorageSync("userInfo");
             common_vendor.index.showToast({
               title: "\u5DF2\u9000\u51FA\u767B\u5F55",
               icon: "success"
             });
+            setTimeout(() => {
+              common_vendor.index.navigateTo({
+                url: "/pages/login/login"
+              });
+            }, 1500);
           }
         }
       });

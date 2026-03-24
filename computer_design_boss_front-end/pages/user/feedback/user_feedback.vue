@@ -1,10 +1,16 @@
-<template>
+xu<template>
   <view class="feedback-page">
     <!-- 顶部导航 -->
     <view class="nav-bar">
-      <text class="back-btn" @click="goBack">←</text>
-      <text class="title">投诉反馈</text>
-      <text class="add-btn" @click="addFeedback">+</text>
+      <view class="nav-bar-left">
+        <text class="nav-back-icon" @click="goBack">←</text>
+      </view>
+      <view class="nav-bar-center">
+        <text class="nav-bar-title">投诉反馈</text>
+      </view>
+      <view class="nav-bar-right">
+        <text class="add-btn" @click="addFeedback">+</text>
+      </view>
     </view>
     
     <!-- 反馈列表 -->
@@ -219,27 +225,57 @@ export default {
 .nav-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 30rpx 20rpx;
-  background-color: #fff;
-  border-bottom: 1rpx solid #eee;
+  height: 80px;
+  margin-bottom: 12px;
+  padding: 0 16px;
 }
 
-.back-btn {
-  font-size: 36rpx;
-  color: #333;
+.nav-bar-left {
+  flex: 0 0 auto;
+  padding: 8px;
 }
 
-.title {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
+.nav-bar-center {
+  flex: 1;
+  text-align: center;
+}
+
+.nav-bar-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1E1E1E;
+}
+
+.nav-bar-right {
+  flex: 0 0 auto;
+  padding: 8px;
+}
+
+.nav-back-icon {
+  font-size: 24px;
+  color: #1E1E1E;
+  transition: all 0.3s ease;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.nav-back-icon:active {
+  color: #007aff;
+  background-color: #F0F4FF;
 }
 
 .add-btn {
-  font-size: 40rpx;
+  font-size: 16px;
   color: #007aff;
-  font-weight: bold;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.add-btn:active {
+  background-color: #F0F4FF;
+  transform: scale(0.98);
 }
 
 .feedback-list {

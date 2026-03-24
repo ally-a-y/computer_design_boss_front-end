@@ -631,12 +631,12 @@ export default {
   font-family: -apple-system, Helvetica, Roboto, sans-serif;
 }
 
+/* 导航栏样式 */
 .nav-bar {
   display: flex;
   align-items: center;
-  height: 44px;
+  height: 80px;
   margin-bottom: 12px;
-  padding: 0 16px;
 }
 
 .nav-bar-left {
@@ -661,16 +661,12 @@ export default {
 }
 
 .nav-back-icon {
-  font-size: 24px;
   color: #1E1E1E;
   transition: all 0.3s ease;
-  padding: 4px;
-  border-radius: 8px;
 }
 
 .nav-back-icon:active {
   color: #007aff;
-  background-color: #F0F4FF;
 }
 
 .save-btn {

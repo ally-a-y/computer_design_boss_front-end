@@ -375,7 +375,7 @@ export default {
 .nav-bar {
   background-color: #ffffff;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  height: 40px;
+  height: 80px;
   display: flex;
   align-items: center;
   padding: 0 16px;

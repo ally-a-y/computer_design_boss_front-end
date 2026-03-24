@@ -212,7 +212,8 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20rpx 30rpx;
+  height: 80px;
+  padding: 0 16px;
   background-color: #fff;
   border-bottom: 1rpx solid #eee;
 }

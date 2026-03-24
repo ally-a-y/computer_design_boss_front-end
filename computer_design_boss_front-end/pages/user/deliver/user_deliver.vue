@@ -112,7 +112,7 @@ export default {
 .nav-bar {
   display: flex;
   align-items: center;
-  height: 44px;
+  height: 80px;
   margin-bottom: 12px;
   padding: 0 16px;
 }

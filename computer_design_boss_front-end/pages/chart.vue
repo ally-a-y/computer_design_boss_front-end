@@ -228,7 +228,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   background-color: #fff;
-  height: 44px;
+  height: 80px;
   padding: 0 16px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   position: sticky;

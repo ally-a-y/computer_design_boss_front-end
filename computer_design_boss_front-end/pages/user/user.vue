@@ -56,13 +56,13 @@
       
       <view class="menu-item" @click="navigateToDisplay" :style="{ borderBottom: isDarkMode ? '1px solid #404040' : '1px solid #F2F5F9' }">
         <uni-icons type="settings" size="30" :color="isDarkMode ? '#999' : '#666'"></uni-icons>
-        <text class="menu-text" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">可视化页面</text>
+        <text class="menu-text" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">显示设置</text>
         <uni-icons type="right" size="20" :color="isDarkMode ? '#666' : '#999'"></uni-icons>
       </view>
       
       <view class="menu-item" @click="navigateToThemeDemo">
         <uni-icons type="color" size="30" :color="isDarkMode ? '#999' : '#666'"></uni-icons>
-        <text class="menu-text" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">主题演示</text>
+        <text class="menu-text" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">可视化页面</text>
         <uni-icons type="right" size="20" :color="isDarkMode ? '#666' : '#999'"></uni-icons>
       </view>
     </view>
@@ -173,12 +173,19 @@ export default {
         content: '确定要退出登录吗？',
         success: (res) => {
           if (res.confirm) {
+            // 同时清除token和userInfo
+            uni.removeStorageSync('token')
             uni.removeStorageSync('userInfo')
             uni.showToast({
               title: '已退出登录',
               icon: 'success'
             })
-            // 可以跳转到登录页面
+            // 跳转到登录页面
+            setTimeout(() => {
+              uni.navigateTo({
+                url: '/pages/login/login'
+              })
+            }, 1500)
           }
         }
       })
@@ -201,7 +208,7 @@ export default {
 .nav-bar {
   display: flex;
   align-items: center;
-  height: 44px;
+  height: 80px;
   margin-bottom: 12px;
 }
 

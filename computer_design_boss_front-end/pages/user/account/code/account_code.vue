@@ -127,7 +127,8 @@ export default {
 .nav-bar {
   display: flex;
   align-items: center;
-  padding: 30rpx 20rpx;
+  height: 80px;
+  padding: 0 16px;
   background-color: #fff;
   border-bottom: 1rpx solid #eee;
 }

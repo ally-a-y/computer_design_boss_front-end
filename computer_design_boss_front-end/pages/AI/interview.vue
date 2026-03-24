@@ -173,7 +173,7 @@
       </view>
     </view>
 
-    <!-- 面试报告弹窗 -->
+    <!-- 面试报告弹窗  -->
     <view v-if="showReport" class="report-overlay" @click="closeReport">
       <view class="report-modal" @click.stop>
         <view class="report-header">
@@ -181,41 +181,42 @@
           <image class="close-report" src="/static/ai/close.png" @click="closeReport" mode="aspectFit"></image>
         </view>
 
-        <scroll-view class="report-content" scroll-y>
-          <!-- 综合评分 -->
-          <view class="score-section">
-            <text class="score-title">综合评分</text>
-            <view class="score-circle">
-              <text class="score-number">{{ overallScore }}</text>
-              <text class="score-total">/100</text>
+        <view class="report-content-wrapper">
+          <scroll-view class="report-scroll-view" scroll-y>
+            <view class="score-section">
+              <text class="score-title">综合评分</text>
+              <view class="score-circle">
+                <text class="score-number">{{ overallScore }}</text>
+                <text class="score-total">/100</text>
+              </view>
             </view>
-          </view>
 
-          <!-- 雷达图 -->
-          <view class="radar-section">
-            <text class="section-title">能力雷达图</text>
-            <view class="radar-chart">
-              <canvas canvas-id="radarChart" class="radar-canvas"></canvas>
+            <!-- 雷达图区域 - -->
+            <view class="radar-section">
+              <text class="section-title">能力雷达图</text>
+              <view class="radar-chart">
+                <canvas canvas-id="radarChart" class="radar-canvas"></canvas>
+              </view>
             </view>
-          </view>
 
-          <!-- 详细评价 -->
-          <view class="evaluation-section">
-            <text class="section-title">详细评价</text>
-            <view class="evaluation-item" v-for="(item, index) in evaluationItems" :key="index">
-              <text class="item-title">{{ item.title }}</text>
-              <text class="item-content">{{ item.content }}</text>
+            <!-- 详细评价 -->
+            <view class="evaluation-section">
+              <text class="section-title">详细评价</text>
+              <view class="evaluation-item" v-for="(item, index) in evaluationItems" :key="index">
+                <text class="item-title">{{ item.title }}</text>
+                <text class="item-content">{{ item.content }}</text>
+              </view>
             </view>
-          </view>
 
-          <!-- 改进建议 -->
-          <view class="suggestions-section">
-            <text class="section-title">改进建议</text>
-            <view class="suggestion-item" v-for="(suggestion, index) in suggestions" :key="index">
-              <text>• {{ suggestion }}</text>
+            <!-- 改进建议 -->
+            <view class="suggestions-section">
+              <text class="section-title">改进建议</text>
+              <view class="suggestion-item" v-for="(suggestion, index) in suggestions" :key="index">
+                <text>• {{ suggestion }}</text>
+              </view>
             </view>
-          </view>
-        </scroll-view>
+          </scroll-view>
+        </view>
 
         <view class="report-footer">
           <button class="report-btn restart-btn" @click="restartInterview">重新面试</button>
@@ -224,7 +225,7 @@
       </view>
     </view>
 
-    <!-- 级联选择器弹窗（职位选择） -->
+    <!-- 级联选择器弹窗 -->
     <view v-if="showCascadePicker" class="cascade-overlay" @click="closeCascadePicker">
       <view class="cascade-modal" @click.stop>
         <view class="cascade-header">
@@ -428,7 +429,7 @@ export default {
     this.initializeInterview()
     this.initRecorder()
     this.fetchUserInfo()
-    this.resetPositionSelection() // 初始化职位选择为空
+    this.resetPositionSelection() 
   },
 
   onUnload() {
@@ -817,7 +818,7 @@ export default {
         uni.showToast({ title: '请等待AI响应', icon: 'none' })
         return
       }
-      recorderManager.start({ duration: 60000, sampleRate: 16000, numberOfChannels: 1, encodeBitRate: 96000, format: 'mp3' })
+      recorderManager.start({ duration: 180000, sampleRate: 16000, numberOfChannels: 1, encodeBitRate: 96000, format: 'mp3' })
     },
     stopRecording() {
       if (!this.isRecording) return
@@ -827,7 +828,7 @@ export default {
       this.recordingTime = 0
       this.recordingTimer = setInterval(() => {
         this.recordingTime++
-        if (this.recordingTime >= 60) this.stopRecording()
+        if (this.recordingTime >= 180) this.stopRecording()
       }, 1000)
     },
     clearRecordingTimer() {
@@ -976,11 +977,20 @@ export default {
           this.generateMockReport()
         }
         this.showReport = true
-        this.$nextTick(() => { this.drawRadarChart() })
+        this.$nextTick(() => {
+          setTimeout(() => {
+            this.drawRadarChart()
+          }, 200)
+        })
       } catch (error) {
         console.error('获取报告失败', error)
         this.generateMockReport()
         this.showReport = true
+        this.$nextTick(() => {
+          setTimeout(() => {
+            this.drawRadarChart()
+          }, 200)
+        })
       } finally {
         uni.hideLoading()
       }
@@ -1022,36 +1032,126 @@ export default {
       this.resetInterview()
       this.interviewStarted = false
     },
-    exportReport() {
-      uni.showModal({
-        title: '导出报告',
-        content: '是否将面试报告保存到本地？',
-        success: (res) => { if (res.confirm) uni.showToast({ title: '报告已保存', icon: 'success' }) }
-      })
+    async exportReport() {
+      // 构建报告内容
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>面试报告</title>
+          <style>
+            body { font-family: '微软雅黑', '宋体', Arial, sans-serif; margin: 40px; }
+            h1 { color: #333; border-bottom: 2px solid #007aff; padding-bottom: 10px; }
+            .score { font-size: 48px; color: #007aff; font-weight: bold; margin: 20px 0; }
+            .section { margin: 30px 0; }
+            .section-title { font-size: 24px; font-weight: bold; color: #333; margin-bottom: 15px; }
+            .item { margin-bottom: 20px; }
+            .item-title { font-size: 18px; font-weight: bold; color: #007aff; }
+            .item-content { margin-top: 5px; line-height: 1.6; }
+            .suggestion { margin: 10px 0; }
+          </style>
+        </head>
+        <body>
+          <h1>AI 模拟面试报告</h1>
+          <div class="section">
+            <div class="section-title">综合评分</div>
+            <div class="score">${this.overallScore} / 100</div>
+          </div>
+          <div class="section">
+            <div class="section-title">详细评价</div>
+            ${this.evaluationItems.map(item => `
+              <div class="item">
+                <div class="item-title">${item.title}</div>
+                <div class="item-content">${item.content}</div>
+              </div>
+            `).join('')}
+          </div>
+          <div class="section">
+            <div class="section-title">改进建议</div>
+            ${this.suggestions.map(s => `<div class="suggestion">• ${s}</div>`).join('')}
+          </div>
+          <p style="margin-top: 40px; color: #999; font-size: 12px;">生成时间：${new Date().toLocaleString()}</p>
+        </body>
+        </html>
+      `;
+    
+      const fs = uni.getFileSystemManager();
+      const filePath = `${uni.env.USER_DATA_PATH}/report_${Date.now()}.doc`;
+    
+      fs.writeFile({
+        filePath,
+        data: htmlContent,
+        encoding: 'utf8',
+        success: () => {
+          uni.openDocument({
+            filePath: filePath,
+            success: () => {
+              uni.showToast({ title: '报告已保存并打开', icon: 'success' });
+            },
+            fail: (err) => {
+              console.error('打开文件失败', err);
+              uni.showToast({ title: '报告已保存，但打开失败', icon: 'none' });
+            }
+          });
+        },
+        fail: (err) => {
+          console.error('写入文件失败', err);
+          uni.showToast({ title: '导出失败', icon: 'none' });
+        }
+      });
     },
+	
     drawRadarChart() {
-      const ctx = uni.createCanvasContext('radarChart', this)
-      this.drawRadarGrid(ctx)
-      this.drawRadarData(ctx)
-      ctx.draw()
+      const query = uni.createSelectorQuery().in(this)
+      query.select('.radar-canvas').boundingClientRect(rect => {
+        if (!rect || rect.width === 0 || rect.height === 0) {
+          setTimeout(() => this.drawRadarChart(), 100)
+          return
+        }
+        const canvasWidth = rect.width
+        const canvasHeight = rect.height
+        const ctx = uni.createCanvasContext('radarChart', this)
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight)
+        
+        // 定义雷达图参数
+        const centerX = canvasWidth / 2
+        const centerY = canvasHeight / 2
+        const radius = Math.min(canvasWidth, canvasHeight) * 0.35 
+        const points = 6
+        const angleStep = (Math.PI * 2) / points
+        this.drawRadarGrid(ctx, centerX, centerY, radius, points, angleStep)
+        
+        // 绘制数据区域
+        const score = this.overallScore / 100
+        const data = [0.8 * score, 0.85 * score, 0.75 * score, 0.9 * score, 0.8 * score, 0.85 * score]
+        this.drawRadarData(ctx, centerX, centerY, radius, points, angleStep, data)
+        
+        // 绘制标签
+        const labels = ['技术', '沟通', '经验', '态度', '潜力', '稳定']
+        this.drawRadarLabels(ctx, centerX, centerY, radius, points, angleStep, labels)
+        
+        ctx.draw()
+      }).exec()
     },
-    drawRadarGrid(ctx) {
-      const centerX = 150, centerY = 150, radius = 100, points = 6
-      const angleStep = (Math.PI * 2) / points
+    drawRadarGrid(ctx, centerX, centerY, radius, points, angleStep) {
       ctx.setStrokeStyle('#e0e0e0')
       ctx.setLineWidth(1)
+      // 绘制同心圆网格（5层）
       for (let i = 1; i <= 5; i++) {
         ctx.beginPath()
+        const r = radius * i / 5
         for (let j = 0; j <= points; j++) {
           const angle = j * angleStep - Math.PI / 2
-          const r = radius * i / 5
           const x = centerX + Math.cos(angle) * r
           const y = centerY + Math.sin(angle) * r
-          j === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
+          if (j === 0) ctx.moveTo(x, y)
+          else ctx.lineTo(x, y)
         }
         ctx.closePath()
         ctx.stroke()
       }
+      // 绘制从中心到顶点的连线
       for (let i = 0; i < points; i++) {
         const angle = i * angleStep - Math.PI / 2
         ctx.beginPath()
@@ -1059,21 +1159,8 @@ export default {
         ctx.lineTo(centerX + Math.cos(angle) * radius, centerY + Math.sin(angle) * radius)
         ctx.stroke()
       }
-      ctx.setFontSize(12)
-      ctx.setFillStyle('#666')
-      const labels = ['技术', '沟通', '经验', '态度', '潜力', '稳定']
-      for (let i = 0; i < points; i++) {
-        const angle = i * angleStep - Math.PI / 2
-        const x = centerX + Math.cos(angle) * (radius + 20)
-        const y = centerY + Math.sin(angle) * (radius + 20)
-        ctx.fillText(labels[i], x - 12, y + 6)
-      }
     },
-    drawRadarData(ctx) {
-      const centerX = 150, centerY = 150, radius = 100, points = 6
-      const angleStep = (Math.PI * 2) / points
-      const score = this.overallScore / 100
-      const data = [0.8 * score, 0.85 * score, 0.75 * score, 0.9 * score, 0.8 * score, 0.85 * score]
+    drawRadarData(ctx, centerX, centerY, radius, points, angleStep, data) {
       ctx.setFillStyle('rgba(0, 122, 255, 0.3)')
       ctx.setStrokeStyle('#007aff')
       ctx.setLineWidth(2)
@@ -1083,11 +1170,13 @@ export default {
         const value = data[i % points]
         const x = centerX + Math.cos(angle) * (radius * value)
         const y = centerY + Math.sin(angle) * (radius * value)
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
+        if (i === 0) ctx.moveTo(x, y)
+        else ctx.lineTo(x, y)
       }
       ctx.closePath()
       ctx.fill()
       ctx.stroke()
+      // 绘制数据点
       ctx.setFillStyle('#007aff')
       for (let i = 0; i < points; i++) {
         const angle = i * angleStep - Math.PI / 2
@@ -1097,6 +1186,17 @@ export default {
         ctx.beginPath()
         ctx.arc(x, y, 4, 0, Math.PI * 2)
         ctx.fill()
+      }
+    },
+    drawRadarLabels(ctx, centerX, centerY, radius, points, angleStep, labels) {
+      ctx.setFontSize(12)
+      ctx.setFillStyle('#666')
+      const labelRadius = radius + 18
+      for (let i = 0; i < points; i++) {
+        const angle = i * angleStep - Math.PI / 2
+        const x = centerX + Math.cos(angle) * labelRadius
+        const y = centerY + Math.sin(angle) * labelRadius
+        ctx.fillText(labels[i], x - 12, y + 6)
       }
     },
 
@@ -1804,6 +1904,225 @@ export default {
   }
 }
 
+/* 修复报告弹窗布局：解决遮挡和滚动问题 */
+.report-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+
+  .report-modal {
+    width: 90%;
+    max-width: 700rpx;
+    height: 85vh;
+    max-height: 85vh;
+    background-color: #fff;
+    border-radius: 20rpx;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: modalSlideUp 0.3s ease-out;
+
+    .report-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 30rpx;
+      border-bottom: 2rpx solid #e0e0e0;
+      flex-shrink: 0;
+
+      .report-title {
+        font-size: 36rpx;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .close-report {
+        width: 40rpx;
+        height: 40rpx;
+      }
+    }
+
+    .report-content-wrapper {
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .report-scroll-view {
+      height: 100%;
+      padding: 0 30rpx;
+    }
+
+    .report-content {
+      padding-bottom: 20rpx;
+    }
+
+    .score-section {
+      text-align: center;
+      margin-bottom: 30rpx;
+      padding-top: 20rpx;
+
+      .score-title {
+        font-size: 32rpx;
+        color: #333;
+        margin-bottom: 20rpx;
+        display: block;
+      }
+
+      .score-circle {
+        width: 200rpx;
+        height: 200rpx;
+        border-radius: 50%;
+        background: conic-gradient(#007aff 0deg, #007aff calc(v-bind(overallScore) * 3.6deg), #e0e0e0 calc(v-bind(overallScore) * 3.6deg));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        position: relative;
+
+        &::before {
+          content: '';
+          position: absolute;
+          width: 160rpx;
+          height: 160rpx;
+          background-color: #fff;
+          border-radius: 50%;
+        }
+
+        .score-number {
+          font-size: 48rpx;
+          font-weight: bold;
+          color: #007aff;
+          position: relative;
+          z-index: 1;
+        }
+
+        .score-total {
+          font-size: 32rpx;
+          color: #666;
+          position: relative;
+          z-index: 1;
+        }
+      }
+    }
+
+    .radar-section {
+      margin-bottom: 30rpx;
+      flex-shrink: 0;
+
+      .section-title {
+        font-size: 32rpx;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 20rpx;
+        display: block;
+      }
+
+      .radar-chart {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 320rpx;
+        
+        .radar-canvas {
+          width: 300rpx;
+          height: 300rpx;
+        }
+      }
+    }
+
+    .evaluation-section {
+      margin-bottom: 30rpx;
+
+      .section-title {
+        font-size: 32rpx;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 20rpx;
+        display: block;
+      }
+
+      .evaluation-item {
+        margin-bottom: 20rpx;
+        padding: 20rpx;
+        background-color: #f8f9fa;
+        border-radius: 12rpx;
+
+        .item-title {
+          font-size: 28rpx;
+          font-weight: 600;
+          color: #333;
+          margin-bottom: 10rpx;
+          display: block;
+        }
+
+        .item-content {
+          font-size: 26rpx;
+          color: #666;
+          line-height: 1.5;
+        }
+      }
+    }
+
+    .suggestions-section {
+      margin-bottom: 30rpx;
+
+      .section-title {
+        font-size: 32rpx;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 20rpx;
+        display: block;
+      }
+
+      .suggestion-item {
+        margin-bottom: 15rpx;
+
+        text {
+          font-size: 26rpx;
+          color: #666;
+          line-height: 1.5;
+        }
+      }
+    }
+
+    .report-footer {
+      display: flex;
+      padding: 20rpx 30rpx;
+      border-top: 2rpx solid #e0e0e0;
+      gap: 20rpx;
+      flex-shrink: 0;
+      background-color: #fff;
+
+      .report-btn {
+        flex: 1;
+        padding: 24rpx;
+        border-radius: 20rpx;
+        font-size: 30rpx;
+        font-weight: 500;
+
+        &.restart-btn {
+          background: linear-gradient(135deg, #f0f8ff 0%, #e6f2ff 100%);
+          color: #007aff;
+          border: 2rpx solid #007aff;
+        }
+
+        &.export-btn {
+          background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+          color: #fff;
+        }
+      }
+    }
+  }
+}
+
 .cascade-overlay {
   position: fixed;
   top: 0;
@@ -1924,205 +2243,6 @@ export default {
             margin-left: 16rpx;
             font-weight: 600;
           }
-        }
-      }
-    }
-  }
-}
-
-.report-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0,0,0,0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-
-  .report-modal {
-    width: 90%;
-    max-width: 800rpx;
-    max-height: 90vh;
-    background-color: #fff;
-    border-radius: 20rpx;
-    display: flex;
-    flex-direction: column;
-    animation: modalSlideUp 0.3s ease-out;
-
-    .report-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 30rpx;
-      border-bottom: 2rpx solid #e0e0e0;
-
-      .report-title {
-        font-size: 36rpx;
-        font-weight: bold;
-        color: #333;
-      }
-
-      .close-report {
-        width: 40rpx;
-        height: 40rpx;
-      }
-    }
-
-    .report-content {
-      flex: 1;
-      padding: 30rpx;
-
-      .score-section {
-        text-align: center;
-        margin-bottom: 40rpx;
-
-        .score-title {
-          font-size: 32rpx;
-          color: #333;
-          margin-bottom: 20rpx;
-          display: block;
-        }
-
-        .score-circle {
-          width: 200rpx;
-          height: 200rpx;
-          border-radius: 50%;
-          background: conic-gradient(#007aff 0deg, #007aff calc(v-bind(overallScore) * 3.6deg), #e0e0e0 calc(v-bind(overallScore) * 3.6deg));
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin: 0 auto;
-          position: relative;
-
-          &::before {
-            content: '';
-            position: absolute;
-            width: 160rpx;
-            height: 160rpx;
-            background-color: #fff;
-            border-radius: 50%;
-          }
-
-          .score-number {
-            font-size: 48rpx;
-            font-weight: bold;
-            color: #007aff;
-            position: relative;
-            z-index: 1;
-          }
-
-          .score-total {
-            font-size: 32rpx;
-            color: #666;
-            position: relative;
-            z-index: 1;
-          }
-        }
-      }
-
-      .radar-section {
-        margin-bottom: 40rpx;
-
-        .section-title {
-          font-size: 32rpx;
-          font-weight: bold;
-          color: #333;
-          margin-bottom: 20rpx;
-          display: block;
-        }
-
-        .radar-chart {
-          height: 300rpx;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-
-          .radar-canvas {
-            width: 300rpx;
-            height: 300rpx;
-          }
-        }
-      }
-
-      .evaluation-section {
-        margin-bottom: 40rpx;
-
-        .section-title {
-          font-size: 32rpx;
-          font-weight: bold;
-          color: #333;
-          margin-bottom: 20rpx;
-          display: block;
-        }
-
-        .evaluation-item {
-          margin-bottom: 20rpx;
-          padding: 20rpx;
-          background-color: #f8f9fa;
-          border-radius: 12rpx;
-
-          .item-title {
-            font-size: 28rpx;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10rpx;
-            display: block;
-          }
-
-          .item-content {
-            font-size: 26rpx;
-            color: #666;
-            line-height: 1.5;
-          }
-        }
-      }
-
-      .suggestions-section {
-        .section-title {
-          font-size: 32rpx;
-          font-weight: bold;
-          color: #333;
-          margin-bottom: 20rpx;
-          display: block;
-        }
-
-        .suggestion-item {
-          margin-bottom: 15rpx;
-
-          text {
-            font-size: 26rpx;
-            color: #666;
-            line-height: 1.5;
-          }
-        }
-      }
-    }
-
-    .report-footer {
-      display: flex;
-      padding: 30rpx;
-      border-top: 2rpx solid #e0e0e0;
-      gap: 20rpx;
-
-      .report-btn {
-        flex: 1;
-        padding: 24rpx;
-        border-radius: 20rpx;
-        font-size: 30rpx;
-        font-weight: 500;
-
-        &.restart-btn {
-          background: linear-gradient(135deg, #f0f8ff 0%, #e6f2ff 100%);
-          color: #007aff;
-          border: 2rpx solid #007aff;
-        }
-
-        &.export-btn {
-          background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
-          color: #fff;
         }
       }
     }
@@ -2338,6 +2458,46 @@ export default {
     
     .control-btn text {
       color: #ffffff !important;
+    }
+  }
+  
+  .report-modal {
+    background-color: #2d2d2d !important;
+    
+    .report-header {
+      border-bottom-color: #4d4d4d;
+      
+      .report-title {
+        color: #ffffff;
+      }
+    }
+    
+    .score-section .score-title,
+    .radar-section .section-title,
+    .evaluation-section .section-title,
+    .suggestions-section .section-title {
+      color: #ffffff !important;
+    }
+    
+    .evaluation-item {
+      background-color: #1a1a1a !important;
+      
+      .item-title {
+        color: #ffffff !important;
+      }
+      
+      .item-content {
+        color: #cccccc !important;
+      }
+    }
+    
+    .suggestion-item text {
+      color: #cccccc !important;
+    }
+    
+    .report-footer {
+      border-top-color: #4d4d4d;
+      background-color: #2d2d2d;
     }
   }
 }

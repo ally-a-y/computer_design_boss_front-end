@@ -709,53 +709,12 @@ export default {
   font-family: -apple-system, Helvetica, Roboto, sans-serif;
 }
 
-/* 导航栏样式 */
-.nav-bar {
-  background-color: #ffffff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  height: 40px;
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-  position: relative;
-  margin-bottom: 12px;
-}
-
-.nav-bar-left {
-  flex: 0 0 auto;
-  padding: 8px;
-}
-
-.nav-bar-center {
-  flex: 1;
-  text-align: center;
-}
-
-.nav-bar-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1E1E1E;
-}
-
-.nav-bar-right {
-  flex: 0 0 auto;
-  padding: 8px;
-}
-
-.nav-back-icon {
-  color: #1E1E1E;
-  transition: all 0.3s ease;
-}
-
-.nav-back-icon:active {
-  color: #007aff;
-}
 
 /* 论坛导航栏样式 */
 .forum-nav {
   background-color: #ffffff;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  height: 40px;
+  height: 80px;
   padding: 0 16px;
 }
 
