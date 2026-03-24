@@ -1,28 +1,7 @@
 "use strict";
-var __defProp = Object.defineProperty;
-var __defProps = Object.defineProperties;
-var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
-var __getOwnPropSymbols = Object.getOwnPropertySymbols;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __propIsEnum = Object.prototype.propertyIsEnumerable;
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __spreadValues = (a, b) => {
-  for (var prop in b || (b = {}))
-    if (__hasOwnProp.call(b, prop))
-      __defNormalProp(a, prop, b[prop]);
-  if (__getOwnPropSymbols)
-    for (var prop of __getOwnPropSymbols(b)) {
-      if (__propIsEnum.call(b, prop))
-        __defNormalProp(a, prop, b[prop]);
-    }
-  return a;
-};
-var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
-var common_vendor = require("../../common/vendor.js");
-var common_api_forum = require("../../common/api/forum.js");
-var common_utils_themeSimple = require("../../common/utils/theme-simple.js");
-require("../../common/api/request.js");
-require("../../common/config.js");
+const common_vendor = require("../../common/vendor.js");
+const common_api_forum = require("../../common/api/forum.js");
+const common_utils_themeSimple = require("../../common/utils/theme-simple.js");
 const _sfc_main = {
   data() {
     return {
@@ -38,33 +17,35 @@ const _sfc_main = {
       loadMoreTimer: null,
       isLoadingReplies: false,
       debugMode: false,
+      // 手动控制调试模式
       categories: [
-        { id: "100", name: "\u6280\u672F\u5F00\u53D1\u7C7B", parent_id: null, level: 1, next_category_id: 100 },
-        { id: "101", name: "\u524D\u7AEF\u5F00\u53D1", parent_id: 100, level: 2, next_category_id: 101 },
-        { id: "102", name: "\u540E\u7AEF\u5F00\u53D1", parent_id: 100, level: 2, next_category_id: 102 },
-        { id: "103", name: "\u79FB\u52A8\u7AEF\u5F00\u53D1", parent_id: 100, level: 2, next_category_id: 103 },
-        { id: "104", name: "\u6570\u636E\u4E0EAI", parent_id: 100, level: 2, next_category_id: 104 },
-        { id: "105", name: "\u8FD0\u7EF4\u4E0E\u6D4B\u8BD5", parent_id: 100, level: 2, next_category_id: 105 },
-        { id: "106", name: "\u4EA7\u54C1\u8BBE\u8BA1", parent_id: 100, level: 2, next_category_id: 106 },
-        { id: "107", name: "\u7F51\u7EDC\u5B89\u5168", parent_id: 100, level: 2, next_category_id: 107 },
-        { id: "108", name: "\u5D4C\u5165\u5F0F\u5F00\u53D1", parent_id: 100, level: 2, next_category_id: 108 },
-        { id: "200", name: "\u4EA7\u54C1\u4E0E\u8BBE\u8BA1\u7C7B", parent_id: null, level: 1, next_category_id: 200 },
-        { id: "300", name: "\u6280\u672F\u7BA1\u7406\u7C7B", parent_id: null, level: 1, next_category_id: 300 }
+        { id: "100", name: "技术开发类", parent_id: null, level: 1, next_category_id: 100 },
+        { id: "101", name: "前端开发", parent_id: 100, level: 2, next_category_id: 101 },
+        { id: "102", name: "后端开发", parent_id: 100, level: 2, next_category_id: 102 },
+        { id: "103", name: "移动端开发", parent_id: 100, level: 2, next_category_id: 103 },
+        { id: "104", name: "数据与AI", parent_id: 100, level: 2, next_category_id: 104 },
+        { id: "105", name: "运维与测试", parent_id: 100, level: 2, next_category_id: 105 },
+        { id: "106", name: "产品设计", parent_id: 100, level: 2, next_category_id: 106 },
+        { id: "107", name: "网络安全", parent_id: 100, level: 2, next_category_id: 107 },
+        { id: "108", name: "嵌入式开发", parent_id: 100, level: 2, next_category_id: 108 },
+        { id: "200", name: "产品与设计类", parent_id: null, level: 1, next_category_id: 200 },
+        { id: "300", name: "技术管理类", parent_id: null, level: 1, next_category_id: 300 }
       ],
       showCategoryTabs: false,
       selectedSubCategories: [],
       categoryMap: {
-        "101": "\u524D\u7AEF",
-        "102": "\u540E\u7AEF",
-        "103": "\u79FB\u52A8\u7AEF",
-        "104": "\u6570\u636E\u4E0EAI",
-        "105": "\u8FD0\u7EF4\u4E0E\u6D4B\u8BD5",
-        "106": "\u4EA7\u54C1\u8BBE\u8BA1",
-        "107": "\u7F51\u7EDC\u5B89\u5168",
-        "108": "\u5D4C\u5165\u5F0F",
-        "200": "\u4EA7\u54C1\u8BBE\u8BA1",
-        "300": "\u6280\u672F\u7BA1\u7406"
+        "101": "前端",
+        "102": "后端",
+        "103": "移动端",
+        "104": "数据与AI",
+        "105": "运维与测试",
+        "106": "产品设计",
+        "107": "网络安全",
+        "108": "嵌入式",
+        "200": "产品设计",
+        "300": "技术管理"
       },
+      // 主题相关
       currentTheme: "light",
       isDarkMode: false
     };
@@ -82,24 +63,32 @@ const _sfc_main = {
     }
     common_vendor.index.$off("globalThemeChange", this.handleGlobalThemeChange);
   },
+  // 切换调试模式 - 长按标题5次开启/关闭
   toggleDebugMode() {
     this.debugMode = !this.debugMode;
     common_vendor.index.showToast({
-      title: this.debugMode ? "\u8C03\u8BD5\u6A21\u5F0F\u5DF2\u5F00\u542F" : "\u8C03\u8BD5\u6A21\u5F0F\u5DF2\u5173\u95ED",
+      title: this.debugMode ? "调试模式已开启" : "调试模式已关闭",
       icon: "none",
       duration: 2e3
     });
   },
   methods: {
+    /**
+     * 初始化主题
+     */
     initTheme() {
       this.currentTheme = common_utils_themeSimple.themeManager.getCurrentTheme();
       this.isDarkMode = this.currentTheme === "dark";
       common_vendor.index.$on("globalThemeChange", this.handleGlobalThemeChange);
     },
+    /**
+     * 处理全局主题变化
+     */
     handleGlobalThemeChange(data) {
       this.currentTheme = data.theme;
       this.isDarkMode = data.isDark;
     },
+    // 加载帖子数据
     async loadPosts(reset = false) {
       if (reset) {
         this.page = 1;
@@ -115,17 +104,17 @@ const _sfc_main = {
         const isTopLevelCategory = this.categories.some((c) => Number(c.id) === currentCategoryNum && c.level === 1);
         res = await common_api_forum.forumApi.getAllFirstComments();
         if (this.debugMode) {
-          console.log("\u8BBA\u575B\u6570\u636E:", res);
-          console.log("\u5F53\u524D\u5206\u7C7B:", this.currentCategory);
-          console.log("\u662F\u5426\u4E00\u7EA7\u5206\u7C7B:", isTopLevelCategory);
-          console.log("\u6240\u6709\u5206\u7C7B:", this.categories);
+          common_vendor.index.__f__("log", "at pages/forum/forum.vue:268", "论坛数据:", res);
+          common_vendor.index.__f__("log", "at pages/forum/forum.vue:269", "当前分类:", this.currentCategory);
+          common_vendor.index.__f__("log", "at pages/forum/forum.vue:270", "是否一级分类:", isTopLevelCategory);
+          common_vendor.index.__f__("log", "at pages/forum/forum.vue:271", "所有分类:", this.categories);
         }
         if (res === null) {
           res = [];
         }
         if (res && res.length > 0 && this.debugMode) {
-          console.log("\u7B2C\u4E00\u6761\u6570\u636E\u793A\u4F8B:", res[0]);
-          console.log("\u6570\u636E\u5B57\u6BB5\u9A8C\u8BC1:", {
+          common_vendor.index.__f__("log", "at pages/forum/forum.vue:281", "第一条数据示例:", res[0]);
+          common_vendor.index.__f__("log", "at pages/forum/forum.vue:282", "数据字段验证:", {
             hasId: res[0].hasOwnProperty("id"),
             hasContent: res[0].hasOwnProperty("content"),
             hasCategoryId: res[0].hasOwnProperty("category_id"),
@@ -141,12 +130,12 @@ const _sfc_main = {
             if ([200, 300].includes(currentCategoryNum)) {
               targetCategoryIds = [currentCategoryNum];
               if (this.debugMode) {
-                console.log("200/300\u5206\u7C7B\u76F4\u63A5\u4F7F\u7528:", targetCategoryIds);
+                common_vendor.index.__f__("log", "at pages/forum/forum.vue:307", "200/300分类直接使用:", targetCategoryIds);
               }
             } else {
               targetCategoryIds = this.categories.filter((c) => c.parent_id && (c.parent_id.toString() === this.currentCategory || c.parent_id === currentCategoryNum)).map((c) => parseInt(c.next_category_id));
               if (this.debugMode) {
-                console.log("\u5B50\u5206\u7C7BID\u5217\u8868:", targetCategoryIds);
+                common_vendor.index.__f__("log", "at pages/forum/forum.vue:316", "子分类ID列表:", targetCategoryIds);
               }
             }
             filteredPosts = filteredPosts.filter((post) => {
@@ -156,7 +145,7 @@ const _sfc_main = {
               const postCategoryId = post.category_id;
               const isMatch = targetCategoryIds.includes(postCategoryId);
               if (this.debugMode) {
-                console.log(`\u5E16\u5B50${post.id}\u7684\u5206\u7C7B${postCategoryId}\u662F\u5426\u5339\u914D:`, isMatch);
+                common_vendor.index.__f__("log", "at pages/forum/forum.vue:330", `帖子${post.id}的分类${postCategoryId}是否匹配:`, isMatch);
               }
               return isMatch;
             });
@@ -198,8 +187,10 @@ const _sfc_main = {
               return titleMatch || contentMatch;
             });
           }
-          let postsWithReplyCount = filteredPosts.map((post) => __spreadProps(__spreadValues({}, post), {
+          let postsWithReplyCount = filteredPosts.map((post) => ({
+            ...post,
             reply_count: 0
+            // 初始化为0，后续异步更新
           }));
           setTimeout(() => {
             this.updateReplyCounts(filteredPosts);
@@ -218,10 +209,10 @@ const _sfc_main = {
           }
         }
       } catch (error) {
-        console.error("\u52A0\u8F7D\u5E16\u5B50\u5931\u8D25:", error);
-        console.error("\u9519\u8BEF\u8BE6\u60C5:", error.message, error.stack);
+        common_vendor.index.__f__("error", "at pages/forum/forum.vue:407", "加载帖子失败:", error);
+        common_vendor.index.__f__("error", "at pages/forum/forum.vue:408", "错误详情:", error.message, error.stack);
         common_vendor.index.showToast({
-          title: "\u52A0\u8F7D\u5931\u8D25\uFF0C\u8BF7\u91CD\u8BD5",
+          title: "加载失败，请重试",
           icon: "none"
         });
       } finally {
@@ -229,6 +220,7 @@ const _sfc_main = {
         this.isRefreshing = false;
       }
     },
+    // 异步更新回复数量 - 分批处理，避免一次性请求过多
     async updateReplyCounts(posts) {
       if (!posts || posts.length === 0 || this.isLoadingReplies)
         return;
@@ -238,23 +230,25 @@ const _sfc_main = {
         for (let i = 0; i < posts.length; i += batchSize) {
           const batch = posts.slice(i, i + batchSize);
           try {
-            const batchResults = await Promise.all(batch.map(async (post) => {
-              try {
-                const replies = await common_api_forum.forumApi.getCommentReplies(post.id);
-                return {
-                  id: post.id,
-                  reply_count: replies && replies.length ? replies.length : 0
-                };
-              } catch (error) {
-                if (this.debugMode) {
-                  console.error(`\u83B7\u53D6\u5E16\u5B50${post.id}\u56DE\u590D\u6570\u91CF\u5931\u8D25:`, error);
+            const batchResults = await Promise.all(
+              batch.map(async (post) => {
+                try {
+                  const replies = await common_api_forum.forumApi.getCommentReplies(post.id);
+                  return {
+                    id: post.id,
+                    reply_count: replies && replies.length ? replies.length : 0
+                  };
+                } catch (error) {
+                  if (this.debugMode) {
+                    common_vendor.index.__f__("error", "at pages/forum/forum.vue:443", `获取帖子${post.id}回复数量失败:`, error);
+                  }
+                  return {
+                    id: post.id,
+                    reply_count: 0
+                  };
                 }
-                return {
-                  id: post.id,
-                  reply_count: 0
-                };
-              }
-            }));
+              })
+            );
             batchResults.forEach((result) => {
               const postIndex = this.posts.findIndex((p) => p.id === result.id);
               if (postIndex !== -1) {
@@ -266,7 +260,7 @@ const _sfc_main = {
             }
           } catch (error) {
             if (this.debugMode) {
-              console.error(`\u6279\u91CF\u66F4\u65B0\u56DE\u590D\u6570\u91CF\u5931\u8D25:`, error);
+              common_vendor.index.__f__("error", "at pages/forum/forum.vue:469", `批量更新回复数量失败:`, error);
             }
           }
         }
@@ -274,10 +268,12 @@ const _sfc_main = {
         this.isLoadingReplies = false;
       }
     },
+    // 搜索
     search() {
       this.page = 1;
       this.loadPosts(true);
     },
+    // 切换分类
     switchCategory(category) {
       this.currentCategory = category;
       const categoryNum = Number(category);
@@ -297,6 +293,7 @@ const _sfc_main = {
       this.page = 1;
       this.loadPosts(true);
     },
+    // 初始化默认分类
     initDefaultCategory() {
       const topLevelCategories = this.categories.filter((c) => c.level === 1);
       if (topLevelCategories.length > 0) {
@@ -304,6 +301,7 @@ const _sfc_main = {
         this.switchCategory(this.currentCategory);
       }
     },
+    // 切换子分类
     toggleSubCategory(categoryId) {
       const category = this.categories.find((c) => c.id === categoryId);
       const numCategoryId = category ? Number(category.next_category_id) : Number(categoryId);
@@ -316,15 +314,18 @@ const _sfc_main = {
       this.page = 1;
       this.loadPosts(true);
     },
+    // 清空子分类筛选
     clearSubCategories() {
       this.selectedSubCategories = [];
       this.page = 1;
       this.loadPosts(true);
     },
+    // 下拉刷新
     onRefresh() {
       this.isRefreshing = true;
       this.loadPosts(true);
     },
+    // 加载更多
     loadMore() {
       if (this.loading || !this.hasMore)
         return;
@@ -335,41 +336,49 @@ const _sfc_main = {
         this.loadPosts();
       }, 300);
     },
+    // 跳转到详情页
     goToDetail(post) {
       common_vendor.index.navigateTo({
         url: `/pages/forum/details/forum_detail?id=${post.id}`
       });
     },
+    // 返回上一页
     goBack() {
       common_vendor.index.navigateBack();
     },
+    // 跳转到发帖页
     goToPost() {
       common_vendor.index.navigateTo({
         url: "/pages/forum/post"
       });
     },
+    // 切换快速菜单
     toggleQuickMenu() {
       this.showQuickMenu = !this.showQuickMenu;
     },
+    // 隐藏快速菜单
     hideQuickMenu() {
       this.showQuickMenu = false;
     },
+    // 跳转到提问页
     goToAsk() {
       this.hideQuickMenu();
       common_vendor.index.navigateTo({
         url: "/pages/forum/post?type=ask"
       });
     },
+    // 跳转到分享资源页
     goToShare() {
       this.hideQuickMenu();
       common_vendor.index.navigateTo({
         url: "/pages/forum/post?type=share"
       });
     },
+    // 获取分类名称
     getCategoryName(categoryId) {
       const category = this.categories.find((c) => Number(c.next_category_id) === Number(categoryId));
       if (!category) {
-        return "\u5176\u4ED6";
+        return "其他";
       }
       if (category.level === 1) {
         return category.name;
@@ -378,26 +387,27 @@ const _sfc_main = {
       if (parentCategory) {
         return `${parentCategory.name}-${category.name}`;
       }
-      return category.name || "\u5176\u4ED6";
+      return category.name || "其他";
     },
+    // 格式化时间
     formatTime(timeStr) {
       if (!timeStr)
-        return "\u672A\u77E5\u65F6\u95F4";
+        return "未知时间";
       try {
         const date = new Date(timeStr.replace(/-/g, "/"));
-        const now = new Date();
+        const now = /* @__PURE__ */ new Date();
         const diff = now - date;
         const minute = 60 * 1e3;
         const hour = 60 * minute;
         const day = 24 * hour;
         if (diff < minute) {
-          return "\u521A\u521A";
+          return "刚刚";
         } else if (diff < hour) {
-          return Math.floor(diff / minute) + "\u5206\u949F\u524D";
+          return Math.floor(diff / minute) + "分钟前";
         } else if (diff < day) {
-          return Math.floor(diff / hour) + "\u5C0F\u65F6\u524D";
+          return Math.floor(diff / hour) + "小时前";
         } else {
-          return Math.floor(diff / day) + "\u5929\u524D";
+          return Math.floor(diff / day) + "天前";
         }
       } catch (e) {
         return timeStr;
@@ -521,5 +531,6 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     aj: $data.isDarkMode ? "#1a1a1a" : "#F8FAFD"
   });
 }
-var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-7386314a"], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/forum/forum.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-aeadbf01"]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/forum/forum.js.map

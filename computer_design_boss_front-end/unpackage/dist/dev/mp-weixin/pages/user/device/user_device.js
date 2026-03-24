@@ -1,5 +1,5 @@
 "use strict";
-var common_vendor = require("../../../common/vendor.js");
+const common_vendor = require("../../../common/vendor.js");
 const _sfc_main = {
   data() {
     return {
@@ -28,13 +28,13 @@ const _sfc_main = {
     },
     deleteDevice(index) {
       common_vendor.index.showModal({
-        title: "\u63D0\u793A",
-        content: "\u786E\u5B9A\u8981\u5220\u9664\u8BE5\u8BBE\u5907\u5417\uFF1F",
+        title: "提示",
+        content: "确定要删除该设备吗？",
         success: (res) => {
           if (res.confirm) {
             this.devices.splice(index, 1);
             common_vendor.index.showToast({
-              title: "\u8BBE\u5907\u5DF2\u5220\u9664",
+              title: "设备已删除",
               icon: "success"
             });
           }
@@ -52,14 +52,14 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     a: common_vendor.o((...args) => $options.goBack && $options.goBack(...args)),
     b: common_vendor.f($data.devices, (item, index, i0) => {
       return common_vendor.e({
-        a: "6fd6f29b-0-" + i0,
+        a: "6d40c03a-0-" + i0,
         b: common_vendor.t(item.name),
         c: common_vendor.t(item.loginTime),
         d: item.isCurrent
       }, item.isCurrent ? {} : {}, {
         e: !item.isCurrent
       }, !item.isCurrent ? {
-        f: common_vendor.o(($event) => $options.deleteDevice(index))
+        f: common_vendor.o(($event) => $options.deleteDevice(index), index)
       } : {}, {
         g: index
       });
@@ -71,5 +71,6 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   };
 }
-var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/user/device/user_device.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/user/device/user_device.js.map

@@ -1,9 +1,7 @@
 "use strict";
-var common_vendor = require("../../../common/vendor.js");
-var common_api_job = require("../../../common/api/job.js");
-var common_api_user = require("../../../common/api/user.js");
-require("../../../common/api/request.js");
-require("../../../common/config.js");
+const common_vendor = require("../../../common/vendor.js");
+const common_api_job = require("../../../common/api/job.js");
+const common_api_user = require("../../../common/api/user.js");
 const _sfc_main = {
   data() {
     return {
@@ -24,6 +22,7 @@ const _sfc_main = {
     await this.checkDeliverStatus();
   },
   methods: {
+    /* ================= 导航方法 ================= */
     goBack() {
       common_vendor.index.navigateBack();
     },
@@ -32,10 +31,11 @@ const _sfc_main = {
         withShareTicket: true
       });
     },
+    /* ================= 获取职位详情 ================= */
     async getJobDetail() {
       try {
         const res = await common_api_job.jobApi.getJobDetail(this.jobId);
-        console.log("\u8F6C\u6362\u540E\u7684delivers:", res);
+        common_vendor.index.__f__("log", "at pages/job/detail/job_detail_index.vue:170", "转换后的delivers:", res);
         this.jobDetail = res;
         if (Array.isArray(res) && res.length > 0) {
           this.jobDetail = res[0];
@@ -54,36 +54,38 @@ const _sfc_main = {
           this.jobDetail.boss_job_id = this.jobDetail.id;
         }
       } catch (error) {
-        console.error("\u83B7\u53D6\u804C\u4F4D\u8BE6\u60C5\u5931\u8D25:", error);
-        common_vendor.index.showToast({ title: "\u83B7\u53D6\u8BE6\u60C5\u5931\u8D25", icon: "none" });
+        common_vendor.index.__f__("error", "at pages/job/detail/job_detail_index.vue:195", "获取职位详情失败:", error);
+        common_vendor.index.showToast({ title: "获取详情失败", icon: "none" });
       }
     },
+    /* ================= 获取用户信息 ================= */
     async getUserProfile() {
       try {
         const user = await common_api_user.userApi.getUserProfile();
-        console.log("\u4ECEAPI\u83B7\u53D6\u7528\u6237\u4FE1\u606F:", user);
+        common_vendor.index.__f__("log", "at pages/job/detail/job_detail_index.vue:204", "从API获取用户信息:", user);
         this.userProfile = user;
       } catch (error) {
-        console.error("\u83B7\u53D6\u7528\u6237\u4FE1\u606F\u5931\u8D25:", error);
+        common_vendor.index.__f__("error", "at pages/job/detail/job_detail_index.vue:207", "获取用户信息失败:", error);
         const userInfoStr = common_vendor.index.getStorageSync("userInfo");
-        console.log("\u4ECE\u672C\u5730\u5B58\u50A8\u83B7\u53D6\u7528\u6237\u4FE1\u606F:", userInfoStr);
+        common_vendor.index.__f__("log", "at pages/job/detail/job_detail_index.vue:210", "从本地存储获取用户信息:", userInfoStr);
         if (userInfoStr) {
           try {
             const userInfo = JSON.parse(userInfoStr);
-            console.log("\u89E3\u6790\u540E\u7684\u7528\u6237\u4FE1\u606F:", userInfo);
+            common_vendor.index.__f__("log", "at pages/job/detail/job_detail_index.vue:214", "解析后的用户信息:", userInfo);
             this.userProfile = userInfo;
           } catch (parseError) {
-            console.error("\u89E3\u6790\u7528\u6237\u4FE1\u606F\u5931\u8D25:", parseError);
+            common_vendor.index.__f__("error", "at pages/job/detail/job_detail_index.vue:217", "解析用户信息失败:", parseError);
           }
         }
       }
-      console.log("\u6700\u7EC8\u7528\u6237\u4FE1\u606F:", this.userProfile);
+      common_vendor.index.__f__("log", "at pages/job/detail/job_detail_index.vue:221", "最终用户信息:", this.userProfile);
     },
+    /* ================= 点击投递 ================= */
     applyForJob() {
       var _a, _b;
       const jobId = ((_a = this.jobDetail) == null ? void 0 : _a.boss_job_id) || ((_b = this.jobDetail) == null ? void 0 : _b.id);
       if (!jobId) {
-        common_vendor.index.showToast({ title: "\u804C\u4F4D\u4FE1\u606F\u4E0D\u5B8C\u6574", icon: "none" });
+        common_vendor.index.showToast({ title: "职位信息不完整", icon: "none" });
         return;
       }
       let delivers = common_vendor.index.getStorageSync("delivers") || [];
@@ -91,32 +93,33 @@ const _sfc_main = {
         delivers = delivers.filter((item) => item.id !== jobId);
         this.isApplied = false;
         common_vendor.index.showToast({
-          title: "\u5DF2\u53D6\u6D88\u6295\u9012",
+          title: "已取消投递",
           icon: "success"
         });
       } else {
         const newDeliver = {
           id: jobId,
           jobTitle: this.jobDetail.title,
-          company: this.jobDetail.company || "\u672A\u77E5\u516C\u53F8",
+          company: this.jobDetail.company || "未知公司",
           salary: this.jobDetail.salary || "",
-          deliverTime: new Date().toLocaleString(),
+          deliverTime: (/* @__PURE__ */ new Date()).toLocaleString(),
           status: "pending",
-          statusText: "\u5F85\u5904\u7406"
+          statusText: "待处理"
         };
         delivers.push(newDeliver);
         this.isApplied = true;
         common_vendor.index.showToast({
-          title: "\u6295\u9012\u6210\u529F",
+          title: "投递成功",
           icon: "success"
         });
       }
       common_vendor.index.setStorageSync("delivers", delivers);
     },
+    /* ================= 点击收藏 ================= */
     favoriteJob() {
       var _a;
       if (!((_a = this.jobDetail) == null ? void 0 : _a.boss_job_id)) {
-        common_vendor.index.showToast({ title: "\u804C\u4F4D\u4FE1\u606F\u4E0D\u5B8C\u6574", icon: "none" });
+        common_vendor.index.showToast({ title: "职位信息不完整", icon: "none" });
         return;
       }
       let collections = common_vendor.index.getStorageSync("collections") || [];
@@ -124,14 +127,14 @@ const _sfc_main = {
         collections = collections.filter((item) => item.id !== this.jobDetail.boss_job_id);
         this.isFavorited = false;
         common_vendor.index.showToast({
-          title: "\u5DF2\u53D6\u6D88\u6536\u85CF",
+          title: "已取消收藏",
           icon: "success"
         });
       } else {
         const isAlreadyFavorited = collections.some((item) => item.id === this.jobDetail.boss_job_id);
         if (isAlreadyFavorited) {
           common_vendor.index.showToast({
-            title: "\u8BE5\u804C\u4F4D\u5DF2\u6536\u85CF",
+            title: "该职位已收藏",
             icon: "none"
           });
           return;
@@ -139,20 +142,21 @@ const _sfc_main = {
         const newCollection = {
           id: this.jobDetail.boss_job_id,
           jobTitle: this.jobDetail.title,
-          company: this.jobDetail.company || "\u672A\u77E5\u516C\u53F8",
+          company: this.jobDetail.company || "未知公司",
           salary: this.jobDetail.salary || "",
-          collectionTime: new Date().toLocaleString()
+          collectionTime: (/* @__PURE__ */ new Date()).toLocaleString()
         };
         collections.push(newCollection);
         this.isFavorited = true;
         common_vendor.index.showToast({
-          title: "\u6536\u85CF\u6210\u529F",
+          title: "收藏成功",
           icon: "success"
         });
       }
       common_vendor.index.setStorageSync("collections", collections);
       this.$emit("update:favorited", this.isFavorited);
     },
+    /* ================= 检查收藏状态 ================= */
     checkFavoriteStatus() {
       var _a;
       if (!((_a = this.jobDetail) == null ? void 0 : _a.boss_job_id))
@@ -160,6 +164,7 @@ const _sfc_main = {
       const collections = common_vendor.index.getStorageSync("collections") || [];
       this.isFavorited = collections.some((item) => item.id === this.jobDetail.boss_job_id);
     },
+    /* ================= 检查投递状态 ================= */
     checkDeliverStatus() {
       var _a, _b;
       const jobId = ((_a = this.jobDetail) == null ? void 0 : _a.boss_job_id) || ((_b = this.jobDetail) == null ? void 0 : _b.id);
@@ -168,13 +173,14 @@ const _sfc_main = {
       const delivers = common_vendor.index.getStorageSync("delivers") || [];
       this.isApplied = delivers.some((item) => item.id === jobId);
     },
+    /* ================= 工具方法 ================= */
     getEmpTypeText(type) {
       const map = {
-        "1": "\u5168\u804C",
-        "2": "\u517C\u804C",
-        "3": "\u5B9E\u4E60"
+        "1": "全职",
+        "2": "兼职",
+        "3": "实习"
       };
-      return map[type] || "\u5168\u804C";
+      return map[type] || "全职";
     },
     formatDate(dateString) {
       if (!dateString)
@@ -201,12 +207,12 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       type: "back",
       size: "28"
     }),
-    c: common_vendor.t(((_a = $data.jobDetail) == null ? void 0 : _a.title) || "\u6682\u65E0\u804C\u4F4D\u4FE1\u606F"),
-    d: common_vendor.t(((_b = $data.jobDetail) == null ? void 0 : _b.salary_min) ? `${($data.jobDetail.salary_min / 1e3).toFixed(0)}k-${((_c = $data.jobDetail) == null ? void 0 : _c.salary_max) ? ($data.jobDetail.salary_max / 1e3).toFixed(0) : "?"}k` : "\u85AA\u8D44\u9762\u8BAE"),
-    e: common_vendor.t(((_d = $data.jobDetail) == null ? void 0 : _d.company) || "\u672A\u77E5\u516C\u53F8"),
-    f: common_vendor.t(((_e = $data.jobDetail) == null ? void 0 : _e.edu_req) || "\u5B66\u5386\u4E0D\u9650"),
-    g: common_vendor.t(((_f = $data.jobDetail) == null ? void 0 : _f.exp_req) || "\u7ECF\u9A8C\u4E0D\u9650"),
-    h: common_vendor.t(((_g = $data.jobDetail) == null ? void 0 : _g.emp_type) ? $options.getEmpTypeText($data.jobDetail.emp_type) : "\u5168\u804C"),
+    c: common_vendor.t(((_a = $data.jobDetail) == null ? void 0 : _a.title) || "暂无职位信息"),
+    d: common_vendor.t(((_b = $data.jobDetail) == null ? void 0 : _b.salary_min) ? `${($data.jobDetail.salary_min / 1e3).toFixed(0)}k-${((_c = $data.jobDetail) == null ? void 0 : _c.salary_max) ? ($data.jobDetail.salary_max / 1e3).toFixed(0) : "?"}k` : "薪资面议"),
+    e: common_vendor.t(((_d = $data.jobDetail) == null ? void 0 : _d.company) || "未知公司"),
+    f: common_vendor.t(((_e = $data.jobDetail) == null ? void 0 : _e.edu_req) || "学历不限"),
+    g: common_vendor.t(((_f = $data.jobDetail) == null ? void 0 : _f.exp_req) || "经验不限"),
+    h: common_vendor.t(((_g = $data.jobDetail) == null ? void 0 : _g.emp_type) ? $options.getEmpTypeText($data.jobDetail.emp_type) : "全职"),
     i: (_h = $data.jobDetail) == null ? void 0 : _h.address
   }, ((_i = $data.jobDetail) == null ? void 0 : _i.address) ? {
     j: common_vendor.p({
@@ -222,7 +228,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       color: "#6C757D"
     })
   } : {}, {
-    n: common_vendor.t(((_j = $data.jobDetail) == null ? void 0 : _j.description) || "\u6682\u65E0\u63CF\u8FF0"),
+    n: common_vendor.t(((_j = $data.jobDetail) == null ? void 0 : _j.description) || "暂无描述"),
     o: Array.isArray((_k = $data.jobDetail) == null ? void 0 : _k.require_list) && $data.jobDetail.require_list.length > 0
   }, Array.isArray((_l = $data.jobDetail) == null ? void 0 : _l.require_list) && $data.jobDetail.require_list.length > 0 ? {
     p: common_vendor.f($data.jobDetail.require_list, (req, index, i0) => {
@@ -232,7 +238,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       };
     })
   } : {
-    q: common_vendor.t(((_m = $data.jobDetail) == null ? void 0 : _m.require_list) || "\u6682\u65E0\u8981\u6C42")
+    q: common_vendor.t(((_m = $data.jobDetail) == null ? void 0 : _m.require_list) || "暂无要求")
   }, {
     r: (_n = $data.jobDetail) == null ? void 0 : _n.welfare_list
   }, ((_o = $data.jobDetail) == null ? void 0 : _o.welfare_list) ? common_vendor.e({
@@ -260,7 +266,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       size: "24",
       color: $data.isFavorited ? "#007aff" : "#6C757D"
     }),
-    B: common_vendor.t($data.isFavorited ? "\u5DF2\u6536\u85CF" : "\u6536\u85CF"),
+    B: common_vendor.t($data.isFavorited ? "已收藏" : "收藏"),
     C: common_vendor.n({
       "collected": $data.isFavorited
     }),
@@ -268,7 +274,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       "collected": $data.isFavorited
     }),
     E: common_vendor.o((...args) => $options.favoriteJob && $options.favoriteJob(...args)),
-    F: common_vendor.t($data.isApplied ? "\u5DF2\u6295\u9012" : "\u6295\u9012"),
+    F: common_vendor.t($data.isApplied ? "已投递" : "投递"),
     G: common_vendor.n({
       "applied": $data.isApplied
     }),
@@ -276,5 +282,6 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     I: common_vendor.o((...args) => $options.applyForJob && $options.applyForJob(...args))
   });
 }
-var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/job/detail/job_detail_index.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/job/detail/job_detail_index.js.map

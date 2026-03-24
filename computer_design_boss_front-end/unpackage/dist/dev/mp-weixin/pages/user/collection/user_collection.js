@@ -1,5 +1,5 @@
 "use strict";
-var common_vendor = require("../../../common/vendor.js");
+const common_vendor = require("../../../common/vendor.js");
 const _sfc_main = {
   data() {
     return {
@@ -29,7 +29,7 @@ const _sfc_main = {
     viewDetails(item) {
       if (!item.id) {
         common_vendor.index.showToast({
-          title: "\u804C\u4F4DID\u4E0D\u5B58\u5728",
+          title: "职位ID不存在",
           icon: "none"
         });
         return;
@@ -40,8 +40,8 @@ const _sfc_main = {
     },
     cancelCollection(index) {
       common_vendor.index.showModal({
-        title: "\u63D0\u793A",
-        content: "\u786E\u5B9A\u53D6\u6D88\u6536\u85CF\u5417\uFF1F",
+        title: "提示",
+        content: "确定取消收藏吗？",
         success: (res) => {
           if (res.confirm) {
             let collections = common_vendor.index.getStorageSync("collections") || [];
@@ -49,7 +49,7 @@ const _sfc_main = {
             common_vendor.index.setStorageSync("collections", collections);
             this.collections = collections;
             common_vendor.index.showToast({
-              title: "\u5DF2\u53D6\u6D88\u6536\u85CF",
+              title: "已取消收藏",
               icon: "success"
             });
           }
@@ -71,8 +71,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         b: common_vendor.t(item.company),
         c: common_vendor.t(item.salary),
         d: common_vendor.t(item.collectionTime),
-        e: common_vendor.o(($event) => $options.cancelCollection(index)),
-        f: common_vendor.o(($event) => $options.viewDetails(item)),
+        e: common_vendor.o(($event) => $options.cancelCollection(index), index),
+        f: common_vendor.o(($event) => $options.viewDetails(item), index),
         g: index
       };
     }),
@@ -85,5 +85,6 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   } : {});
 }
-var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/user/collection/user_collection.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/user/collection/user_collection.js.map

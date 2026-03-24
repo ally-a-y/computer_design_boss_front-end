@@ -3,6 +3,7 @@ const config = {
   development: {
     baseURL: "http://localhost:5000/api",
     staticURL: "http://localhost:5000",
+    // 添加兼容命名
     apiBase: "http://localhost:5000/api",
     fileBase: "http://localhost:5000"
   },
@@ -14,5 +15,6 @@ const config = {
   }
 };
 const env = "development";
-var config$1 = config[env];
+const config$1 = config[env];
 exports.config = config$1;
+//# sourceMappingURL=../../.sourcemap/mp-weixin/common/config.js.map

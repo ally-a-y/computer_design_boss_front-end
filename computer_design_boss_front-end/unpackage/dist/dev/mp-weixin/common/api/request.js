@@ -1,25 +1,6 @@
 "use strict";
-var __defProp = Object.defineProperty;
-var __defProps = Object.defineProperties;
-var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
-var __getOwnPropSymbols = Object.getOwnPropertySymbols;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __propIsEnum = Object.prototype.propertyIsEnumerable;
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __spreadValues = (a, b) => {
-  for (var prop in b || (b = {}))
-    if (__hasOwnProp.call(b, prop))
-      __defNormalProp(a, prop, b[prop]);
-  if (__getOwnPropSymbols)
-    for (var prop of __getOwnPropSymbols(b)) {
-      if (__propIsEnum.call(b, prop))
-        __defNormalProp(a, prop, b[prop]);
-    }
-  return a;
-};
-var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
-var common_vendor = require("../vendor.js");
-var common_config = require("../config.js");
+const common_vendor = require("../vendor.js");
+const common_config = require("../config.js");
 const buildFullUrl = (path, params) => {
   if (!path)
     return common_config.config.baseURL;
@@ -45,7 +26,7 @@ const requestWithRetry = (options, retryCount = 3) => {
   return new Promise((resolve, reject) => {
     const attemptRequest = (attempt) => {
       const isGet = (options.method || "GET").toUpperCase() === "GET";
-      const queryParams = isGet ? __spreadValues(__spreadValues({}, options.params || {}), options.data || {}) : options.params || {};
+      const queryParams = isGet ? { ...options.params || {}, ...options.data || {} } : options.params || {};
       const fullUrl = buildFullUrl(options.url, queryParams);
       const urlWithTimestamp = fullUrl + (fullUrl.includes("?") ? "&" : "?") + "t=" + Date.now();
       const requestConfig = {
@@ -53,20 +34,22 @@ const requestWithRetry = (options, retryCount = 3) => {
         method: options.method || "GET",
         timeout: 6e4,
         sslVerify: false,
-        header: __spreadValues({
+        header: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${common_vendor.index.getStorageSync("token") || ""}`,
-          "Cache-Control": "no-cache"
-        }, options.header)
+          "Cache-Control": "no-cache",
+          ...options.header
+        }
       };
       if (!isGet && options.data) {
         requestConfig.data = options.data;
       }
-      common_vendor.index.request(__spreadProps(__spreadValues({}, requestConfig), {
+      common_vendor.index.request({
+        ...requestConfig,
         success: (res) => {
           var _a;
           {
-            console.log("\u3010\u54CD\u5E94\u3011", res.statusCode, res.data);
+            common_vendor.index.__f__("log", "at common/api/request.js:77", "【响应】", res.statusCode, res.data);
           }
           if (res.statusCode === 200) {
             const data = res.data;
@@ -74,7 +57,7 @@ const requestWithRetry = (options, retryCount = 3) => {
               if (data.code === 200) {
                 resolve(data.data !== void 0 ? data.data : data);
               } else {
-                reject(new Error(data.message || `\u8BF7\u6C42\u5931\u8D25: ${data.code}`));
+                reject(new Error(data.message || `请求失败: ${data.code}`));
               }
             } else {
               resolve(data);
@@ -84,17 +67,18 @@ const requestWithRetry = (options, retryCount = 3) => {
           }
         },
         fail: (err) => {
-          console.error(`\u3010\u8BF7\u6C42\u5931\u8D25\u3011`, err);
+          common_vendor.index.__f__("error", "at common/api/request.js:97", `【请求失败】`, err);
           if (attempt < retryCount - 1) {
             const delay = Math.pow(2, attempt) * 1e3;
             setTimeout(() => attemptRequest(attempt + 1), delay);
           } else {
-            reject(new Error(err.errMsg || "\u7F51\u7EDC\u8BF7\u6C42\u5931\u8D25"));
+            reject(new Error(err.errMsg || "网络请求失败"));
           }
         }
-      }));
+      });
     };
     attemptRequest(0);
   });
 };
 exports.requestWithRetry = requestWithRetry;
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/common/api/request.js.map

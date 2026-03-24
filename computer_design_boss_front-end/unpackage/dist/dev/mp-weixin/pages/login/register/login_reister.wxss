@@ -1,13 +1,13 @@
 
 /* 全局样式 */
-.register-page.data-v-1776d0fe {
+.register-page.data-v-f0d703cf {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   background-color: #F8FAFD;
   font-family: -apple-system, Helvetica, Roboto, sans-serif;
 }
-.register-container.data-v-1776d0fe {
+.register-container.data-v-f0d703cf {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -15,7 +15,7 @@
 }
 
 /* 导航栏样式 */
-.nav-bar.data-v-1776d0fe {
+.nav-bar.data-v-f0d703cf {
   background-color: #ffffff;
   box-shadow: 0 1px 2px rgba(0,0,0,0.02);
   height: 80px;
@@ -25,26 +25,26 @@
   position: relative;
   margin-bottom: 12px;
 }
-.nav-bar-left.data-v-1776d0fe {
+.nav-bar-left.data-v-f0d703cf {
   flex: 0 0 auto;
   padding: 8px;
 }
-.nav-bar-center.data-v-1776d0fe {
+.nav-bar-center.data-v-f0d703cf {
   flex: 1;
   text-align: center;
 }
-.nav-bar-title.data-v-1776d0fe {
+.nav-bar-title.data-v-f0d703cf {
   font-size: 17px;
   font-weight: 600;
   color: #1E1E1E;
 }
-.nav-bar-right.data-v-1776d0fe {
+.nav-bar-right.data-v-f0d703cf {
   flex: 0 0 auto;
   padding: 8px;
 }
 
 /* 注册表单 */
-.register-form.data-v-1776d0fe {
+.register-form.data-v-f0d703cf {
   background-color: #fff;
   border-radius: 16px;
   padding: 24px 20px;
@@ -53,14 +53,14 @@
 }
 
 /* 步骤标题 */
-.step-title.data-v-1776d0fe {
+.step-title.data-v-f0d703cf {
   font-size: 18px;
   font-weight: 600;
   color: #1E1E1E;
   margin-bottom: 24px;
   text-align: center;
 }
-.optional-tag.data-v-1776d0fe {
+.optional-tag.data-v-f0d703cf {
   font-size: 14px;
   color: #007aff;
   font-weight: normal;
@@ -68,16 +68,16 @@
 }
 
 /* 表单样式 */
-.form-item.data-v-1776d0fe {
+.form-item.data-v-f0d703cf {
   margin-bottom: 16px;
 }
-.form-label.data-v-1776d0fe {
+.form-label.data-v-f0d703cf {
   font-size: 14px;
   color: #6C757D;
   margin-bottom: 8px;
   display: block;
 }
-.form-input-wrapper.data-v-1776d0fe {
+.form-input-wrapper.data-v-f0d703cf {
   display: flex;
   align-items: center;
   border-radius: 12px;
@@ -86,20 +86,20 @@
   height: 48px;
   transition: all 0.3s ease;
 }
-.form-input-wrapper.data-v-1776d0fe:focus-within {
+.form-input-wrapper.data-v-f0d703cf:focus-within {
   box-shadow: 0 0 0 2px rgba(0,122,255,0.2);
 }
 
 /* picker包装器样式 */
-.picker-wrapper.data-v-1776d0fe {
+.picker-wrapper.data-v-f0d703cf {
   width: 100%;
 }
 
 /* 确保picker覆盖整个区域 */
-picker.data-v-1776d0fe {
+picker.data-v-f0d703cf {
   width: 100%;
 }
-.form-input.data-v-1776d0fe {
+.form-input.data-v-f0d703cf {
   flex: 1;
   font-size: 15px;
   color: #1E1E1E;
@@ -108,20 +108,20 @@ picker.data-v-1776d0fe {
   border: none;
   outline: none;
 }
-.form-input.data-v-1776d0fe::-webkit-input-placeholder {
+.form-input.data-v-f0d703cf::-webkit-input-placeholder {
   color: #ADB5BD;
 }
-.form-input.data-v-1776d0fe::placeholder {
+.form-input.data-v-f0d703cf::placeholder {
   color: #ADB5BD;
 }
-.form-input.data-v-1776d0fe:disabled {
+.form-input.data-v-f0d703cf:disabled {
   color: #1E1E1E;
   opacity: 1;
   -webkit-text-fill-color: #1E1E1E;
 }
 
 /* 错误提示 */
-.error-text.data-v-1776d0fe {
+.error-text.data-v-f0d703cf {
   font-size: 13px;
   color: #e54d42;
   margin-top: 8px;
@@ -129,11 +129,11 @@ picker.data-v-1776d0fe {
 }
 
 /* 性别选择器 */
-.gender-selector.data-v-1776d0fe {
+.gender-selector.data-v-f0d703cf {
   display: flex;
   gap: 12px;
 }
-.gender-item.data-v-1776d0fe {
+.gender-item.data-v-f0d703cf {
   flex: 1;
   text-align: center;
   padding: 0 16px;
@@ -145,24 +145,24 @@ picker.data-v-1776d0fe {
   justify-content: center;
   transition: all 0.3s ease;
 }
-.gender-item.data-v-1776d0fe:active {
+.gender-item.data-v-f0d703cf:active {
   transform: scale(0.95);
 }
-.gender-item.active.data-v-1776d0fe {
+.gender-item.active.data-v-f0d703cf {
   background-color: #007aff;
 }
-.gender-text.data-v-1776d0fe {
+.gender-text.data-v-f0d703cf {
   font-size: 14px;
   color: #1E1E1E;
   transition: all 0.3s ease;
 }
-.gender-item.active .gender-text.data-v-1776d0fe {
+.gender-item.active .gender-text.data-v-f0d703cf {
   color: #fff;
   font-weight: 600;
 }
 
 /* 薪资范围 */
-.salary-range.data-v-1776d0fe {
+.salary-range.data-v-f0d703cf {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -171,7 +171,7 @@ picker.data-v-1776d0fe {
   border-radius: 12px;
   height: 48px;
 }
-.salary-input.data-v-1776d0fe {
+.salary-input.data-v-f0d703cf {
   flex: 1;
   font-size: 15px;
   color: #1E1E1E;
@@ -179,28 +179,28 @@ picker.data-v-1776d0fe {
   border: none;
   outline: none;
 }
-.salary-input.data-v-1776d0fe::-webkit-input-placeholder {
+.salary-input.data-v-f0d703cf::-webkit-input-placeholder {
   color: #ADB5BD;
 }
-.salary-input.data-v-1776d0fe::placeholder {
+.salary-input.data-v-f0d703cf::placeholder {
   color: #ADB5BD;
 }
-.salary-separator.data-v-1776d0fe {
+.salary-separator.data-v-f0d703cf {
   font-size: 15px;
   color: #6C757D;
 }
-.salary-unit.data-v-1776d0fe {
+.salary-unit.data-v-f0d703cf {
   font-size: 13px;
   color: #6C757D;
 }
 
 /* 按钮区域 */
-.register-buttons.data-v-1776d0fe {
+.register-buttons.data-v-f0d703cf {
   display: flex;
   gap: 12px;
   margin: 32px 0 16px;
 }
-.back-btn.data-v-1776d0fe {
+.back-btn.data-v-f0d703cf {
   flex: 1;
   height: 48px;
   background-color: #F2F5F9;
@@ -210,11 +210,11 @@ picker.data-v-1776d0fe {
   transition: all 0.3s ease;
   border: none;
 }
-.back-btn.data-v-1776d0fe:active {
+.back-btn.data-v-f0d703cf:active {
   background-color: #E9ECEF;
   transform: scale(0.98);
 }
-.register-btn.data-v-1776d0fe {
+.register-btn.data-v-f0d703cf {
   flex: 1;
   height: 48px;
   background-color: #007aff;
@@ -225,17 +225,17 @@ picker.data-v-1776d0fe {
   transition: all 0.3s ease;
   border: none;
 }
-.register-btn.data-v-1776d0fe:active {
+.register-btn.data-v-f0d703cf:active {
   background-color: #0056b3;
   transform: scale(0.98);
 }
-.register-btn.data-v-1776d0fe:disabled {
+.register-btn.data-v-f0d703cf:disabled {
   background-color: #E9ECEF;
   color: #ADB5BD;
 }
 
 /* 跳过按钮 */
-.skip-btn.data-v-1776d0fe {
+.skip-btn.data-v-f0d703cf {
   flex: 1;
   height: 48px;
   background-color: #F2F5F9;
@@ -245,26 +245,26 @@ picker.data-v-1776d0fe {
   transition: all 0.3s ease;
   border: none;
 }
-.skip-btn.data-v-1776d0fe:active {
+.skip-btn.data-v-f0d703cf:active {
   background-color: #E9ECEF;
   transform: scale(0.98);
 }
 
 /* 注册步骤 */
-.register-step.data-v-1776d0fe {
+.register-step.data-v-f0d703cf {
   display: none;
-  animation: fadeIn-1776d0fe 0.3s ease-in-out;
+  animation: fadeIn-f0d703cf 0.3s ease-in-out;
 }
-.register-step.active.data-v-1776d0fe {
+.register-step.active.data-v-f0d703cf {
   display: block;
 }
-.register-step.optional.data-v-1776d0fe {
+.register-step.optional.data-v-f0d703cf {
   display: block;
-  animation: fadeIn-1776d0fe 0.3s ease-in-out;
+  animation: fadeIn-f0d703cf 0.3s ease-in-out;
 }
 
 /* 动画效果 */
-@keyframes fadeIn-1776d0fe {
+@keyframes fadeIn-f0d703cf {
 from {
     opacity: 0;
     transform: translateY(12px);

@@ -1,6 +1,7 @@
 "use strict";
-var common_api_request = require("./request.js");
+const common_api_request = require("./request.js");
 const resumeApi = {
+  // 基本信息
   saveBasic(data) {
     return common_api_request.requestWithRetry({
       url: "/api/resume/basic",
@@ -14,6 +15,7 @@ const resumeApi = {
       method: "GET"
     });
   },
+  // 求职意向
   saveIntention(data) {
     return common_api_request.requestWithRetry({
       url: "/api/resume/job-intention",
@@ -27,6 +29,7 @@ const resumeApi = {
       method: "GET"
     });
   },
+  // 求职偏好
   savePreference(data) {
     return common_api_request.requestWithRetry({
       url: "/api/resume/job-preference",
@@ -40,6 +43,7 @@ const resumeApi = {
       method: "GET"
     });
   },
+  // 校园经历
   saveCampus(data) {
     return common_api_request.requestWithRetry({
       url: "/api/resume/campus-experience",
@@ -53,6 +57,7 @@ const resumeApi = {
       method: "GET"
     });
   },
+  // 校园经历
   saveCertificates(data) {
     return common_api_request.requestWithRetry({
       url: "/api/resume/certificates",
@@ -68,3 +73,4 @@ const resumeApi = {
   }
 };
 exports.resumeApi = resumeApi;
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/common/api/resume.js.map

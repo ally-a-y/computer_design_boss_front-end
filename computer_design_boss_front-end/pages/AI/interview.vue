@@ -84,8 +84,9 @@
       </view>
     </view>
 
-    <!-- 面试交互区 -->
+    <!-- 面试交互区 - 全新布局 -->
     <view v-else class="interview-area">
+      <!-- 进度条区域 -->
       <view class="progress-section">
         <text class="progress-text">面试进度 {{ currentQuestion }}/{{ totalQuestions }}</text>
         <view class="progress-bar">
@@ -94,45 +95,51 @@
         <text class="stage-text">{{ currentStage }}</text>
       </view>
 
-      <!-- 面试内容区 -->
-      <view class="interview-content">
-        <view class="interviewer-section">
-          <view class="interviewer-avatar">
+      <!-- 顶部面试官状态条（横向） -->
+      <view class="interviewer-status-bar">
+        <view class="status-left">
+          <view class="avatar-small">
             <image src="/static/ai/interviewer.png" mode="aspectFit"></image>
           </view>
-          <view class="voice-wave" v-if="isSpeaking">
-            <view v-for="i in 5" :key="i" 
-                  :class="['wave-bar', { active: voiceWaveActive }]"
+          <text class="interviewer-name">AI面试官</text>
+        </view>
+        <view class="status-right">
+          <view class="voice-wave-mini" v-if="isSpeaking">
+            <view v-for="i in 4" :key="i" 
+                  :class="['wave-bar-mini', { active: voiceWaveActive }]"
                   :style="{ animationDelay: (i * 0.1) + 's' }"></view>
           </view>
-          <text class="interviewer-status">{{ getInterviewerStatus() }}</text>
+          <text class="interviewer-status-text">{{ getInterviewerStatus() }}</text>
         </view>
+      </view>
 
-        <!-- 中间：对话区域 -->
-        <view class="chat-section">
-          <scroll-view class="chat-messages" scroll-y :scroll-top="chatScrollTop" scroll-with-animation>
-            <view v-for="(message, index) in interviewMessages" :key="index"
-                  :class="['chat-message', message.sender]">
-              <view class="message-bubble">
-                <text>{{ message.content }}</text>
-              </view>
-              <text class="message-time">{{ formatTime(message.timestamp) }}</text>
+      <!-- 聊天区 - 主区域 -->
+      <view class="chat-section-main">
+        <scroll-view class="chat-messages" scroll-y :scroll-top="chatScrollTop" scroll-with-animation>
+          <view v-for="(message, index) in interviewMessages" :key="index"
+                :class="['chat-message', message.sender]">
+            <view class="message-bubble">
+              <text>{{ message.content }}</text>
             </view>
+            <text class="message-time">{{ formatTime(message.timestamp) }}</text>
+          </view>
 
-            <!-- AI思考中 -->
-            <view v-if="isAIThinking" class="thinking-indicator">
-              <view class="thinking-dots">
-                <view v-for="i in 3" :key="i" class="dot" :style="{ animationDelay: (i * 0.2) + 's' }"></view>
-              </view>
-              <text>AI正在思考中...</text>
+          <!-- AI思考中 -->
+          <view v-if="isAIThinking" class="thinking-indicator">
+            <view class="thinking-dots">
+              <view v-for="i in 3" :key="i" class="dot" :style="{ animationDelay: (i * 0.2) + 's' }"></view>
             </view>
-          </scroll-view>
-        </view>
+            <text>AI正在思考中...</text>
+          </view>
+        </scroll-view>
+      </view>
 
-        <!-- 右侧：面试技巧 -->
-        <view class="tips-section" :class="{ collapsed: tipsCollapsed }">
+      <!-- 底部面板：左侧技巧 + 右侧控制区 -->
+      <view class="bottom-panel">
+        <!-- 面试技巧卡片（可折叠） -->
+        <view class="tips-card" :class="{ collapsed: tipsCollapsed }">
           <view class="tips-header" @click="toggleTips">
-            <text>面试技巧</text>
+            <text class="tips-title">面试技巧</text>
             <image :class="['collapse-icon', { rotated: tipsCollapsed }]" 
                    src="/static/ai/arrow-right.png" mode="aspectFit"></image>
           </view>
@@ -142,34 +149,34 @@
             </view>
           </view>
         </view>
-      </view>
 
-      <!-- 底部控制区 -->
-      <view class="control-section">
-        <button class="control-btn replay-btn" @click="replayQuestion" :disabled="!currentAudioUrl">
-          <image src="/static/ai/replay.png" mode="aspectFit"></image>
-          <text>重听问题</text>
-        </button>
-
-        <view class="voice-record-area">
-          <button class="voice-btn" 
-                  :class="{ recording: isRecording, disabled: isProcessing }"
-                  @touchstart="startRecording"
-                  @touchend="stopRecording"
-                  :disabled="isProcessing">
-            <image :src="isRecording ? '/static/ai/recording.png' : '/static/ai/mic.png'" mode="aspectFit"></image>
-            <text>{{ isRecording ? '录音中...' : (isProcessing ? '处理中...' : '按住说话') }}</text>
+        <!-- 控制按钮区 -->
+        <view class="control-buttons">
+          <button class="ctrl-btn replay-btn" @click="replayQuestion" :disabled="!currentAudioUrl">
+            <image src="/static/ai/replay.png" mode="aspectFit"></image>
+            <text>重听</text>
           </button>
-          <view v-if="isRecording" class="recording-indicator">
-            <view class="pulse-ring"></view>
-            <text>{{ recordingTime }}s</text>
-          </view>
-        </view>
 
-        <button class="control-btn end-btn" @click="confirmEndInterview">
-          <image src="/static/ai/end.png" mode="aspectFit"></image>
-          <text>结束面试</text>
-        </button>
+          <view class="voice-record-wrapper">
+            <button class="voice-main-btn" 
+                    :class="{ recording: isRecording, disabled: isProcessing }"
+                    @touchstart="startRecording"
+                    @touchend="stopRecording"
+                    :disabled="isProcessing">
+              <image :src="isRecording ? '/static/ai/recording.png' : '/static/ai/mic.png'" mode="aspectFit"></image>
+              <text>{{ isRecording ? '录音中' : (isProcessing ? '处理中' : '按住说话') }}</text>
+            </button>
+            <view v-if="isRecording" class="recording-tip">
+              <view class="pulse-ring-mini"></view>
+              <text>{{ recordingTime }}s</text>
+            </view>
+          </view>
+
+          <button class="ctrl-btn end-btn" @click="confirmEndInterview">
+            <image src="/static/ai/end.png" mode="aspectFit"></image>
+            <text>结束</text>
+          </button>
+        </view>
       </view>
     </view>
 
@@ -191,7 +198,7 @@
               </view>
             </view>
 
-            <!-- 雷达图区域 - -->
+            <!-- 雷达图区域 -->
             <view class="radar-section">
               <text class="section-title">能力雷达图</text>
               <view class="radar-chart">
@@ -617,7 +624,7 @@ export default {
       if (this.isAIThinking) return '思考中...'
       if (this.isSpeaking) return '说话中...'
       if (this.isProcessing) return '处理中...'
-      return '等待中'
+      return '等待回答'
     },
 
     // ==================== 导航 ====================
@@ -1574,337 +1581,418 @@ export default {
   }
 }
 
+// ==================== 全新面试交互区样式 ====================
 .interview-area {
   flex: 1;
   display: flex;
   flex-direction: column;
+  background-color: #f5f7fa;
+  overflow: hidden;
 
   .progress-section {
-    padding: 30rpx;
+    padding: 20rpx 30rpx;
     background-color: #fff;
-    box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.1);
+    border-bottom: 1rpx solid #eef2f6;
+    flex-shrink: 0;
 
     .progress-text {
-      font-size: 28rpx;
-      color: #666;
-      margin-bottom: 15rpx;
+      font-size: 26rpx;
+      color: #6c7a8a;
+      margin-bottom: 12rpx;
+      display: block;
     }
 
     .progress-bar {
-      height: 12rpx;
-      background-color: #e0e0e0;
-      border-radius: 6rpx;
+      height: 8rpx;
+      background-color: #e4e9f0;
+      border-radius: 4rpx;
       overflow: hidden;
-      margin-bottom: 15rpx;
+      margin-bottom: 12rpx;
 
       .progress-fill {
         height: 100%;
-        background-color: #007aff;
+        background: linear-gradient(90deg, #007aff, #00c6ff);
+        border-radius: 4rpx;
         transition: width 0.3s ease;
       }
     }
 
     .stage-text {
-      font-size: 32rpx;
-      color: #333;
-      font-weight: 600;
+      font-size: 28rpx;
+      color: #1f2a3e;
+      font-weight: 500;
     }
   }
 
-  .interview-content {
-    flex: 1;
+  // 顶部面试官状态条（横向）
+  .interviewer-status-bar {
     display: flex;
-    padding: 30rpx;
-    gap: 30rpx;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16rpx 30rpx;
+    background-color: #fff;
+    border-bottom: 1rpx solid #eef2f6;
+    flex-shrink: 0;
 
-    .interviewer-section {
-      width: 200rpx;
+    .status-left {
       display: flex;
-      flex-direction: column;
       align-items: center;
+      gap: 16rpx;
 
-      .interviewer-avatar {
-        width: 120rpx;
-        height: 120rpx;
+      .avatar-small {
+        width: 64rpx;
+        height: 64rpx;
         border-radius: 50%;
         overflow: hidden;
-        margin-bottom: 20rpx;
-
+        background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
         image {
           width: 100%;
           height: 100%;
         }
       }
 
-      .voice-wave {
-        display: flex;
-        align-items: center;
-        height: 40rpx;
-        margin-bottom: 16rpx;
-
-        .wave-bar {
-          width: 6rpx;
-          height: 16rpx;
-          background-color: #ccc;
-          margin: 0 3rpx;
-          border-radius: 3rpx;
-          transition: all 0.3s ease;
-
-          &.active {
-            animation: wave 1s infinite;
-          }
-
-          &:nth-child(2) { animation-delay: 0.1s; }
-          &:nth-child(3) { animation-delay: 0.2s; }
-          &:nth-child(4) { animation-delay: 0.3s; }
-          &:nth-child(5) { animation-delay: 0.4s; }
-        }
-      }
-
-      .interviewer-status {
-        font-size: 24rpx;
-        color: #666;
-        text-align: center;
+      .interviewer-name {
+        font-size: 30rpx;
+        font-weight: 600;
+        color: #1f2a3e;
       }
     }
 
-    .chat-section {
-      flex: 1;
-      background-color: #fff;
-      border-radius: 20rpx;
-      padding: 30rpx;
-      box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.1);
+    .status-right {
+      display: flex;
+      align-items: center;
+      gap: 20rpx;
 
-      .chat-messages {
-        height: 100%;
+      .voice-wave-mini {
+        display: flex;
+        align-items: center;
+        gap: 6rpx;
 
-        .chat-message {
-          margin-bottom: 30rpx;
-
-          &.interviewer {
-            .message-bubble {
-              background-color: #f0f8ff;
-              border: 2rpx solid #007aff;
-              margin-right: 100rpx;
-            }
+        .wave-bar-mini {
+          width: 4rpx;
+          height: 24rpx;
+          background-color: #007aff;
+          border-radius: 2rpx;
+          transition: all 0.2s ease;
+          
+          &.active {
+            animation: waveMini 0.6s infinite ease-in-out;
           }
+        }
+      }
 
-          &.candidate {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
+      .interviewer-status-text {
+        font-size: 26rpx;
+        color: #6c7a8a;
+        background-color: #f0f3f8;
+        padding: 8rpx 20rpx;
+        border-radius: 40rpx;
+      }
+    }
+  }
 
-            .message-bubble {
-              background-color: #e6f7ff;
-              margin-left: 100rpx;
-            }
+  // 聊天主区域 - 最大化空间
+  .chat-section-main {
+    flex: 1;
+    overflow: hidden;
+    margin: 0 20rpx;
+    
+    .chat-messages {
+      height: 100%;
+      padding: 20rpx 10rpx;
+
+      .chat-message {
+        margin-bottom: 30rpx;
+
+        &.interviewer {
+          .message-bubble {
+            background-color: #fff;
+            border: 1rpx solid #e9edf2;
+            border-radius: 24rpx 24rpx 24rpx 12rpx;
+            margin-right: 80rpx;
+            box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.02);
           }
+        }
+
+        &.candidate {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
 
           .message-bubble {
-            padding: 20rpx;
-            border-radius: 15rpx;
-            margin-bottom: 10rpx;
-
-            text {
-              font-size: 30rpx;
-              line-height: 1.5;
-            }
-          }
-
-          .message-time {
-            font-size: 24rpx;
-            color: #999;
+            background: linear-gradient(135deg, #007aff, #0066cc);
+            color: #fff;
+            border-radius: 24rpx 24rpx 12rpx 24rpx;
+            margin-left: 80rpx;
           }
         }
 
-        .thinking-indicator {
-          display: flex;
-          align-items: center;
-          margin-bottom: 30rpx;
-
+        .message-bubble {
+          padding: 20rpx 24rpx;
+          margin-bottom: 8rpx;
+          display: inline-block;
+          max-width: 85%;
+          
           text {
-            font-size: 28rpx;
-            color: #666;
-            margin-left: 20rpx;
-          }
-
-          .thinking-dots {
-            display: flex;
-
-            .dot {
-              width: 12rpx;
-              height: 12rpx;
-              background-color: #007aff;
-              border-radius: 50%;
-              margin: 0 6rpx;
-              animation: thinking 1.4s infinite;
-
-              &:nth-child(2) { animation-delay: 0.2s; }
-              &:nth-child(3) { animation-delay: 0.4s; }
-            }
+            font-size: 30rpx;
+            line-height: 1.45;
+            word-break: break-word;
           }
         }
-      }
-    }
 
-    .tips-section {
-      width: 250rpx;
-      background-color: #fff;
-      border-radius: 20rpx;
-      padding: 30rpx;
-      box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.1);
-      transition: all 0.3s ease;
-
-      &.collapsed {
-        width: 80rpx;
-
-        .tips-content {
-          display: none;
+        .message-time {
+          font-size: 22rpx;
+          color: #9aa6b5;
+          margin-top: 6rpx;
+          display: block;
         }
       }
 
-      .tips-header {
+      .thinking-indicator {
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        margin-bottom: 20rpx;
-        cursor: pointer;
+        padding: 16rpx 0;
 
+        .thinking-dots {
+          display: flex;
+          margin-right: 16rpx;
+          .dot {
+            width: 12rpx;
+            height: 12rpx;
+            background-color: #007aff;
+            border-radius: 50%;
+            margin: 0 4rpx;
+            animation: thinking 1.2s infinite;
+          }
+        }
         text {
-          font-size: 28rpx;
-          font-weight: 600;
-          color: #333;
-        }
-
-        .collapse-icon {
-          width: 30rpx;
-          height: 30rpx;
-          transition: transform 0.3s ease;
-
-          &.rotated {
-            transform: rotate(180deg);
-          }
-        }
-      }
-
-      .tips-content {
-        .tip-item {
-          margin-bottom: 15rpx;
-
-          text {
-            font-size: 26rpx;
-            color: #666;
-            line-height: 1.4;
-          }
+          font-size: 26rpx;
+          color: #8f9bb3;
         }
       }
     }
   }
 
-  .control-section {
+  // 底部面板（左右两栏）
+  .bottom-panel {
+    flex-shrink: 0;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 30rpx;
+    gap: 24rpx;
+    padding: 20rpx 30rpx 30rpx;
     background-color: #fff;
-    box-shadow: 0 -2rpx 10rpx rgba(0,0,0,0.1);
-
-    .control-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background-color: transparent;
-      border: none;
-
-      &[disabled] {
-        opacity: 0.5;
+    border-top: 1rpx solid #eef2f6;
+    
+    // 左侧技巧卡片
+    .tips-card {
+      flex: 1.2;
+      background-color: #f8fafd;
+      border-radius: 24rpx;
+      padding: 20rpx 24rpx;
+      transition: all 0.2s ease;
+      
+      &.collapsed {
+        flex: 0.4;
+        background-color: #f8fafd;
+        padding: 20rpx 24rpx;
       }
-
-      image {
-        width: 50rpx;
-        height: 50rpx;
-        margin-bottom: 10rpx;
+      
+      .tips-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        
+        .tips-title {
+          font-size: 28rpx;
+          font-weight: 600;
+          color: #1f2a3e;
+        }
+        
+        .collapse-icon {
+          width: 32rpx;
+          height: 32rpx;
+          transition: transform 0.2s ease;
+          &.rotated {
+            transform: rotate(180deg);
+          }
+        }
       }
-
-      text {
-        font-size: 24rpx;
-        color: #666;
-      }
-
-      &.end-btn {
-        text {
-          color: #ff4757;
+      
+      .tips-content {
+        margin-top: 20rpx;
+        .tip-item {
+          margin-bottom: 16rpx;
+          text {
+            font-size: 26rpx;
+            color: #5e6f8d;
+            line-height: 1.4;
+          }
         }
       }
     }
-
-    .voice-record-area {
-      position: relative;
-
-      .voice-btn {
-        width: 120rpx;
-        height: 120rpx;
-        border-radius: 50%;
-        background-color: #007aff;
+    
+    // 右侧控制按钮组
+    .control-buttons {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 24rpx;
+      
+      .ctrl-btn {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        background: transparent;
         border: none;
-
-        &.recording {
-          background-color: #ff4757;
-          animation: pulse 1s infinite;
-        }
-
-        &.disabled {
-          background-color: #ccc;
-        }
-
-        &[disabled] {
-          opacity: 0.6;
-        }
-
+        padding: 12rpx 20rpx;
+        border-radius: 40rpx;
+        transition: all 0.2s;
+        
         image {
-          width: 50rpx;
-          height: 50rpx;
-          margin-bottom: 10rpx;
+          width: 44rpx;
+          height: 44rpx;
+          margin-bottom: 8rpx;
         }
-
-        text {
-          color: #fff;
-          font-size: 22rpx;
-        }
-      }
-
-      .recording-indicator {
-        position: absolute;
-        top: -60rpx;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-
-        .pulse-ring {
-          width: 60rpx;
-          height: 60rpx;
-          border: 4rpx solid #ff4757;
-          border-radius: 50%;
-          animation: pulse-ring 1s infinite;
-        }
-
+        
         text {
           font-size: 24rpx;
-          color: #ff4757;
-          margin-top: 10rpx;
+          color: #5e6f8d;
+        }
+        
+        &:active {
+          background-color: #f0f3f8;
+          transform: scale(0.96);
+        }
+        
+        &.end-btn text {
+          color: #ff6b6b;
+        }
+        
+        &[disabled] {
+          opacity: 0.5;
+          pointer-events: none;
+        }
+      }
+      
+      .voice-record-wrapper {
+        position: relative;
+        
+        .voice-main-btn {
+          width: 120rpx;
+          height: 120rpx;
+          border-radius: 60rpx;
+          background: linear-gradient(135deg, #007aff, #0051d5);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          border: none;
+          box-shadow: 0 8rpx 20rpx rgba(0,122,255,0.3);
+          transition: all 0.2s;
+          
+          &.recording {
+            background: linear-gradient(135deg, #ff4757, #e33e4c);
+            animation: pulse 1s infinite;
+          }
+          
+          image {
+            width: 52rpx;
+            height: 52rpx;
+            margin-bottom: 8rpx;
+          }
+          
+          text {
+            color: #fff;
+            font-size: 22rpx;
+            font-weight: 500;
+          }
+          
+          &:active {
+            transform: scale(0.95);
+          }
+        }
+        
+        .recording-tip {
+          position: absolute;
+          top: -56rpx;
+          left: 50%;
+          transform: translateX(-50%);
+          background-color: rgba(0,0,0,0.7);
+          backdrop-filter: blur(20rpx);
+          padding: 8rpx 20rpx;
+          border-radius: 60rpx;
+          display: flex;
+          align-items: center;
+          gap: 12rpx;
+          white-space: nowrap;
+          
+          .pulse-ring-mini {
+            width: 20rpx;
+            height: 20rpx;
+            background-color: #ff4757;
+            border-radius: 50%;
+            animation: pulse-ring 0.8s infinite;
+          }
+          
+          text {
+            font-size: 24rpx;
+            color: #fff;
+          }
         }
       }
     }
   }
 }
 
-/* 修复报告弹窗布局：解决遮挡和滚动问题 */
+// 响应式：窄屏底部面板垂直排列
+@media (max-width: 768px) {
+  .interview-area .bottom-panel {
+    flex-direction: column;
+    gap: 20rpx;
+    
+    .tips-card {
+      flex: auto;
+      &.collapsed {
+        flex: auto;
+      }
+    }
+    
+    .control-buttons {
+      justify-content: space-around;
+      padding-top: 8rpx;
+    }
+  }
+}
+
+// 动画
+@keyframes waveMini {
+  0%, 100% { height: 16rpx; opacity: 0.6; }
+  50% { height: 32rpx; opacity: 1; }
+}
+
+@keyframes thinking {
+  0%, 60%, 100% { transform: scale(1); opacity: 0.5; }
+  30% { transform: scale(1.3); opacity: 1; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); box-shadow: 0 8rpx 20rpx rgba(255,71,87,0.3); }
+  50% { transform: scale(1.05); box-shadow: 0 12rpx 28rpx rgba(255,71,87,0.5); }
+  100% { transform: scale(1); box-shadow: 0 8rpx 20rpx rgba(255,71,87,0.3); }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+// ==================== 报告弹窗样式（保持不变） ====================
 .report-overlay {
   position: fixed;
   top: 0;
@@ -1958,10 +2046,6 @@ export default {
     .report-scroll-view {
       height: 100%;
       padding: 0 30rpx;
-    }
-
-    .report-content {
-      padding-bottom: 20rpx;
     }
 
     .score-section {
@@ -2249,32 +2333,6 @@ export default {
   }
 }
 
-@keyframes wave {
-  0%, 100% { height: 20rpx; }
-  50% { height: 40rpx; }
-}
-
-@keyframes thinking {
-  0%, 60%, 100% { transform: scale(1); }
-  30% { transform: scale(1.3); }
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
-}
-
-@keyframes pulse-ring {
-  0% { transform: scale(1); opacity: 1; }
-  100% { transform: scale(1.3); opacity: 0; }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
-
 @keyframes modalSlideUp {
   from {
     transform: translateY(100%);
@@ -2286,35 +2344,12 @@ export default {
   }
 }
 
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .interview-content {
-    flex-direction: column;
-
-    .interviewer-section {
-      width: 100%;
-      flex-direction: row;
-      justify-content: center;
-      margin-bottom: 20rpx;
-    }
-
-    .tips-section {
-      width: 100%;
-      margin-top: 20rpx;
-    }
-  }
-
-  .control-section {
-    flex-direction: column;
-    gap: 20rpx;
-
-    .voice-record-area {
-      order: -1;
-    }
-  }
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
 }
 
-/* 暗黑模式支持 */
+// 暗黑模式支持
 @media (prefers-color-scheme: dark) {
   .interview-container {
     background-color: #1a1a1a;
@@ -2337,168 +2372,57 @@ export default {
     }
   }
   
+  .interview-area {
+    background-color: #141414;
+    
+    .progress-section {
+      background-color: #222;
+      border-bottom-color: #333;
+      .progress-text, .stage-text { color: #ddd; }
+      .progress-bar { background-color: #333; }
+    }
+    
+    .interviewer-status-bar {
+      background-color: #222;
+      border-bottom-color: #333;
+      .interviewer-name { color: #eee; }
+      .status-right .interviewer-status-text { background-color: #2c2c2c; color: #aaa; }
+    }
+    
+    .chat-section-main .chat-messages .chat-message {
+      &.interviewer .message-bubble {
+        background-color: #2a2a2a;
+        border-color: #3a3a3a;
+        color: #e0e0e0;
+      }
+      &.candidate .message-bubble {
+        background: linear-gradient(135deg, #0051d5, #003d99);
+      }
+    }
+    
+    .bottom-panel {
+      background-color: #222;
+      border-top-color: #333;
+      .tips-card {
+        background-color: #2c2c2c;
+        .tips-header .tips-title { color: #eee; }
+        .tip-item text { color: #bbb; }
+      }
+      .control-buttons .ctrl-btn text { color: #aaa; }
+    }
+  }
+  
   .config-card {
     background-color: #2d2d2d !important;
-    
-    .config-title {
-      color: #ffffff !important;
-    }
-    
-    .form-label {
-      color: #e0e0e0 !important;
-    }
-    
-    .form-textarea {
-      background-color: #3d3d3d !important;
-      border-color: #4d4d4d !important;
-      color: #ffffff !important;
-    }
-    
-    .user-id-display {
-      background-color: #3d3d3d !important;
-      border-color: #4d4d4d !important;
-      
-      .user-id-text {
-        color: #007aff !important;
-      }
-    }
-    
-    .cascade-selector {
-      background-color: #3d3d3d !important;
-      border-color: #4d4d4d !important;
-      
-      .selector-content {
-        color: #ffffff !important;
-        
-        &.placeholder {
-          color: #adb5bd !important;
-        }
-      }
-    }
-  }
-  
-  .cascade-modal {
-    background-color: #2d2d2d !important;
-    
-    .cascade-header {
-      background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
-      border-bottom-color: #4d4d4d;
-      
-      .cascade-title {
-        color: #ffffff;
-      }
-    }
-    
-    .category-list {
-      background-color: #1a1a1a;
-      border-right-color: #4d4d4d;
-      
-      .category-item {
-        color: #999;
-        
-        &.active {
-          background-color: #2d2d2d;
-          color: #007aff;
-        }
-      }
-    }
-    
-    .position-list {
-      background-color: #2d2d2d;
-      
-      .position-item {
-        color: #ffffff;
-        border-bottom-color: #4d4d4d;
-        
-        &.active {
-          background-color: #1a1a1a;
-        }
-      }
-    }
-  }
-  
-  .progress-section {
-    background-color: #2d2d2d !important;
-    
-    .progress-text, .stage-text {
-      color: #ffffff !important;
-    }
-  }
-  
-  .chat-section {
-    background-color: #2d2d2d !important;
-    
-    .chat-message {
-      &.interviewer .message-bubble {
-        background-color: #1a1a1a !important;
-        color: #ffffff !important;
-      }
-      
-      &.candidate .message-bubble {
-        background-color: #007aff !important;
-        color: #ffffff !important;
-      }
-    }
-  }
-  
-  .tips-section {
-    background-color: #2d2d2d !important;
-    
-    .tips-header text {
-      color: #ffffff !important;
-    }
-    
-    .tip-item text {
-      color: #e0e0e0 !important;
-    }
-  }
-  
-  .control-section {
-    background-color: #2d2d2d !important;
-    
-    .control-btn text {
-      color: #ffffff !important;
-    }
+    .config-title, .form-label { color: #fff !important; }
+    .form-textarea, .cascade-selector, .user-id-display { background-color: #3d3d3d; border-color: #4d4d4d; color: #fff; }
   }
   
   .report-modal {
     background-color: #2d2d2d !important;
-    
-    .report-header {
-      border-bottom-color: #4d4d4d;
-      
-      .report-title {
-        color: #ffffff;
-      }
-    }
-    
-    .score-section .score-title,
-    .radar-section .section-title,
-    .evaluation-section .section-title,
-    .suggestions-section .section-title {
-      color: #ffffff !important;
-    }
-    
-    .evaluation-item {
-      background-color: #1a1a1a !important;
-      
-      .item-title {
-        color: #ffffff !important;
-      }
-      
-      .item-content {
-        color: #cccccc !important;
-      }
-    }
-    
-    .suggestion-item text {
-      color: #cccccc !important;
-    }
-    
-    .report-footer {
-      border-top-color: #4d4d4d;
-      background-color: #2d2d2d;
-    }
+    .report-header, .report-footer { border-color: #444; }
+    .report-title, .section-title, .score-title { color: #fff; }
+    .evaluation-item { background-color: #1e1e1e; }
   }
 }
 </style>

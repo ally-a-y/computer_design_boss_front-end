@@ -1,5 +1,5 @@
 
-.splash-container.data-v-30b72be6 {
+.splash-container.data-v-b5d3b004 {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -7,25 +7,25 @@
   height: 100vh;
   background-color: #F8FAFD;
 }
-.splash-content.data-v-30b72be6 {
+.splash-content.data-v-b5d3b004 {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
-.splash-logo.data-v-30b72be6 {
+.splash-logo.data-v-b5d3b004 {
   width: 240rpx;
   height: 240rpx;
   margin-bottom: 40rpx;
-  animation: pulse-30b72be6 1.5s ease-in-out infinite;
+  animation: pulse-b5d3b004 1.5s ease-in-out infinite;
 }
-.splash-text.data-v-30b72be6 {
+.splash-text.data-v-b5d3b004 {
   font-size: 20px;
   font-weight: 600;
   color: #1E1E1E;
-  animation: fadeIn-30b72be6 1s ease-in-out;
+  animation: fadeIn-b5d3b004 1s ease-in-out;
 }
-@keyframes pulse-30b72be6 {
+@keyframes pulse-b5d3b004 {
 0% {
     transform: scale(1);
 }
@@ -36,7 +36,7 @@
     transform: scale(1);
 }
 }
-@keyframes fadeIn-30b72be6 {
+@keyframes fadeIn-b5d3b004 {
 from {
     opacity: 0;
     transform: translateY(10px);

@@ -7,7 +7,7 @@
         "navigationStyle": "custom"
       }
     },
-    {
+	{
       "path": "pages/login/login",
       "style": {
         "navigationBarTitleText": "登录",

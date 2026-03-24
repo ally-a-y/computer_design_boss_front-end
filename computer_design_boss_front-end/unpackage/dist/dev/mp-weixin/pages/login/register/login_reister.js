@@ -1,17 +1,17 @@
 "use strict";
-var common_vendor = require("../../../common/vendor.js");
-var common_api_user = require("../../../common/api/user.js");
-require("../../../common/api/request.js");
-require("../../../common/config.js");
+const common_vendor = require("../../../common/vendor.js");
+const common_api_user = require("../../../common/api/user.js");
 const _sfc_main = {
   data() {
     return {
+      // 从登录页面传递过来的注册数据
       registerForm: {
         mobile: "",
         sms_code: "",
         password: "",
         confirm_password: ""
       },
+      // 用户基本信息表单
       basicInfoForm: {
         real_name: "",
         gender: 0,
@@ -19,12 +19,14 @@ const _sfc_main = {
         city: "",
         email: ""
       },
+      // 教育背景表单
       educationForm: {
         degree: "",
         school_name: "",
         major: "",
         graduation_year: ""
       },
+      // 求职意向表单
       jobIntentForm: {
         job_direction: "",
         expected_city: "",
@@ -32,79 +34,91 @@ const _sfc_main = {
         expected_salary_max: "",
         available_time: ""
       },
+      // 注册步骤
       registerStep: 2,
       loading: false,
-      provinces: ["\u5317\u4EAC", "\u4E0A\u6D77", "\u5E7F\u4E1C", "\u6D59\u6C5F", "\u6C5F\u82CF", "\u56DB\u5DDD", "\u6E56\u5317", "\u9655\u897F", "\u91CD\u5E86", "\u6E56\u5357", "\u6CB3\u5357", "\u5C71\u4E1C", "\u5B89\u5FBD", "\u798F\u5EFA", "\u6CB3\u5317"],
+      // ========== 城市选择器数据 ==========
+      provinces: ["北京", "上海", "广东", "浙江", "江苏", "四川", "湖北", "陕西", "重庆", "湖南", "河南", "山东", "安徽", "福建", "河北"],
       cities: {
-        "\u5317\u4EAC": ["\u5317\u4EAC\u5E02"],
-        "\u4E0A\u6D77": ["\u4E0A\u6D77\u5E02"],
-        "\u5E7F\u4E1C": ["\u5E7F\u5DDE", "\u6DF1\u5733", "\u4F5B\u5C71", "\u4E1C\u839E", "\u73E0\u6D77", "\u4E2D\u5C71", "\u60E0\u5DDE", "\u6C5F\u95E8", "\u6C55\u5934", "\u6E5B\u6C5F"],
-        "\u6D59\u6C5F": ["\u676D\u5DDE", "\u5B81\u6CE2", "\u6E29\u5DDE", "\u5609\u5174", "\u7ECD\u5174", "\u91D1\u534E", "\u53F0\u5DDE", "\u6E56\u5DDE", "\u8862\u5DDE", "\u4E3D\u6C34"],
-        "\u6C5F\u82CF": ["\u5357\u4EAC", "\u82CF\u5DDE", "\u65E0\u9521", "\u5E38\u5DDE", "\u5F90\u5DDE", "\u5357\u901A", "\u626C\u5DDE", "\u76D0\u57CE", "\u6DEE\u5B89", "\u8FDE\u4E91\u6E2F"],
-        "\u56DB\u5DDD": ["\u6210\u90FD", "\u7EF5\u9633", "\u5FB7\u9633", "\u4E50\u5C71", "\u5B9C\u5BBE", "\u5357\u5145", "\u6CF8\u5DDE", "\u8FBE\u5DDE", "\u7709\u5C71", "\u9042\u5B81"],
-        "\u6E56\u5317": ["\u6B66\u6C49", "\u5B9C\u660C", "\u8944\u9633", "\u8346\u5DDE", "\u9EC4\u77F3", "\u5341\u5830", "\u5B5D\u611F", "\u8346\u95E8", "\u9102\u5DDE", "\u9EC4\u5188"],
-        "\u9655\u897F": ["\u897F\u5B89", "\u5B9D\u9E21", "\u54B8\u9633", "\u6E2D\u5357", "\u6C49\u4E2D", "\u6986\u6797", "\u5EF6\u5B89", "\u5B89\u5EB7", "\u5546\u6D1B", "\u94DC\u5DDD"],
-        "\u91CD\u5E86": ["\u91CD\u5E86\u5E02"],
-        "\u6E56\u5357": ["\u957F\u6C99", "\u682A\u6D32", "\u6E58\u6F6D", "\u8861\u9633", "\u5CB3\u9633", "\u5E38\u5FB7", "\u90B5\u9633", "\u90F4\u5DDE", "\u6C38\u5DDE", "\u6000\u5316"],
-        "\u6CB3\u5357": ["\u90D1\u5DDE", "\u6D1B\u9633", "\u5F00\u5C01", "\u65B0\u4E61", "\u8BB8\u660C", "\u5E73\u9876\u5C71", "\u7126\u4F5C", "\u5546\u4E18", "\u5B89\u9633", "\u5357\u9633"],
-        "\u5C71\u4E1C": ["\u6D4E\u5357", "\u9752\u5C9B", "\u70DF\u53F0", "\u6F4D\u574A", "\u4E34\u6C82", "\u6DC4\u535A", "\u5A01\u6D77", "\u4E1C\u8425", "\u65E5\u7167", "\u5FB7\u5DDE"],
-        "\u5B89\u5FBD": ["\u5408\u80A5", "\u829C\u6E56", "\u868C\u57E0", "\u6DEE\u5357", "\u9A6C\u978D\u5C71", "\u6DEE\u5317", "\u94DC\u9675", "\u5B89\u5E86", "\u9EC4\u5C71", "\u6EC1\u5DDE"],
-        "\u798F\u5EFA": ["\u798F\u5DDE", "\u53A6\u95E8", "\u6CC9\u5DDE", "\u8386\u7530", "\u6F33\u5DDE", "\u9F99\u5CA9", "\u4E09\u660E", "\u5357\u5E73", "\u5B81\u5FB7", "\u6B66\u5937\u5C71"],
-        "\u6CB3\u5317": ["\u77F3\u5BB6\u5E84", "\u5510\u5C71", "\u79E6\u7687\u5C9B", "\u90AF\u90F8", "\u90A2\u53F0", "\u4FDD\u5B9A", "\u5F20\u5BB6\u53E3", "\u627F\u5FB7", "\u6CA7\u5DDE", "\u5ECA\u574A"]
+        "北京": ["北京市"],
+        "上海": ["上海市"],
+        "广东": ["广州", "深圳", "佛山", "东莞", "珠海", "中山", "惠州", "江门", "汕头", "湛江"],
+        "浙江": ["杭州", "宁波", "温州", "嘉兴", "绍兴", "金华", "台州", "湖州", "衢州", "丽水"],
+        "江苏": ["南京", "苏州", "无锡", "常州", "徐州", "南通", "扬州", "盐城", "淮安", "连云港"],
+        "四川": ["成都", "绵阳", "德阳", "乐山", "宜宾", "南充", "泸州", "达州", "眉山", "遂宁"],
+        "湖北": ["武汉", "宜昌", "襄阳", "荆州", "黄石", "十堰", "孝感", "荆门", "鄂州", "黄冈"],
+        "陕西": ["西安", "宝鸡", "咸阳", "渭南", "汉中", "榆林", "延安", "安康", "商洛", "铜川"],
+        "重庆": ["重庆市"],
+        "湖南": ["长沙", "株洲", "湘潭", "衡阳", "岳阳", "常德", "邵阳", "郴州", "永州", "怀化"],
+        "河南": ["郑州", "洛阳", "开封", "新乡", "许昌", "平顶山", "焦作", "商丘", "安阳", "南阳"],
+        "山东": ["济南", "青岛", "烟台", "潍坊", "临沂", "淄博", "威海", "东营", "日照", "德州"],
+        "安徽": ["合肥", "芜湖", "蚌埠", "淮南", "马鞍山", "淮北", "铜陵", "安庆", "黄山", "滁州"],
+        "福建": ["福州", "厦门", "泉州", "莆田", "漳州", "龙岩", "三明", "南平", "宁德", "武夷山"],
+        "河北": ["石家庄", "唐山", "秦皇岛", "邯郸", "邢台", "保定", "张家口", "承德", "沧州", "廊坊"]
       },
       districts: {
-        "\u5317\u4EAC\u5E02": ["\u671D\u9633\u533A", "\u6D77\u6DC0\u533A", "\u4E1C\u57CE\u533A", "\u897F\u57CE\u533A", "\u4E30\u53F0\u533A", "\u77F3\u666F\u5C71\u533A", "\u95E8\u5934\u6C9F\u533A", "\u623F\u5C71\u533A", "\u901A\u5DDE\u533A", "\u987A\u4E49\u533A", "\u660C\u5E73\u533A", "\u5927\u5174\u533A", "\u6000\u67D4\u533A", "\u5E73\u8C37\u533A", "\u5BC6\u4E91\u533A", "\u5EF6\u5E86\u533A"],
-        "\u4E0A\u6D77\u5E02": ["\u6D66\u4E1C\u65B0\u533A", "\u9EC4\u6D66\u533A", "\u5F90\u6C47\u533A", "\u957F\u5B81\u533A", "\u9759\u5B89\u533A", "\u666E\u9640\u533A", "\u8679\u53E3\u533A", "\u6768\u6D66\u533A", "\u95F5\u884C\u533A", "\u5B9D\u5C71\u533A", "\u5609\u5B9A\u533A", "\u91D1\u5C71\u533A", "\u677E\u6C5F\u533A", "\u9752\u6D66\u533A", "\u5949\u8D24\u533A", "\u5D07\u660E\u533A"],
-        "\u5E7F\u5DDE": ["\u5929\u6CB3\u533A", "\u8D8A\u79C0\u533A", "\u6D77\u73E0\u533A", "\u767D\u4E91\u533A", "\u756A\u79BA\u533A", "\u8354\u6E7E\u533A", "\u9EC4\u57D4\u533A", "\u82B1\u90FD\u533A", "\u5357\u6C99\u533A", "\u4ECE\u5316\u533A", "\u589E\u57CE\u533A"],
-        "\u6DF1\u5733": ["\u798F\u7530\u533A", "\u7F57\u6E56\u533A", "\u5357\u5C71\u533A", "\u5B9D\u5B89\u533A", "\u9F99\u5C97\u533A", "\u76D0\u7530\u533A", "\u9F99\u534E\u533A", "\u576A\u5C71\u533A", "\u5149\u660E\u533A"],
-        "\u676D\u5DDE": ["\u897F\u6E56\u533A", "\u4E0A\u57CE\u533A", "\u4E0B\u57CE\u533A", "\u6C5F\u5E72\u533A", "\u62F1\u5885\u533A", "\u6EE8\u6C5F\u533A", "\u8427\u5C71\u533A", "\u4F59\u676D\u533A", "\u5BCC\u9633\u533A", "\u4E34\u5B89\u533A", "\u6850\u5E90\u53BF", "\u6DF3\u5B89\u53BF", "\u5EFA\u5FB7\u5E02"],
-        "\u5357\u4EAC": ["\u9F13\u697C\u533A", "\u7384\u6B66\u533A", "\u79E6\u6DEE\u533A", "\u5EFA\u90BA\u533A", "\u96E8\u82B1\u53F0\u533A", "\u6D66\u53E3\u533A", "\u6816\u971E\u533A", "\u6C5F\u5B81\u533A", "\u516D\u5408\u533A", "\u6EA7\u6C34\u533A", "\u9AD8\u6DF3\u533A"],
-        "\u6210\u90FD": ["\u9526\u6C5F\u533A", "\u9752\u7F8A\u533A", "\u91D1\u725B\u533A", "\u6B66\u4FAF\u533A", "\u6210\u534E\u533A", "\u9F99\u6CC9\u9A7F\u533A", "\u9752\u767D\u6C5F\u533A", "\u65B0\u90FD\u533A", "\u6E29\u6C5F\u533A", "\u53CC\u6D41\u533A", "\u90EB\u90FD\u533A", "\u65B0\u6D25\u533A", "\u90FD\u6C5F\u5830\u5E02", "\u5F6D\u5DDE\u5E02", "\u909B\u5D03\u5E02", "\u5D07\u5DDE\u5E02", "\u7B80\u9633\u5E02"],
-        "\u6B66\u6C49": ["\u6C5F\u5CB8\u533A", "\u6C5F\u6C49\u533A", "\u785A\u53E3\u533A", "\u6C49\u9633\u533A", "\u6B66\u660C\u533A", "\u9752\u5C71\u533A", "\u6D2A\u5C71\u533A", "\u4E1C\u897F\u6E56\u533A", "\u6C49\u5357\u533A", "\u8521\u7538\u533A", "\u6C5F\u590F\u533A", "\u9EC4\u9642\u533A", "\u65B0\u6D32\u533A"],
-        "\u897F\u5B89": ["\u65B0\u57CE\u533A", "\u7891\u6797\u533A", "\u83B2\u6E56\u533A", "\u96C1\u5854\u533A", "\u672A\u592E\u533A", "\u705E\u6865\u533A", "\u957F\u5B89\u533A", "\u960E\u826F\u533A", "\u4E34\u6F7C\u533A", "\u9AD8\u9675\u533A", "\u9120\u9091\u533A", "\u84DD\u7530\u53BF", "\u5468\u81F3\u53BF"],
-        "\u91CD\u5E86\u5E02": ["\u6E1D\u4E2D\u533A", "\u6C5F\u5317\u533A", "\u5357\u5CB8\u533A", "\u4E5D\u9F99\u5761\u533A", "\u6C99\u576A\u575D\u533A", "\u5927\u6E21\u53E3\u533A", "\u5317\u789A\u533A", "\u6E1D\u5317\u533A", "\u5DF4\u5357\u533A", "\u6DAA\u9675\u533A", "\u4E07\u5DDE\u533A", "\u9ED4\u6C5F\u533A", "\u957F\u5BFF\u533A", "\u6C5F\u6D25\u533A", "\u5408\u5DDD\u533A", "\u6C38\u5DDD\u533A", "\u5357\u5DDD\u533A", "\u7DA6\u6C5F\u533A", "\u5927\u8DB3\u533A", "\u74A7\u5C71\u533A", "\u94DC\u6881\u533A", "\u6F7C\u5357\u533A", "\u8363\u660C\u533A", "\u5F00\u5DDE\u533A", "\u6881\u5E73\u533A", "\u6B66\u9686\u533A"],
-        "\u957F\u6C99": ["\u8299\u84C9\u533A", "\u5929\u5FC3\u533A", "\u5CB3\u9E93\u533A", "\u5F00\u798F\u533A", "\u96E8\u82B1\u533A", "\u671B\u57CE\u533A", "\u957F\u6C99\u53BF", "\u6D4F\u9633\u5E02", "\u5B81\u4E61\u5E02"],
-        "\u90D1\u5DDE": ["\u4E2D\u539F\u533A", "\u4E8C\u4E03\u533A", "\u7BA1\u57CE\u56DE\u65CF\u533A", "\u91D1\u6C34\u533A", "\u4E0A\u8857\u533A", "\u60E0\u6D4E\u533A", "\u4E2D\u725F\u53BF", "\u5DE9\u4E49\u5E02", "\u8365\u9633\u5E02", "\u65B0\u5BC6\u5E02", "\u65B0\u90D1\u5E02", "\u767B\u5C01\u5E02"],
-        "\u6D4E\u5357": ["\u5386\u4E0B\u533A", "\u5E02\u4E2D\u533A", "\u69D0\u836B\u533A", "\u5929\u6865\u533A", "\u5386\u57CE\u533A", "\u957F\u6E05\u533A", "\u7AE0\u4E18\u533A", "\u6D4E\u9633\u533A", "\u83B1\u829C\u533A", "\u94A2\u57CE\u533A", "\u5E73\u9634\u53BF", "\u5546\u6CB3\u53BF"],
-        "\u5408\u80A5": ["\u7476\u6D77\u533A", "\u5E90\u9633\u533A", "\u8700\u5C71\u533A", "\u5305\u6CB3\u533A", "\u957F\u4E30\u53BF", "\u80A5\u4E1C\u53BF", "\u80A5\u897F\u53BF", "\u5E90\u6C5F\u53BF", "\u5DE2\u6E56\u5E02"],
-        "\u798F\u5DDE": ["\u9F13\u697C\u533A", "\u53F0\u6C5F\u533A", "\u4ED3\u5C71\u533A", "\u9A6C\u5C3E\u533A", "\u664B\u5B89\u533A", "\u957F\u4E50\u533A", "\u95FD\u4FAF\u53BF", "\u8FDE\u6C5F\u53BF", "\u7F57\u6E90\u53BF", "\u95FD\u6E05\u53BF", "\u6C38\u6CF0\u53BF", "\u5E73\u6F6D\u53BF", "\u798F\u6E05\u5E02"],
-        "\u77F3\u5BB6\u5E84": ["\u957F\u5B89\u533A", "\u6865\u897F\u533A", "\u65B0\u534E\u533A", "\u4E95\u9649\u77FF\u533A", "\u88D5\u534E\u533A", "\u85C1\u57CE\u533A", "\u9E7F\u6CC9\u533A", "\u683E\u57CE\u533A", "\u4E95\u9649\u53BF", "\u6B63\u5B9A\u53BF", "\u884C\u5510\u53BF", "\u7075\u5BFF\u53BF", "\u9AD8\u9091\u53BF", "\u6DF1\u6CFD\u53BF", "\u8D5E\u7687\u53BF", "\u65E0\u6781\u53BF", "\u5E73\u5C71\u53BF", "\u5143\u6C0F\u53BF", "\u8D75\u53BF", "\u664B\u5DDE\u5E02", "\u65B0\u4E50\u5E02"]
+        "北京市": ["朝阳区", "海淀区", "东城区", "西城区", "丰台区", "石景山区", "门头沟区", "房山区", "通州区", "顺义区", "昌平区", "大兴区", "怀柔区", "平谷区", "密云区", "延庆区"],
+        "上海市": ["浦东新区", "黄浦区", "徐汇区", "长宁区", "静安区", "普陀区", "虹口区", "杨浦区", "闵行区", "宝山区", "嘉定区", "金山区", "松江区", "青浦区", "奉贤区", "崇明区"],
+        "广州": ["天河区", "越秀区", "海珠区", "白云区", "番禺区", "荔湾区", "黄埔区", "花都区", "南沙区", "从化区", "增城区"],
+        "深圳": ["福田区", "罗湖区", "南山区", "宝安区", "龙岗区", "盐田区", "龙华区", "坪山区", "光明区"],
+        "杭州": ["西湖区", "上城区", "下城区", "江干区", "拱墅区", "滨江区", "萧山区", "余杭区", "富阳区", "临安区", "桐庐县", "淳安县", "建德市"],
+        "南京": ["鼓楼区", "玄武区", "秦淮区", "建邺区", "雨花台区", "浦口区", "栖霞区", "江宁区", "六合区", "溧水区", "高淳区"],
+        "成都": ["锦江区", "青羊区", "金牛区", "武侯区", "成华区", "龙泉驿区", "青白江区", "新都区", "温江区", "双流区", "郫都区", "新津区", "都江堰市", "彭州市", "邛崃市", "崇州市", "简阳市"],
+        "武汉": ["江岸区", "江汉区", "硚口区", "汉阳区", "武昌区", "青山区", "洪山区", "东西湖区", "汉南区", "蔡甸区", "江夏区", "黄陂区", "新洲区"],
+        "西安": ["新城区", "碑林区", "莲湖区", "雁塔区", "未央区", "灞桥区", "长安区", "阎良区", "临潼区", "高陵区", "鄠邑区", "蓝田县", "周至县"],
+        "重庆市": ["渝中区", "江北区", "南岸区", "九龙坡区", "沙坪坝区", "大渡口区", "北碚区", "渝北区", "巴南区", "涪陵区", "万州区", "黔江区", "长寿区", "江津区", "合川区", "永川区", "南川区", "綦江区", "大足区", "璧山区", "铜梁区", "潼南区", "荣昌区", "开州区", "梁平区", "武隆区"],
+        "长沙": ["芙蓉区", "天心区", "岳麓区", "开福区", "雨花区", "望城区", "长沙县", "浏阳市", "宁乡市"],
+        "郑州": ["中原区", "二七区", "管城回族区", "金水区", "上街区", "惠济区", "中牟县", "巩义市", "荥阳市", "新密市", "新郑市", "登封市"],
+        "济南": ["历下区", "市中区", "槐荫区", "天桥区", "历城区", "长清区", "章丘区", "济阳区", "莱芜区", "钢城区", "平阴县", "商河县"],
+        "合肥": ["瑶海区", "庐阳区", "蜀山区", "包河区", "长丰县", "肥东县", "肥西县", "庐江县", "巢湖市"],
+        "福州": ["鼓楼区", "台江区", "仓山区", "马尾区", "晋安区", "长乐区", "闽侯县", "连江县", "罗源县", "闽清县", "永泰县", "平潭县", "福清市"],
+        "石家庄": ["长安区", "桥西区", "新华区", "井陉矿区", "裕华区", "藁城区", "鹿泉区", "栾城区", "井陉县", "正定县", "行唐县", "灵寿县", "高邑县", "深泽县", "赞皇县", "无极县", "平山县", "元氏县", "赵县", "晋州市", "新乐市"]
       },
+      // 城市选择器索引 [省, 市, 区]
       cityIndex: [0, 0, 0],
       expectedCityIndex: [0, 0, 0],
+      // ========== 学历选择器数据 ==========
       degreeOptions: [
-        { value: "high_school", text: "\u9AD8\u4E2D" },
-        { value: "college", text: "\u4E13\u79D1" },
-        { value: "bachelor", text: "\u672C\u79D1" },
-        { value: "master", text: "\u7855\u58EB" },
-        { value: "doctor", text: "\u535A\u58EB" }
+        { value: "high_school", text: "高中" },
+        { value: "college", text: "专科" },
+        { value: "bachelor", text: "本科" },
+        { value: "master", text: "硕士" },
+        { value: "doctor", text: "博士" }
       ],
       degreeIndex: 2,
+      // 默认本科
+      // ========== 毕业年份数据 ==========
       graduationYears: [],
       yearIndex: 5,
-      availableTimeOptions: ["\u7ACB\u5373\u5230\u5C97", "\u4E00\u5468\u5185\u5230\u5C97", "\u4E24\u5468\u5185\u5230\u5C97", "\u4E00\u4E2A\u6708\u5185\u5230\u5C97", "\u4E24\u4E2A\u6708\u5185\u5230\u5C97", "\u4E09\u4E2A\u6708\u5185\u5230\u5C97", "\u5F85\u5B9A"],
+      // 默认当前年份
+      // ========== 到岗时间选项 ==========
+      availableTimeOptions: ["立即到岗", "一周内到岗", "两周内到岗", "一个月内到岗", "两个月内到岗", "三个月内到岗", "待定"],
       timeIndex: 0
     };
   },
   computed: {
+    // 所在城市选择器范围
     cityRange() {
       const province = this.provinces[this.cityIndex[0]] || this.provinces[0];
-      const cityList = this.cities[province] || ["\u5176\u4ED6"];
+      const cityList = this.cities[province] || ["其他"];
       const city = cityList[this.cityIndex[1]] || cityList[0];
-      const districtList = this.districts[city] || ["\u5176\u4ED6"];
+      const districtList = this.districts[city] || ["其他"];
       return [this.provinces, cityList, districtList];
     },
+    // 期望城市选择器范围（独立的计算属性）
     expectedCityRange() {
       const province = this.provinces[this.expectedCityIndex[0]] || this.provinces[0];
-      const cityList = this.cities[province] || ["\u5176\u4ED6"];
+      const cityList = this.cities[province] || ["其他"];
       const city = cityList[this.expectedCityIndex[1]] || cityList[0];
-      const districtList = this.districts[city] || ["\u5176\u4ED6"];
+      const districtList = this.districts[city] || ["其他"];
       return [this.provinces, cityList, districtList];
     },
+    // 学历文本显示
     degreeText() {
       const item = this.degreeOptions[this.degreeIndex];
       return item ? item.text : "";
     },
+    // 基本信息表单验证
     isBasicInfoFormValid() {
       const { real_name, birth_date, city, email } = this.basicInfoForm;
       const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -114,6 +128,7 @@ const _sfc_main = {
       const emailValid = email.trim() === "" || emailRegex.test(email);
       return realNameValid && birthDateValid && cityValid && emailValid;
     },
+    // 教育背景表单验证
     isEducationFormValid() {
       const { degree, school_name, major, graduation_year } = this.educationForm;
       const degreeValid = degree.trim().length > 0;
@@ -122,6 +137,7 @@ const _sfc_main = {
       const graduationYearValid = graduation_year.trim().length === 4 && !isNaN(graduation_year);
       return degreeValid && schoolNameValid && majorValid && graduationYearValid;
     },
+    // 求职意向表单验证
     isJobIntentFormValid() {
       const { expected_salary_min, expected_salary_max } = this.jobIntentForm;
       if (expected_salary_min && isNaN(expected_salary_min))
@@ -135,9 +151,9 @@ const _sfc_main = {
     if (options.registerData) {
       try {
         this.registerForm = JSON.parse(decodeURIComponent(options.registerData));
-        console.log("\u63A5\u6536\u5230\u7684\u6CE8\u518C\u6570\u636E:", this.registerForm);
+        common_vendor.index.__f__("log", "at pages/login/register/login_reister.vue:498", "接收到的注册数据:", this.registerForm);
       } catch (e) {
-        console.error("\u89E3\u6790\u6CE8\u518C\u6570\u636E\u5931\u8D25:", e);
+        common_vendor.index.__f__("error", "at pages/login/register/login_reister.vue:500", "解析注册数据失败:", e);
       }
     }
     this.initYearData();
@@ -145,21 +161,23 @@ const _sfc_main = {
   methods: {
     initYearData() {
       this.graduationYears = [];
-      const currentYear = new Date().getFullYear();
+      const currentYear = (/* @__PURE__ */ new Date()).getFullYear();
       for (let i = currentYear - 5; i <= currentYear + 5; i++) {
-        this.graduationYears.push(i + "\u5E74");
+        this.graduationYears.push(i + "年");
       }
       this.yearIndex = 5;
     },
+    // ========== 出生日期选择 ==========
     onBirthDateChange(e) {
       this.basicInfoForm.birth_date = e.detail.value;
     },
+    // ========== 所在城市选择器方法 ==========
     onCityChange(e) {
       const value = e.detail.value;
       const province = this.provinces[value[0]];
-      const cityList = this.cities[province] || ["\u5176\u4ED6"];
+      const cityList = this.cities[province] || ["其他"];
       const city = cityList[value[1]];
-      const districtList = this.districts[city] || ["\u5176\u4ED6"];
+      const districtList = this.districts[city] || ["其他"];
       const district = districtList[value[2]];
       this.basicInfoForm.city = `${province} ${city} ${district}`;
       this.cityIndex = value;
@@ -174,12 +192,13 @@ const _sfc_main = {
         this.cityIndex = [this.cityIndex[0], this.cityIndex[1], value];
       }
     },
+    // ========== 期望城市选择器方法 ==========
     onExpectedCityChange(e) {
       const value = e.detail.value;
       const province = this.provinces[value[0]];
-      const cityList = this.cities[province] || ["\u5176\u4ED6"];
+      const cityList = this.cities[province] || ["其他"];
       const city = cityList[value[1]];
-      const districtList = this.districts[city] || ["\u5176\u4ED6"];
+      const districtList = this.districts[city] || ["其他"];
       const district = districtList[value[2]];
       this.jobIntentForm.expected_city = `${province} ${city} ${district}`;
       this.expectedCityIndex = value;
@@ -194,19 +213,23 @@ const _sfc_main = {
         this.expectedCityIndex = [this.expectedCityIndex[0], this.expectedCityIndex[1], value];
       }
     },
+    // ========== 学历选择 ==========
     onDegreeChange(e) {
       this.degreeIndex = e.detail.value;
       this.educationForm.degree = this.degreeOptions[this.degreeIndex].value;
     },
+    // ========== 毕业年份选择 ==========
     onYearChange(e) {
       this.yearIndex = e.detail.value;
       const yearStr = this.graduationYears[this.yearIndex];
-      this.educationForm.graduation_year = yearStr.replace("\u5E74", "");
+      this.educationForm.graduation_year = yearStr.replace("年", "");
     },
+    // ========== 到岗时间选择 ==========
     onTimeChange(e) {
       this.timeIndex = e.detail.value;
       this.jobIntentForm.available_time = this.availableTimeOptions[this.timeIndex];
     },
+    // ========== 步骤控制方法 ==========
     nextRegisterStep() {
       if (this.registerStep === 2 && this.isBasicInfoFormValid) {
         this.registerStep = 3;
@@ -221,6 +244,7 @@ const _sfc_main = {
         common_vendor.index.navigateBack();
       }
     },
+    // ========== 完成注册 ==========
     async completeRegister() {
       this.loading = true;
       try {
@@ -228,26 +252,28 @@ const _sfc_main = {
           mobile: this.registerForm.mobile,
           sms_code: this.registerForm.sms_code,
           password: this.registerForm.password,
+          // 基本信息
           real_name: this.basicInfoForm.real_name.trim(),
           gender: this.basicInfoForm.gender,
           birth_date: this.basicInfoForm.birth_date,
           city: this.basicInfoForm.city,
           email: this.basicInfoForm.email.trim() || void 0,
+          // 教育背景
           education_level: this.educationForm.degree,
           school_name: this.educationForm.school_name.trim(),
           major: this.educationForm.major.trim(),
           graduation_year: this.educationForm.graduation_year
         };
-        console.log("\u53D1\u9001\u6CE8\u518C\u6570\u636E:", registerData);
+        common_vendor.index.__f__("log", "at pages/login/register/login_reister.vue:634", "发送注册数据:", registerData);
         const res = await common_api_user.userApi.register(registerData);
-        console.log("\u6CE8\u518C\u54CD\u5E94:", res);
+        common_vendor.index.__f__("log", "at pages/login/register/login_reister.vue:638", "注册响应:", res);
         if (res && res.user_id) {
-          console.log("\u6CE8\u518C\u6210\u529F\uFF0C\u5F00\u59CB\u81EA\u52A8\u767B\u5F55");
+          common_vendor.index.__f__("log", "at pages/login/register/login_reister.vue:642", "注册成功，开始自动登录");
           const loginRes = await common_api_user.userApi.login({
             mobile: this.registerForm.mobile,
             password: this.registerForm.password
           });
-          console.log("\u767B\u5F55\u54CD\u5E94:", loginRes);
+          common_vendor.index.__f__("log", "at pages/login/register/login_reister.vue:649", "登录响应:", loginRes);
           if (loginRes && loginRes.token) {
             common_vendor.index.setStorageSync("token", loginRes.token);
             common_vendor.index.setStorageSync("userInfo", JSON.stringify(loginRes.user_info));
@@ -262,7 +288,7 @@ const _sfc_main = {
               common_vendor.index.setStorageSync("resumeInfo", JSON.stringify(resumeInfo));
             }
             common_vendor.index.showToast({
-              title: "\u6CE8\u518C\u6210\u529F",
+              title: "注册成功",
               icon: "success"
             });
             setTimeout(() => {
@@ -271,15 +297,15 @@ const _sfc_main = {
               });
             }, 1500);
           } else {
-            throw new Error("\u81EA\u52A8\u767B\u5F55\u5931\u8D25");
+            throw new Error("自动登录失败");
           }
         } else {
-          throw new Error("\u6CE8\u518C\u5931\u8D25\uFF1A\u672A\u8FD4\u56DE\u7528\u6237ID");
+          throw new Error("注册失败：未返回用户ID");
         }
       } catch (error) {
-        console.error("\u6CE8\u518C\u5931\u8D25:", error);
+        common_vendor.index.__f__("error", "at pages/login/register/login_reister.vue:685", "注册失败:", error);
         common_vendor.index.showToast({
-          title: error.message || "\u6CE8\u518C\u5931\u8D25\uFF0C\u8BF7\u7A0D\u540E\u91CD\u8BD5",
+          title: error.message || "注册失败，请稍后重试",
           icon: "none",
           duration: 3e3
         });
@@ -304,7 +330,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       size: "24",
       color: "#1E1E1E"
     }),
-    f: common_vendor.t($data.registerStep === 2 ? "\u5B8C\u5584\u4E2A\u4EBA\u4FE1\u606F" : $data.registerStep === 3 ? "\u6559\u80B2\u7ECF\u5386" : "\u6C42\u804C\u610F\u5411"),
+    f: common_vendor.t($data.registerStep === 2 ? "完善个人信息" : $data.registerStep === 3 ? "教育经历" : "求职意向"),
     g: $data.registerStep === 2
   }, $data.registerStep === 2 ? {
     h: common_vendor.p({
@@ -396,7 +422,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       size: "24",
       color: "#999"
     }),
-    Z: $data.educationForm.graduation_year ? $data.educationForm.graduation_year + "\u5E74" : "",
+    Z: $data.educationForm.graduation_year ? $data.educationForm.graduation_year + "年" : "",
     aa: common_vendor.p({
       type: "arrowright",
       size: "18",
@@ -459,5 +485,6 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     aI: common_vendor.o((...args) => $options.completeRegister && $options.completeRegister(...args))
   } : {});
 }
-var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-1776d0fe"], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/login/register/login_reister.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-f0d703cf"]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/login/register/login_reister.js.map

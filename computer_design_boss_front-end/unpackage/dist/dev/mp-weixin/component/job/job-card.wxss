@@ -1,5 +1,5 @@
 
-.job-card.data-v-0b59c612 {
+.job-card.data-v-8b16e01f {
   background-color: #fff;
   margin: 0;
   padding: 16px;
@@ -8,11 +8,11 @@
   position: relative;
   transition: all 0.3s ease;
 }
-.job-card.data-v-0b59c612:active {
+.job-card.data-v-8b16e01f:active {
   transform: scale(0.98);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
-.right-buttons.data-v-0b59c612 {
+.right-buttons.data-v-8b16e01f {
   position: absolute;
   top: 50%;
   right: 16px;
@@ -23,7 +23,7 @@
   gap: 8px;
   z-index: 10;
 }
-.favorite-btn.data-v-0b59c612 {
+.favorite-btn.data-v-8b16e01f {
   background-color: rgba(255, 255, 255, 0.8);
   padding: 8px;
   border-radius: 50%;
@@ -32,46 +32,46 @@
   align-items: center;
   justify-content: center;
 }
-.favorite-btn.data-v-0b59c612:active {
+.favorite-btn.data-v-8b16e01f:active {
   transform: scale(0.9);
 }
-.card-header.data-v-0b59c612 {
+.card-header.data-v-8b16e01f {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
   padding-right: 80px;
 }
-.job-title.data-v-0b59c612 {
+.job-title.data-v-8b16e01f {
   font-size: 17px;
   font-weight: 600;
   color: #1E1E1E;
   flex: 1;
 }
-.salary.data-v-0b59c612 {
+.salary.data-v-8b16e01f {
   font-size: 16px;
   font-weight: 500;
   color: #007aff;
 }
-.company-info.data-v-0b59c612 {
+.company-info.data-v-8b16e01f {
   margin-bottom: 12px;
   padding-right: 80px;
 }
-.company-name.data-v-0b59c612 {
+.company-name.data-v-8b16e01f {
   font-size: 15px;
   font-weight: 500;
   color: #1E1E1E;
   margin-bottom: 8px;
   display: block;
 }
-.job-tags.data-v-0b59c612 {
+.job-tags.data-v-8b16e01f {
   display: flex;
   flex-wrap: wrap;
   margin-bottom: 8px;
   gap: 6px;
   padding-right: 80px;
 }
-.tag.data-v-0b59c612 {
+.tag.data-v-8b16e01f {
   font-size: 12px;
   color: #6C757D;
   background-color: #F2F5F9;
@@ -80,7 +80,7 @@
   margin-right: 6px;
   margin-bottom: 6px;
 }
-.card-footer.data-v-0b59c612 {
+.card-footer.data-v-8b16e01f {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -89,24 +89,24 @@
   margin-top: 8px;
   padding-right: 80px;
 }
-.location.data-v-0b59c612 {
+.location.data-v-8b16e01f {
   display: flex;
   align-items: center;
   font-size: 13px;
   color: #1E1E1E;
 }
-.location.data-v-0b59c612::before {
+.location.data-v-8b16e01f::before {
   content: "📍";
   margin-right: 4px;
   color: #007aff;
 }
-.time.data-v-0b59c612 {
+.time.data-v-8b16e01f {
   font-size: 13px;
   color: #6C757D;
 }
 
 /* 投递按钮 */
-.apply-btn.data-v-0b59c612 {
+.apply-btn.data-v-8b16e01f {
   background-color: #007aff;
   color: white;
   font-size: 12px;
@@ -118,15 +118,15 @@
   align-items: center;
   transition: all 0.3s ease;
 }
-.apply-btn.applied.data-v-0b59c612 {
+.apply-btn.applied.data-v-8b16e01f {
   background-color: #F2F5F9;
   color: #6C757D;
 }
-.apply-btn.data-v-0b59c612:active {
+.apply-btn.data-v-8b16e01f:active {
   background-color: #0056b3;
   transform: scale(0.95);
 }
-.apply-btn.applied.data-v-0b59c612:active {
+.apply-btn.applied.data-v-8b16e01f:active {
   background-color: #E3E8F0;
   transform: scale(0.95);
 }

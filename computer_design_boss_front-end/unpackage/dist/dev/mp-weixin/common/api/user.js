@@ -1,6 +1,7 @@
 "use strict";
-var common_api_request = require("./request.js");
+const common_api_request = require("./request.js");
 const userApi = {
+  // 用户登录
   login: (loginData) => {
     return common_api_request.requestWithRetry({
       url: "/api/user/login",
@@ -8,6 +9,7 @@ const userApi = {
       data: loginData
     });
   },
+  // 手机号验证码登录
   smsLogin: (loginData) => {
     return common_api_request.requestWithRetry({
       url: "/api/user/sms_login",
@@ -15,6 +17,7 @@ const userApi = {
       data: loginData
     });
   },
+  // 用户注册
   register: (registerData) => {
     return common_api_request.requestWithRetry({
       url: "/api/user/register",
@@ -22,6 +25,7 @@ const userApi = {
       data: registerData
     });
   },
+  // 发送验证码
   sendSmsCode: (data) => {
     return common_api_request.requestWithRetry({
       url: "/api/user/send_sms",
@@ -29,6 +33,7 @@ const userApi = {
       data
     });
   },
+  // 忘记密码
   forgetPassword: (resetData) => {
     return common_api_request.requestWithRetry({
       url: "/api/user/forget_password",
@@ -36,12 +41,14 @@ const userApi = {
       data: resetData
     });
   },
+  // 获取用户信息
   getUserProfile: () => {
     return common_api_request.requestWithRetry({
       url: "/api/user/profile",
       method: "GET"
     });
   },
+  // 更新用户信息
   updateUserProfile: (profileData) => {
     return common_api_request.requestWithRetry({
       url: "/api/user/profile",
@@ -49,6 +56,7 @@ const userApi = {
       data: profileData
     });
   },
+  // 修改密码
   updatePassword: (passwordData) => {
     return common_api_request.requestWithRetry({
       url: "/api/user/password",
@@ -56,6 +64,7 @@ const userApi = {
       data: passwordData
     });
   },
+  // 更新头像
   updateAvatar: (avatarData) => {
     return common_api_request.requestWithRetry({
       url: "/api/user/avatar",
@@ -63,12 +72,14 @@ const userApi = {
       data: avatarData
     });
   },
+  // 获取用户状态
   getUserStatus: () => {
     return common_api_request.requestWithRetry({
       url: "/api/user/status",
       method: "GET"
     });
   },
+  // 用户登出
   logout: () => {
     return common_api_request.requestWithRetry({
       url: "/api/user/logout",
@@ -77,3 +88,4 @@ const userApi = {
   }
 };
 exports.userApi = userApi;
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/common/api/user.js.map

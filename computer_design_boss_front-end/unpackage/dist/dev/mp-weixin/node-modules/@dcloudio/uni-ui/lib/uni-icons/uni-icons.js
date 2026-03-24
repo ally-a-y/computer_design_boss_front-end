@@ -1,5 +1,5 @@
 "use strict";
-var common_vendor = require("../../../../../common/vendor.js");
+const common_vendor = require("../../../../../common/vendor.js");
 const getVal = (val) => {
   const reg = /^[0-9]*$/g;
   return typeof val === "number" || reg.test(val) ? val + "px" : val;
@@ -67,5 +67,6 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     e: common_vendor.o((...args) => $options._onClick && $options._onClick(...args))
   };
 }
-var Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/node_modules/@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue"]]);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render]]);
 wx.createComponent(Component);
+//# sourceMappingURL=../../../../../../.sourcemap/mp-weixin/node-modules/@dcloudio/uni-ui/lib/uni-icons/uni-icons.js.map

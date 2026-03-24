@@ -1,14 +1,13 @@
 "use strict";
-var common_vendor = require("../../../common/vendor.js");
-var common_api_feedback = require("../../../common/api/feedback.js");
-require("../../../common/api/request.js");
-require("../../../common/config.js");
+const common_vendor = require("../../../common/vendor.js");
+const common_api_feedback = require("../../../common/api/feedback.js");
 const _sfc_main = {
   data() {
     return {
       feedbacks: [],
       typeOptions: [],
       typeCodeMap: {},
+      // 保存 type_name -> type_code 映射
       typeIndex: 0,
       newFeedback: {
         complaint_type: null,
@@ -26,51 +25,55 @@ const _sfc_main = {
     goBack() {
       common_vendor.index.navigateBack();
     },
+    // ================= 加载投诉类型 =================
     async loadComplaintTypes() {
       try {
         const res = await common_api_feedback.getComplaintTypes();
-        console.log("\u8F6C\u6362\u540E\u7684collections:");
+        common_vendor.index.__f__("log", "at pages/user/feedback/user_feedback.vue:102", "转换后的collections:");
         const types = res || [];
         this.typeOptions = types.map((t) => t.type_name);
         types.forEach((t) => {
           this.typeCodeMap[t.type_name] = t.type_code;
         });
-        console.log("\u8F6C\u6362\u540E\u7684collections:", this.typeOptions);
+        common_vendor.index.__f__("log", "at pages/user/feedback/user_feedback.vue:111", "转换后的collections:", this.typeOptions);
         if (types.length > 0) {
           this.newFeedback.complaint_type = types[0].type_code;
         }
       } catch (err) {
         common_vendor.index.showToast({
-          title: "\u83B7\u53D6\u6295\u8BC9\u7C7B\u578B\u5931\u8D25",
+          title: "获取投诉类型失败",
           icon: "none"
         });
       }
     },
+    // ================= 加载反馈列表 =================
     async loadFeedbackList() {
       try {
         const res = await common_api_feedback.getFeedbackList({
           page: this.page,
           limit: this.limit
         });
-        console.log("\u8F6C\u6362\u540E\u7684collections:", res);
+        common_vendor.index.__f__("log", "at pages/user/feedback/user_feedback.vue:135", "转换后的collections:", res);
         const list = res || [];
-        console.log("\u8F6C\u6362\u540E\u7684collections:", list);
+        common_vendor.index.__f__("log", "at pages/user/feedback/user_feedback.vue:137", "转换后的collections:", list);
         this.feedbacks = list.map((item) => ({
           id: item.id,
           type: this.typeOptions[item.complaint_type - 1],
+          // 后端最好返回 type_name
           submitTime: item.create_time,
           status: item.is_resolved === 1 ? "processed" : "pending",
-          statusText: item.is_resolved === 1 ? "\u5DF2\u5904\u7406" : "\u5F85\u5904\u7406",
+          statusText: item.is_resolved === 1 ? "已处理" : "待处理",
           description: item.description,
           response: item.feedback_content
         }));
       } catch (err) {
         common_vendor.index.showToast({
-          title: "\u83B7\u53D6\u53CD\u9988\u5217\u8868\u5931\u8D25",
+          title: "获取反馈列表失败",
           icon: "none"
         });
       }
     },
+    // ================= 打开弹窗 =================
     addFeedback() {
       this.newFeedback.description = "";
       this.$refs.addPopup.open();
@@ -80,22 +83,24 @@ const _sfc_main = {
         this.$refs.addPopup.close();
       }
     },
+    // ================= 类型切换 =================
     onTypeChange(e) {
       this.typeIndex = e.detail.value;
       const typeName = this.typeOptions[this.typeIndex];
       this.newFeedback.complaint_type = this.typeCodeMap[typeName];
     },
+    // ================= 提交反馈 =================
     async submitFeedback() {
       if (!this.newFeedback.description.trim()) {
         common_vendor.index.showToast({
-          title: "\u8BF7\u8F93\u5165\u6295\u8BC9\u63CF\u8FF0",
+          title: "请输入投诉描述",
           icon: "none"
         });
         return;
       }
       if (this.newFeedback.description.length < 10) {
         common_vendor.index.showToast({
-          title: "\u63CF\u8FF0\u4E0D\u80FD\u5C11\u4E8E10\u4E2A\u5B57",
+          title: "描述不能少于10个字",
           icon: "none"
         });
         return;
@@ -107,7 +112,7 @@ const _sfc_main = {
         });
         if (res.code === 200) {
           common_vendor.index.showToast({
-            title: "\u53CD\u9988\u63D0\u4EA4\u6210\u529F",
+            title: "反馈提交成功",
             icon: "success"
           });
           this.closePopup();
@@ -115,7 +120,7 @@ const _sfc_main = {
         }
       } catch (err) {
         common_vendor.index.showToast({
-          title: err.message || "\u63D0\u4EA4\u5931\u8D25",
+          title: err.message || "提交失败",
           icon: "none"
         });
       }
@@ -161,11 +166,12 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     k: $data.newFeedback.description,
     l: common_vendor.o(($event) => $data.newFeedback.description = $event.detail.value),
     m: common_vendor.o((...args) => $options.submitFeedback && $options.submitFeedback(...args)),
-    n: common_vendor.sr("addPopup", "6551b80e-1"),
+    n: common_vendor.sr("addPopup", "3fd30a18-1"),
     o: common_vendor.p({
       type: "bottom"
     })
   });
 }
-var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/user/feedback/user_feedback.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/user/feedback/user_feedback.js.map

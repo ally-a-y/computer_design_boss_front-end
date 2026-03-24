@@ -1,5 +1,5 @@
 "use strict";
-var common_vendor = require("../../../common/vendor.js");
+const common_vendor = require("../../../common/vendor.js");
 const _sfc_main = {
   data() {
     return {
@@ -19,8 +19,8 @@ const _sfc_main = {
     },
     cancelDeliver(index) {
       common_vendor.index.showModal({
-        title: "\u63D0\u793A",
-        content: "\u786E\u5B9A\u53D6\u6D88\u6295\u9012\u8BE5\u804C\u4F4D\u5417\uFF1F",
+        title: "提示",
+        content: "确定取消投递该职位吗？",
         success: (res) => {
           if (res.confirm) {
             let delivers = common_vendor.index.getStorageSync("delivers") || [];
@@ -28,7 +28,7 @@ const _sfc_main = {
             common_vendor.index.setStorageSync("delivers", delivers);
             this.delivers = delivers;
             common_vendor.index.showToast({
-              title: "\u5DF2\u53D6\u6D88\u6295\u9012",
+              title: "已取消投递",
               icon: "success"
             });
           }
@@ -38,7 +38,7 @@ const _sfc_main = {
     viewDetails(item) {
       if (!item.id) {
         common_vendor.index.showToast({
-          title: "\u804C\u4F4DID\u4E0D\u5B58\u5728",
+          title: "职位ID不存在",
           icon: "none"
         });
         return;
@@ -64,8 +64,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.t(item.deliverTime),
         e: common_vendor.t(item.statusText),
         f: common_vendor.n(item.status),
-        g: common_vendor.o(($event) => $options.cancelDeliver(index)),
-        h: common_vendor.o(($event) => $options.viewDetails(item)),
+        g: common_vendor.o(($event) => $options.cancelDeliver(index), index),
+        h: common_vendor.o(($event) => $options.viewDetails(item), index),
         i: index
       };
     }),
@@ -78,5 +78,6 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   } : {});
 }
-var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/user/deliver/user_deliver.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/user/deliver/user_deliver.js.map

@@ -1,7 +1,7 @@
 {
   "pages": [
-    "pages/splash/splash",
     "pages/login/login",
+    "pages/splash/splash",
     "pages/login/register/login_reister",
     "pages/login/forget/login_forget",
     "pages/index/index_index",

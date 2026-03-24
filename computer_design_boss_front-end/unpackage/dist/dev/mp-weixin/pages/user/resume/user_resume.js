@@ -1,18 +1,16 @@
 "use strict";
-var common_vendor = require("../../../common/vendor.js");
-var common_api_resume = require("../../../common/api/resume.js");
-require("../../../common/api/request.js");
-require("../../../common/config.js");
+const common_vendor = require("../../../common/vendor.js");
+const common_api_resume = require("../../../common/api/resume.js");
 const _sfc_main = {
   data() {
     return {
-      genderOptions: ["\u7537", "\u5973"],
+      genderOptions: ["男", "女"],
       genderIndex: 0,
-      companySizeOptions: ["\u4E0D\u9650", "\u5C0F\u578B", "\u4E2D\u578B", "\u5927\u578B"],
+      companySizeOptions: ["不限", "小型", "中型", "大型"],
       companySizeIndex: 0,
-      workTypeOptions: ["\u5168\u804C", "\u517C\u804C", "\u5B9E\u4E60"],
+      workTypeOptions: ["全职", "兼职", "实习"],
       workTypeIndex: 0,
-      certTypeOptions: ["\u6280\u80FD\u7C7B", "\u8D44\u683C\u7C7B", "\u8BED\u8A00\u7C7B", "\u5176\u4ED6"],
+      certTypeOptions: ["技能类", "资格类", "语言类", "其他"],
       resume: {
         real_name: "",
         gender: "",
@@ -45,12 +43,16 @@ const _sfc_main = {
         campus_experience: {
           student_union: false,
           student_union_desc: "",
+          // 学生会详细描述
           club: false,
           club_desc: "",
+          // 社团详细描述
           scholarship: false,
           scholarship_desc: "",
+          // 奖学金详细描述
           honor: false,
           honor_desc: ""
+          // 荣誉详细描述         
         },
         certificates: []
       }
@@ -63,22 +65,24 @@ const _sfc_main = {
     goBack() {
       common_vendor.index.navigateBack();
     },
+    /* =============================
+       加载完整简历
+    ============================= */
     async loadResume() {
-      var _a, _b;
       try {
         const basic = await common_api_resume.resumeApi.getBasic();
-        console.log("basic", basic);
+        common_vendor.index.__f__("log", "at pages/user/resume/user_resume.vue:405", "basic", basic);
         const intention = await common_api_resume.resumeApi.getIntention();
-        console.log("intention", intention);
+        common_vendor.index.__f__("log", "at pages/user/resume/user_resume.vue:407", "intention", intention);
         const preference = await common_api_resume.resumeApi.getPreference();
-        console.log("preference", preference);
+        common_vendor.index.__f__("log", "at pages/user/resume/user_resume.vue:409", "preference", preference);
         const campus = await common_api_resume.resumeApi.getCampus();
-        console.log("campus", campus);
+        common_vendor.index.__f__("log", "at pages/user/resume/user_resume.vue:411", "campus", campus);
         const certificates = await common_api_resume.resumeApi.getCertificates();
-        console.log("certificates", certificates);
-        this.companySizeIndex = (_a = preference.company_size_preference) != null ? _a : 0;
-        console.log("\u6682\u65E0\u7B80\u5386", this.resume.intention.city_priority);
-        this.workTypeIndex = (_b = preference.work_type_preference) != null ? _b : 0;
+        common_vendor.index.__f__("log", "at pages/user/resume/user_resume.vue:413", "certificates", certificates);
+        this.companySizeIndex = preference.company_size_preference ?? 0;
+        common_vendor.index.__f__("log", "at pages/user/resume/user_resume.vue:416", "暂无简历", this.resume.intention.city_priority);
+        this.workTypeIndex = preference.work_type_preference ?? 0;
         Object.assign(this.resume, {
           real_name: basic.real_name,
           gender: basic.gender,
@@ -121,18 +125,24 @@ const _sfc_main = {
         this.resume.certificates = certificates || [];
         this.genderIndex = this.resume.gender === 2 ? 1 : 0;
       } catch (err) {
-        console.log("\u6682\u65E0\u7B80\u5386");
+        common_vendor.index.__f__("log", "at pages/user/resume/user_resume.vue:463", "暂无简历");
       }
     },
+    /* =============================
+       保存简历
+    ============================= */
     async saveResume() {
       try {
         await common_api_resume.resumeApi.saveBasic({
           real_name: this.resume.real_name,
           gender: this.resume.gender,
+          // 1=男 2=女
           birth_date: this.resume.birth_date,
           phone: this.resume.phone,
+          // 修正
           email: this.resume.email,
           wechat: this.resume.wechat,
+          // 加回
           city: this.resume.city,
           education_level: this.resume.education_level,
           school_name: this.resume.school_name,
@@ -145,6 +155,7 @@ const _sfc_main = {
           target_industries: this.resume.intention.industry,
           target_positions: this.resume.intention.position,
           city_priority: this.resume.intention.city,
+          // 对应 city_priority
           salary_min: this.resume.intention.salary_min,
           salary_max: this.resume.intention.salary_max,
           availability: this.resume.intention.available_time
@@ -183,16 +194,19 @@ const _sfc_main = {
           }
         }
         common_vendor.index.showToast({
-          title: "\u4FDD\u5B58\u6210\u529F",
+          title: "保存成功",
           icon: "success"
         });
       } catch (err) {
         common_vendor.index.showToast({
-          title: err.message || "\u4FDD\u5B58\u5931\u8D25",
+          title: err.message || "保存失败",
           icon: "none"
         });
       }
     },
+    /* =============================
+       选择器事件处理
+    ============================= */
     onGenderChange(e) {
       this.genderIndex = e.detail.value;
       this.resume.gender = this.genderIndex === 1 ? 2 : 1;
@@ -203,6 +217,9 @@ const _sfc_main = {
     onWorkTypeChange(e) {
       this.workTypeIndex = e.detail.value;
     },
+    /* =============================
+       证书操作
+    ============================= */
     addCertificate() {
       this.resume.certificates.push({
         cert_name: "",
@@ -222,16 +239,16 @@ const _sfc_main = {
         return;
       }
       common_vendor.index.showModal({
-        title: "\u5220\u9664\u8BC1\u4E66",
-        content: "\u786E\u5B9A\u5220\u9664\u6B64\u8BC1\u4E66\u5417\uFF1F",
+        title: "删除证书",
+        content: "确定删除此证书吗？",
         success: async (res) => {
           if (res.confirm) {
             try {
               await common_api_resume.resumeApi.deleteCertificate(cert.id);
               this.resume.certificates.splice(index, 1);
-              common_vendor.index.showToast({ title: "\u5220\u9664\u6210\u529F", icon: "success" });
+              common_vendor.index.showToast({ title: "删除成功", icon: "success" });
             } catch (err) {
-              common_vendor.index.showToast({ title: "\u5220\u9664\u5931\u8D25", icon: "none" });
+              common_vendor.index.showToast({ title: "删除失败", icon: "none" });
             }
           }
         }
@@ -265,7 +282,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     f: common_vendor.o((...args) => $options.onGenderChange && $options.onGenderChange(...args)),
     g: $data.genderIndex,
     h: $data.genderOptions,
-    i: common_vendor.t($data.resume.birth_date || "\u8BF7\u9009\u62E9\u51FA\u751F\u65E5\u671F"),
+    i: common_vendor.t($data.resume.birth_date || "请选择出生日期"),
     j: common_vendor.o((e) => $data.resume.birth_date = e.detail.value),
     k: $data.resume.birth_date,
     l: $data.resume.phone,
@@ -282,7 +299,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     x: common_vendor.o(($event) => $data.resume.school_name = $event.detail.value),
     y: $data.resume.major,
     z: common_vendor.o(($event) => $data.resume.major = $event.detail.value),
-    A: common_vendor.t($data.resume.graduation_year || "\u8BF7\u9009\u62E9\u6BD5\u4E1A\u5E74\u4EFD"),
+    A: common_vendor.t($data.resume.graduation_year || "请选择毕业年份"),
     B: common_vendor.o((e) => $data.resume.graduation_year = e.detail.value.substring(0, 4)),
     C: $data.resume.graduation_year,
     D: $data.resume.gpa,
@@ -359,28 +376,29 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     aP: common_vendor.o((...args) => $options.addCertificate && $options.addCertificate(...args)),
     aQ: common_vendor.f($data.resume.certificates, (certificate, index, i0) => {
       return {
-        a: common_vendor.t($data.certTypeOptions[$options.getCertTypeIndex(certificate.cert_type)] || "\u8BF7\u9009\u62E9\u8BC1\u4E66\u7C7B\u578B"),
-        b: common_vendor.o((e) => $options.onCertTypeChange(e, index)),
+        a: common_vendor.t($data.certTypeOptions[$options.getCertTypeIndex(certificate.cert_type)] || "请选择证书类型"),
+        b: common_vendor.o((e) => $options.onCertTypeChange(e, index), index),
         c: $options.getCertTypeIndex(certificate.cert_type),
         d: certificate.cert_name,
-        e: common_vendor.o(($event) => certificate.cert_name = $event.detail.value),
+        e: common_vendor.o(($event) => certificate.cert_name = $event.detail.value, index),
         f: certificate.cert_level,
-        g: common_vendor.o(($event) => certificate.cert_level = $event.detail.value),
-        h: common_vendor.t(certificate.issue_date || "\u8BF7\u9009\u62E9\u9881\u53D1\u65E5\u671F"),
-        i: common_vendor.o((e) => $options.onCertDateChange(e, index, "issue_date")),
+        g: common_vendor.o(($event) => certificate.cert_level = $event.detail.value, index),
+        h: common_vendor.t(certificate.issue_date || "请选择颁发日期"),
+        i: common_vendor.o((e) => $options.onCertDateChange(e, index, "issue_date"), index),
         j: certificate.issue_date,
-        k: common_vendor.t(certificate.expiry_date || "\u8BF7\u9009\u62E9\u6709\u6548\u671F\uFF08\u53EF\u9009\uFF09"),
-        l: common_vendor.o((e) => $options.onCertDateChange(e, index, "expiry_date")),
+        k: common_vendor.t(certificate.expiry_date || "请选择有效期（可选）"),
+        l: common_vendor.o((e) => $options.onCertDateChange(e, index, "expiry_date"), index),
         m: certificate.expiry_date,
         n: certificate.issuing_authority,
-        o: common_vendor.o(($event) => certificate.issuing_authority = $event.detail.value),
+        o: common_vendor.o(($event) => certificate.issuing_authority = $event.detail.value, index),
         p: certificate.certificate_no,
-        q: common_vendor.o(($event) => certificate.certificate_no = $event.detail.value),
+        q: common_vendor.o(($event) => certificate.certificate_no = $event.detail.value, index),
         r: index
       };
     }),
     aR: $data.certTypeOptions
   });
 }
-var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/user/resume/user_resume.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/user/resume/user_resume.js.map
