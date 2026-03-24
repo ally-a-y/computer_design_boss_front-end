@@ -35,8 +35,6 @@ const _sfc_main = {
       pageSize: 20,
       isRefreshing: false,
       showQuickMenu: false,
-      userInfo: null,
-      userPostCount: 0,
       loadMoreTimer: null,
       isLoadingReplies: false,
       debugMode: false,
@@ -72,13 +70,10 @@ const _sfc_main = {
     };
   },
   onLoad() {
-    this.loadUserInfo();
-    this.loadUserPostCount();
     this.initDefaultCategory();
     this.initTheme();
   },
   onShow() {
-    this.loadUserInfo();
     this.loadPosts(true);
   },
   onUnload() {
@@ -370,26 +365,6 @@ const _sfc_main = {
       common_vendor.index.navigateTo({
         url: "/pages/forum/post?type=share"
       });
-    },
-    loadUserInfo() {
-      let userInfo = common_vendor.index.getStorageSync("userInfo");
-      if (typeof userInfo === "string") {
-        try {
-          userInfo = JSON.parse(userInfo);
-        } catch (e) {
-          userInfo = null;
-        }
-      }
-      this.userInfo = userInfo;
-    },
-    async loadUserPostCount() {
-      if (!this.userInfo)
-        return;
-      try {
-        this.userPostCount = 0;
-      } catch (error) {
-        console.error("\u52A0\u8F7D\u7528\u6237\u53D1\u5E16\u6570\u5931\u8D25:", error);
-      }
     },
     getCategoryName(categoryId) {
       const category = this.categories.find((c) => Number(c.next_category_id) === Number(categoryId));

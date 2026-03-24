@@ -152,8 +152,6 @@ export default {
       pageSize: 20,
       isRefreshing: false,
       showQuickMenu: false,
-      userInfo: null,
-      userPostCount: 0,
       loadMoreTimer: null,
       isLoadingReplies: false,
       debugMode: false, // 手动控制调试模式
@@ -192,14 +190,11 @@ export default {
   },
   
   onLoad() {
-    this.loadUserInfo()
-    this.loadUserPostCount()
     this.initDefaultCategory()
     this.initTheme()
   },
   
   onShow() {
-    this.loadUserInfo()
     // 重新加载帖子数据，确保新发布的话题显示
     this.loadPosts(true)
   },
@@ -617,34 +612,6 @@ export default {
       uni.navigateTo({
         url: '/pages/forum/post?type=share'
       })
-    },
-    
-    // 加载用户信息
-    loadUserInfo() {
-      let userInfo = uni.getStorageSync('userInfo')
-      // 处理userInfo可能是JSON字符串的情况
-      if (typeof userInfo === 'string') {
-        try {
-          userInfo = JSON.parse(userInfo)
-        } catch (e) {
-          userInfo = null
-        }
-      }
-      this.userInfo = userInfo
-    },
-    
-    // 加载用户发帖数
-    async loadUserPostCount() {
-      if (!this.userInfo) return
-      
-      try {
-        // 这里应该调用实际的API
-        // const res = await forumApi.getUserPostCount(this.userInfo.user_id)
-        // this.userPostCount = res.count || 0
-        this.userPostCount = 0 // 模拟数据
-      } catch (error) {
-        console.error('加载用户发帖数失败:', error)
-      }
     },
     
     // 获取分类名称

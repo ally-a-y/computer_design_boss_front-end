@@ -57,16 +57,7 @@ const _sfc_main = {
       }
     },
     applyGlobalTheme(theme) {
-      common_vendor.index.removeClass(document.body, "light-theme");
-      common_vendor.index.removeClass(document.body, "dark-theme");
-      common_vendor.index.addClass(document.body, theme === "dark" ? "dark-theme" : "light-theme");
-      if (theme === "dark") {
-        document.body.style.backgroundColor = "#1a1a1a";
-        document.body.style.color = "#ffffff";
-      } else {
-        document.body.style.backgroundColor = "#f5f5f5";
-        document.body.style.color = "#333333";
-      }
+      console.log("\u5E94\u7528\u4E3B\u9898:", theme);
     },
     listenSystemThemeChange() {
       common_utils_themeSimple.themeManager.onSystemThemeChange((newTheme) => {

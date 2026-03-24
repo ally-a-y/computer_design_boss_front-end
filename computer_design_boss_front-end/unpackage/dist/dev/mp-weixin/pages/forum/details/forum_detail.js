@@ -1,6 +1,7 @@
 "use strict";
 var common_vendor = require("../../../common/vendor.js");
 var common_api_forum = require("../../../common/api/forum.js");
+var common_utils_themeSimple = require("../../../common/utils/theme-simple.js");
 require("../../../common/api/request.js");
 require("../../../common/config.js");
 const _sfc_main = {
@@ -21,7 +22,9 @@ const _sfc_main = {
         "103": "\u79FB\u52A8\u7AEF",
         "104": "\u6570\u636E\u4E0EAI",
         "105": "\u8FD0\u7EF4\u4E0E\u6D4B\u8BD5"
-      }
+      },
+      currentTheme: "light",
+      isDarkMode: false
     };
   },
   computed: {
@@ -33,10 +36,26 @@ const _sfc_main = {
   onLoad(options) {
     this.postId = parseInt(options.id) || null;
     console.log("\u5E16\u5B50ID (\u6574\u6570):", this.postId);
+    this.initTheme();
     this.loadPostDetail();
     this.loadReplies();
   },
+  onUnload() {
+    common_vendor.index.$off("globalThemeChange", this.handleGlobalThemeChange);
+  },
   methods: {
+    initTheme() {
+      this.currentTheme = common_utils_themeSimple.themeManager.getCurrentTheme();
+      this.isDarkMode = this.currentTheme === "dark";
+      common_vendor.index.$on("globalThemeChange", this.handleGlobalThemeChange);
+    },
+    handleGlobalThemeChange(data) {
+      this.currentTheme = data.theme;
+      this.isDarkMode = data.isDark;
+    },
+    goBack() {
+      common_vendor.index.navigateBack();
+    },
     async loadPostDetail() {
       try {
         console.log("=== \u5F00\u59CB\u52A0\u8F7D\u5E16\u5B50\u8BE6\u60C5 ===");
@@ -353,41 +372,45 @@ const _sfc_main = {
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: $data.post
+    a: common_vendor.o((...args) => $options.goBack && $options.goBack(...args)),
+    b: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
+    c: $data.isDarkMode ? "#2c2c2c" : "#ffffff",
+    d: $data.isDarkMode ? "0 2px 8px rgba(0,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.05)",
+    e: $data.post
   }, $data.post ? common_vendor.e({
-    b: common_vendor.o(($event) => $options.goToUserProfile($data.post.user_id)),
-    c: common_vendor.t($data.post.user_id),
-    d: common_vendor.o(($event) => $options.goToUserProfile($data.post.user_id)),
-    e: $options.isOriginalAuthor
+    f: common_vendor.o(($event) => $options.goToUserProfile($data.post.user_id)),
+    g: common_vendor.t($data.post.user_id),
+    h: common_vendor.o(($event) => $options.goToUserProfile($data.post.user_id)),
+    i: $options.isOriginalAuthor
   }, $options.isOriginalAuthor ? {} : {}, {
-    f: common_vendor.t($options.formatTime($data.post.created_at)),
-    g: $data.post.updated_at && $data.post.updated_at !== $data.post.created_at
+    j: common_vendor.t($options.formatTime($data.post.created_at)),
+    k: $data.post.updated_at && $data.post.updated_at !== $data.post.created_at
   }, $data.post.updated_at && $data.post.updated_at !== $data.post.created_at ? {
-    h: common_vendor.t($options.formatTime($data.post.updated_at))
+    l: common_vendor.t($options.formatTime($data.post.updated_at))
   } : {}, {
-    i: common_vendor.t($options.getCategoryName($data.post.category_id)),
-    j: common_vendor.t($data.post.title || $data.post.content),
-    k: common_vendor.t($data.post.content),
-    l: common_vendor.t($data.post.view_count || 0),
-    m: common_vendor.t($data.post.reply_count || 0),
-    n: common_vendor.t($data.post.favorite_count || 0),
-    o: common_vendor.t($data.post.like_count || 0),
-    p: common_vendor.o((...args) => $options.toggleLike && $options.toggleLike(...args)),
-    q: $data.post.is_liked ? 1 : "",
+    m: common_vendor.t($options.getCategoryName($data.post.category_id)),
+    n: common_vendor.t($data.post.title || $data.post.content),
+    o: common_vendor.t($data.post.content),
+    p: common_vendor.t($data.post.view_count || 0),
+    q: common_vendor.t($data.post.reply_count || 0),
     r: common_vendor.t($data.post.favorite_count || 0),
-    s: common_vendor.o((...args) => $options.toggleFavorite && $options.toggleFavorite(...args)),
-    t: $data.post.is_favorited ? 1 : "",
-    v: common_vendor.o((...args) => $options.sharePost && $options.sharePost(...args)),
-    w: common_vendor.o((...args) => $options.reportPost && $options.reportPost(...args))
+    s: common_vendor.t($data.post.like_count || 0),
+    t: common_vendor.o((...args) => $options.toggleLike && $options.toggleLike(...args)),
+    v: $data.post.is_liked ? 1 : "",
+    w: common_vendor.t($data.post.favorite_count || 0),
+    x: common_vendor.o((...args) => $options.toggleFavorite && $options.toggleFavorite(...args)),
+    y: $data.post.is_favorited ? 1 : "",
+    z: common_vendor.o((...args) => $options.sharePost && $options.sharePost(...args)),
+    A: common_vendor.o((...args) => $options.reportPost && $options.reportPost(...args))
   }) : {}, common_vendor.e({
-    x: common_vendor.t($data.replies.length),
-    y: $data.replySort === "time_asc" ? 1 : "",
-    z: common_vendor.o(($event) => $options.switchReplySort("time_asc")),
-    A: $data.replySort === "time_desc" ? 1 : "",
-    B: common_vendor.o(($event) => $options.switchReplySort("time_desc")),
-    C: $data.replySort === "likes" ? 1 : "",
-    D: common_vendor.o(($event) => $options.switchReplySort("likes")),
-    E: common_vendor.f($data.replies, (reply, index, i0) => {
+    B: common_vendor.t($data.replies.length),
+    C: $data.replySort === "time_asc" ? 1 : "",
+    D: common_vendor.o(($event) => $options.switchReplySort("time_asc")),
+    E: $data.replySort === "time_desc" ? 1 : "",
+    F: common_vendor.o(($event) => $options.switchReplySort("time_desc")),
+    G: $data.replySort === "likes" ? 1 : "",
+    H: common_vendor.o(($event) => $options.switchReplySort("likes")),
+    I: common_vendor.f($data.replies, (reply, index, i0) => {
       return common_vendor.e({
         a: common_vendor.o(($event) => $options.goToUserProfile(reply.user_id)),
         b: common_vendor.t(reply.user_id),
@@ -407,21 +430,23 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         n: reply.id
       });
     }),
-    F: $data.replies.length === 0
+    J: $data.replies.length === 0
   }, $data.replies.length === 0 ? {} : {}), common_vendor.e({
-    G: common_vendor.o((...args) => $options.toggleAdvancedEditor && $options.toggleAdvancedEditor(...args)),
-    H: $data.newReply.content,
-    I: common_vendor.o(($event) => $data.newReply.content = $event.detail.value),
-    J: common_vendor.o((...args) => $options.submitReply && $options.submitReply(...args)),
-    K: !$data.newReply.content.trim(),
-    L: $data.showAdvancedEditor
+    K: common_vendor.o((...args) => $options.toggleAdvancedEditor && $options.toggleAdvancedEditor(...args)),
+    L: $data.newReply.content,
+    M: common_vendor.o(($event) => $data.newReply.content = $event.detail.value),
+    N: common_vendor.o((...args) => $options.submitReply && $options.submitReply(...args)),
+    O: !$data.newReply.content.trim(),
+    P: $data.showAdvancedEditor
   }, $data.showAdvancedEditor ? {
-    M: common_vendor.o((...args) => $options.insertBold && $options.insertBold(...args)),
-    N: common_vendor.o((...args) => $options.insertItalic && $options.insertItalic(...args)),
-    O: common_vendor.o((...args) => $options.insertLink && $options.insertLink(...args)),
-    P: common_vendor.o((...args) => $options.insertCode && $options.insertCode(...args)),
-    Q: common_vendor.o((...args) => $options.uploadImage && $options.uploadImage(...args))
-  } : {}));
+    Q: common_vendor.o((...args) => $options.insertBold && $options.insertBold(...args)),
+    R: common_vendor.o((...args) => $options.insertItalic && $options.insertItalic(...args)),
+    S: common_vendor.o((...args) => $options.insertLink && $options.insertLink(...args)),
+    T: common_vendor.o((...args) => $options.insertCode && $options.insertCode(...args)),
+    U: common_vendor.o((...args) => $options.uploadImage && $options.uploadImage(...args))
+  } : {}), {
+    V: $data.isDarkMode ? "#1a1a1a" : "#F8FAFD"
+  });
 }
 var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-2f1ba243"], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/forum/details/forum_detail.vue"]]);
 wx.createPage(MiniProgramPage);

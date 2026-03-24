@@ -1,7 +1,7 @@
 <template>
   <view class="user-page" :style="{ backgroundColor: isDarkMode ? '#1a1a1a' : '#F8FAFD' }">
     <!-- 顶部导航 -->
-    <view class="nav-bar">
+    <view class="nav-bar" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : 'transparent' }">
       <view class="nav-bar-left">
         <!-- 左侧预留空间 -->
       </view>
@@ -26,41 +26,41 @@
       <!-- 功能图标 -->
       <view class="function-icons" :style="{ borderTop: isDarkMode ? '1px solid #404040' : '1px solid #F2F5F9' }">
         <view class="icon-item" @click="navigateToCollection" :style="{ color: isDarkMode ? '#999' : '#6C757D' }">
-          <uni-icons type="star" size="40" color="#ff9500"></uni-icons>
-          <text>收藏职位</text>
+          <uni-icons type="star" size="40" :color="isDarkMode ? '#ffb800' : '#ff9500'"></uni-icons>
+          <text :style="{ color: isDarkMode ? '#999' : '#6C757D' }">收藏职位</text>
         </view>
         <view class="icon-item" @click="navigateToDeliver" :style="{ color: isDarkMode ? '#999' : '#6C757D' }">
           <uni-icons type="paperplane" size="40" color="#007aff"></uni-icons>
-          <text>投递职位</text>
+          <text :style="{ color: isDarkMode ? '#999' : '#6C757D' }">投递职位</text>
         </view>
         <view class="icon-item" @click="navigateToFeedback" :style="{ color: isDarkMode ? '#999' : '#6C757D' }">
-          <uni-icons type="chatbubble" size="40" color="#4cd964"></uni-icons>
-          <text>投诉反馈</text>
+          <uni-icons type="chatbubble" size="40" :color="isDarkMode ? '#52c41a' : '#4cd964'"></uni-icons>
+          <text :style="{ color: isDarkMode ? '#999' : '#6C757D' }">投诉反馈</text>
         </view>
       </view>
     </view>
     
     <!-- 菜单列表 -->
     <view class="menu-list" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#fff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
-      <view class="menu-item" @click="navigateToAccount" :style="{ borderBottom: isDarkMode ? '1px solid #404040' : '1px solid #F2F5F9' }">
+      <view class="menu-item" @click="navigateToAccount" :style="{ borderBottom: isDarkMode ? '1px solid #404040' : '1px solid #F2F5F9', backgroundColor: isDarkMode ? 'transparent' : 'transparent' }">
         <uni-icons type="person" size="30" :color="isDarkMode ? '#999' : '#666'"></uni-icons>
         <text class="menu-text" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">我的账号</text>
         <uni-icons type="right" size="20" :color="isDarkMode ? '#666' : '#999'"></uni-icons>
       </view>
       
-      <view class="menu-item" @click="navigateToDevice" :style="{ borderBottom: isDarkMode ? '1px solid #404040' : '1px solid #F2F5F9' }">
+      <view class="menu-item" @click="navigateToDevice" :style="{ borderBottom: isDarkMode ? '1px solid #404040' : '1px solid #F2F5F9', backgroundColor: isDarkMode ? 'transparent' : 'transparent' }">
         <uni-icons type="phone" size="30" :color="isDarkMode ? '#999' : '#666'"></uni-icons>
         <text class="menu-text" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">登录设备管理</text>
         <uni-icons type="right" size="20" :color="isDarkMode ? '#666' : '#999'"></uni-icons>
       </view>
       
-      <view class="menu-item" @click="navigateToDisplay" :style="{ borderBottom: isDarkMode ? '1px solid #404040' : '1px solid #F2F5F9' }">
+      <view class="menu-item" @click="navigateToDisplay" :style="{ borderBottom: isDarkMode ? '1px solid #404040' : '1px solid #F2F5F9', backgroundColor: isDarkMode ? 'transparent' : 'transparent' }">
         <uni-icons type="settings" size="30" :color="isDarkMode ? '#999' : '#666'"></uni-icons>
         <text class="menu-text" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">显示设置</text>
         <uni-icons type="right" size="20" :color="isDarkMode ? '#666' : '#999'"></uni-icons>
       </view>
       
-      <view class="menu-item" @click="navigateToThemeDemo">
+      <view class="menu-item" @click="navigateToThemeDemo" :style="{ backgroundColor: isDarkMode ? 'transparent' : 'transparent' }">
         <uni-icons type="color" size="30" :color="isDarkMode ? '#999' : '#666'"></uni-icons>
         <text class="menu-text" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">可视化页面</text>
         <uni-icons type="right" size="20" :color="isDarkMode ? '#666' : '#999'"></uni-icons>
@@ -124,7 +124,17 @@ export default {
       // 这里可以检查用户登录状态
       const userInfo = uni.getStorageSync('userInfo')
       if (userInfo) {
-        this.userInfo = JSON.parse(userInfo)
+        // 检查userInfo是否为字符串，如果是则解析，否则直接使用
+        if (typeof userInfo === 'string') {
+          try {
+            this.userInfo = JSON.parse(userInfo)
+          } catch (e) {
+            console.error('解析userInfo失败:', e)
+            this.userInfo = null
+          }
+        } else {
+          this.userInfo = userInfo
+        }
       }
     },
     navigateToResume() {

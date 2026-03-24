@@ -1,5 +1,18 @@
 <template>
-  <view class="forum-detail-container">
+  <view class="forum-detail-container" :style="{ backgroundColor: isDarkMode ? '#1a1a1a' : '#F8FAFD' }">
+    <!-- 顶部导航 -->
+    <view class="nav-bar forum-nav" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
+      <view class="nav-bar-left">
+        <text class="nav-icon" @click="goBack">←</text>
+      </view>
+      <view class="nav-bar-center">
+        <text class="nav-bar-title forum-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">帖子详情</text>
+      </view>
+      <view class="nav-bar-right">
+        <!-- 右侧空白区域，保持布局对称 -->
+      </view>
+    </view>
+    
     <!-- 帖子详情 -->
     <view class="post-detail" v-if="post">
       <!-- 头部信息区 -->
@@ -175,6 +188,7 @@
 
 <script>
 import { forumApi } from '@/common/api/forum.js'
+import { themeManager } from '@/common/utils/theme-simple.js'
 
 export default {
   data() {
@@ -194,7 +208,10 @@ export default {
         '103': '移动端',
         '104': '数据与AI',
         '105': '运维与测试'
-      }
+      },
+      // 主题相关
+      currentTheme: 'light',
+      isDarkMode: false
     }
   },
   
@@ -209,11 +226,42 @@ export default {
     // 确保postId是整数类型
     this.postId = parseInt(options.id) || null
     console.log('帖子ID (整数):', this.postId)
+    this.initTheme()
     this.loadPostDetail()
     this.loadReplies()
   },
   
+  onUnload() {
+    // 清理主题监听
+    uni.$off('globalThemeChange', this.handleGlobalThemeChange)
+  },
+  
   methods: {
+    /**
+     * 初始化主题
+     */
+    initTheme() {
+      // 获取当前主题
+      this.currentTheme = themeManager.getCurrentTheme()
+      this.isDarkMode = this.currentTheme === 'dark'
+      
+      // 监听全局主题变化
+      uni.$on('globalThemeChange', this.handleGlobalThemeChange)
+    },
+    
+    /**
+     * 处理全局主题变化
+     */
+    handleGlobalThemeChange(data) {
+      this.currentTheme = data.theme
+      this.isDarkMode = data.isDark
+    },
+    
+    // 返回上一页
+    goBack() {
+      uni.navigateBack()
+    },
+    
     // 加载帖子详情
     async loadPostDetail() {
       try {
@@ -613,12 +661,75 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '@/common/styles/theme.css';
 .forum-detail-container {
   min-height: 100vh;
   background-color: #F8FAFD;
   display: flex;
   flex-direction: column;
   font-family: -apple-system, Helvetica, Roboto, sans-serif;
+}
+
+/* 论坛导航栏样式 */
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 80px;
+  padding: 0 16px;
+  position: relative;
+}
+
+.nav-bar-left,
+.nav-bar-right {
+  width: 80rpx;
+  display: flex;
+  align-items: center;
+}
+
+.nav-bar-left {
+  justify-content: flex-start;
+}
+
+.nav-bar-right {
+  justify-content: flex-end;
+}
+
+.nav-bar-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+.forum-nav {
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  height: 80px;
+  padding: 0 16px;
+}
+
+.forum-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1E1E1E;
+  text-align: center;
+}
+
+.nav-icon {
+  font-size: 20px;
+  color: #1E1E1E;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.nav-icon:active {
+  color: #007aff;
+  transform: scale(0.95);
 }
 
 /* 帖子详情样式 */

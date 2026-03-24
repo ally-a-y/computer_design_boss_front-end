@@ -505,7 +505,7 @@ const __default__ = {
         common_vendor.index.showToast({ title: "\u8BF7\u7B49\u5F85AI\u54CD\u5E94", icon: "none" });
         return;
       }
-      recorderManager.start({ duration: 6e4, sampleRate: 16e3, numberOfChannels: 1, encodeBitRate: 96e3, format: "mp3" });
+      recorderManager.start({ duration: 18e4, sampleRate: 16e3, numberOfChannels: 1, encodeBitRate: 96e3, format: "mp3" });
     },
     stopRecording() {
       if (!this.isRecording)
@@ -516,7 +516,7 @@ const __default__ = {
       this.recordingTime = 0;
       this.recordingTimer = setInterval(() => {
         this.recordingTime++;
-        if (this.recordingTime >= 60)
+        if (this.recordingTime >= 180)
           this.stopRecording();
       }, 1e3);
     },
@@ -672,12 +672,19 @@ const __default__ = {
         }
         this.showReport = true;
         this.$nextTick(() => {
-          this.drawRadarChart();
+          setTimeout(() => {
+            this.drawRadarChart();
+          }, 200);
         });
       } catch (error) {
         console.error("\u83B7\u53D6\u62A5\u544A\u5931\u8D25", error);
         this.generateMockReport();
         this.showReport = true;
+        this.$nextTick(() => {
+          setTimeout(() => {
+            this.drawRadarChart();
+          }, 200);
+        });
       } finally {
         common_vendor.index.hideLoading();
       }
@@ -719,35 +726,111 @@ const __default__ = {
       this.resetInterview();
       this.interviewStarted = false;
     },
-    exportReport() {
-      common_vendor.index.showModal({
-        title: "\u5BFC\u51FA\u62A5\u544A",
-        content: "\u662F\u5426\u5C06\u9762\u8BD5\u62A5\u544A\u4FDD\u5B58\u5230\u672C\u5730\uFF1F",
-        success: (res) => {
-          if (res.confirm)
-            common_vendor.index.showToast({ title: "\u62A5\u544A\u5DF2\u4FDD\u5B58", icon: "success" });
+    async exportReport() {
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>\u9762\u8BD5\u62A5\u544A</title>
+          <style>
+            body { font-family: '\u5FAE\u8F6F\u96C5\u9ED1', '\u5B8B\u4F53', Arial, sans-serif; margin: 40px; }
+            h1 { color: #333; border-bottom: 2px solid #007aff; padding-bottom: 10px; }
+            .score { font-size: 48px; color: #007aff; font-weight: bold; margin: 20px 0; }
+            .section { margin: 30px 0; }
+            .section-title { font-size: 24px; font-weight: bold; color: #333; margin-bottom: 15px; }
+            .item { margin-bottom: 20px; }
+            .item-title { font-size: 18px; font-weight: bold; color: #007aff; }
+            .item-content { margin-top: 5px; line-height: 1.6; }
+            .suggestion { margin: 10px 0; }
+          </style>
+        </head>
+        <body>
+          <h1>AI \u6A21\u62DF\u9762\u8BD5\u62A5\u544A</h1>
+          <div class="section">
+            <div class="section-title">\u7EFC\u5408\u8BC4\u5206</div>
+            <div class="score">${this.overallScore} / 100</div>
+          </div>
+          <div class="section">
+            <div class="section-title">\u8BE6\u7EC6\u8BC4\u4EF7</div>
+            ${this.evaluationItems.map((item) => `
+              <div class="item">
+                <div class="item-title">${item.title}</div>
+                <div class="item-content">${item.content}</div>
+              </div>
+            `).join("")}
+          </div>
+          <div class="section">
+            <div class="section-title">\u6539\u8FDB\u5EFA\u8BAE</div>
+            ${this.suggestions.map((s) => `<div class="suggestion">\u2022 ${s}</div>`).join("")}
+          </div>
+          <p style="margin-top: 40px; color: #999; font-size: 12px;">\u751F\u6210\u65F6\u95F4\uFF1A${new Date().toLocaleString()}</p>
+        </body>
+        </html>
+      `;
+      const fs = common_vendor.index.getFileSystemManager();
+      const filePath = `${common_vendor.index.env.USER_DATA_PATH}/report_${Date.now()}.doc`;
+      fs.writeFile({
+        filePath,
+        data: htmlContent,
+        encoding: "utf8",
+        success: () => {
+          common_vendor.index.openDocument({
+            filePath,
+            success: () => {
+              common_vendor.index.showToast({ title: "\u62A5\u544A\u5DF2\u4FDD\u5B58\u5E76\u6253\u5F00", icon: "success" });
+            },
+            fail: (err) => {
+              console.error("\u6253\u5F00\u6587\u4EF6\u5931\u8D25", err);
+              common_vendor.index.showToast({ title: "\u62A5\u544A\u5DF2\u4FDD\u5B58\uFF0C\u4F46\u6253\u5F00\u5931\u8D25", icon: "none" });
+            }
+          });
+        },
+        fail: (err) => {
+          console.error("\u5199\u5165\u6587\u4EF6\u5931\u8D25", err);
+          common_vendor.index.showToast({ title: "\u5BFC\u51FA\u5931\u8D25", icon: "none" });
         }
       });
     },
     drawRadarChart() {
-      const ctx = common_vendor.index.createCanvasContext("radarChart", this);
-      this.drawRadarGrid(ctx);
-      this.drawRadarData(ctx);
-      ctx.draw();
+      const query = common_vendor.index.createSelectorQuery().in(this);
+      query.select(".radar-canvas").boundingClientRect((rect) => {
+        if (!rect || rect.width === 0 || rect.height === 0) {
+          setTimeout(() => this.drawRadarChart(), 100);
+          return;
+        }
+        const canvasWidth = rect.width;
+        const canvasHeight = rect.height;
+        const ctx = common_vendor.index.createCanvasContext("radarChart", this);
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+        const centerX = canvasWidth / 2;
+        const centerY = canvasHeight / 2;
+        const radius = Math.min(canvasWidth, canvasHeight) * 0.35;
+        const points = 6;
+        const angleStep = Math.PI * 2 / points;
+        this.drawRadarGrid(ctx, centerX, centerY, radius, points, angleStep);
+        const score = this.overallScore / 100;
+        const data = [0.8 * score, 0.85 * score, 0.75 * score, 0.9 * score, 0.8 * score, 0.85 * score];
+        this.drawRadarData(ctx, centerX, centerY, radius, points, angleStep, data);
+        const labels = ["\u6280\u672F", "\u6C9F\u901A", "\u7ECF\u9A8C", "\u6001\u5EA6", "\u6F5C\u529B", "\u7A33\u5B9A"];
+        this.drawRadarLabels(ctx, centerX, centerY, radius, points, angleStep, labels);
+        ctx.draw();
+      }).exec();
     },
-    drawRadarGrid(ctx) {
-      const centerX = 150, centerY = 150, radius = 100, points = 6;
-      const angleStep = Math.PI * 2 / points;
+    drawRadarGrid(ctx, centerX, centerY, radius, points, angleStep) {
       ctx.setStrokeStyle("#e0e0e0");
       ctx.setLineWidth(1);
       for (let i = 1; i <= 5; i++) {
         ctx.beginPath();
+        const r = radius * i / 5;
         for (let j = 0; j <= points; j++) {
           const angle = j * angleStep - Math.PI / 2;
-          const r = radius * i / 5;
           const x = centerX + Math.cos(angle) * r;
           const y = centerY + Math.sin(angle) * r;
-          j === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+          if (j === 0)
+            ctx.moveTo(x, y);
+          else
+            ctx.lineTo(x, y);
         }
         ctx.closePath();
         ctx.stroke();
@@ -759,21 +842,8 @@ const __default__ = {
         ctx.lineTo(centerX + Math.cos(angle) * radius, centerY + Math.sin(angle) * radius);
         ctx.stroke();
       }
-      ctx.setFontSize(12);
-      ctx.setFillStyle("#666");
-      const labels = ["\u6280\u672F", "\u6C9F\u901A", "\u7ECF\u9A8C", "\u6001\u5EA6", "\u6F5C\u529B", "\u7A33\u5B9A"];
-      for (let i = 0; i < points; i++) {
-        const angle = i * angleStep - Math.PI / 2;
-        const x = centerX + Math.cos(angle) * (radius + 20);
-        const y = centerY + Math.sin(angle) * (radius + 20);
-        ctx.fillText(labels[i], x - 12, y + 6);
-      }
     },
-    drawRadarData(ctx) {
-      const centerX = 150, centerY = 150, radius = 100, points = 6;
-      const angleStep = Math.PI * 2 / points;
-      const score = this.overallScore / 100;
-      const data = [0.8 * score, 0.85 * score, 0.75 * score, 0.9 * score, 0.8 * score, 0.85 * score];
+    drawRadarData(ctx, centerX, centerY, radius, points, angleStep, data) {
       ctx.setFillStyle("rgba(0, 122, 255, 0.3)");
       ctx.setStrokeStyle("#007aff");
       ctx.setLineWidth(2);
@@ -783,7 +853,10 @@ const __default__ = {
         const value = data[i % points];
         const x = centerX + Math.cos(angle) * (radius * value);
         const y = centerY + Math.sin(angle) * (radius * value);
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        if (i === 0)
+          ctx.moveTo(x, y);
+        else
+          ctx.lineTo(x, y);
       }
       ctx.closePath();
       ctx.fill();
@@ -797,6 +870,17 @@ const __default__ = {
         ctx.beginPath();
         ctx.arc(x, y, 4, 0, Math.PI * 2);
         ctx.fill();
+      }
+    },
+    drawRadarLabels(ctx, centerX, centerY, radius, points, angleStep, labels) {
+      ctx.setFontSize(12);
+      ctx.setFillStyle("#666");
+      const labelRadius = radius + 18;
+      for (let i = 0; i < points; i++) {
+        const angle = i * angleStep - Math.PI / 2;
+        const x = centerX + Math.cos(angle) * labelRadius;
+        const y = centerY + Math.sin(angle) * labelRadius;
+        ctx.fillText(labels[i], x - 12, y + 6);
       }
     },
     resetInterview() {

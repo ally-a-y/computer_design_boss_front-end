@@ -32,7 +32,16 @@ const _sfc_main = {
     checkLoginStatus() {
       const userInfo = common_vendor.index.getStorageSync("userInfo");
       if (userInfo) {
-        this.userInfo = JSON.parse(userInfo);
+        if (typeof userInfo === "string") {
+          try {
+            this.userInfo = JSON.parse(userInfo);
+          } catch (e) {
+            console.error("\u89E3\u6790userInfo\u5931\u8D25:", e);
+            this.userInfo = null;
+          }
+        } else {
+          this.userInfo = userInfo;
+        }
       }
     },
     navigateToResume() {
@@ -105,61 +114,53 @@ if (!Array) {
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return {
     a: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
-    b: common_vendor.t($data.userInfo.name || "\u5DF2\u767B\u5F55"),
-    c: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
-    d: common_vendor.o((...args) => $options.navigateToResume && $options.navigateToResume(...args)),
-    e: common_vendor.p({
+    b: $data.isDarkMode ? "#2c2c2c" : "transparent",
+    c: common_vendor.t($data.userInfo.name || "\u5DF2\u767B\u5F55"),
+    d: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
+    e: common_vendor.o((...args) => $options.navigateToResume && $options.navigateToResume(...args)),
+    f: common_vendor.p({
       type: "star",
       size: "40",
-      color: "#ff9500"
+      color: $data.isDarkMode ? "#ffb800" : "#ff9500"
     }),
-    f: common_vendor.o((...args) => $options.navigateToCollection && $options.navigateToCollection(...args)),
     g: $data.isDarkMode ? "#999" : "#6C757D",
-    h: common_vendor.p({
+    h: common_vendor.o((...args) => $options.navigateToCollection && $options.navigateToCollection(...args)),
+    i: $data.isDarkMode ? "#999" : "#6C757D",
+    j: common_vendor.p({
       type: "paperplane",
       size: "40",
       color: "#007aff"
     }),
-    i: common_vendor.o((...args) => $options.navigateToDeliver && $options.navigateToDeliver(...args)),
-    j: $data.isDarkMode ? "#999" : "#6C757D",
-    k: common_vendor.p({
+    k: $data.isDarkMode ? "#999" : "#6C757D",
+    l: common_vendor.o((...args) => $options.navigateToDeliver && $options.navigateToDeliver(...args)),
+    m: $data.isDarkMode ? "#999" : "#6C757D",
+    n: common_vendor.p({
       type: "chatbubble",
       size: "40",
-      color: "#4cd964"
+      color: $data.isDarkMode ? "#52c41a" : "#4cd964"
     }),
-    l: common_vendor.o((...args) => $options.navigateToFeedback && $options.navigateToFeedback(...args)),
-    m: $data.isDarkMode ? "#999" : "#6C757D",
-    n: $data.isDarkMode ? "1px solid #404040" : "1px solid #F2F5F9",
-    o: $data.isDarkMode ? "#2c2c2c" : "#fff",
-    p: $data.isDarkMode ? "0 2px 8px rgba(0,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.05)",
-    q: common_vendor.p({
+    o: $data.isDarkMode ? "#999" : "#6C757D",
+    p: common_vendor.o((...args) => $options.navigateToFeedback && $options.navigateToFeedback(...args)),
+    q: $data.isDarkMode ? "#999" : "#6C757D",
+    r: $data.isDarkMode ? "1px solid #404040" : "1px solid #F2F5F9",
+    s: $data.isDarkMode ? "#2c2c2c" : "#fff",
+    t: $data.isDarkMode ? "0 2px 8px rgba(0,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.05)",
+    v: common_vendor.p({
       type: "person",
       size: "30",
       color: $data.isDarkMode ? "#999" : "#666"
     }),
-    r: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
-    s: common_vendor.p({
+    w: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
+    x: common_vendor.p({
       type: "right",
       size: "20",
       color: $data.isDarkMode ? "#666" : "#999"
     }),
-    t: common_vendor.o((...args) => $options.navigateToAccount && $options.navigateToAccount(...args)),
-    v: $data.isDarkMode ? "1px solid #404040" : "1px solid #F2F5F9",
-    w: common_vendor.p({
-      type: "phone",
-      size: "30",
-      color: $data.isDarkMode ? "#999" : "#666"
-    }),
-    x: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
-    y: common_vendor.p({
-      type: "right",
-      size: "20",
-      color: $data.isDarkMode ? "#666" : "#999"
-    }),
-    z: common_vendor.o((...args) => $options.navigateToDevice && $options.navigateToDevice(...args)),
-    A: $data.isDarkMode ? "1px solid #404040" : "1px solid #F2F5F9",
+    y: common_vendor.o((...args) => $options.navigateToAccount && $options.navigateToAccount(...args)),
+    z: $data.isDarkMode ? "1px solid #404040" : "1px solid #F2F5F9",
+    A: $data.isDarkMode ? "transparent" : "transparent",
     B: common_vendor.p({
-      type: "settings",
+      type: "phone",
       size: "30",
       color: $data.isDarkMode ? "#999" : "#666"
     }),
@@ -169,26 +170,42 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       size: "20",
       color: $data.isDarkMode ? "#666" : "#999"
     }),
-    E: common_vendor.o((...args) => $options.navigateToDisplay && $options.navigateToDisplay(...args)),
+    E: common_vendor.o((...args) => $options.navigateToDevice && $options.navigateToDevice(...args)),
     F: $data.isDarkMode ? "1px solid #404040" : "1px solid #F2F5F9",
-    G: common_vendor.p({
-      type: "color",
+    G: $data.isDarkMode ? "transparent" : "transparent",
+    H: common_vendor.p({
+      type: "settings",
       size: "30",
       color: $data.isDarkMode ? "#999" : "#666"
     }),
-    H: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
-    I: common_vendor.p({
+    I: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
+    J: common_vendor.p({
       type: "right",
       size: "20",
       color: $data.isDarkMode ? "#666" : "#999"
     }),
-    J: common_vendor.o((...args) => $options.navigateToThemeDemo && $options.navigateToThemeDemo(...args)),
-    K: $data.isDarkMode ? "#2c2c2c" : "#fff",
-    L: $data.isDarkMode ? "0 2px 8px rgba(0,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.05)",
-    M: common_vendor.o((...args) => $options.logout && $options.logout(...args)),
-    N: $data.isDarkMode ? "#2c2c2c" : "#fff",
-    O: $data.isDarkMode ? "0 2px 8px rgba(0,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.05)",
-    P: $data.isDarkMode ? "#1a1a1a" : "#F8FAFD"
+    K: common_vendor.o((...args) => $options.navigateToDisplay && $options.navigateToDisplay(...args)),
+    L: $data.isDarkMode ? "1px solid #404040" : "1px solid #F2F5F9",
+    M: $data.isDarkMode ? "transparent" : "transparent",
+    N: common_vendor.p({
+      type: "color",
+      size: "30",
+      color: $data.isDarkMode ? "#999" : "#666"
+    }),
+    O: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
+    P: common_vendor.p({
+      type: "right",
+      size: "20",
+      color: $data.isDarkMode ? "#666" : "#999"
+    }),
+    Q: common_vendor.o((...args) => $options.navigateToThemeDemo && $options.navigateToThemeDemo(...args)),
+    R: $data.isDarkMode ? "transparent" : "transparent",
+    S: $data.isDarkMode ? "#2c2c2c" : "#fff",
+    T: $data.isDarkMode ? "0 2px 8px rgba(0,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.05)",
+    U: common_vendor.o((...args) => $options.logout && $options.logout(...args)),
+    V: $data.isDarkMode ? "#2c2c2c" : "#fff",
+    W: $data.isDarkMode ? "0 2px 8px rgba(0,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.05)",
+    X: $data.isDarkMode ? "#1a1a1a" : "#F8FAFD"
   };
 }
 var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/user/user.vue"]]);

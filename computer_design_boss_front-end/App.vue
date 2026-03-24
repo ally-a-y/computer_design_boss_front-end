@@ -44,21 +44,9 @@
 			 * 应用全局主题
 			 */
 			applyGlobalTheme(theme) {
-				// 移除所有主题类
-				uni.removeClass(document.body, 'light-theme')
-				uni.removeClass(document.body, 'dark-theme')
-				
-				// 添加当前主题类
-				uni.addClass(document.body, theme === 'dark' ? 'dark-theme' : 'light-theme')
-				
-				// 设置页面背景色
-				if (theme === 'dark') {
-					document.body.style.backgroundColor = '#1a1a1a'
-					document.body.style.color = '#ffffff'
-				} else {
-					document.body.style.backgroundColor = '#f5f5f5'
-					document.body.style.color = '#333333'
-				}
+				// 在微信小程序环境中，document对象不存在，所以我们不需要操作DOM
+				// 主题切换通过CSS变量和页面内的动态样式来实现
+				console.log('应用主题:', theme)
 			},
 			
 			/**

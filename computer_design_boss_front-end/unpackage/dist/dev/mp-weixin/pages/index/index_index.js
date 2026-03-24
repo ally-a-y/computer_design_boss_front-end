@@ -247,9 +247,17 @@ const _sfc_main = {
       this.applyFilters();
     },
     onSearchInput() {
+      if (this.allJobs.length === 0) {
+        console.log("allJobs\u4E3A\u7A7A\uFF0C\u4F7F\u7528\u6A21\u62DF\u6570\u636E");
+        this.allJobs = this.getMockJobsData();
+      }
       this.applyFilters();
     },
     applyFilters() {
+      if (this.allJobs.length === 0) {
+        console.log("allJobs\u4E3A\u7A7A\uFF0C\u4F7F\u7528\u6A21\u62DF\u6570\u636E");
+        this.allJobs = this.getMockJobsData();
+      }
       let filteredJobs = [...this.allJobs];
       if (this.currentCategory) {
         const currentCatNum = Number(this.currentCategory);

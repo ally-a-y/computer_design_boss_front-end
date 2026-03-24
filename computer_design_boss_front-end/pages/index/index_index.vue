@@ -378,51 +378,62 @@ export default {
     
     // 搜索输入事件
     onSearchInput() {
+      // 确保allJobs有数据
+      if (this.allJobs.length === 0) {
+        console.log('allJobs为空，使用模拟数据')
+        this.allJobs = this.getMockJobsData()
+      }
       this.applyFilters()
     },
     
     // 应用所有筛选条件
     applyFilters() {
+      // 确保allJobs有数据
+      if (this.allJobs.length === 0) {
+        console.log('allJobs为空，使用模拟数据')
+        this.allJobs = this.getMockJobsData()
+      }
+      
       let filteredJobs = [...this.allJobs]
       
       // 应用分类筛选
-        if (this.currentCategory) {
-          // 根据实际数据库结构处理分类筛选
-          const currentCatNum = Number(this.currentCategory)
+      if (this.currentCategory) {
+        // 根据实际数据库结构处理分类筛选
+        const currentCatNum = Number(this.currentCategory)
+        
+        // 将Proxy对象转换为普通数组，并确保所有元素为数字类型
+        const selectedSubCats = Array.from(this.selectedSubCategories).map(id => Number(id))
+        
+        filteredJobs = filteredJobs.filter(job => {
+          // 确保job存在且有有效的category_id
+          if (!job || job.category_id === null) {
+            return false
+          }
           
-          // 将Proxy对象转换为普通数组，并确保所有元素为数字类型
-          const selectedSubCats = Array.from(this.selectedSubCategories).map(id => Number(id))
+          // 确保jobCategoryId为数字类型
+          const jobCategoryId = Number(job.category_id)
           
-          filteredJobs = filteredJobs.filter(job => {
-            // 确保job存在且有有效的category_id
-            if (!job || job.category_id === null) {
-              return false
-            }
-            
-            // 确保jobCategoryId为数字类型
-            const jobCategoryId = Number(job.category_id)
-            
-            // 如果选择了技术开发类主分类（100）
-            if (currentCatNum === 100) {
-              if (selectedSubCats.length > 0) {
-                // 使用OR逻辑：职位属于任意一个选择的子分类
-                return selectedSubCats.some(catId => catId === jobCategoryId)
-              } else {
-                return this.techCategories.includes(jobCategoryId)
-              }
-            } else if (this.techCategories.includes(currentCatNum)) {
-              // 如果点击的是技术开发的子分类
-              return jobCategoryId === currentCatNum
-            } else if (this.designCategories.includes(currentCatNum)) {
-              return this.designCategories.includes(jobCategoryId)
-            } else if (this.manageCategories.includes(currentCatNum)) {
-              return this.manageCategories.includes(jobCategoryId)
+          // 如果选择了技术开发类主分类（100）
+          if (currentCatNum === 100) {
+            if (selectedSubCats.length > 0) {
+              // 使用OR逻辑：职位属于任意一个选择的子分类
+              return selectedSubCats.some(catId => catId === jobCategoryId)
             } else {
-              // 对于具体分类ID，直接匹配
-              return jobCategoryId === currentCatNum
+              return this.techCategories.includes(jobCategoryId)
             }
-          })
-        }
+          } else if (this.techCategories.includes(currentCatNum)) {
+            // 如果点击的是技术开发的子分类
+            return jobCategoryId === currentCatNum
+          } else if (this.designCategories.includes(currentCatNum)) {
+            return this.designCategories.includes(jobCategoryId)
+          } else if (this.manageCategories.includes(currentCatNum)) {
+            return this.manageCategories.includes(jobCategoryId)
+          } else {
+            // 对于具体分类ID，直接匹配
+            return jobCategoryId === currentCatNum
+          }
+        })
+      }
       
       // 应用关键词搜索
       if (this.keyword && this.keyword.trim() !== '') {
