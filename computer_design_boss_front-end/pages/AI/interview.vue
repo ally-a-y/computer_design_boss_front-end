@@ -84,9 +84,8 @@
       </view>
     </view>
 
-    <!-- 面试交互区 - 全新布局 -->
+    <!-- 面试交互区  -->
     <view v-else class="interview-area">
-      <!-- 进度条区域 -->
       <view class="progress-section">
         <text class="progress-text">面试进度 {{ currentQuestion }}/{{ totalQuestions }}</text>
         <view class="progress-bar">
@@ -99,7 +98,9 @@
       <view class="interviewer-status-bar">
         <view class="status-left">
           <view class="avatar-small">
-            <image src="/static/ai/interviewer.png" mode="aspectFit"></image>
+            <view class="avatar-gradient">
+              <text class="avatar-emoji">🤖</text>
+            </view>
           </view>
           <text class="interviewer-name">AI面试官</text>
         </view>
@@ -136,7 +137,7 @@
 
       <!-- 底部面板：左侧技巧 + 右侧控制区 -->
       <view class="bottom-panel">
-        <!-- 面试技巧卡片（可折叠） -->
+        <!-- 面试技巧卡片 -->
         <view class="tips-card" :class="{ collapsed: tipsCollapsed }">
           <view class="tips-header" @click="toggleTips">
             <text class="tips-title">面试技巧</text>
@@ -1581,7 +1582,6 @@ export default {
   }
 }
 
-// ==================== 全新面试交互区样式 ====================
 .interview-area {
   flex: 1;
   display: flex;
@@ -1624,7 +1624,6 @@ export default {
     }
   }
 
-  // 顶部面试官状态条（横向）
   .interviewer-status-bar {
     display: flex;
     justify-content: space-between;
@@ -1695,7 +1694,6 @@ export default {
     }
   }
 
-  // 聊天主区域 - 最大化空间
   .chat-section-main {
     flex: 1;
     overflow: hidden;
@@ -1704,7 +1702,7 @@ export default {
     .chat-messages {
       height: 100%;
       padding: 20rpx 10rpx;
-
+	  box-sizing: border-box;
       .chat-message {
         margin-bottom: 30rpx;
 
@@ -1714,6 +1712,7 @@ export default {
             border: 1rpx solid #e9edf2;
             border-radius: 24rpx 24rpx 24rpx 12rpx;
             margin-right: 80rpx;
+			margin-left: 0;
             box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.02);
           }
         }
@@ -1728,6 +1727,8 @@ export default {
             color: #fff;
             border-radius: 24rpx 24rpx 12rpx 24rpx;
             margin-left: 80rpx;
+			margin-right: 0;  
+			max-width: 85%;
           }
         }
 
@@ -1777,7 +1778,6 @@ export default {
     }
   }
 
-  // 底部面板（左右两栏）
   .bottom-panel {
     flex-shrink: 0;
     display: flex;
@@ -1786,7 +1786,6 @@ export default {
     background-color: #fff;
     border-top: 1rpx solid #eef2f6;
     
-    // 左侧技巧卡片
     .tips-card {
       flex: 1.2;
       background-color: #f8fafd;
@@ -1835,7 +1834,6 @@ export default {
       }
     }
     
-    // 右侧控制按钮组
     .control-buttons {
       flex: 1;
       display: flex;
@@ -1849,7 +1847,7 @@ export default {
         align-items: center;
         justify-content: center;
         background: transparent;
-        border: none;
+        border: 3rpx solid #e0e0e0;  
         padding: 12rpx 20rpx;
         border-radius: 40rpx;
         transition: all 0.2s;
@@ -1870,8 +1868,24 @@ export default {
           transform: scale(0.96);
         }
         
-        &.end-btn text {
-          color: #ff6b6b;
+        &.end-btn {
+          border: 3rpx solid #ff6b6b;  
+          text {
+            color: #ff6b6b;
+          }
+          image {
+            filter: brightness(0) saturate(100%) invert(47%) sepia(98%) saturate(1175%) hue-rotate(328deg) brightness(101%) contrast(101%);
+          }
+        }
+        
+        &.replay-btn {
+          border: 3rpx solid #007aff;  
+          text {
+            color: #007aff;
+          }
+          image {
+            filter: brightness(0) saturate(100%) invert(30%) sepia(98%) saturate(2000%) hue-rotate(200deg) brightness(95%) contrast(95%);
+          }
         }
         
         &[disabled] {
@@ -1950,7 +1964,6 @@ export default {
   }
 }
 
-// 响应式：窄屏底部面板垂直排列
 @media (max-width: 768px) {
   .interview-area .bottom-panel {
     flex-direction: column;
@@ -1970,7 +1983,6 @@ export default {
   }
 }
 
-// 动画
 @keyframes waveMini {
   0%, 100% { height: 16rpx; opacity: 0.6; }
   50% { height: 32rpx; opacity: 1; }
@@ -1992,7 +2004,7 @@ export default {
   100% { transform: scale(1.4); opacity: 0; }
 }
 
-// ==================== 报告弹窗样式（保持不变） ====================
+// ==================== 报告弹窗样式 ====================
 .report-overlay {
   position: fixed;
   top: 0;
@@ -2408,7 +2420,16 @@ export default {
         .tips-header .tips-title { color: #eee; }
         .tip-item text { color: #bbb; }
       }
-      .control-buttons .ctrl-btn text { color: #aaa; }
+      .control-buttons .ctrl-btn {
+        border: 3rpx solid #4a4a4a;  
+        &.end-btn {
+          border: 3rpx solid #ff6b6b;
+        }
+        &.replay-btn {
+          border: 3rpx solid #007aff;
+        }
+        text { color: #aaa; }
+      }
     }
   }
   
