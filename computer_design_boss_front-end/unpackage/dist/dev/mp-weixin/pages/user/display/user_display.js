@@ -1,15 +1,14 @@
 "use strict";
-const common_vendor = require("../../../common/vendor.js");
-const common_utils_themeSimple = require("../../../common/utils/theme-simple.js");
+var common_vendor = require("../../../common/vendor.js");
+var common_utils_themeSimple = require("../../../common/utils/theme-simple.js");
 const _sfc_main = {
   data() {
     return {
       themeMode: "system",
-      // 默认跟随系统
       availableThemes: [
-        { key: "light", name: "浅色模式", icon: "☀️" },
-        { key: "dark", name: "深色模式", icon: "🌙" },
-        { key: "system", name: "跟随系统", icon: "⚙️" }
+        { key: "light", name: "\u6D45\u8272\u6A21\u5F0F", icon: "\u2600\uFE0F" },
+        { key: "dark", name: "\u6DF1\u8272\u6A21\u5F0F", icon: "\u{1F319}" },
+        { key: "system", name: "\u8DDF\u968F\u7CFB\u7EDF", icon: "\u2699\uFE0F" }
       ],
       currentTheme: "light",
       isDarkMode: false,
@@ -29,7 +28,7 @@ const _sfc_main = {
       this.updatePageTheme();
       const themeName = this.getThemeText(mode);
       common_vendor.index.showToast({
-        title: `已切换到${themeName}`,
+        title: `\u5DF2\u5207\u6362\u5230${themeName}`,
         icon: "success",
         duration: 1500
       });
@@ -114,6 +113,5 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     D: $data.pageTextColor
   });
 }
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render]]);
+var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/user/display/user_display.vue"]]);
 wx.createPage(MiniProgramPage);
-//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/user/display/user_display.js.map

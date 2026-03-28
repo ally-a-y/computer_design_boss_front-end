@@ -1,6 +1,6 @@
 "use strict";
-const common_vendor = require("../../common/vendor.js");
-const common_assets = require("../../common/assets.js");
+var common_vendor = require("../../common/vendor.js");
+var _imports_0 = "/static/logo.png";
 const _sfc_main = {
   data() {
     return {};
@@ -22,9 +22,8 @@ const _sfc_main = {
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return {
-    a: common_assets._imports_0
+    a: _imports_0
   };
 }
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-b5d3b004"]]);
+var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-30b72be6"], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/splash/splash.vue"]]);
 wx.createPage(MiniProgramPage);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/splash/splash.js.map

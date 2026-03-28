@@ -1,34 +1,22 @@
 "use strict";
-const common_vendor = require("../../../../../common/vendor.js");
+var common_vendor = require("../../../../../common/vendor.js");
 const _sfc_main = {
   name: "UniDrawer",
   components: {},
   emits: ["change"],
   props: {
-    /**
-     * 显示模式（左、右），只在初始化生效
-     */
     mode: {
       type: String,
       default: ""
     },
-    /**
-     * 蒙层显示状态
-     */
     mask: {
       type: Boolean,
       default: true
     },
-    /**
-     * 遮罩是否可点击关闭
-     */
     maskClick: {
       type: Boolean,
       default: true
     },
-    /**
-     * 抽屉宽度
-     */
     width: {
       type: Number,
       default: 220
@@ -86,6 +74,5 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     i: common_vendor.o((...args) => $options.clear && $options.clear(...args))
   } : {});
 }
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-183a7e94"]]);
+var Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-22378bf4"], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/node_modules/@dcloudio/uni-ui/lib/uni-drawer/uni-drawer.vue"]]);
 wx.createComponent(Component);
-//# sourceMappingURL=../../../../../../.sourcemap/mp-weixin/node-modules/@dcloudio/uni-ui/lib/uni-drawer/uni-drawer.js.map

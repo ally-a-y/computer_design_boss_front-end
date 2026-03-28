@@ -1,15 +1,16 @@
 "use strict";
-const common_vendor = require("../../common/vendor.js");
-const common_utils_themeSimple = require("../../common/utils/theme-simple.js");
-const common_assets = require("../../common/assets.js");
+var common_vendor = require("../../common/vendor.js");
+var common_utils_themeSimple = require("../../common/utils/theme-simple.js");
+var common_api_user = require("../../common/api/user.js");
+require("../../common/api/request.js");
+require("../../common/config.js");
 const _sfc_main = {
   data() {
     return {
       userInfo: {
-        name: "张三",
+        name: "\u5F20\u4E09",
         avatar: "/static/logo.png"
       },
-      // 主题相关
       currentTheme: "light",
       isDarkMode: false
     };
@@ -22,35 +23,60 @@ const _sfc_main = {
     common_vendor.index.$off("globalThemeChange", this.handleGlobalThemeChange);
   },
   methods: {
-    /**
-     * 初始化主题
-     */
     initTheme() {
       this.currentTheme = common_utils_themeSimple.themeManager.getCurrentTheme();
       this.isDarkMode = this.currentTheme === "dark";
       common_vendor.index.$on("globalThemeChange", this.handleGlobalThemeChange);
     },
-    /**
-     * 处理全局主题变化
-     */
     handleGlobalThemeChange(data) {
       this.currentTheme = data.theme;
       this.isDarkMode = data.isDark;
     },
-    checkLoginStatus() {
+    async checkLoginStatus() {
       const userInfo = common_vendor.index.getStorageSync("userInfo");
       if (userInfo) {
         if (typeof userInfo === "string") {
           try {
             this.userInfo = JSON.parse(userInfo);
           } catch (e) {
-            common_vendor.index.__f__("error", "at pages/user/user.vue:132", "解析userInfo失败:", e);
+            console.error("\u89E3\u6790userInfo\u5931\u8D25:", e);
             this.userInfo = null;
           }
         } else {
           this.userInfo = userInfo;
         }
+        try {
+          const res = await common_api_user.userApi.getUserProfile();
+          if (res) {
+            this.userInfo = res;
+            common_vendor.index.setStorageSync("userInfo", JSON.stringify(res));
+          }
+        } catch (error) {
+          console.error("\u83B7\u53D6\u7528\u6237\u4FE1\u606F\u5931\u8D25:", error);
+        }
       }
+    },
+    isValidAvatar(avatar) {
+      if (!avatar || avatar === "") {
+        return false;
+      }
+      if (avatar.startsWith("http://") || avatar.startsWith("https://") || avatar.startsWith("/")) {
+        return false;
+      }
+      const cleaned = avatar.replace(/\s+/g, "");
+      return cleaned.length > 0;
+    },
+    decodeHtmlEntities(text) {
+      const entities = {
+        "&amp;": "&",
+        "&lt;": "<",
+        "&gt;": ">",
+        "&quot;": '"',
+        "&#39;": "'"
+      };
+      return text.replace(/&[#\w]+;/g, (entity) => {
+        return entities[entity] || entity;
+      });
     },
     navigateToResume() {
       common_vendor.index.navigateTo({
@@ -94,14 +120,14 @@ const _sfc_main = {
     },
     logout() {
       common_vendor.index.showModal({
-        title: "提示",
-        content: "确定要退出登录吗？",
+        title: "\u63D0\u793A",
+        content: "\u786E\u5B9A\u8981\u9000\u51FA\u767B\u5F55\u5417\uFF1F",
         success: (res) => {
           if (res.confirm) {
             common_vendor.index.removeStorageSync("token");
             common_vendor.index.removeStorageSync("userInfo");
             common_vendor.index.showToast({
-              title: "已退出登录",
+              title: "\u5DF2\u9000\u51FA\u767B\u5F55",
               icon: "success"
             });
             setTimeout(() => {
@@ -123,8 +149,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return {
     a: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
     b: $data.isDarkMode ? "#2c2c2c" : "transparent",
-    c: common_assets._imports_0,
-    d: common_vendor.t($data.userInfo.name || "已登录"),
+    c: $data.userInfo.avatar ? $data.userInfo.avatar.startsWith("http://") || $data.userInfo.avatar.startsWith("https://") || $data.userInfo.avatar.startsWith("/") ? $data.userInfo.avatar : $options.isValidAvatar($data.userInfo.avatar) ? "data:image/" + ($data.userInfo.avatar_format === "jpg" ? "jpeg" : $data.userInfo.avatar_format || "jpeg") + ";base64," + $options.decodeHtmlEntities($data.userInfo.avatar.replace(/\s+/g, "")) : "/static/default-avatar.png" : "/static/default-avatar.png",
+    d: common_vendor.t($data.userInfo.name || "\u5DF2\u767B\u5F55"),
     e: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
     f: common_vendor.o((...args) => $options.navigateToResume && $options.navigateToResume(...args)),
     g: common_vendor.p({
@@ -217,6 +243,5 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     Y: $data.isDarkMode ? "#1a1a1a" : "#F8FAFD"
   };
 }
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render]]);
+var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/user/user.vue"]]);
 wx.createPage(MiniProgramPage);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/user/user.js.map

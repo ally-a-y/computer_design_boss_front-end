@@ -218,8 +218,10 @@ export default {
 .chart-page {
   background-color: #F8FAFD;
   min-height: 100vh;
-  padding: 0;
+  padding: 80px 16px 0;
   font-family: -apple-system, Helvetica, Roboto, sans-serif;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 /* 顶部导航栏 */
@@ -231,9 +233,14 @@ export default {
   height: 80px;
   padding: 0 16px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  position: sticky;
+  position: fixed;
   top: 0;
   z-index: 100;
+  width: 100%;
+  margin: 0;
+  left: 0;
+  right: 0;
+  box-sizing: border-box;
 }
 
 .nav-bar-left {
@@ -270,8 +277,10 @@ export default {
 .user-card {
   background-color: #fff;
   padding: 20px 16px;
-  margin-bottom: 12px;
+  margin: 0 0 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border-radius: 16px;
+  box-sizing: border-box;
 }
 
 .user-header {
@@ -334,10 +343,11 @@ export default {
   background-color: #fff;
   border-radius: 16px;
   padding: 24px;
-  margin: 0 16px 16px;
+  margin: 0 0 16px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   text-align: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-sizing: border-box;
 }
 
 .competitive-card:active {
@@ -432,7 +442,7 @@ export default {
 .metrics-container {
   display: flex;
   gap: 12px;
-  padding: 0 16px;
+  padding: 0;
   margin-bottom: 16px;
 }
 
@@ -444,6 +454,7 @@ export default {
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   text-align: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-sizing: border-box;
 }
 
 .metric-card:active {
@@ -482,9 +493,10 @@ export default {
 /* 双栏图表区 */
 .chart-section {
   display: flex;
-  gap: 16px;
-  padding: 0 16px;
+  gap: 12px;
+  padding: 0;
   margin-bottom: 16px;
+  box-sizing: border-box;
 }
 
 .chart-card {
@@ -494,6 +506,8 @@ export default {
   padding: 20px 16px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 .chart-card:active {
@@ -649,8 +663,9 @@ export default {
   background: linear-gradient(180deg, #E8F0FE 0%, #FFFFFF 100%);
   border-radius: 24px;
   padding: 24px 20px;
-  margin: 0 16px 24px;
+  margin: 0 0 24px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-sizing: border-box;
 }
 
 .insight-title {

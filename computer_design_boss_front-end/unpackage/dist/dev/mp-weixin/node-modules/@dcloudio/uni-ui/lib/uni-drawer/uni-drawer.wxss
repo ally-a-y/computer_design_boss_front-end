@@ -23,7 +23,7 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-.uni-drawer.data-v-183a7e94 {
+.uni-drawer.data-v-22378bf4 {
   display: block;
   position: fixed;
   top: 0;
@@ -33,7 +33,7 @@
   overflow: hidden;
   z-index: 999;
 }
-.uni-drawer__content.data-v-183a7e94 {
+.uni-drawer__content.data-v-22378bf4 {
   display: block;
   position: absolute;
   top: 0;
@@ -42,18 +42,18 @@
   background-color: #ffffff;
   transition: transform 0.3s ease;
 }
-.uni-drawer--left.data-v-183a7e94 {
+.uni-drawer--left.data-v-22378bf4 {
   left: 0;
   transform: translateX(-100%);
 }
-.uni-drawer--right.data-v-183a7e94 {
+.uni-drawer--right.data-v-22378bf4 {
   right: 0;
   transform: translateX(100%);
 }
-.uni-drawer__content--visible.data-v-183a7e94 {
+.uni-drawer__content--visible.data-v-22378bf4 {
   transform: translateX(0px);
 }
-.uni-drawer__mask.data-v-183a7e94 {
+.uni-drawer__mask.data-v-22378bf4 {
   display: block;
   opacity: 0;
   position: absolute;
@@ -64,7 +64,7 @@
   background-color: rgba(0, 0, 0, 0.4);
   transition: opacity 0.3s;
 }
-.uni-drawer__mask--visible.data-v-183a7e94 {
+.uni-drawer__mask--visible.data-v-22378bf4 {
   display: block;
   opacity: 1;
 }

@@ -55,6 +55,14 @@ export const userApi = {
     })
   },
   
+  // 获取用户名称和头像
+  getUserNameAndAvatar: () => {
+    return request({
+      url: '/api/user/get_name_and_avatar',
+      method: 'GET'
+    })
+  },
+  
   // 更新用户信息
   updateUserProfile: (profileData) => {
     return request({

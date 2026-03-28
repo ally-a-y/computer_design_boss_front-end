@@ -16,7 +16,7 @@
     <!-- 顶部卡片 -->
     <view class="top-card" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#fff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
       <view class="user-header">
-        <image class="avatar" src="/static/logo.png" mode="aspectFill"></image>
+        <image class="avatar" :src="userInfo.avatar ? 'data:image/jpeg;base64,' + userInfo.avatar.replace(/\s+/g, '') : '/static/default-avatar.png'" mode="aspectFill"></image>
         <view class="user-info">
           <text class="user-name" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">{{ userInfo.name || '已登录' }}</text>
           <text class="edit-resume" @click="navigateToResume" :style="{ color: '#007aff' }">编辑简历</text>
@@ -76,13 +76,14 @@
 
 <script>
 import { themeManager } from '@/common/utils/theme-simple.js'
+import { userApi } from '@/common/api/user.js'
 
 export default {
   data() {
     return {
       userInfo: {
         name: '张三',
-        avatar: '/static/logo.png'
+        avatar: ''
       },
       // 主题相关
       currentTheme: 'light',
@@ -120,22 +121,111 @@ export default {
       this.isDarkMode = data.isDark
     },
     
-    checkLoginStatus() {
+    async checkLoginStatus() {
       // 这里可以检查用户登录状态
+      console.log('开始检查用户登录状态')
       const userInfo = uni.getStorageSync('userInfo')
+      console.log('从本地存储获取userInfo:', userInfo)
       if (userInfo) {
         // 检查userInfo是否为字符串，如果是则解析，否则直接使用
         if (typeof userInfo === 'string') {
           try {
             this.userInfo = JSON.parse(userInfo)
+            console.log('解析userInfo成功:', this.userInfo)
           } catch (e) {
             console.error('解析userInfo失败:', e)
             this.userInfo = null
           }
         } else {
           this.userInfo = userInfo
+          console.log('直接使用userInfo:', this.userInfo)
         }
+        
+        // 尝试从后端获取最新的用户信息，包括头像
+        try {
+          // 首先尝试使用专门的获取名称和头像的接口
+          console.log('开始获取用户名称和头像')
+          const res = await userApi.getUserNameAndAvatar()
+          console.log('获取用户名称和头像成功:', res)
+          if (res) {
+            // 更新用户信息
+            this.userInfo.name = res.user_name
+            this.userInfo.real_name = res.user_name
+            this.userInfo.avatar = res.user_avatar
+            this.userInfo.avatar_format = res.user_avatar_format
+            this.userInfo.avatar_size = res.user_avatar_size
+            console.log('更新用户信息成功:', this.userInfo)
+            // 保存到本地存储，只保存必要的信息
+            const userInfoToSave = {
+              name: res.user_name,
+              real_name: res.user_name,
+              avatar: res.user_avatar,
+              avatar_format: res.user_avatar_format,
+              avatar_size: res.user_avatar_size
+            }
+            uni.setStorageSync('userInfo', JSON.stringify(userInfoToSave))
+            console.log('保存用户信息到本地存储成功')
+          }
+        } catch (error) {
+          console.error('获取用户名称和头像失败:', error)
+          // 如果失败，尝试使用通用的用户信息接口
+          try {
+            console.log('开始获取用户信息')
+            const res = await userApi.getUserProfile()
+            console.log('获取用户信息成功:', res)
+            if (res) {
+              this.userInfo = res
+              console.log('更新用户信息成功:', this.userInfo)
+              // 保存到本地存储，只保存必要的信息
+              const userInfoToSave = {
+                name: res.name || res.real_name,
+                real_name: res.real_name,
+                avatar: res.avatar,
+                avatar_format: res.avatar_format,
+                avatar_size: res.avatar_size
+              }
+              uni.setStorageSync('userInfo', JSON.stringify(userInfoToSave))
+              console.log('保存用户信息到本地存储成功')
+            }
+          } catch (error) {
+            console.error('获取用户信息失败:', error)
+          }
+        }
+      } else {
+        console.log('本地存储中没有userInfo')
       }
+    },
+    
+    // 检查头像数据是否有效
+    isValidAvatar(avatar) {
+      if (!avatar || avatar === '') {
+        return false
+      }
+      
+      // 检查是否是URL格式（以http://或https://开头）
+      if (avatar.startsWith('http://') || avatar.startsWith('https://')) {
+        return false
+      }
+      
+      // 清理空白字符
+      const cleaned = avatar.replace(/\s+/g, '')
+      
+      // 尝试使用后端返回的数据，即使不是标准格式
+      return cleaned.length > 0
+    },
+    
+    // 解码HTML实体
+    decodeHtmlEntities(text) {
+      const entities = {
+        '&amp;': '&',
+        '&lt;': '<',
+        '&gt;': '>',
+        '&quot;': '"',
+        '&#39;': "'"
+      }
+      return text.replace(/&[#\w]+;/g, (entity) => {
+        return entities[entity] || entity
+      })
     },
     navigateToResume() {
       uni.navigateTo({

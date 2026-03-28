@@ -1,5 +1,5 @@
 "use strict";
-const common_vendor = require("../../../../common/vendor.js");
+var common_vendor = require("../../../../common/vendor.js");
 const _sfc_main = {
   data() {
     return {
@@ -14,7 +14,7 @@ const _sfc_main = {
     },
     sendCode() {
       common_vendor.index.showToast({
-        title: "验证码发送成功",
+        title: "\u9A8C\u8BC1\u7801\u53D1\u9001\u6210\u529F",
         icon: "success"
       });
       this.countdown = 60;
@@ -28,7 +28,7 @@ const _sfc_main = {
     verifyCode() {
       if (!this.verificationCode.trim()) {
         common_vendor.index.showToast({
-          title: "请输入验证码",
+          title: "\u8BF7\u8F93\u5165\u9A8C\u8BC1\u7801",
           icon: "none"
         });
         return;
@@ -39,7 +39,7 @@ const _sfc_main = {
         });
       } else {
         common_vendor.index.showToast({
-          title: "验证码错误",
+          title: "\u9A8C\u8BC1\u7801\u9519\u8BEF",
           icon: "none"
         });
       }
@@ -52,12 +52,11 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     b: common_vendor.t($data.currentEmail),
     c: $data.verificationCode,
     d: common_vendor.o(($event) => $data.verificationCode = $event.detail.value),
-    e: common_vendor.t($data.countdown > 0 ? `${$data.countdown}秒后重新发送` : "发送验证码"),
+    e: common_vendor.t($data.countdown > 0 ? `${$data.countdown}\u79D2\u540E\u91CD\u65B0\u53D1\u9001` : "\u53D1\u9001\u9A8C\u8BC1\u7801"),
     f: common_vendor.o((...args) => $options.sendCode && $options.sendCode(...args)),
     g: $data.countdown > 0,
     h: common_vendor.o((...args) => $options.verifyCode && $options.verifyCode(...args))
   };
 }
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render]]);
+var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/user/account/email/account_email.vue"]]);
 wx.createPage(MiniProgramPage);
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/pages/user/account/email/account_email.js.map

@@ -17,7 +17,7 @@
     <view class="post-detail" v-if="post">
       <!-- 头部信息区 -->
       <view class="post-header">
-        <view class="avatar" @click="goToUserProfile(post.user_id)"><text class="avatar-text">U</text></view>
+        <image class="avatar" @click="goToUserProfile(post.user_id)" :src="isValidAvatar(post.user_avatar) ? 'data:image/' + (post.user_avatar_format === 'jpg' ? 'jpeg' : post.user_avatar_format || 'jpeg') + ';base64,' + decodeHtmlEntities(post.user_avatar.replace(/\s+/g, '')) : '/static/default-avatar.png'" mode="aspectFill"></image>
         <view class="user-info">
           <view class="user-main-info">
             <text class="username" @click="goToUserProfile(post.user_id)">用户{{post.user_id}}</text>
@@ -104,7 +104,7 @@
       <scroll-view class="replies-list" scroll-y>
         <view class="reply-item" v-for="(reply, index) in replies" :key="reply.id">
           <view class="reply-header">
-            <view class="avatar" @click="goToUserProfile(reply.user_id)"><text class="avatar-text">U</text></view>
+            <image class="avatar" @click="goToUserProfile(reply.user_id)" :src="isValidAvatar(reply.user_avatar) ? 'data:image/' + (reply.user_avatar_format === 'jpg' ? 'jpeg' : reply.user_avatar_format || 'jpeg') + ';base64,' + decodeHtmlEntities(reply.user_avatar.replace(/\s+/g, '')) : '/static/default-avatar.png'" mode="aspectFill"></image>
             <view class="user-info">
               <view class="user-main-info">
                 <text class="username" @click="goToUserProfile(reply.user_id)">用户{{reply.user_id}}</text>
@@ -237,6 +237,41 @@ export default {
   },
   
   methods: {
+    // 解码HTML实体
+    decodeHtmlEntities(text) {
+      const entities = {
+        '&amp;': '&',
+        '&lt;': '<',
+        '&gt;': '>',
+        '&quot;': '"',
+        '&#39;': "'"
+      }
+      return text.replace(/&[#\w]+;/g, (entity) => {
+        return entities[entity] || entity
+      })
+    },
+    
+    // 检查头像数据是否有效
+    isValidAvatar(avatar) {
+      if (!avatar || avatar === '') {
+        return false
+      }
+      
+      // 清理空白字符
+      const cleaned = avatar.replace(/\s+/g, '')
+      
+      // 检查是否是有效的图片base64编码
+      // 有效的JPEG开头: /9j/
+      // 有效的PNG开头: iVBOR
+      // 有效的GIF开头: R0lG
+      // 有效的BMP开头: Qk
+      const validPrefixes = ['/9j/', 'iVBOR', 'R0lG', 'Qk']
+      
+      // 尝试使用后端返回的数据，即使不是标准格式
+      // 可能是后端的TO_BASE64函数生成的格式不同
+      return cleaned.length > 0
+    },
+    
     /**
      * 初始化主题
      */
@@ -753,10 +788,10 @@ export default {
   height: 48px;
   border-radius: 50%;
   margin-top: 4px;
-  background: #f0f0f0;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
 .avatar-text {

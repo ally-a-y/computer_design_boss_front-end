@@ -57,10 +57,15 @@ const requestWithRetry = (options, retryCount = 3) => {
         sslVerify: false,
         header: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${uni.getStorageSync('token') || ''}`,
           'Cache-Control': 'no-cache',
           ...options.header
         }
+      }
+      
+      // 只有在 token 存在时才设置 Authorization 请求头
+      const token = uni.getStorageSync('token')
+      if (token) {
+        requestConfig.header['Authorization'] = `Bearer ${token}`
       }
       
       // 只有非 GET 请求才设置 data 字段

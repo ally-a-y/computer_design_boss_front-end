@@ -1,58 +1,47 @@
 "use strict";
-const common_vendor = require("../../common/vendor.js");
-const common_api_user = require("../../common/api/user.js");
+var common_vendor = require("../../common/vendor.js");
+var common_api_user = require("../../common/api/user.js");
+require("../../common/api/request.js");
+require("../../common/config.js");
 const _sfc_main = {
   data() {
     return {
-      // 选项卡状态
       activeTab: "login",
-      // login 或 register
-      // 登录表单数据
       loginForm: {
         mobile: "",
         password: "",
         sms_code: ""
       },
-      // 登录方式
       loginMethod: "sms",
-      // sms 或 password
-      // 注册表单数据
       registerForm: {
         mobile: "",
         sms_code: "",
         password: "",
         confirm_password: ""
       },
-      // 密码显示状态
       showPassword: false,
-      // 加载状态
       loading: false,
-      // 验证码相关
       isSendingSms: false,
       smsCountdown: 60,
       canSendSms: false,
-      // 注册验证码相关
       isSendingRegisterSms: false,
       registerSmsCountdown: 60,
       canSendRegisterSms: false
     };
   },
   computed: {
-    // 验证码按钮文本
     smsBtnText() {
       if (this.isSendingSms) {
-        return `${this.smsCountdown}s后重新发送`;
+        return `${this.smsCountdown}s\u540E\u91CD\u65B0\u53D1\u9001`;
       }
-      return "获取验证码";
+      return "\u83B7\u53D6\u9A8C\u8BC1\u7801";
     },
-    // 注册验证码按钮文本
     registerSmsBtnText() {
       if (this.isSendingRegisterSms) {
-        return `${this.registerSmsCountdown}s后重新发送`;
+        return `${this.registerSmsCountdown}s\u540E\u91CD\u65B0\u53D1\u9001`;
       }
-      return "获取验证码";
+      return "\u83B7\u53D6\u9A8C\u8BC1\u7801";
     },
-    // 登录表单验证
     isLoginFormValid() {
       const { mobile, password, sms_code } = this.loginForm;
       const mobileRegex = /^1[3-9]\d{9}$/;
@@ -66,7 +55,6 @@ const _sfc_main = {
         return password.length >= 8;
       }
     },
-    // 注册表单验证（步骤1：账号设置）
     isRegisterFormValid() {
       const { mobile, sms_code, password, confirm_password } = this.registerForm;
       const mobileRegex = /^1[3-9]\d{9}$/;
@@ -77,21 +65,17 @@ const _sfc_main = {
     }
   },
   methods: {
-    // 处理手机号输入
     handleMobileInput() {
       const mobileRegex = /^1[3-9]\d{9}$/;
       this.canSendSms = mobileRegex.test(this.loginForm.mobile);
     },
-    // 处理注册手机号输入
     handleRegisterMobileInput() {
       const mobileRegex = /^1[3-9]\d{9}$/;
       this.canSendRegisterSms = mobileRegex.test(this.registerForm.mobile);
     },
-    // 切换密码显示/隐藏
     togglePassword() {
       this.showPassword = !this.showPassword;
     },
-    // 发送登录验证码
     async sendSms() {
       if (!this.canSendSms)
         return;
@@ -99,20 +83,19 @@ const _sfc_main = {
         this.isSendingSms = true;
         await new Promise((resolve) => setTimeout(resolve, 500));
         common_vendor.index.showToast({
-          title: "验证码发送成功",
+          title: "\u9A8C\u8BC1\u7801\u53D1\u9001\u6210\u529F",
           icon: "success"
         });
         this.startSmsCountdown();
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/login/login.vue:361", "发送验证码失败:", error);
+        console.error("\u53D1\u9001\u9A8C\u8BC1\u7801\u5931\u8D25:", error);
         common_vendor.index.showToast({
-          title: "验证码发送失败，请稍后重试",
+          title: "\u9A8C\u8BC1\u7801\u53D1\u9001\u5931\u8D25\uFF0C\u8BF7\u7A0D\u540E\u91CD\u8BD5",
           icon: "none"
         });
         this.isSendingSms = false;
       }
     },
-    // 发送注册验证码
     async sendRegisterSms() {
       if (!this.canSendRegisterSms)
         return;
@@ -120,20 +103,19 @@ const _sfc_main = {
         this.isSendingRegisterSms = true;
         await new Promise((resolve) => setTimeout(resolve, 500));
         common_vendor.index.showToast({
-          title: "验证码发送成功",
+          title: "\u9A8C\u8BC1\u7801\u53D1\u9001\u6210\u529F",
           icon: "success"
         });
         this.startRegisterSmsCountdown();
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/login/login.vue:388", "发送验证码失败:", error);
+        console.error("\u53D1\u9001\u9A8C\u8BC1\u7801\u5931\u8D25:", error);
         common_vendor.index.showToast({
-          title: "验证码发送失败，请稍后重试",
+          title: "\u9A8C\u8BC1\u7801\u53D1\u9001\u5931\u8D25\uFF0C\u8BF7\u7A0D\u540E\u91CD\u8BD5",
           icon: "none"
         });
         this.isSendingRegisterSms = false;
       }
     },
-    // 登录验证码倒计时
     startSmsCountdown() {
       const countdownTimer = setInterval(() => {
         this.smsCountdown--;
@@ -144,7 +126,6 @@ const _sfc_main = {
         }
       }, 1e3);
     },
-    // 注册验证码倒计时
     startRegisterSmsCountdown() {
       const countdownTimer = setInterval(() => {
         this.registerSmsCountdown--;
@@ -155,11 +136,10 @@ const _sfc_main = {
         }
       }, 1e3);
     },
-    // 处理登录
     async handleLogin() {
       if (!this.isLoginFormValid) {
         common_vendor.index.showToast({
-          title: "请填写正确的登录信息",
+          title: "\u8BF7\u586B\u5199\u6B63\u786E\u7684\u767B\u5F55\u4FE1\u606F",
           icon: "none"
         });
         return;
@@ -180,12 +160,12 @@ const _sfc_main = {
           };
           res = await common_api_user.userApi.login(loginData);
         }
-        common_vendor.index.__f__("log", "at pages/login/login.vue:454", "登录响应:", res);
+        console.log("\u767B\u5F55\u54CD\u5E94:", res);
         if (res && res.token) {
           common_vendor.index.setStorageSync("token", res.token);
           common_vendor.index.setStorageSync("userInfo", JSON.stringify(res.user_info));
           common_vendor.index.showToast({
-            title: "登录成功",
+            title: "\u767B\u5F55\u6210\u529F",
             icon: "success"
           });
           setTimeout(() => {
@@ -195,27 +175,25 @@ const _sfc_main = {
           }, 1500);
         } else {
           common_vendor.index.showToast({
-            title: res.message || "登录失败",
+            title: res.message || "\u767B\u5F55\u5931\u8D25",
             icon: "none"
           });
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/login/login.vue:479", "登录失败:", error);
+        console.error("\u767B\u5F55\u5931\u8D25:", error);
         common_vendor.index.showToast({
-          title: error.message || "登录失败，请稍后重试",
+          title: error.message || "\u767B\u5F55\u5931\u8D25\uFF0C\u8BF7\u7A0D\u540E\u91CD\u8BD5",
           icon: "none"
         });
       } finally {
         this.loading = false;
       }
     },
-    // 跳转到忘记密码页面
     goToForgetPassword() {
       common_vendor.index.navigateTo({
         url: "/pages/login/forget/login_forget"
       });
     },
-    // 跳转到单独的注册页面
     goToRegisterPage() {
       common_vendor.index.navigateTo({
         url: "/pages/login/register/login_reister?registerData=" + encodeURIComponent(JSON.stringify(this.registerForm))
@@ -229,8 +207,8 @@ if (!Array) {
 }
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: common_vendor.t($data.activeTab === "login" ? "登录" : "注册"),
-    b: common_vendor.t($data.activeTab === "login" ? "欢迎回来" : "创建账号"),
+    a: common_vendor.t($data.activeTab === "login" ? "\u767B\u5F55" : "\u6CE8\u518C"),
+    b: common_vendor.t($data.activeTab === "login" ? "\u6B22\u8FCE\u56DE\u6765" : "\u521B\u5EFA\u8D26\u53F7"),
     c: $data.activeTab === "login" ? 1 : "",
     d: common_vendor.o(($event) => $data.activeTab = "login"),
     e: $data.activeTab === "register" ? 1 : "",
@@ -329,6 +307,5 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     ac: common_vendor.o(($event) => $data.activeTab = "login")
   }) : {});
 }
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-e4e4508d"]]);
+var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-b237504c"], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/login/login.vue"]]);
 wx.createPage(MiniProgramPage);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/login/login.js.map

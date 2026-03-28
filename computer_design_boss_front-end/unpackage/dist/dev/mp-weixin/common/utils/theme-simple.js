@@ -1,5 +1,5 @@
 "use strict";
-const common_vendor = require("../vendor.js");
+var common_vendor = require("../vendor.js");
 const THEME_MODE_KEY = "themeMode";
 const CURRENT_THEME_KEY = "currentTheme";
 class ThemeManager {
@@ -8,9 +8,6 @@ class ThemeManager {
     this.themeMode = "system";
     this.init();
   }
-  /**
-   * 初始化主题管理器
-   */
   init() {
     this.themeMode = common_vendor.index.getStorageSync(THEME_MODE_KEY) || "system";
     this.currentTheme = common_vendor.index.getStorageSync(CURRENT_THEME_KEY) || "light";
@@ -18,26 +15,19 @@ class ThemeManager {
       this.detectSystemTheme();
     }
   }
-  /**
-   * 检测系统主题（微信小程序支持）
-   */
   detectSystemTheme() {
     try {
       const systemInfo = common_vendor.index.getSystemInfoSync();
       const systemTheme = systemInfo.theme || "light";
       this.setTheme(systemTheme === "dark" ? "dark" : "light");
     } catch (error) {
-      common_vendor.index.__f__("warn", "at common/utils/theme-simple.js:39", "无法获取系统主题，使用默认浅色主题");
+      console.warn("\u65E0\u6CD5\u83B7\u53D6\u7CFB\u7EDF\u4E3B\u9898\uFF0C\u4F7F\u7528\u9ED8\u8BA4\u6D45\u8272\u4E3B\u9898");
       this.setTheme("light");
     }
   }
-  /**
-   * 设置主题模式
-   * @param {string} mode - 主题模式: light, dark, system
-   */
   setThemeMode(mode) {
     if (!["light", "dark", "system"].includes(mode)) {
-      common_vendor.index.__f__("warn", "at common/utils/theme-simple.js:50", "Invalid theme mode:", mode);
+      console.warn("Invalid theme mode:", mode);
       return;
     }
     this.themeMode = mode;
@@ -48,43 +38,27 @@ class ThemeManager {
       this.setTheme(mode);
     }
   }
-  /**
-   * 设置实际主题
-   * @param {string} theme - 主题: light, dark
-   */
   setTheme(theme) {
     if (!["light", "dark"].includes(theme)) {
-      common_vendor.index.__f__("warn", "at common/utils/theme-simple.js:70", "Invalid theme:", theme);
+      console.warn("Invalid theme:", theme);
       return;
     }
     this.currentTheme = theme;
     common_vendor.index.setStorageSync(CURRENT_THEME_KEY, theme);
     this.notifyThemeChange(theme);
   }
-  /**
-   * 通知主题变化
-   */
   notifyThemeChange(theme) {
     common_vendor.index.$emit("globalThemeChange", {
       theme,
       isDark: theme === "dark"
     });
   }
-  /**
-   * 获取主题模式
-   */
   getThemeMode() {
     return this.themeMode;
   }
-  /**
-   * 获取当前主题
-   */
   getCurrentTheme() {
     return this.currentTheme;
   }
-  /**
-   * 获取主题配置
-   */
   getThemeConfig() {
     return {
       light: {
@@ -93,7 +67,7 @@ class ThemeManager {
         cardBackground: "#ffffff",
         borderColor: "#eeeeee",
         primaryColor: "#007aff",
-        name: "浅色模式"
+        name: "\u6D45\u8272\u6A21\u5F0F"
       },
       dark: {
         backgroundColor: "#1a1a1a",
@@ -101,29 +75,35 @@ class ThemeManager {
         cardBackground: "#2c2c2c",
         borderColor: "#404040",
         primaryColor: "#0a84ff",
-        name: "深色模式"
+        name: "\u6DF1\u8272\u6A21\u5F0F"
       }
     }[this.currentTheme];
   }
-  /**
-   * 监听系统主题变化（微信小程序）
-   */
   onSystemThemeChange(callback) {
     try {
-      common_vendor.index.onThemeChange((res) => {
-        if (this.themeMode === "system") {
-          const newTheme = res.theme === "dark" ? "dark" : "light";
-          this.setTheme(newTheme);
-          if (callback) {
-            callback(newTheme);
+      if (typeof common_vendor.index.onThemeChange === "function") {
+        common_vendor.index.onThemeChange((res) => {
+          if (this.themeMode === "system") {
+            const newTheme = res.theme === "dark" ? "dark" : "light";
+            this.setTheme(newTheme);
+            if (callback) {
+              callback(newTheme);
+            }
           }
+        });
+      } else {
+        console.log("\u975E\u5FAE\u4FE1\u5C0F\u7A0B\u5E8F\u73AF\u5883\uFF0C\u8DF3\u8FC7\u7CFB\u7EDF\u4E3B\u9898\u76D1\u542C");
+        if (this.themeMode === "system") {
+          this.setTheme("light");
         }
-      });
+      }
     } catch (error) {
-      common_vendor.index.__f__("warn", "at common/utils/theme-simple.js:145", "无法监听系统主题变化:", error);
+      console.warn("\u65E0\u6CD5\u76D1\u542C\u7CFB\u7EDF\u4E3B\u9898\u53D8\u5316:", error);
+      if (this.themeMode === "system") {
+        this.setTheme("light");
+      }
     }
   }
 }
 const themeManager = new ThemeManager();
 exports.themeManager = themeManager;
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/common/utils/theme-simple.js.map

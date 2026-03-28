@@ -2,8 +2,9 @@
 .container {
   background-color: #F8FAFD;
   min-height: 100vh;
-  padding: 0 16px;
+  padding: 80px 16px 0;
   font-family: -apple-system, Helvetica, Roboto, sans-serif;
+  box-sizing: border-box;
 }
 
 /* 导航栏样式 */
@@ -14,8 +15,14 @@
   display: flex;
   align-items: center;
   padding: 0 16px;
-  position: relative;
-  margin-bottom: 12rpx;
+  position: fixed;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  margin: 0 0 12rpx;
+  left: 0;
+  right: 0;
+  box-sizing: border-box;
 }
 .nav-bar-left {
   flex: 0 0 auto;
@@ -167,14 +174,15 @@
   margin-bottom: 8px;
 }
 .sub-category-tab.active {
-  background-color: #E0E9FF;
-  color: #007aff;
+  background-color: #007aff;
+  color: #ffffff;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
 }
 .sub-category-tab:active {
   transform: scale(0.95);
-  background-color: #E0E9FF;
-}
-.sub-category-tab:active {
+  background-color: #007aff;
+  color: #ffffff;
   opacity: 0.8;
 }
 

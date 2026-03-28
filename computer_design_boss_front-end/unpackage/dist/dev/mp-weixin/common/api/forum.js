@@ -1,15 +1,12 @@
 "use strict";
-const common_vendor = require("../vendor.js");
-const common_api_request = require("./request.js");
+var common_api_request = require("./request.js");
 const forumApi = {
-  // 获取所有一级评论
   getAllFirstComments: () => {
     return common_api_request.requestWithRetry({
       url: "/forum/forum_all_first_talk",
       method: "GET"
     });
   },
-  // 发表评论
   addComment: (commentData) => {
     return common_api_request.requestWithRetry({
       url: "/forum/forums_add",
@@ -17,7 +14,6 @@ const forumApi = {
       data: commentData
     });
   },
-  // 删除评论
   deleteComment: (commentId) => {
     return common_api_request.requestWithRetry({
       url: "/forum/forum_delete",
@@ -25,7 +21,6 @@ const forumApi = {
       data: { id: commentId }
     });
   },
-  // 获取评论详情
   getCommentDetail: async (commentId) => {
     try {
       const allComments = await common_api_request.requestWithRetry({
@@ -34,11 +29,10 @@ const forumApi = {
       });
       return allComments.filter((comment) => comment.id == commentId);
     } catch (error) {
-      common_vendor.index.__f__("error", "at common/api/forum.js:41", "获取评论详情失败:", error);
+      console.error("\u83B7\u53D6\u8BC4\u8BBA\u8BE6\u60C5\u5931\u8D25:", error);
       return [];
     }
   },
-  // 添加回复
   addReply: (replyData) => {
     return common_api_request.requestWithRetry({
       url: "/forum/forums_add",
@@ -46,7 +40,6 @@ const forumApi = {
       data: replyData
     });
   },
-  // 获取评论回复列表
   getCommentReplies: (parentId) => {
     return common_api_request.requestWithRetry({
       url: "/forum/forums_back",
@@ -56,4 +49,3 @@ const forumApi = {
   }
 };
 exports.forumApi = forumApi;
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/common/api/forum.js.map

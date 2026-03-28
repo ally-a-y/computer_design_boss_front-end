@@ -1,5 +1,5 @@
 "use strict";
-const common_vendor = require("../../../../common/vendor.js");
+var common_vendor = require("../../../../common/vendor.js");
 const _sfc_main = {
   data() {
     return {
@@ -15,13 +15,13 @@ const _sfc_main = {
     sendCode() {
       if (!this.newEmail) {
         common_vendor.index.showToast({
-          title: "请输入正确的邮箱地址",
+          title: "\u8BF7\u8F93\u5165\u6B63\u786E\u7684\u90AE\u7BB1\u5730\u5740",
           icon: "none"
         });
         return;
       }
       common_vendor.index.showToast({
-        title: "验证码发送成功",
+        title: "\u9A8C\u8BC1\u7801\u53D1\u9001\u6210\u529F",
         icon: "success"
       });
       this.countdown = 60;
@@ -35,26 +35,25 @@ const _sfc_main = {
     confirmChange() {
       if (!this.newEmail) {
         common_vendor.index.showToast({
-          title: "请输入正确的邮箱地址",
+          title: "\u8BF7\u8F93\u5165\u6B63\u786E\u7684\u90AE\u7BB1\u5730\u5740",
           icon: "none"
         });
         return;
       }
       if (!this.verificationCode) {
         common_vendor.index.showToast({
-          title: "请输入正确的验证码",
+          title: "\u8BF7\u8F93\u5165\u6B63\u786E\u7684\u9A8C\u8BC1\u7801",
           icon: "none"
         });
         return;
       }
       common_vendor.index.showToast({
-        title: "邮箱修改成功",
+        title: "\u90AE\u7BB1\u4FEE\u6539\u6210\u529F",
         icon: "success"
       });
       setTimeout(() => {
         common_vendor.index.navigateBack({
           delta: 2
-          // 返回两级，回到账号页面
         });
       }, 1500);
     }
@@ -67,12 +66,11 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     c: common_vendor.o(($event) => $data.newEmail = $event.detail.value),
     d: $data.verificationCode,
     e: common_vendor.o(($event) => $data.verificationCode = $event.detail.value),
-    f: common_vendor.t($data.countdown > 0 ? `${$data.countdown}秒后重新发送` : "发送验证码"),
+    f: common_vendor.t($data.countdown > 0 ? `${$data.countdown}\u79D2\u540E\u91CD\u65B0\u53D1\u9001` : "\u53D1\u9001\u9A8C\u8BC1\u7801"),
     g: common_vendor.o((...args) => $options.sendCode && $options.sendCode(...args)),
     h: $data.countdown > 0,
     i: common_vendor.o((...args) => $options.confirmChange && $options.confirmChange(...args))
   };
 }
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render]]);
+var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/user/account/email/email_change.vue"]]);
 wx.createPage(MiniProgramPage);
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/pages/user/account/email/email_change.js.map

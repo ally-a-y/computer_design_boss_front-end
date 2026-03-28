@@ -1,7 +1,28 @@
 "use strict";
-const common_vendor = require("../../common/vendor.js");
-const common_api_job = require("../../common/api/job.js");
-const common_utils_themeSimple = require("../../common/utils/theme-simple.js");
+var __defProp = Object.defineProperty;
+var __defProps = Object.defineProperties;
+var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
+var __getOwnPropSymbols = Object.getOwnPropertySymbols;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __propIsEnum = Object.prototype.propertyIsEnumerable;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __spreadValues = (a, b) => {
+  for (var prop in b || (b = {}))
+    if (__hasOwnProp.call(b, prop))
+      __defNormalProp(a, prop, b[prop]);
+  if (__getOwnPropSymbols)
+    for (var prop of __getOwnPropSymbols(b)) {
+      if (__propIsEnum.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
+    }
+  return a;
+};
+var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
+var common_vendor = require("../../common/vendor.js");
+var common_api_job = require("../../common/api/job.js");
+var common_utils_themeSimple = require("../../common/utils/theme-simple.js");
+require("../../common/api/request.js");
+require("../../common/config.js");
 const jobCard = () => "../../component/job/job-card.js";
 const _sfc_main = {
   components: {
@@ -30,11 +51,9 @@ const _sfc_main = {
       keyword: "",
       selectedSubCategories: [],
       showCategoryTabs: false,
-      // 分类常量
       techCategories,
       designCategories,
       manageCategories,
-      // 主题相关
       currentTheme: "light",
       isDarkMode: false
     };
@@ -51,17 +70,11 @@ const _sfc_main = {
     this.onRefresh();
   },
   methods: {
-    /**
-     * 初始化主题
-     */
     initTheme() {
       this.currentTheme = common_utils_themeSimple.themeManager.getCurrentTheme();
       this.isDarkMode = this.currentTheme === "dark";
       common_vendor.index.$on("globalThemeChange", this.handleGlobalThemeChange);
     },
-    /**
-     * 处理全局主题变化
-     */
     handleGlobalThemeChange(data) {
       this.currentTheme = data.theme;
       this.isDarkMode = data.isDark;
@@ -75,7 +88,7 @@ const _sfc_main = {
         });
         if (networkType === "none") {
           common_vendor.index.showToast({
-            title: "当前无网络连接",
+            title: "\u5F53\u524D\u65E0\u7F51\u7EDC\u8FDE\u63A5",
             icon: "none"
           });
           return;
@@ -94,21 +107,21 @@ const _sfc_main = {
               jobsData = res.jobs;
             } else {
               common_vendor.index.showToast({
-                title: "获取推荐职位失败: 数据格式错误",
+                title: "\u83B7\u53D6\u63A8\u8350\u804C\u4F4D\u5931\u8D25: \u6570\u636E\u683C\u5F0F\u9519\u8BEF",
                 icon: "none"
               });
               jobsData = [];
             }
           } else {
             common_vendor.index.showToast({
-              title: "获取推荐职位失败: 数据格式错误",
+              title: "\u83B7\u53D6\u63A8\u8350\u804C\u4F4D\u5931\u8D25: \u6570\u636E\u683C\u5F0F\u9519\u8BEF",
               icon: "none"
             });
             jobsData = [];
           }
         } else {
           common_vendor.index.showToast({
-            title: "获取推荐职位失败: 后端无数据返回",
+            title: "\u83B7\u53D6\u63A8\u8350\u804C\u4F4D\u5931\u8D25: \u540E\u7AEF\u65E0\u6570\u636E\u8FD4\u56DE",
             icon: "none"
           });
           jobsData = [];
@@ -116,8 +129,7 @@ const _sfc_main = {
         if (jobsData.length === 0) {
           jobsData = this.getMockJobsData();
         }
-        jobsData = jobsData.map((job) => ({
-          ...job,
+        jobsData = jobsData.map((job) => __spreadProps(__spreadValues({}, job), {
           category_id: job.category_id && job.category_id !== "" ? Number(job.category_id) : null
         }));
         this.allJobs = jobsData;
@@ -125,16 +137,16 @@ const _sfc_main = {
       } catch (error) {
         this.allJobs = [];
         this.jobList = [];
-        common_vendor.index.__f__("error", "at pages/index/index_index.vue:224", "获取推荐职位失败:", error);
-        common_vendor.index.__f__("error", "at pages/index/index_index.vue:225", "错误详情:", error.message, error.stack);
+        console.error("\u83B7\u53D6\u63A8\u8350\u804C\u4F4D\u5931\u8D25:", error);
+        console.error("\u9519\u8BEF\u8BE6\u60C5:", error.message, error.stack);
         if (error.message && error.message.includes("Packet sequence number wrong")) {
           common_vendor.index.showToast({
-            title: "网络连接异常，请稍后重试",
+            title: "\u7F51\u7EDC\u8FDE\u63A5\u5F02\u5E38\uFF0C\u8BF7\u7A0D\u540E\u91CD\u8BD5",
             icon: "none"
           });
         } else {
           common_vendor.index.showToast({
-            title: "获取推荐职位失败",
+            title: "\u83B7\u53D6\u63A8\u8350\u804C\u4F4D\u5931\u8D25",
             icon: "none"
           });
         }
@@ -148,9 +160,7 @@ const _sfc_main = {
       }
       if (this.currentCategory === "100" || this.techCategories.includes(Number(categoryId))) {
         this.showCategoryTabs = true;
-        this.subCategoryList = this.allCategories.filter(
-          (category) => this.techCategories.includes(Number(category.id))
-        );
+        this.subCategoryList = this.allCategories.filter((category) => this.techCategories.includes(Number(category.id)));
       } else {
         this.showCategoryTabs = false;
         this.subCategoryList = [];
@@ -164,7 +174,6 @@ const _sfc_main = {
         this.applyFilters();
       }
     },
-    // 根据分类获取职位数据
     async getJobsByCategory(categoryId) {
       try {
         const networkType = await new Promise((resolve) => {
@@ -174,7 +183,7 @@ const _sfc_main = {
         });
         if (networkType === "none") {
           common_vendor.index.showToast({
-            title: "当前无网络连接",
+            title: "\u5F53\u524D\u65E0\u7F51\u7EDC\u8FDE\u63A5",
             icon: "none"
           });
           return;
@@ -193,27 +202,26 @@ const _sfc_main = {
               jobsData = res.jobs;
             } else {
               common_vendor.index.showToast({
-                title: "获取职位失败: 数据格式错误",
+                title: "\u83B7\u53D6\u804C\u4F4D\u5931\u8D25: \u6570\u636E\u683C\u5F0F\u9519\u8BEF",
                 icon: "none"
               });
               jobsData = [];
             }
           } else {
             common_vendor.index.showToast({
-              title: "获取职位失败: 数据格式错误",
+              title: "\u83B7\u53D6\u804C\u4F4D\u5931\u8D25: \u6570\u636E\u683C\u5F0F\u9519\u8BEF",
               icon: "none"
             });
             jobsData = [];
           }
         } else {
           common_vendor.index.showToast({
-            title: "获取职位失败: 后端无数据返回",
+            title: "\u83B7\u53D6\u804C\u4F4D\u5931\u8D25: \u540E\u7AEF\u65E0\u6570\u636E\u8FD4\u56DE",
             icon: "none"
           });
           jobsData = [];
         }
-        jobsData = jobsData.map((job) => ({
-          ...job,
+        jobsData = jobsData.map((job) => __spreadProps(__spreadValues({}, job), {
           category_id: job.category_id && job.category_id !== "" ? Number(job.category_id) : null
         }));
         this.allJobs = jobsData;
@@ -221,14 +229,13 @@ const _sfc_main = {
       } catch (error) {
         this.allJobs = [];
         this.jobList = [];
-        common_vendor.index.__f__("error", "at pages/index/index_index.vue:353", "获取职位失败:", error);
+        console.error("\u83B7\u53D6\u804C\u4F4D\u5931\u8D25:", error);
         common_vendor.index.showToast({
-          title: "获取职位失败",
+          title: "\u83B7\u53D6\u804C\u4F4D\u5931\u8D25",
           icon: "none"
         });
       }
     },
-    // 选择子分类
     selectSubCategory(categoryId) {
       const numCategoryId = Number(categoryId);
       const index = this.selectedSubCategories.indexOf(numCategoryId);
@@ -239,18 +246,16 @@ const _sfc_main = {
       }
       this.applyFilters();
     },
-    // 搜索输入事件
     onSearchInput() {
       if (this.allJobs.length === 0) {
-        common_vendor.index.__f__("log", "at pages/index/index_index.vue:383", "allJobs为空，使用模拟数据");
+        console.log("allJobs\u4E3A\u7A7A\uFF0C\u4F7F\u7528\u6A21\u62DF\u6570\u636E");
         this.allJobs = this.getMockJobsData();
       }
       this.applyFilters();
     },
-    // 应用所有筛选条件
     applyFilters() {
       if (this.allJobs.length === 0) {
-        common_vendor.index.__f__("log", "at pages/index/index_index.vue:393", "allJobs为空，使用模拟数据");
+        console.log("allJobs\u4E3A\u7A7A\uFF0C\u4F7F\u7528\u6A21\u62DF\u6570\u636E");
         this.allJobs = this.getMockJobsData();
       }
       let filteredJobs = [...this.allJobs];
@@ -308,9 +313,9 @@ const _sfc_main = {
     },
     getJobCategories() {
       const mainCategories = [
-        { id: "100", name: "技术开发", icon: "/static/category/tech.png" },
-        { id: "200", name: "产品与设计", icon: "/static/category/design.png" },
-        { id: "300", name: "技术管理", icon: "/static/category/product.png" }
+        { id: "100", name: "\u6280\u672F\u5F00\u53D1", icon: "/static/category/tech.png" },
+        { id: "200", name: "\u4EA7\u54C1\u4E0E\u8BBE\u8BA1", icon: "/static/category/design.png" },
+        { id: "300", name: "\u6280\u672F\u7BA1\u7406", icon: "/static/category/product.png" }
       ];
       common_api_job.jobApi.getJobCategories().then((res) => {
         if (res && Array.isArray(res)) {
@@ -322,26 +327,24 @@ const _sfc_main = {
           this.generateMockSubCategories();
         }
       }).catch((error) => {
-        common_vendor.index.__f__("error", "at pages/index/index_index.vue:507", "获取职位分类失败:", error);
+        console.error("\u83B7\u53D6\u804C\u4F4D\u5206\u7C7B\u5931\u8D25:", error);
         this.categoryList = mainCategories;
         this.generateMockSubCategories();
       });
     },
-    // 根据技术开发分类ID获取分类名称
     getTechSubCategoryName(categoryId) {
       const nameMap = {
-        101: "前端开发",
-        102: "后端开发",
-        103: "移动开发",
-        104: "人工智能",
-        105: "大数据",
-        106: "云计算",
-        107: "网络安全",
-        108: "嵌入式开发"
+        101: "\u524D\u7AEF\u5F00\u53D1",
+        102: "\u540E\u7AEF\u5F00\u53D1",
+        103: "\u79FB\u52A8\u5F00\u53D1",
+        104: "\u4EBA\u5DE5\u667A\u80FD",
+        105: "\u5927\u6570\u636E",
+        106: "\u4E91\u8BA1\u7B97",
+        107: "\u7F51\u7EDC\u5B89\u5168",
+        108: "\u5D4C\u5165\u5F0F\u5F00\u53D1"
       };
-      return nameMap[categoryId] || "未知分类";
+      return nameMap[categoryId] || "\u672A\u77E5\u5206\u7C7B";
     },
-    // 确保allCategories包含技术开发的子分类
     ensureTechSubCategories() {
       const techSubCategories = this.techCategories.map((id) => ({
         id,
@@ -355,52 +358,44 @@ const _sfc_main = {
         }
       });
     },
-    // 生成模拟的子分类数据（当后端没有返回时使用）
     generateMockSubCategories() {
       this.allCategories = [
-        // 技术开发类（101-108）
-        { id: 101, name: "前端开发", parent_id: null },
-        { id: 102, name: "后端开发", parent_id: null },
-        { id: 103, name: "移动开发", parent_id: null },
-        { id: 104, name: "人工智能", parent_id: null },
-        { id: 105, name: "大数据", parent_id: null },
-        { id: 106, name: "云计算", parent_id: null },
-        { id: 107, name: "网络安全", parent_id: null },
-        { id: 108, name: "嵌入式开发", parent_id: null },
-        // 产品与设计类（200系列）
-        { id: 200, name: "产品经理", parent_id: null },
-        { id: 201, name: "UI设计师", parent_id: null },
-        { id: 202, name: "交互设计师", parent_id: null },
-        { id: 203, name: "UX研究员", parent_id: null },
-        // 技术管理类（300系列）
-        { id: 300, name: "技术经理", parent_id: null },
-        { id: 301, name: "架构师", parent_id: null },
-        { id: 302, name: "研发总监", parent_id: null },
+        { id: 101, name: "\u524D\u7AEF\u5F00\u53D1", parent_id: null },
+        { id: 102, name: "\u540E\u7AEF\u5F00\u53D1", parent_id: null },
+        { id: 103, name: "\u79FB\u52A8\u5F00\u53D1", parent_id: null },
+        { id: 104, name: "\u4EBA\u5DE5\u667A\u80FD", parent_id: null },
+        { id: 105, name: "\u5927\u6570\u636E", parent_id: null },
+        { id: 106, name: "\u4E91\u8BA1\u7B97", parent_id: null },
+        { id: 107, name: "\u7F51\u7EDC\u5B89\u5168", parent_id: null },
+        { id: 108, name: "\u5D4C\u5165\u5F0F\u5F00\u53D1", parent_id: null },
+        { id: 200, name: "\u4EA7\u54C1\u7ECF\u7406", parent_id: null },
+        { id: 201, name: "UI\u8BBE\u8BA1\u5E08", parent_id: null },
+        { id: 202, name: "\u4EA4\u4E92\u8BBE\u8BA1\u5E08", parent_id: null },
+        { id: 203, name: "UX\u7814\u7A76\u5458", parent_id: null },
+        { id: 300, name: "\u6280\u672F\u7ECF\u7406", parent_id: null },
+        { id: 301, name: "\u67B6\u6784\u5E08", parent_id: null },
+        { id: 302, name: "\u7814\u53D1\u603B\u76D1", parent_id: null },
         { id: 303, name: "CTO", parent_id: null }
       ];
     },
-    // 生成模拟职位数据
     getMockJobsData() {
       const mockData = [
-        // 技术开发类（101-108）
-        { id: 1, title: "前端开发工程师", company: "科技有限公司", category_id: 101, emp_type: 1, description: "负责公司网站前端开发，使用Vue框架" },
-        { id: 2, title: "后端开发工程师", company: "互联网科技", category_id: 102, emp_type: 1, description: "负责Java后端开发，熟悉Spring框架" },
-        { id: 3, title: "移动端开发工程师", company: "移动科技", category_id: 103, emp_type: 1, description: "负责React Native移动应用开发" },
-        { id: 4, title: "人工智能工程师", company: "AI科技", category_id: 104, emp_type: 1, description: "负责机器学习模型开发" },
-        { id: 5, title: "大数据工程师", company: "数据科技", category_id: 105, emp_type: 1, description: "负责大数据平台开发" },
-        { id: 6, title: "云计算工程师", company: "云服务", category_id: 106, emp_type: 1, description: "负责云平台架构设计" },
-        { id: 7, title: "网络安全工程师", company: "安全科技", category_id: 107, emp_type: 1, description: "负责网络安全防护" },
-        { id: 8, title: "嵌入式开发工程师", company: "硬件科技", category_id: 108, emp_type: 1, description: "负责嵌入式系统开发" },
-        // 产品与设计类（200系列）
-        { id: 9, title: "产品经理", company: "产品科技", category_id: 200, emp_type: 1, description: "负责产品规划和需求分析" },
-        { id: 10, title: "UI设计师", company: "设计工作室", category_id: 201, emp_type: 2, description: "负责产品UI设计，熟悉Figma工具" },
-        { id: 11, title: "交互设计师", company: "用户体验", category_id: 202, emp_type: 1, description: "负责交互设计和原型制作" },
-        { id: 12, title: "UX研究员", company: "用户研究", category_id: 203, emp_type: 2, description: "负责用户调研和数据分析" },
-        // 技术管理类（300系列）
-        { id: 13, title: "技术经理", company: "管理团队", category_id: 300, emp_type: 1, description: "负责技术团队管理" },
-        { id: 14, title: "架构师", company: "架构团队", category_id: 301, emp_type: 1, description: "负责系统架构设计" },
-        { id: 15, title: "研发总监", company: "研发管理", category_id: 302, emp_type: 1, description: "负责研发部门管理" },
-        { id: 16, title: "CTO", company: "技术领导", category_id: 303, emp_type: 1, description: "负责公司技术战略" }
+        { id: 1, title: "\u524D\u7AEF\u5F00\u53D1\u5DE5\u7A0B\u5E08", company: "\u79D1\u6280\u6709\u9650\u516C\u53F8", category_id: 101, emp_type: 1, description: "\u8D1F\u8D23\u516C\u53F8\u7F51\u7AD9\u524D\u7AEF\u5F00\u53D1\uFF0C\u4F7F\u7528Vue\u6846\u67B6" },
+        { id: 2, title: "\u540E\u7AEF\u5F00\u53D1\u5DE5\u7A0B\u5E08", company: "\u4E92\u8054\u7F51\u79D1\u6280", category_id: 102, emp_type: 1, description: "\u8D1F\u8D23Java\u540E\u7AEF\u5F00\u53D1\uFF0C\u719F\u6089Spring\u6846\u67B6" },
+        { id: 3, title: "\u79FB\u52A8\u7AEF\u5F00\u53D1\u5DE5\u7A0B\u5E08", company: "\u79FB\u52A8\u79D1\u6280", category_id: 103, emp_type: 1, description: "\u8D1F\u8D23React Native\u79FB\u52A8\u5E94\u7528\u5F00\u53D1" },
+        { id: 4, title: "\u4EBA\u5DE5\u667A\u80FD\u5DE5\u7A0B\u5E08", company: "AI\u79D1\u6280", category_id: 104, emp_type: 1, description: "\u8D1F\u8D23\u673A\u5668\u5B66\u4E60\u6A21\u578B\u5F00\u53D1" },
+        { id: 5, title: "\u5927\u6570\u636E\u5DE5\u7A0B\u5E08", company: "\u6570\u636E\u79D1\u6280", category_id: 105, emp_type: 1, description: "\u8D1F\u8D23\u5927\u6570\u636E\u5E73\u53F0\u5F00\u53D1" },
+        { id: 6, title: "\u4E91\u8BA1\u7B97\u5DE5\u7A0B\u5E08", company: "\u4E91\u670D\u52A1", category_id: 106, emp_type: 1, description: "\u8D1F\u8D23\u4E91\u5E73\u53F0\u67B6\u6784\u8BBE\u8BA1" },
+        { id: 7, title: "\u7F51\u7EDC\u5B89\u5168\u5DE5\u7A0B\u5E08", company: "\u5B89\u5168\u79D1\u6280", category_id: 107, emp_type: 1, description: "\u8D1F\u8D23\u7F51\u7EDC\u5B89\u5168\u9632\u62A4" },
+        { id: 8, title: "\u5D4C\u5165\u5F0F\u5F00\u53D1\u5DE5\u7A0B\u5E08", company: "\u786C\u4EF6\u79D1\u6280", category_id: 108, emp_type: 1, description: "\u8D1F\u8D23\u5D4C\u5165\u5F0F\u7CFB\u7EDF\u5F00\u53D1" },
+        { id: 9, title: "\u4EA7\u54C1\u7ECF\u7406", company: "\u4EA7\u54C1\u79D1\u6280", category_id: 200, emp_type: 1, description: "\u8D1F\u8D23\u4EA7\u54C1\u89C4\u5212\u548C\u9700\u6C42\u5206\u6790" },
+        { id: 10, title: "UI\u8BBE\u8BA1\u5E08", company: "\u8BBE\u8BA1\u5DE5\u4F5C\u5BA4", category_id: 201, emp_type: 2, description: "\u8D1F\u8D23\u4EA7\u54C1UI\u8BBE\u8BA1\uFF0C\u719F\u6089Figma\u5DE5\u5177" },
+        { id: 11, title: "\u4EA4\u4E92\u8BBE\u8BA1\u5E08", company: "\u7528\u6237\u4F53\u9A8C", category_id: 202, emp_type: 1, description: "\u8D1F\u8D23\u4EA4\u4E92\u8BBE\u8BA1\u548C\u539F\u578B\u5236\u4F5C" },
+        { id: 12, title: "UX\u7814\u7A76\u5458", company: "\u7528\u6237\u7814\u7A76", category_id: 203, emp_type: 2, description: "\u8D1F\u8D23\u7528\u6237\u8C03\u7814\u548C\u6570\u636E\u5206\u6790" },
+        { id: 13, title: "\u6280\u672F\u7ECF\u7406", company: "\u7BA1\u7406\u56E2\u961F", category_id: 300, emp_type: 1, description: "\u8D1F\u8D23\u6280\u672F\u56E2\u961F\u7BA1\u7406" },
+        { id: 14, title: "\u67B6\u6784\u5E08", company: "\u67B6\u6784\u56E2\u961F", category_id: 301, emp_type: 1, description: "\u8D1F\u8D23\u7CFB\u7EDF\u67B6\u6784\u8BBE\u8BA1" },
+        { id: 15, title: "\u7814\u53D1\u603B\u76D1", company: "\u7814\u53D1\u7BA1\u7406", category_id: 302, emp_type: 1, description: "\u8D1F\u8D23\u7814\u53D1\u90E8\u95E8\u7BA1\u7406" },
+        { id: 16, title: "CTO", company: "\u6280\u672F\u9886\u5BFC", category_id: 303, emp_type: 1, description: "\u8D1F\u8D23\u516C\u53F8\u6280\u672F\u6218\u7565" }
       ];
       return mockData;
     }
@@ -454,13 +449,13 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     p: $data.isDarkMode ? "#3a3a3a" : "#F0F4FF"
   } : {}, {
-    q: common_vendor.t(_ctx.categoryName || "推荐职位"),
+    q: common_vendor.t(_ctx.categoryName || "\u63A8\u8350\u804C\u4F4D"),
     r: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
     s: common_vendor.o((...args) => $options.scrollToJobList && $options.scrollToJobList(...args)),
     t: common_vendor.f($data.jobList, (job, k0, i0) => {
       return {
         a: job.id,
-        b: "e1ad9be6-1-" + i0,
+        b: "fd2dfda4-1-" + i0,
         c: common_vendor.p({
           data: job,
           ["is-dark"]: $data.isDarkMode
@@ -477,6 +472,5 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     A: $data.isDarkMode ? "#1a1a1a" : "#F8FAFD"
   });
 }
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render]]);
+var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/index/index_index.vue"]]);
 wx.createPage(MiniProgramPage);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/index/index_index.js.map

@@ -1,17 +1,17 @@
 "use strict";
-const common_vendor = require("../../common/vendor.js");
-const common_api_ai = require("../../common/api/ai.js");
-const common_assets = require("../../common/assets.js");
+var common_vendor = require("../../common/vendor.js");
+var common_api_ai = require("../../common/api/ai.js");
+require("../../common/api/request.js");
+require("../../common/config.js");
 const BASE_URL = "http://localhost:5000";
-const recorderManager = common_vendor.index.getRecorderManager();
-const _sfc_main = {
+const __default__ = {
   data() {
     return {
-      // 页面状态
+      isH5: false,
+      isMP: false,
       interviewStarted: false,
       isStarting: false,
       currentMethod: "resumeText+positionText",
-      // 表单数据
       formData: {
         resumeText: "",
         resumePdf: null,
@@ -20,120 +20,115 @@ const _sfc_main = {
         positionText: "",
         positionName: ""
       },
-      // 用户信息
       userInfo: null,
       isLoadingUser: false,
-      // 职位数据
       mainCategories: [
-        { id: "101", name: "前端开发" },
-        { id: "102", name: "后端开发" },
-        { id: "103", name: "移动端开发" },
-        { id: "104", name: "数据与AI" },
-        { id: "105", name: "运维与测试" },
-        { id: "106", name: "产品设计" },
-        { id: "107", name: "网络安全" },
-        { id: "108", name: "嵌入式开发" },
-        { id: "200", name: "产品与设计类" },
-        { id: "300", name: "技术管理类" }
+        { id: "101", name: "\u524D\u7AEF\u5F00\u53D1" },
+        { id: "102", name: "\u540E\u7AEF\u5F00\u53D1" },
+        { id: "103", name: "\u79FB\u52A8\u7AEF\u5F00\u53D1" },
+        { id: "104", name: "\u6570\u636E\u4E0EAI" },
+        { id: "105", name: "\u8FD0\u7EF4\u4E0E\u6D4B\u8BD5" },
+        { id: "106", name: "\u4EA7\u54C1\u8BBE\u8BA1" },
+        { id: "107", name: "\u7F51\u7EDC\u5B89\u5168" },
+        { id: "108", name: "\u5D4C\u5165\u5F0F\u5F00\u53D1" },
+        { id: "200", name: "\u4EA7\u54C1\u4E0E\u8BBE\u8BA1\u7C7B" },
+        { id: "300", name: "\u6280\u672F\u7BA1\u7406\u7C7B" }
       ],
       positionDetails: {
         "101": [
-          { id: "1", name: "Web前端工程师" },
-          { id: "2", name: "移动端前端工程师" },
-          { id: "3", name: "小程序开发工程师" },
-          { id: "4", name: "跨平台开发工程师" },
-          { id: "5", name: "前端架构师" },
-          { id: "6", name: "Node.js全栈工程师" }
+          { id: "1", name: "Web\u524D\u7AEF\u5DE5\u7A0B\u5E08" },
+          { id: "2", name: "\u79FB\u52A8\u7AEF\u524D\u7AEF\u5DE5\u7A0B\u5E08" },
+          { id: "3", name: "\u5C0F\u7A0B\u5E8F\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "4", name: "\u8DE8\u5E73\u53F0\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "5", name: "\u524D\u7AEF\u67B6\u6784\u5E08" },
+          { id: "6", name: "Node.js\u5168\u6808\u5DE5\u7A0B\u5E08" }
         ],
         "102": [
-          { id: "7", name: "Java开发工程师" },
-          { id: "8", name: "Python开发工程师" },
-          { id: "9", name: "Go开发工程师" },
-          { id: "10", name: "C++开发工程师" },
-          { id: "11", name: "PHP开发工程师" },
-          { id: "12", name: "微服务架构师" }
+          { id: "7", name: "Java\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "8", name: "Python\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "9", name: "Go\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "10", name: "C++\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "11", name: "PHP\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "12", name: "\u5FAE\u670D\u52A1\u67B6\u6784\u5E08" }
         ],
         "103": [
-          { id: "13", name: "Android开发工程师" },
-          { id: "14", name: "iOS开发工程师" },
-          { id: "15", name: "鸿蒙开发工程师" },
-          { id: "16", name: "移动游戏开发工程师" }
+          { id: "13", name: "Android\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "14", name: "iOS\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "15", name: "\u9E3F\u8499\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "16", name: "\u79FB\u52A8\u6E38\u620F\u5F00\u53D1\u5DE5\u7A0B\u5E08" }
         ],
         "104": [
-          { id: "17", name: "大数据开发工程师" },
-          { id: "18", name: "数据仓库工程师" },
-          { id: "19", name: "机器学习工程师" },
-          { id: "20", name: "深度学习工程师" },
-          { id: "21", name: "算法工程师（推荐/广告）" },
-          { id: "22", name: "自然语言处理工程师" },
-          { id: "23", name: "计算机视觉工程师" },
-          { id: "24", name: "数据分析师" },
-          { id: "25", name: "数据产品经理" }
+          { id: "17", name: "\u5927\u6570\u636E\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "18", name: "\u6570\u636E\u4ED3\u5E93\u5DE5\u7A0B\u5E08" },
+          { id: "19", name: "\u673A\u5668\u5B66\u4E60\u5DE5\u7A0B\u5E08" },
+          { id: "20", name: "\u6DF1\u5EA6\u5B66\u4E60\u5DE5\u7A0B\u5E08" },
+          { id: "21", name: "\u7B97\u6CD5\u5DE5\u7A0B\u5E08\uFF08\u63A8\u8350/\u5E7F\u544A\uFF09" },
+          { id: "22", name: "\u81EA\u7136\u8BED\u8A00\u5904\u7406\u5DE5\u7A0B\u5E08" },
+          { id: "23", name: "\u8BA1\u7B97\u673A\u89C6\u89C9\u5DE5\u7A0B\u5E08" },
+          { id: "24", name: "\u6570\u636E\u5206\u6790\u5E08" },
+          { id: "25", name: "\u6570\u636E\u4EA7\u54C1\u7ECF\u7406" }
         ],
         "105": [
-          { id: "26", name: "测试工程师" },
-          { id: "27", name: "自动化测试工程师" },
-          { id: "28", name: "性能测试工程师" },
-          { id: "29", name: "测试开发工程师" },
-          { id: "30", name: "安全测试工程师" }
+          { id: "26", name: "\u6D4B\u8BD5\u5DE5\u7A0B\u5E08" },
+          { id: "27", name: "\u81EA\u52A8\u5316\u6D4B\u8BD5\u5DE5\u7A0B\u5E08" },
+          { id: "28", name: "\u6027\u80FD\u6D4B\u8BD5\u5DE5\u7A0B\u5E08" },
+          { id: "29", name: "\u6D4B\u8BD5\u5F00\u53D1\u5DE5\u7A0B\u5E08" },
+          { id: "30", name: "\u5B89\u5168\u6D4B\u8BD5\u5DE5\u7A0B\u5E08" }
         ],
         "106": [
-          { id: "31", name: "运维工程师" },
-          { id: "32", name: "DevOps工程师" },
-          { id: "33", name: "SRE工程师" },
-          { id: "34", name: "云原生工程师" },
-          { id: "35", name: "数据库管理员(DBA)" },
-          { id: "36", name: "网络工程师" }
+          { id: "31", name: "\u8FD0\u7EF4\u5DE5\u7A0B\u5E08" },
+          { id: "32", name: "DevOps\u5DE5\u7A0B\u5E08" },
+          { id: "33", name: "SRE\u5DE5\u7A0B\u5E08" },
+          { id: "34", name: "\u4E91\u539F\u751F\u5DE5\u7A0B\u5E08" },
+          { id: "35", name: "\u6570\u636E\u5E93\u7BA1\u7406\u5458(DBA)" },
+          { id: "36", name: "\u7F51\u7EDC\u5DE5\u7A0B\u5E08" }
         ],
         "107": [
-          { id: "37", name: "网络安全工程师" },
-          { id: "38", name: "渗透测试工程师" },
-          { id: "39", name: "安全运维工程师" },
-          { id: "40", name: "逆向工程师" },
-          { id: "41", name: "安全架构师" }
+          { id: "37", name: "\u7F51\u7EDC\u5B89\u5168\u5DE5\u7A0B\u5E08" },
+          { id: "38", name: "\u6E17\u900F\u6D4B\u8BD5\u5DE5\u7A0B\u5E08" },
+          { id: "39", name: "\u5B89\u5168\u8FD0\u7EF4\u5DE5\u7A0B\u5E08" },
+          { id: "40", name: "\u9006\u5411\u5DE5\u7A0B\u5E08" },
+          { id: "41", name: "\u5B89\u5168\u67B6\u6784\u5E08" }
         ],
         "108": [
-          { id: "42", name: "嵌入式软件工程师" },
-          { id: "43", name: "Linux驱动工程师" },
-          { id: "44", name: "物联网(IoT)工程师" },
-          { id: "45", name: "FPGA工程师" }
+          { id: "42", name: "\u5D4C\u5165\u5F0F\u8F6F\u4EF6\u5DE5\u7A0B\u5E08" },
+          { id: "43", name: "Linux\u9A71\u52A8\u5DE5\u7A0B\u5E08" },
+          { id: "44", name: "\u7269\u8054\u7F51(IoT)\u5DE5\u7A0B\u5E08" },
+          { id: "45", name: "FPGA\u5DE5\u7A0B\u5E08" }
         ],
         "200": [
-          { id: "46", name: "产品经理（技术型）" },
-          { id: "47", name: "UI设计师" },
-          { id: "48", name: "交互设计师(IXD)" },
-          { id: "49", name: "UX研究员" }
+          { id: "46", name: "\u4EA7\u54C1\u7ECF\u7406\uFF08\u6280\u672F\u578B\uFF09" },
+          { id: "47", name: "UI\u8BBE\u8BA1\u5E08" },
+          { id: "48", name: "\u4EA4\u4E92\u8BBE\u8BA1\u5E08(IXD)" },
+          { id: "49", name: "UX\u7814\u7A76\u5458" }
         ],
         "300": [
-          { id: "50", name: "技术经理/组长" },
-          { id: "51", name: "架构师" },
-          { id: "52", name: "研发总监" },
-          { id: "53", name: "CTO/技术VP" }
+          { id: "50", name: "\u6280\u672F\u7ECF\u7406/\u7EC4\u957F" },
+          { id: "51", name: "\u67B6\u6784\u5E08" },
+          { id: "52", name: "\u7814\u53D1\u603B\u76D1" },
+          { id: "53", name: "CTO/\u6280\u672FVP" }
         ]
       },
-      // 级联选择器状态
       showCascadePicker: false,
       selectedCategoryId: "",
       selectedCategoryName: "",
       selectedPositionId: "",
       selectedPositionName: "",
-      // 面试配置
       interviewMethods: [
-        { value: "resumeText+positionText", label: "简历文本+岗位文本" },
-        { value: "pdf+positionText", label: "PDF简历+岗位文本" },
-        { value: "pdf+position", label: "PDF简历+岗位ID" },
-        { value: "user+position", label: "用户ID+岗位ID" },
-        { value: "user+positionText", label: "用户ID+岗位文本" },
-        { value: "resumeText+position", label: "简历文本+岗位ID" }
+        { value: "resumeText+positionText", label: "\u7B80\u5386\u6587\u672C+\u804C\u4F4D\u6587\u672C" },
+        { value: "pdf+positionText", label: "PDF\u7B80\u5386+\u804C\u4F4D\u6587\u672C" },
+        { value: "pdf+position", label: "PDF\u7B80\u5386+\u804C\u4F4D" },
+        { value: "user+position", label: "\u804C\u4F4D" },
+        { value: "user+positionText", label: "\u804C\u4F4D\u6587\u672C" },
+        { value: "resumeText+position", label: "\u7B80\u5386\u6587\u672C+\u804C\u4F4D" }
       ],
-      // 面试流程状态
       sessionId: null,
       currentQuestion: 0,
       totalQuestions: 8,
-      currentStage: "自我介绍",
+      currentStage: "\u81EA\u6211\u4ECB\u7ECD",
       resumeSource: "",
       jobSource: "",
-      // 录音状态
+      recorderManager: null,
       isRecording: false,
       isSpeaking: false,
       isAIThinking: false,
@@ -142,55 +137,51 @@ const _sfc_main = {
       recordingTime: 0,
       recordingTimer: null,
       audioFilePath: "",
-      // 音频播放
       currentAudioUrl: "",
       innerAudioContext: null,
-      // 对话数据
       interviewMessages: [],
       chatScrollTop: 0,
-      // 面试技巧
       tipsCollapsed: false,
       currentTips: [
-        "保持自信，语速适中",
-        "回答问题要有条理，使用STAR法则",
-        "适当使用专业术语展示能力",
-        "注意与面试官的眼神交流",
-        "遇到不会的问题诚实回答"
+        "\u4FDD\u6301\u81EA\u4FE1\uFF0C\u8BED\u901F\u9002\u4E2D",
+        "\u56DE\u7B54\u95EE\u9898\u8981\u6709\u6761\u7406\uFF0C\u4F7F\u7528STAR\u6CD5\u5219",
+        "\u9002\u5F53\u4F7F\u7528\u4E13\u4E1A\u672F\u8BED\u5C55\u793A\u80FD\u529B",
+        "\u6CE8\u610F\u4E0E\u9762\u8BD5\u5B98\u7684\u773C\u795E\u4EA4\u6D41",
+        "\u9047\u5230\u4E0D\u4F1A\u7684\u95EE\u9898\u8BDA\u5B9E\u56DE\u7B54"
       ],
-      // 面试报告数据
       showReport: false,
       overallScore: 85,
       evaluationItems: [],
       suggestions: [],
-      reportData: null
+      reportData: null,
+      tempAnswer: ""
     };
   },
   computed: {
     progressPercent() {
       return Math.min(this.currentQuestion / this.totalQuestions * 100, 100);
     },
-    // 当前分类下的职位列表
     currentPositions() {
       if (!this.selectedCategoryId)
         return [];
       return this.positionDetails[this.selectedCategoryId] || [];
     },
-    // 判断是否已获取到用户信息
     hasUserInfo() {
       return !!this.formData.userId;
     }
   },
   onLoad() {
+    this.isMP = true;
     this.initializeInterview();
     this.initRecorder();
     this.fetchUserInfo();
     this.resetPositionSelection();
+    console.log("\u5F53\u524D\u73AF\u5883:", this.isH5 ? "H5" : this.isMP ? "\u5C0F\u7A0B\u5E8F" : "App");
   },
   onUnload() {
     this.cleanupInterview();
   },
   methods: {
-    // ==================== 职位选择（级联弹窗） ====================
     openCascadePicker() {
       var _a;
       this.showCascadePicker = true;
@@ -251,14 +242,14 @@ const _sfc_main = {
     },
     confirmCascadeSelection() {
       if (!this.selectedPositionId) {
-        common_vendor.index.showToast({ title: "请选择职位", icon: "none" });
+        common_vendor.index.showToast({ title: "\u8BF7\u9009\u62E9\u804C\u4F4D", icon: "none" });
         return;
       }
       this.formData.positionId = this.selectedPositionId;
       this.formData.positionName = this.selectedPositionName;
       this.showCascadePicker = false;
       common_vendor.index.showToast({
-        title: `已选择: ${this.selectedCategoryName} - ${this.selectedPositionName}`,
+        title: `\u5DF2\u9009\u62E9: ${this.selectedCategoryName} - ${this.selectedPositionName}`,
         icon: "none",
         duration: 1500
       });
@@ -271,13 +262,12 @@ const _sfc_main = {
       this.formData.positionId = "";
       this.formData.positionName = "";
     },
-    // ==================== 用户信息 ====================
     async fetchUserInfo() {
       this.isLoadingUser = true;
       try {
         const token = common_vendor.index.getStorageSync("token");
         if (!token) {
-          common_vendor.index.__f__("log", "at pages/AI/interview.vue:533", "未找到登录token，需要用户登录");
+          console.log("\u672A\u627E\u5230\u767B\u5F55token\uFF0C\u9700\u8981\u7528\u6237\u767B\u5F55");
           this.formData.userId = null;
           return;
         }
@@ -285,7 +275,7 @@ const _sfc_main = {
         if (cachedUserInfo && cachedUserInfo.user_id) {
           this.userInfo = cachedUserInfo;
           this.formData.userId = String(cachedUserInfo.user_id);
-          common_vendor.index.__f__("log", "at pages/AI/interview.vue:541", "从缓存获取用户ID:", this.formData.userId);
+          console.log("\u4ECE\u7F13\u5B58\u83B7\u53D6\u7528\u6237ID:", this.formData.userId);
           return;
         }
         const res = await this.getUserProfile();
@@ -293,11 +283,11 @@ const _sfc_main = {
           this.userInfo = res.data;
           this.formData.userId = String(res.data.user_id || res.data.userId || res.data.id);
           common_vendor.index.setStorageSync("userInfo", res.data);
-          common_vendor.index.__f__("log", "at pages/AI/interview.vue:549", "从后端获取用户ID:", this.formData.userId);
+          console.log("\u4ECE\u540E\u7AEF\u83B7\u53D6\u7528\u6237ID:", this.formData.userId);
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/AI/interview.vue:552", "获取用户信息失败:", error);
-        common_vendor.index.showToast({ title: "获取用户信息失败", icon: "none", duration: 2e3 });
+        console.error("\u83B7\u53D6\u7528\u6237\u4FE1\u606F\u5931\u8D25:", error);
+        common_vendor.index.showToast({ title: "\u83B7\u53D6\u7528\u6237\u4FE1\u606F\u5931\u8D25", icon: "none", duration: 2e3 });
         this.formData.userId = null;
       } finally {
         this.isLoadingUser = false;
@@ -314,7 +304,6 @@ const _sfc_main = {
         });
       });
     },
-    // ==================== 初始化 ====================
     initializeInterview() {
       this.innerAudioContext = common_vendor.index.createInnerAudioContext();
       this.innerAudioContext.onEnded(() => {
@@ -322,30 +311,43 @@ const _sfc_main = {
         this.voiceWaveActive = false;
       });
       this.innerAudioContext.onError((err) => {
-        common_vendor.index.__f__("error", "at pages/AI/interview.vue:580", "音频播放错误", err);
+        console.error("\u97F3\u9891\u64AD\u653E\u9519\u8BEF", err);
         this.isSpeaking = false;
         this.voiceWaveActive = false;
       });
     },
     initRecorder() {
-      recorderManager.onStart(() => {
-        common_vendor.index.__f__("log", "at pages/AI/interview.vue:587", "录音开始");
-        this.isRecording = true;
-        this.startRecordingTimer();
-      });
-      recorderManager.onStop((res) => {
-        common_vendor.index.__f__("log", "at pages/AI/interview.vue:592", "录音结束", res);
-        this.isRecording = false;
-        this.clearRecordingTimer();
-        this.audioFilePath = res.tempFilePath;
-        this.processAudio(res.tempFilePath);
-      });
-      recorderManager.onError((err) => {
-        common_vendor.index.__f__("error", "at pages/AI/interview.vue:599", "录音错误", err);
-        this.isRecording = false;
-        this.clearRecordingTimer();
-        common_vendor.index.showToast({ title: "录音失败: " + err.message, icon: "none" });
-      });
+      if (!this.isH5) {
+        try {
+          this.recorderManager = common_vendor.index.getRecorderManager();
+          if (this.recorderManager) {
+            this.recorderManager.onStart(() => {
+              console.log("\u5F55\u97F3\u5F00\u59CB");
+              this.isRecording = true;
+              this.startRecordingTimer();
+            });
+            this.recorderManager.onStop((res) => {
+              console.log("\u5F55\u97F3\u7ED3\u675F", res);
+              this.isRecording = false;
+              this.clearRecordingTimer();
+              if (res.tempFilePath) {
+                this.audioFilePath = res.tempFilePath;
+                this.processAudio(res.tempFilePath);
+              }
+            });
+            this.recorderManager.onError((err) => {
+              console.error("\u5F55\u97F3\u9519\u8BEF", err);
+              this.isRecording = false;
+              this.clearRecordingTimer();
+              common_vendor.index.showToast({ title: "\u5F55\u97F3\u5931\u8D25: " + (err.errMsg || "\u672A\u77E5\u9519\u8BEF"), icon: "none" });
+            });
+          } else {
+            console.warn("\u5F53\u524D\u73AF\u5883\u4E0D\u652F\u6301\u5F55\u97F3\u529F\u80FD");
+          }
+        } catch (e) {
+          console.error("\u521D\u59CB\u5316\u5F55\u97F3\u5931\u8D25:", e);
+        }
+      }
     },
     cleanupInterview() {
       this.resetInterview();
@@ -354,25 +356,24 @@ const _sfc_main = {
         this.innerAudioContext.destroy();
         this.innerAudioContext = null;
       }
-      if (this.isRecording) {
-        recorderManager.stop();
+      if (this.isRecording && this.recorderManager) {
+        this.recorderManager.stop();
       }
     },
     getInterviewerStatus() {
       if (this.isAIThinking)
-        return "思考中...";
+        return "\u601D\u8003\u4E2D...";
       if (this.isSpeaking)
-        return "说话中...";
+        return "\u8BF4\u8BDD\u4E2D...";
       if (this.isProcessing)
-        return "处理中...";
-      return "等待中";
+        return "\u5904\u7406\u4E2D...";
+      return "\u7B49\u5F85\u56DE\u7B54";
     },
-    // ==================== 导航 ====================
     goBack() {
       if (this.interviewStarted) {
         common_vendor.index.showModal({
-          title: "提示",
-          content: "确定要结束面试吗？当前进度将不会保存。",
+          title: "\u63D0\u793A",
+          content: "\u786E\u5B9A\u8981\u7ED3\u675F\u9762\u8BD5\u5417\uFF1F\u5F53\u524D\u8FDB\u5EA6\u5C06\u4E0D\u4F1A\u4FDD\u5B58\u3002",
           success: (res) => {
             if (res.confirm) {
               this.interviewStarted = false;
@@ -385,7 +386,6 @@ const _sfc_main = {
         common_vendor.index.navigateBack();
       }
     },
-    // ==================== 配置切换 ====================
     selectMethod(method) {
       this.currentMethod = method;
       this.resetForm();
@@ -396,67 +396,69 @@ const _sfc_main = {
         this.resetPositionSelection();
       }
     },
-    // ==================== 文件上传 ====================
     chooseResumeFile() {
-      common_vendor.wx$1.chooseMessageFile({
+      wx.chooseMessageFile({
         count: 1,
         type: "file",
         extension: ["pdf"],
         success: (res) => {
           const file = res.tempFiles[0];
           const fs = common_vendor.index.getFileSystemManager();
-          fs.readFile({
-            filePath: file.path,
-            encoding: "base64",
-            success: (readRes) => {
-              this.formData.resumePdf = {
-                name: file.name,
-                path: file.path,
-                base64: readRes.data
-              };
-            },
-            fail: (err) => {
-              common_vendor.index.__f__("error", "at pages/AI/interview.vue:675", "读取文件失败", err);
-              common_vendor.index.showToast({ title: "文件读取失败", icon: "none" });
-            }
-          });
+          if (fs) {
+            fs.readFile({
+              filePath: file.path,
+              encoding: "base64",
+              success: (readRes) => {
+                this.formData.resumePdf = {
+                  name: file.name,
+                  path: file.path,
+                  base64: readRes.data
+                };
+                common_vendor.index.showToast({ title: "\u6587\u4EF6\u9009\u62E9\u6210\u529F", icon: "success", duration: 1500 });
+              },
+              fail: (err) => {
+                console.error("\u8BFB\u53D6\u6587\u4EF6\u5931\u8D25", err);
+                common_vendor.index.showToast({ title: "\u6587\u4EF6\u8BFB\u53D6\u5931\u8D25", icon: "none" });
+              }
+            });
+          } else {
+            common_vendor.index.showToast({ title: "\u5F53\u524D\u73AF\u5883\u4E0D\u652F\u6301\u6587\u4EF6\u8BFB\u53D6", icon: "none" });
+          }
         },
         fail: (err) => {
-          common_vendor.index.__f__("log", "at pages/AI/interview.vue:681", "选择文件取消或失败", err);
+          console.log("\u9009\u62E9\u6587\u4EF6\u53D6\u6D88\u6216\u5931\u8D25", err);
         }
       });
     },
-    // ==================== 表单验证 ====================
     validateForm() {
       const method = this.currentMethod;
       if (method.includes("resumeText") && !this.formData.resumeText.trim()) {
-        common_vendor.index.showToast({ title: "请输入简历文本", icon: "none" });
+        common_vendor.index.showToast({ title: "\u8BF7\u8F93\u5165\u7B80\u5386\u6587\u672C", icon: "none" });
         return false;
       }
       if (method.includes("pdf") && !this.formData.resumePdf) {
-        common_vendor.index.showToast({ title: "请上传PDF简历", icon: "none" });
+        common_vendor.index.showToast({ title: "\u8BF7\u4E0A\u4F20PDF\u7B80\u5386", icon: "none" });
         return false;
       }
       if (method.includes("user")) {
         if (!this.formData.userId) {
-          common_vendor.index.showToast({ title: "未获取到用户信息，请重新登录", icon: "none", duration: 3e3 });
+          common_vendor.index.showToast({ title: "\u6B63\u5728\u83B7\u53D6...", icon: "none", duration: 3e3 });
           this.fetchUserInfo();
           return false;
         }
       }
       if (method.includes("position")) {
         if (!this.selectedPositionId) {
-          common_vendor.index.showToast({ title: "请选择职位", icon: "none" });
+          common_vendor.index.showToast({ title: "\u8BF7\u9009\u62E9\u804C\u4F4D", icon: "none" });
           return false;
         }
       }
       if (method.includes("positionText") && !this.formData.positionText.trim()) {
-        common_vendor.index.showToast({ title: "请输入岗位描述", icon: "none" });
+        common_vendor.index.showToast({ title: "\u8BF7\u8F93\u5165\u804C\u4F4D\u63CF\u8FF0", icon: "none" });
         return false;
       }
       return true;
     },
-    // ==================== 开始面试 ====================
     async startInterview() {
       var _a, _b, _c, _d, _e, _f, _g, _h, _i;
       if (!this.validateForm())
@@ -470,19 +472,19 @@ const _sfc_main = {
             break;
           case "pdf+positionText":
             if (!((_a = this.formData.resumePdf) == null ? void 0 : _a.base64))
-              throw new Error("PDF文件未准备好");
+              throw new Error("PDF\u6587\u4EF6\u672A\u51C6\u5907\u597D");
             res = await common_api_ai.interviewApi.startPdfText(this.formData.resumePdf.base64, this.formData.positionText);
             break;
           case "pdf+position":
             if (!((_b = this.formData.resumePdf) == null ? void 0 : _b.base64))
-              throw new Error("PDF文件未准备好");
+              throw new Error("PDF\u6587\u4EF6\u672A\u51C6\u5907\u597D");
             if (!this.formData.positionName)
-              throw new Error("请选择有效的职位");
+              throw new Error("\u8BF7\u9009\u62E9\u6709\u6548\u7684\u804C\u4F4D");
             res = await common_api_ai.interviewApi.startPdfJobName(this.formData.resumePdf.base64, this.formData.positionName);
             break;
           case "user+position":
             if (!this.formData.positionName)
-              throw new Error("请选择有效的职位");
+              throw new Error("\u8BF7\u9009\u62E9\u6709\u6548\u7684\u804C\u4F4D");
             res = await common_api_ai.interviewApi.startUserIdJobName(this.formData.userId, this.formData.positionName);
             break;
           case "user+positionText":
@@ -490,13 +492,13 @@ const _sfc_main = {
             break;
           case "resumeText+position":
             if (!this.formData.positionName)
-              throw new Error("请选择有效的职位");
+              throw new Error("\u8BF7\u9009\u62E9\u6709\u6548\u7684\u804C\u4F4D");
             res = await common_api_ai.interviewApi.startTextJobName(this.formData.resumeText, this.formData.positionName);
             break;
           default:
-            throw new Error("未知的面试方式");
+            throw new Error("\u672A\u77E5\u7684\u9762\u8BD5\u65B9\u5F0F");
         }
-        common_vendor.index.__f__("log", "at pages/AI/interview.vue:786", "面试启动响应", res);
+        console.log("\u9762\u8BD5\u542F\u52A8\u54CD\u5E94", res);
         if (res.code === 200 || ((_c = res.data) == null ? void 0 : _c.session_id)) {
           this.sessionId = res.session_id || ((_d = res.data) == null ? void 0 : _d.session_id);
           this.resumeSource = res.resume_source || ((_e = res.data) == null ? void 0 : _e.resume_source);
@@ -512,27 +514,38 @@ const _sfc_main = {
           }
           this.updateInterviewStage();
         } else {
-          throw new Error(res.message || "启动面试失败");
+          throw new Error(res.message || "\u542F\u52A8\u9762\u8BD5\u5931\u8D25");
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/AI/interview.vue:808", "启动面试失败", error);
-        common_vendor.index.showToast({ title: error.message || "启动面试失败，请重试", icon: "none", duration: 3e3 });
+        console.error("\u542F\u52A8\u9762\u8BD5\u5931\u8D25", error);
+        common_vendor.index.showToast({ title: error.message || "\u542F\u52A8\u9762\u8BD5\u5931\u8D25\uFF0C\u8BF7\u91CD\u8BD5", icon: "none", duration: 3e3 });
       } finally {
         this.isStarting = false;
       }
     },
-    // ==================== 录音相关 ====================
     startRecording() {
       if (this.isProcessing || this.isAIThinking) {
-        common_vendor.index.showToast({ title: "请等待AI响应", icon: "none" });
+        common_vendor.index.showToast({ title: "\u8BF7\u7B49\u5F85AI\u54CD\u5E94", icon: "none" });
         return;
       }
-      recorderManager.start({ duration: 18e4, sampleRate: 16e3, numberOfChannels: 1, encodeBitRate: 96e3, format: "mp3" });
+      if (this.recorderManager) {
+        this.recorderManager.start({
+          duration: 18e4,
+          sampleRate: 16e3,
+          numberOfChannels: 1,
+          encodeBitRate: 96e3,
+          format: "mp3"
+        });
+      } else {
+        common_vendor.index.showToast({ title: "\u5F55\u97F3\u529F\u80FD\u4E0D\u53EF\u7528", icon: "none" });
+      }
     },
     stopRecording() {
       if (!this.isRecording)
         return;
-      recorderManager.stop();
+      if (this.recorderManager) {
+        this.recorderManager.stop();
+      }
     },
     startRecordingTimer() {
       this.recordingTime = 0;
@@ -548,13 +561,26 @@ const _sfc_main = {
         this.recordingTimer = null;
       }
     },
+    submitTextAnswer() {
+      if (this.tempAnswer.trim()) {
+        console.log("\u63D0\u4EA4\u6587\u672C\u56DE\u7B54:", this.tempAnswer.trim());
+        this.addMessage("candidate", this.tempAnswer.trim());
+        this.sendAnswer(this.tempAnswer.trim());
+        this.tempAnswer = "";
+      } else {
+        common_vendor.index.showToast({ title: "\u8BF7\u8F93\u5165\u56DE\u7B54\u5185\u5BB9", icon: "none" });
+      }
+    },
     async processAudio(filePath) {
       if (!this.sessionId) {
-        common_vendor.index.showToast({ title: "会话异常", icon: "none" });
+        common_vendor.index.showToast({ title: "\u4F1A\u8BDD\u5F02\u5E38", icon: "none" });
         return;
       }
       this.isProcessing = true;
       try {
+        if (!common_api_ai.interviewApi.transcribe) {
+          throw new Error("\u8BED\u97F3\u8BC6\u522B\u529F\u80FD\u4E0D\u53EF\u7528");
+        }
         const uploadRes = await common_api_ai.interviewApi.transcribe(this.sessionId, filePath);
         let transcribeData;
         if (typeof uploadRes.data === "string") {
@@ -567,16 +593,15 @@ const _sfc_main = {
           this.addMessage("candidate", userText);
           await this.sendAnswer(userText);
         } else {
-          throw new Error(transcribeData.message || "语音识别失败");
+          throw new Error(transcribeData.message || "\u8BED\u97F3\u8BC6\u522B\u5931\u8D25");
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/AI/interview.vue:862", "处理录音失败", error);
-        common_vendor.index.showToast({ title: error.message || "语音识别失败", icon: "none" });
+        console.error("\u5904\u7406\u5F55\u97F3\u5931\u8D25", error);
+        common_vendor.index.showToast({ title: error.message || "\u8BED\u97F3\u8BC6\u522B\u5931\u8D25\uFF0C\u8BF7\u4F7F\u7528\u6587\u672C\u8F93\u5165", icon: "none", duration: 3e3 });
       } finally {
         this.isProcessing = false;
       }
     },
-    // ==================== 对话交互 ====================
     async sendAnswer(userText, endInterview = false) {
       var _a, _b;
       if (!this.sessionId)
@@ -584,7 +609,7 @@ const _sfc_main = {
       this.isAIThinking = true;
       try {
         const res = await common_api_ai.interviewApi.answer(this.sessionId, userText, endInterview);
-        common_vendor.index.__f__("log", "at pages/AI/interview.vue:875", "AI响应", res);
+        console.log("AI\u54CD\u5E94", res);
         if (res.code === 200 || res.data) {
           const data = res.data || res;
           if (data.is_ended || data.stage === "ended") {
@@ -602,11 +627,11 @@ const _sfc_main = {
           this.currentStage = data.stage || this.currentStage;
           this.updateInterviewStage();
         } else {
-          throw new Error(res.message || "获取回复失败");
+          throw new Error(res.message || "\u83B7\u53D6\u56DE\u590D\u5931\u8D25");
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/AI/interview.vue:896", "发送回答失败", error);
-        common_vendor.index.showToast({ title: error.message || "获取回复失败", icon: "none" });
+        console.error("\u53D1\u9001\u56DE\u7B54\u5931\u8D25", error);
+        common_vendor.index.showToast({ title: error.message || "\u83B7\u53D6\u56DE\u590D\u5931\u8D25", icon: "none" });
       } finally {
         this.isAIThinking = false;
       }
@@ -617,14 +642,14 @@ const _sfc_main = {
       this.isSpeaking = true;
       this.voiceWaveActive = true;
       const fullUrl = common_api_ai.getStaticUrl(url);
-      common_vendor.index.__f__("log", "at pages/AI/interview.vue:907", "播放音频，完整URL:", fullUrl);
+      console.log("\u64AD\u653E\u97F3\u9891\uFF0C\u5B8C\u6574URL:", fullUrl);
       this.innerAudioContext.offError();
       this.innerAudioContext.offEnded();
       this.innerAudioContext.onError((err) => {
-        common_vendor.index.__f__("error", "at pages/AI/interview.vue:911", "音频播放错误", err);
+        console.error("\u97F3\u9891\u64AD\u653E\u9519\u8BEF", err);
         this.isSpeaking = false;
         this.voiceWaveActive = false;
-        common_vendor.index.showToast({ title: "语音加载失败，请阅读文字", icon: "none", duration: 3e3 });
+        common_vendor.index.showToast({ title: "\u8BED\u97F3\u52A0\u8F7D\u5931\u8D25\uFF0C\u8BF7\u9605\u8BFB\u6587\u5B57", icon: "none", duration: 3e3 });
       });
       this.innerAudioContext.onEnded(() => {
         this.isSpeaking = false;
@@ -642,9 +667,9 @@ const _sfc_main = {
       this.scrollToBottom();
     },
     updateInterviewStage() {
-      const stages = ["自我介绍", "技术能力", "项目经验", "职业规划", "综合能力"];
+      const stages = ["\u81EA\u6211\u4ECB\u7ECD", "\u6280\u672F\u80FD\u529B", "\u9879\u76EE\u7ECF\u9A8C", "\u804C\u4E1A\u89C4\u5212", "\u7EFC\u5408\u80FD\u529B"];
       const stageIndex = Math.floor((this.currentQuestion - 1) / (this.totalQuestions / stages.length));
-      this.currentStage = stages[stageIndex] || "综合评估";
+      this.currentStage = stages[stageIndex] || "\u7EFC\u5408\u8BC4\u4F30";
     },
     scrollToBottom() {
       this.$nextTick(() => {
@@ -655,11 +680,10 @@ const _sfc_main = {
       const date = new Date(timestamp);
       return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
     },
-    // ==================== 面试结束与报告 ====================
     confirmEndInterview() {
       common_vendor.index.showModal({
-        title: "结束面试",
-        content: "确定要结束面试吗？将生成面试报告。",
+        title: "\u7ED3\u675F\u9762\u8BD5",
+        content: "\u786E\u5B9A\u8981\u7ED3\u675F\u9762\u8BD5\u5417\uFF1F\u5C06\u751F\u6210\u9762\u8BD5\u62A5\u544A\u3002",
         success: (res) => {
           if (res.confirm)
             this.endInterview();
@@ -672,9 +696,9 @@ const _sfc_main = {
         return;
       }
       try {
-        await this.sendAnswer("面试结束", true);
+        await this.sendAnswer("\u9762\u8BD5\u7ED3\u675F", true);
       } catch (error) {
-        common_vendor.index.__f__("log", "at pages/AI/interview.vue:959", "发送结束信号失败，直接获取报告", error);
+        console.log("\u53D1\u9001\u7ED3\u675F\u4FE1\u53F7\u5931\u8D25\uFF0C\u76F4\u63A5\u83B7\u53D6\u62A5\u544A", error);
       }
       this.finishInterview();
     },
@@ -682,12 +706,17 @@ const _sfc_main = {
       if (!this.sessionId) {
         this.generateMockReport();
         this.showReport = true;
+        this.$nextTick(() => {
+          setTimeout(() => {
+            this.drawRadarChart();
+          }, 300);
+        });
         return;
       }
-      common_vendor.index.showLoading({ title: "生成报告中..." });
+      common_vendor.index.showLoading({ title: "\u751F\u6210\u62A5\u544A\u4E2D..." });
       try {
         const res = await common_api_ai.interviewApi.getReport(this.sessionId);
-        common_vendor.index.__f__("log", "at pages/AI/interview.vue:972", "面试报告", res);
+        console.log("\u9762\u8BD5\u62A5\u544A", res);
         if (res.code === 200 || res.data) {
           this.reportData = res.data || res;
           this.parseReportData(this.reportData);
@@ -698,16 +727,16 @@ const _sfc_main = {
         this.$nextTick(() => {
           setTimeout(() => {
             this.drawRadarChart();
-          }, 200);
+          }, 300);
         });
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/AI/interview.vue:986", "获取报告失败", error);
+        console.error("\u83B7\u53D6\u62A5\u544A\u5931\u8D25", error);
         this.generateMockReport();
         this.showReport = true;
         this.$nextTick(() => {
           setTimeout(() => {
             this.drawRadarChart();
-          }, 200);
+          }, 300);
         });
       } finally {
         common_vendor.index.hideLoading();
@@ -716,27 +745,27 @@ const _sfc_main = {
     parseReportData(data) {
       this.overallScore = data.overall_score || data.score || 85;
       this.evaluationItems = [
-        { title: "技术能力", content: data.tech_evaluation || "基础扎实，能够清晰地解释技术概念。" },
-        { title: "沟通能力", content: data.comm_evaluation || "表达清晰，逻辑性强。" },
-        { title: "项目经验", content: data.project_evaluation || "项目经历丰富，能够详细描述项目细节。" }
+        { title: "\u6280\u672F\u80FD\u529B", content: data.tech_evaluation || "\u57FA\u7840\u624E\u5B9E\uFF0C\u80FD\u591F\u6E05\u6670\u5730\u89E3\u91CA\u6280\u672F\u6982\u5FF5\u3002" },
+        { title: "\u6C9F\u901A\u80FD\u529B", content: data.comm_evaluation || "\u8868\u8FBE\u6E05\u6670\uFF0C\u903B\u8F91\u6027\u5F3A\u3002" },
+        { title: "\u9879\u76EE\u7ECF\u9A8C", content: data.project_evaluation || "\u9879\u76EE\u7ECF\u5386\u4E30\u5BCC\uFF0C\u80FD\u591F\u8BE6\u7EC6\u63CF\u8FF0\u9879\u76EE\u7EC6\u8282\u3002" }
       ];
       this.suggestions = data.suggestions || [
-        "建议在技术深度方面继续加强学习",
-        "可以增加更多实际项目案例的积累"
+        "\u5EFA\u8BAE\u5728\u6280\u672F\u6DF1\u5EA6\u65B9\u9762\u7EE7\u7EED\u52A0\u5F3A\u5B66\u4E60",
+        "\u53EF\u4EE5\u589E\u52A0\u66F4\u591A\u5B9E\u9645\u9879\u76EE\u6848\u4F8B\u7684\u79EF\u7D2F"
       ];
     },
     generateMockReport() {
       this.overallScore = Math.floor(Math.random() * 20) + 75;
       this.evaluationItems = [
-        { title: "技术能力", content: "基础扎实，能够清晰地解释技术概念，但在某些深度问题上略显不足。" },
-        { title: "沟通能力", content: "表达清晰，逻辑性强，能够很好地理解问题并给出合适的回答。" },
-        { title: "项目经验", content: "项目经历丰富，能够详细描述项目细节和个人贡献。" }
+        { title: "\u6280\u672F\u80FD\u529B", content: "\u57FA\u7840\u624E\u5B9E\uFF0C\u80FD\u591F\u6E05\u6670\u5730\u89E3\u91CA\u6280\u672F\u6982\u5FF5\uFF0C\u4F46\u5728\u67D0\u4E9B\u6DF1\u5EA6\u95EE\u9898\u4E0A\u7565\u663E\u4E0D\u8DB3\u3002" },
+        { title: "\u6C9F\u901A\u80FD\u529B", content: "\u8868\u8FBE\u6E05\u6670\uFF0C\u903B\u8F91\u6027\u5F3A\uFF0C\u80FD\u591F\u5F88\u597D\u5730\u7406\u89E3\u95EE\u9898\u5E76\u7ED9\u51FA\u5408\u9002\u7684\u56DE\u7B54\u3002" },
+        { title: "\u9879\u76EE\u7ECF\u9A8C", content: "\u9879\u76EE\u7ECF\u5386\u4E30\u5BCC\uFF0C\u80FD\u591F\u8BE6\u7EC6\u63CF\u8FF0\u9879\u76EE\u7EC6\u8282\u548C\u4E2A\u4EBA\u8D21\u732E\u3002" }
       ];
       this.suggestions = [
-        "建议在技术深度方面继续加强学习",
-        "可以增加更多实际项目案例的积累",
-        "面试时保持更好的眼神交流",
-        "适当准备一些行为面试问题的回答"
+        "\u5EFA\u8BAE\u5728\u6280\u672F\u6DF1\u5EA6\u65B9\u9762\u7EE7\u7EED\u52A0\u5F3A\u5B66\u4E60",
+        "\u53EF\u4EE5\u589E\u52A0\u66F4\u591A\u5B9E\u9645\u9879\u76EE\u6848\u4F8B\u7684\u79EF\u7D2F",
+        "\u9762\u8BD5\u65F6\u4FDD\u6301\u66F4\u597D\u7684\u773C\u795E\u4EA4\u6D41",
+        "\u9002\u5F53\u51C6\u5907\u4E00\u4E9B\u884C\u4E3A\u9762\u8BD5\u95EE\u9898\u7684\u56DE\u7B54"
       ];
     },
     toggleTips() {
@@ -756,9 +785,9 @@ const _sfc_main = {
         <html>
         <head>
           <meta charset="UTF-8">
-          <title>面试报告</title>
+          <title>\u9762\u8BD5\u62A5\u544A</title>
           <style>
-            body { font-family: '微软雅黑', '宋体', Arial, sans-serif; margin: 40px; }
+            body { font-family: '\u5FAE\u8F6F\u96C5\u9ED1', '\u5B8B\u4F53', Arial, sans-serif; margin: 40px; }
             h1 { color: #333; border-bottom: 2px solid #007aff; padding-bottom: 10px; }
             .score { font-size: 48px; color: #007aff; font-weight: bold; margin: 20px 0; }
             .section { margin: 30px 0; }
@@ -770,13 +799,13 @@ const _sfc_main = {
           </style>
         </head>
         <body>
-          <h1>AI 模拟面试报告</h1>
+          <h1>AI \u6A21\u62DF\u9762\u8BD5\u62A5\u544A</h1>
           <div class="section">
-            <div class="section-title">综合评分</div>
+            <div class="section-title">\u7EFC\u5408\u8BC4\u5206</div>
             <div class="score">${this.overallScore} / 100</div>
           </div>
           <div class="section">
-            <div class="section-title">详细评价</div>
+            <div class="section-title">\u8BE6\u7EC6\u8BC4\u4EF7</div>
             ${this.evaluationItems.map((item) => `
               <div class="item">
                 <div class="item-title">${item.title}</div>
@@ -785,36 +814,38 @@ const _sfc_main = {
             `).join("")}
           </div>
           <div class="section">
-            <div class="section-title">改进建议</div>
-            ${this.suggestions.map((s) => `<div class="suggestion">• ${s}</div>`).join("")}
+            <div class="section-title">\u6539\u8FDB\u5EFA\u8BAE</div>
+            ${this.suggestions.map((s) => `<div class="suggestion">\u2022 ${s}</div>`).join("")}
           </div>
-          <p style="margin-top: 40px; color: #999; font-size: 12px;">生成时间：${(/* @__PURE__ */ new Date()).toLocaleString()}</p>
+          <p style="margin-top: 40px; color: #999; font-size: 12px;">\u751F\u6210\u65F6\u95F4\uFF1A${new Date().toLocaleString()}</p>
         </body>
         </html>
       `;
       const fs = common_vendor.index.getFileSystemManager();
       const filePath = `${common_vendor.index.env.USER_DATA_PATH}/report_${Date.now()}.doc`;
-      fs.writeFile({
-        filePath,
-        data: htmlContent,
-        encoding: "utf8",
-        success: () => {
-          common_vendor.index.openDocument({
-            filePath,
-            success: () => {
-              common_vendor.index.showToast({ title: "报告已保存并打开", icon: "success" });
-            },
-            fail: (err) => {
-              common_vendor.index.__f__("error", "at pages/AI/interview.vue:1093", "打开文件失败", err);
-              common_vendor.index.showToast({ title: "报告已保存，但打开失败", icon: "none" });
-            }
-          });
-        },
-        fail: (err) => {
-          common_vendor.index.__f__("error", "at pages/AI/interview.vue:1099", "写入文件失败", err);
-          common_vendor.index.showToast({ title: "导出失败", icon: "none" });
-        }
-      });
+      if (fs && fs.writeFile) {
+        fs.writeFile({
+          filePath,
+          data: htmlContent,
+          encoding: "utf8",
+          success: () => {
+            common_vendor.index.openDocument({
+              filePath,
+              success: () => {
+                common_vendor.index.showToast({ title: "\u62A5\u544A\u5DF2\u4FDD\u5B58\u5E76\u6253\u5F00", icon: "success" });
+              },
+              fail: (err) => {
+                console.error("\u6253\u5F00\u6587\u4EF6\u5931\u8D25", err);
+                common_vendor.index.showToast({ title: "\u62A5\u544A\u5DF2\u4FDD\u5B58\uFF0C\u4F46\u6253\u5F00\u5931\u8D25", icon: "none" });
+              }
+            });
+          },
+          fail: (err) => {
+            console.error("\u5199\u5165\u6587\u4EF6\u5931\u8D25", err);
+            common_vendor.index.showToast({ title: "\u5BFC\u51FA\u5931\u8D25", icon: "none" });
+          }
+        });
+      }
     },
     drawRadarChart() {
       const query = common_vendor.index.createSelectorQuery().in(this);
@@ -836,7 +867,7 @@ const _sfc_main = {
         const score = this.overallScore / 100;
         const data = [0.8 * score, 0.85 * score, 0.75 * score, 0.9 * score, 0.8 * score, 0.85 * score];
         this.drawRadarData(ctx, centerX, centerY, radius, points, angleStep, data);
-        const labels = ["技术", "沟通", "经验", "态度", "潜力", "稳定"];
+        const labels = ["\u6280\u672F", "\u6C9F\u901A", "\u7ECF\u9A8C", "\u6001\u5EA6", "\u6F5C\u529B", "\u7A33\u5B9A"];
         this.drawRadarLabels(ctx, centerX, centerY, radius, points, angleStep, labels);
         ctx.draw();
       }).exec();
@@ -907,7 +938,6 @@ const _sfc_main = {
         ctx.fillText(labels[i], x - 12, y + 6);
       }
     },
-    // ==================== 重置 ====================
     resetInterview() {
       this.sessionId = null;
       this.currentQuestion = 0;
@@ -922,6 +952,7 @@ const _sfc_main = {
       this.audioFilePath = "";
       this.reportData = null;
       this.showReport = false;
+      this.tempAnswer = "";
       this.clearRecordingTimer();
       if (this.innerAudioContext)
         this.innerAudioContext.stop();
@@ -941,97 +972,82 @@ const _sfc_main = {
 };
 const __injectCSSVars__ = () => {
   common_vendor.useCssVars((_ctx) => ({
-    "b122b140": _ctx.overallScore
+    "638c375a-overallScore": _ctx.overallScore
   }));
 };
-const __setup__ = _sfc_main.setup;
-_sfc_main.setup = __setup__ ? (props, ctx) => {
+const __setup__ = __default__.setup;
+__default__.setup = __setup__ ? (props, ctx) => {
   __injectCSSVars__();
   return __setup__(props, ctx);
 } : __injectCSSVars__;
+const _sfc_main = __default__;
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: common_assets._imports_0$2,
-    b: common_vendor.o((...args) => $options.goBack && $options.goBack(...args)),
-    c: !$data.interviewStarted
+    a: common_vendor.o((...args) => $options.goBack && $options.goBack(...args)),
+    b: !$data.interviewStarted
   }, !$data.interviewStarted ? common_vendor.e({
-    d: common_vendor.f($data.interviewMethods, (method, index, i0) => {
+    c: common_vendor.f($data.interviewMethods, (method, index, i0) => {
       return {
         a: common_vendor.t(method.label),
         b: index,
         c: common_vendor.n({
           active: $data.currentMethod === method.value
         }),
-        d: common_vendor.o(($event) => $options.selectMethod(method.value), index)
+        d: common_vendor.o(($event) => $options.selectMethod(method.value))
       };
     }),
-    e: $data.currentMethod.includes("resumeText")
+    d: $data.currentMethod.includes("resumeText")
   }, $data.currentMethod.includes("resumeText") ? {
-    f: $data.formData.resumeText,
-    g: common_vendor.o(($event) => $data.formData.resumeText = $event.detail.value)
+    e: $data.formData.resumeText,
+    f: common_vendor.o(($event) => $data.formData.resumeText = $event.detail.value)
   } : {}, {
-    h: $data.currentMethod.includes("pdf")
+    g: $data.currentMethod.includes("pdf")
   }, $data.currentMethod.includes("pdf") ? common_vendor.e({
+    h: !$data.formData.resumePdf
+  }, !$data.formData.resumePdf ? {} : {}, {
     i: !$data.formData.resumePdf
-  }, !$data.formData.resumePdf ? {
-    j: common_assets._imports_1$1
-  } : {}, {
-    k: !$data.formData.resumePdf
   }, !$data.formData.resumePdf ? {} : {
-    l: common_vendor.t($data.formData.resumePdf.name)
+    j: common_vendor.t($data.formData.resumePdf.name)
   }, {
-    m: common_vendor.o((...args) => $options.chooseResumeFile && $options.chooseResumeFile(...args))
+    k: common_vendor.o((...args) => $options.chooseResumeFile && $options.chooseResumeFile(...args))
   }) : {}, {
-    n: $data.currentMethod.includes("user")
-  }, $data.currentMethod.includes("user") ? common_vendor.e({
-    o: $data.isLoadingUser
-  }, $data.isLoadingUser ? {} : $data.formData.userId ? {
-    q: common_vendor.t($data.formData.userId)
-  } : {
-    r: common_vendor.o((...args) => $options.fetchUserInfo && $options.fetchUserInfo(...args))
-  }, {
-    p: $data.formData.userId,
-    s: $data.isLoadingUser ? 1 : "",
-    t: !$data.formData.userId && !$data.isLoadingUser ? 1 : ""
-  }) : {}, {
-    v: $data.currentMethod.includes("position")
+    l: $data.currentMethod.includes("position")
   }, $data.currentMethod.includes("position") ? common_vendor.e({
-    w: $data.selectedPositionId
+    m: $data.selectedPositionId
   }, $data.selectedPositionId ? {
-    x: common_vendor.t($data.selectedCategoryName),
-    y: common_vendor.t($data.selectedPositionName)
+    n: common_vendor.t($data.selectedCategoryName),
+    o: common_vendor.t($data.selectedPositionName)
   } : {}, {
-    z: !$data.selectedPositionId ? 1 : "",
-    A: common_vendor.o((...args) => $options.openCascadePicker && $options.openCascadePicker(...args))
+    p: !$data.selectedPositionId ? 1 : "",
+    q: common_vendor.o((...args) => $options.openCascadePicker && $options.openCascadePicker(...args))
   }) : {}, {
-    B: $data.currentMethod.includes("positionText")
+    r: $data.currentMethod.includes("positionText")
   }, $data.currentMethod.includes("positionText") ? {
-    C: $data.formData.positionText,
-    D: common_vendor.o(($event) => $data.formData.positionText = $event.detail.value)
+    s: $data.formData.positionText,
+    t: common_vendor.o(($event) => $data.formData.positionText = $event.detail.value)
   } : {}, {
-    E: common_vendor.t($data.isStarting ? "启动中..." : "开始面试"),
-    F: common_vendor.o((...args) => $options.startInterview && $options.startInterview(...args)),
-    G: $data.isStarting
+    v: common_vendor.t($data.isStarting ? "\u542F\u52A8\u4E2D..." : "\u5F00\u59CB\u9762\u8BD5"),
+    w: common_vendor.o((...args) => $options.startInterview && $options.startInterview(...args)),
+    x: $data.isStarting
   }) : common_vendor.e({
-    H: common_vendor.t($data.currentQuestion),
-    I: common_vendor.t($data.totalQuestions),
-    J: $options.progressPercent + "%",
-    K: common_vendor.t($data.currentStage),
-    L: common_assets._imports_2,
-    M: $data.isSpeaking
+    y: common_vendor.t($data.currentQuestion),
+    z: common_vendor.t($data.totalQuestions),
+    A: $options.progressPercent + "%",
+    B: common_vendor.t($data.currentStage),
+    C: $data.isSpeaking
   }, $data.isSpeaking ? {
-    N: common_vendor.f(5, (i, k0, i0) => {
+    D: common_vendor.f(4, (i, k0, i0) => {
       return {
         a: i,
         b: i * 0.1 + "s"
       };
     }),
-    O: common_vendor.n({
+    E: common_vendor.n({
       active: $data.voiceWaveActive
     })
   } : {}, {
-    P: common_vendor.t($options.getInterviewerStatus()),
-    Q: common_vendor.f($data.interviewMessages, (message, index, i0) => {
+    F: common_vendor.t($options.getInterviewerStatus()),
+    G: common_vendor.f($data.interviewMessages, (message, index, i0) => {
       return {
         a: common_vendor.t(message.content),
         b: common_vendor.t($options.formatTime(message.timestamp)),
@@ -1039,76 +1055,87 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.n(message.sender)
       };
     }),
-    R: $data.isAIThinking
+    H: $data.isAIThinking
   }, $data.isAIThinking ? {
-    S: common_vendor.f(3, (i, k0, i0) => {
+    I: common_vendor.f(3, (i, k0, i0) => {
       return {
         a: i,
         b: i * 0.2 + "s"
       };
     })
   } : {}, {
-    T: $data.chatScrollTop,
-    U: common_vendor.n({
+    J: $data.chatScrollTop,
+    K: common_vendor.n({
       rotated: $data.tipsCollapsed
     }),
-    V: common_assets._imports_3,
-    W: common_vendor.o((...args) => $options.toggleTips && $options.toggleTips(...args)),
-    X: !$data.tipsCollapsed
+    L: common_vendor.o((...args) => $options.toggleTips && $options.toggleTips(...args)),
+    M: !$data.tipsCollapsed
   }, !$data.tipsCollapsed ? {
-    Y: common_vendor.f($data.currentTips, (tip, index, i0) => {
+    N: common_vendor.f($data.currentTips, (tip, index, i0) => {
       return {
         a: common_vendor.t(tip),
         b: index
       };
     })
   } : {}, {
-    Z: $data.tipsCollapsed ? 1 : "",
-    aa: common_assets._imports_4,
-    ab: common_vendor.o((...args) => $options.replayQuestion && $options.replayQuestion(...args)),
-    ac: !$data.currentAudioUrl,
-    ad: $data.isRecording ? "/static/ai/recording.png" : "/static/ai/mic.png",
-    ae: common_vendor.t($data.isRecording ? "录音中..." : $data.isProcessing ? "处理中..." : "按住说话"),
-    af: $data.isRecording ? 1 : "",
-    ag: $data.isProcessing ? 1 : "",
-    ah: common_vendor.o((...args) => $options.startRecording && $options.startRecording(...args)),
-    ai: common_vendor.o((...args) => $options.stopRecording && $options.stopRecording(...args)),
-    aj: $data.isProcessing,
-    ak: $data.isRecording
+    O: $data.tipsCollapsed ? 1 : "",
+    P: $data.isH5
+  }, $data.isH5 ? {
+    Q: common_vendor.o((...args) => $options.replayQuestion && $options.replayQuestion(...args)),
+    R: !$data.currentAudioUrl ? 1 : "",
+    S: $data.isProcessing || $data.isAIThinking,
+    T: common_vendor.o((...args) => $options.submitTextAnswer && $options.submitTextAnswer(...args)),
+    U: $data.tempAnswer,
+    V: common_vendor.o(($event) => $data.tempAnswer = $event.detail.value),
+    W: common_vendor.o((...args) => $options.submitTextAnswer && $options.submitTextAnswer(...args)),
+    X: !$data.tempAnswer.trim() || $data.isProcessing || $data.isAIThinking ? 1 : "",
+    Y: common_vendor.o((...args) => $options.confirmEndInterview && $options.confirmEndInterview(...args))
+  } : common_vendor.e({
+    Z: common_vendor.o((...args) => $options.replayQuestion && $options.replayQuestion(...args)),
+    aa: !$data.currentAudioUrl,
+    ab: $data.isRecording ? "/static/ai/recording.png" : "/static/ai/mic.png",
+    ac: common_vendor.t($data.isRecording ? "\u5F55\u97F3\u4E2D" : $data.isProcessing ? "\u5904\u7406\u4E2D" : "\u6309\u4F4F  \u8BF4\u8BDD"),
+    ad: $data.isRecording ? 1 : "",
+    ae: $data.isProcessing ? 1 : "",
+    af: common_vendor.o((...args) => $options.startRecording && $options.startRecording(...args)),
+    ag: common_vendor.o((...args) => $options.stopRecording && $options.stopRecording(...args)),
+    ah: common_vendor.o((...args) => $options.stopRecording && $options.stopRecording(...args)),
+    ai: $data.isProcessing,
+    aj: $data.isRecording
   }, $data.isRecording ? {
-    al: common_vendor.t($data.recordingTime)
+    ak: common_vendor.t($data.recordingTime)
   } : {}, {
-    am: common_assets._imports_5,
-    an: common_vendor.o((...args) => $options.confirmEndInterview && $options.confirmEndInterview(...args))
+    al: common_vendor.o((...args) => $options.confirmEndInterview && $options.confirmEndInterview(...args))
   }), {
-    ao: $data.showReport
+    am: $data.isH5 ? 1 : ""
+  }), {
+    an: $data.showReport
   }, $data.showReport ? {
-    ap: common_assets._imports_6,
-    aq: common_vendor.o((...args) => $options.closeReport && $options.closeReport(...args)),
-    ar: common_vendor.t($data.overallScore),
-    as: common_vendor.f($data.evaluationItems, (item, index, i0) => {
+    ao: common_vendor.o((...args) => $options.closeReport && $options.closeReport(...args)),
+    ap: common_vendor.t($data.overallScore),
+    aq: common_vendor.f($data.evaluationItems, (item, index, i0) => {
       return {
         a: common_vendor.t(item.title),
         b: common_vendor.t(item.content),
         c: index
       };
     }),
-    at: common_vendor.f($data.suggestions, (suggestion, index, i0) => {
+    ar: common_vendor.f($data.suggestions, (suggestion, index, i0) => {
       return {
         a: common_vendor.t(suggestion),
         b: index
       };
     }),
-    av: common_vendor.o((...args) => $options.restartInterview && $options.restartInterview(...args)),
-    aw: common_vendor.o((...args) => $options.exportReport && $options.exportReport(...args)),
-    ax: common_vendor.o(() => {
+    as: common_vendor.o((...args) => $options.restartInterview && $options.restartInterview(...args)),
+    at: common_vendor.o((...args) => $options.exportReport && $options.exportReport(...args)),
+    av: common_vendor.o(() => {
     }),
-    ay: common_vendor.o((...args) => $options.closeReport && $options.closeReport(...args))
+    aw: common_vendor.o((...args) => $options.closeReport && $options.closeReport(...args))
   } : {}, {
-    az: $data.showCascadePicker
+    ax: $data.showCascadePicker
   }, $data.showCascadePicker ? {
-    aA: common_vendor.o((...args) => $options.confirmCascadeSelection && $options.confirmCascadeSelection(...args)),
-    aB: common_vendor.f($data.mainCategories, (category, k0, i0) => {
+    ay: common_vendor.o((...args) => $options.confirmCascadeSelection && $options.confirmCascadeSelection(...args)),
+    az: common_vendor.f($data.mainCategories, (category, k0, i0) => {
       return {
         a: common_vendor.t(category.name),
         b: category.id,
@@ -1116,7 +1143,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $options.selectCategory(category), category.id)
       };
     }),
-    aC: common_vendor.f($options.currentPositions, (position, k0, i0) => {
+    aA: common_vendor.f($options.currentPositions, (position, k0, i0) => {
       return common_vendor.e({
         a: common_vendor.t(position.name),
         b: $data.selectedPositionId === position.id
@@ -1126,13 +1153,10 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         e: common_vendor.o(($event) => $options.selectPosition(position), position.id)
       });
     }),
-    aD: common_vendor.o(() => {
+    aB: common_vendor.o(() => {
     }),
-    aE: common_vendor.o((...args) => $options.closeCascadePicker && $options.closeCascadePicker(...args))
-  } : {}, {
-    aF: common_vendor.s(_ctx.__cssVars())
-  });
+    aC: common_vendor.o((...args) => $options.closeCascadePicker && $options.closeCascadePicker(...args))
+  } : {});
 }
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-c7f67547"]]);
+var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-638c375a"], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/AI/interview.vue"]]);
 wx.createPage(MiniProgramPage);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/AI/interview.js.map

@@ -67,11 +67,10 @@
         <view class="post-main">
           <!-- 左侧：用户信息区 -->
           <view class="user-section">
-            <view class="forum-avatar forum-avatar-md" :style="{ backgroundColor: isDarkMode ? '#3a3a3a' : '#f0f0f0' }"><text class="avatar-text" :style="{ color: isDarkMode ? '#999' : '#666666' }">U</text></view>
+            <image class="forum-avatar forum-avatar-md" :src="isValidAvatar(post.user_avatar) ? 'data:image/' + (post.user_avatar_format === 'jpg' ? 'jpeg' : post.user_avatar_format || 'jpeg') + ';base64,' + decodeHtmlEntities(post.user_avatar.replace(/\s+/g, '')) : '/static/default-avatar.png'" mode="aspectFill"></image>
             <text class="username" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">用户{{post.user_id}}</text>
             <text class="user-level">L1</text>
-          </view>
-          
+          </view>  
           <!-- 中部：内容核心区 -->
           <view class="content-section">
             <text class="post-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">{{post.title || post.content}}</text>
@@ -208,17 +207,51 @@ export default {
     uni.$off('globalThemeChange', this.handleGlobalThemeChange)
   },
   
-  // 切换调试模式 - 长按标题5次开启/关闭
-  toggleDebugMode() {
-    this.debugMode = !this.debugMode
-    uni.showToast({
-      title: this.debugMode ? '调试模式已开启' : '调试模式已关闭',
-      icon: 'none',
-      duration: 2000
-    })
-  },
-  
   methods: {
+    // 切换调试模式 - 长按标题5次开启/关闭
+    toggleDebugMode() {
+      this.debugMode = !this.debugMode
+      uni.showToast({
+        title: this.debugMode ? '调试模式已开启' : '调试模式已关闭',
+        icon: 'none',
+        duration: 2000
+      })
+    },
+    
+    // 解码HTML实体
+    decodeHtmlEntities(text) {
+      const entities = {
+        '&amp;': '&',
+        '&lt;': '<',
+        '&gt;': '>',
+        '&quot;': '"',
+        '&#39;': "'"
+      }
+      return text.replace(/&[#\w]+;/g, (entity) => {
+        return entities[entity] || entity
+      })
+    },
+    
+    // 检查头像数据是否有效
+    isValidAvatar(avatar) {
+      if (!avatar || avatar === '') {
+        return false
+      }
+      
+      // 清理空白字符
+      const cleaned = avatar.replace(/\s+/g, '')
+      
+      // 检查是否是有效的图片base64编码
+      // 有效的JPEG开头: /9j/
+      // 有效的PNG开头: iVBOR
+      // 有效的GIF开头: R0lG
+      // 有效的BMP开头: Qk
+      const validPrefixes = ['/9j/', 'iVBOR', 'R0lG', 'Qk']
+      
+      // 尝试使用后端返回的数据，即使不是标准格式
+      // 可能是后端的TO_BASE64函数生成的格式不同
+      return cleaned.length > 0
+    },
     /**
      * 初始化主题
      */
@@ -262,6 +295,48 @@ export default {
         
         // 直接获取所有帖子，然后在前端进行筛选
         res = await forumApi.getAllFirstComments()
+        
+        // 调试头像数据
+        if (res && res.length > 0) {
+          console.log('=== 头像数据调试信息 ===')
+          res.slice(0, 3).forEach((post, index) => {
+            console.log(`帖子 ${index + 1} (用户ID: ${post.user_id}):`)
+            console.log('  user_avatar 存在:', !!post.user_avatar)
+            console.log('  user_avatar 长度:', post.user_avatar ? post.user_avatar.length : 0)
+            console.log('  user_avatar_format:', post.user_avatar_format)
+            console.log('  user_avatar 前20字符:', post.user_avatar ? post.user_avatar.substring(0, 20) : '空')
+            
+            // 构建头像URL
+            if (post.user_avatar && post.user_avatar !== '') {
+              // 去除空白字符并解码HTML实体
+              const cleanedAvatar = post.user_avatar.replace(/\s+/g, '')
+              const decodedAvatar = this.decodeHtmlEntities(cleanedAvatar)
+              const avatarUrl = 'data:image/' + (post.user_avatar_format === 'jpg' ? 'jpeg' : post.user_avatar_format || 'jpeg') + ';base64,' + decodedAvatar
+              console.log('  构建的头像URL长度:', avatarUrl.length)
+              console.log('  头像URL前50字符:', avatarUrl.substring(0, 50))
+              
+              // 检查base64数据是否有效
+              console.log('  base64数据开头检查:')
+              console.log('    是否以/9j/开头（JPEG）:', decodedAvatar.startsWith('/9j/'))
+              console.log('    是否以iVBOR开头（PNG）:', decodedAvatar.startsWith('iVBOR'))
+              console.log('    是否以R0lG开头（GIF）:', decodedAvatar.startsWith('R0lG'))
+              console.log('    是否以Qk开头（BMP）:', decodedAvatar.startsWith('Qk'))
+              
+              // 检查是否包含空白字符
+              console.log('  空白字符检查:')
+              console.log('    原始数据包含空白字符:', /\s/.test(post.user_avatar))
+              console.log('    清理后长度:', cleanedAvatar.length)
+              console.log('    解码后长度:', decodedAvatar.length)
+              console.log('    原始长度:', post.user_avatar.length)
+              
+              // 检查是否包含HTML实体
+              console.log('  HTML实体检查:')
+              console.log('    包含&符号:', cleanedAvatar.includes('&'))
+              console.log('    解码前后是否不同:', cleanedAvatar !== decodedAvatar)
+            }
+            console.log('---')
+          })
+        }
         
         // 减少日志输出，只在调试模式下显示
         if (this.debugMode) {
@@ -885,13 +960,17 @@ export default {
 }
 
 .filter-option.active {
-  background-color: #E0E9FF;
-  color: #007aff;
+  background-color: #007aff;
+  color: #ffffff;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
 }
 
 .filter-option:active {
   transform: scale(0.95);
-  background-color: #E0E9FF;
+  background-color: #007aff;
+  color: #ffffff;
+  opacity: 0.8;
 }
 
 /* 帖子列表样式 */
@@ -939,10 +1018,10 @@ export default {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background-color: #f0f0f0;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
 .forum-avatar-md {

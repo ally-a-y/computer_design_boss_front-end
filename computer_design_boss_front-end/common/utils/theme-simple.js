@@ -132,17 +132,30 @@ class ThemeManager {
    */
   onSystemThemeChange(callback) {
     try {
-      uni.onThemeChange((res) => {
-        if (this.themeMode === 'system') {
-          const newTheme = res.theme === 'dark' ? 'dark' : 'light'
-          this.setTheme(newTheme)
-          if (callback) {
-            callback(newTheme)
+      // 检查 uni.onThemeChange 是否存在（只在微信小程序环境中存在）
+      if (typeof uni.onThemeChange === 'function') {
+        uni.onThemeChange((res) => {
+          if (this.themeMode === 'system') {
+            const newTheme = res.theme === 'dark' ? 'dark' : 'light'
+            this.setTheme(newTheme)
+            if (callback) {
+              callback(newTheme)
+            }
           }
+        })
+      } else {
+        // 在非微信小程序环境中，使用默认浅色主题
+        console.log('非微信小程序环境，跳过系统主题监听')
+        if (this.themeMode === 'system') {
+          this.setTheme('light')
         }
-      })
+      }
     } catch (error) {
       console.warn('无法监听系统主题变化:', error)
+      // 出错时使用默认浅色主题
+      if (this.themeMode === 'system') {
+        this.setTheme('light')
+      }
     }
   }
 }

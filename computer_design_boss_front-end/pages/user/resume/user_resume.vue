@@ -629,19 +629,31 @@ export default {
   background-color: #F8FAFD;
   min-height: 100vh;
   font-family: -apple-system, Helvetica, Roboto, sans-serif;
+  padding-top: 80px;
+  box-sizing: border-box;
 }
 
 /* 导航栏样式 */
 .nav-bar {
   display: flex;
+  justify-content: space-between;
   align-items: center;
+  background-color: #fff;
   height: 80px;
-  margin-bottom: 12px;
+  padding: 0 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  position: fixed;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  margin: 0;
+  left: 0;
+  right: 0;
+  box-sizing: border-box;
 }
 
 .nav-bar-left {
-  flex: 0 0 auto;
-  padding: 8px;
+  width: 40px;
 }
 
 .nav-bar-center {
@@ -650,37 +662,36 @@ export default {
 }
 
 .nav-bar-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   color: #1E1E1E;
 }
 
 .nav-bar-right {
-  flex: 0 0 auto;
-  padding: 8px;
+  width: 40px;
 }
 
 .nav-back-icon {
+  font-size: 24px;
   color: #1E1E1E;
-  transition: all 0.3s ease;
+  cursor: pointer;
+  transition: color 0.3s ease;
 }
 
 .nav-back-icon:active {
-  color: #007aff;
+  color: #007AFF;
 }
 
 .save-btn {
   font-size: 16px;
-  color: #007aff;
+  color: #007AFF;
   font-weight: 500;
-  transition: all 0.3s ease;
-  padding: 4px 8px;
-  border-radius: 8px;
+  transition: color 0.3s ease;
+  cursor: pointer;
 }
 
 .save-btn:active {
-  background-color: #F0F4FF;
-  transform: scale(0.98);
+  color: #0056b3;
 }
 
 .resume-content {

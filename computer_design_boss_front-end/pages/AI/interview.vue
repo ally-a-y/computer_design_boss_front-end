@@ -3,10 +3,9 @@
     <!-- 顶部导航栏 -->
     <view class="header">
       <view class="header-content">
-        <button class="back-btn" @click="goBack">
-          <image src="/static/ai/back.png" mode="aspectFit"></image>
-          <text class="back-text">返回</text>
-        </button>
+        <view class="nav-bar-left">
+          <text class="nav-back-icon" @click="goBack">←</text>
+        </view>
         <text class="page-title">AI模拟面试</text>
         <view class="header-right"></view>
       </view>
@@ -44,21 +43,6 @@
             </view>
           </view>
 
-          <view v-if="currentMethod.includes('user')" class="form-group">
-            <text class="form-label">用户ID</text>
-            <view class="user-id-display" :class="{ 'loading': isLoadingUser, 'error': !formData.userId && !isLoadingUser }">
-              <text v-if="isLoadingUser" class="loading-text">获取用户信息中...</text>
-              <text v-else-if="formData.userId" class="user-id-text">
-                {{ formData.userId }}
-              </text>
-              <text v-else class="error-text">
-                未获取到用户信息，请
-                <text class="retry-link" @click.stop="fetchUserInfo">点击重试</text>
-                或重新登录
-              </text>
-            </view>
-          </view>
-
           <view v-if="currentMethod.includes('position')" class="form-group">
             <text class="form-label">职位选择</text>
             <view class="cascade-selector" @click="openCascadePicker">
@@ -71,10 +55,10 @@
           </view>
 
           <view v-if="currentMethod.includes('positionText')" class="form-group">
-            <text class="form-label">岗位描述</text>
+            <text class="form-label">职位描述</text>
             <textarea class="form-textarea" 
                       v-model="formData.positionText" 
-                      placeholder="请输入岗位描述"></textarea>
+                      placeholder="请输入职位描述"></textarea>
           </view>
         </view>
 
@@ -84,7 +68,7 @@
       </view>
     </view>
 
-    <!-- 面试交互区  -->
+    <!-- 面试交互区 -->
     <view v-else class="interview-area">
       <view class="progress-section">
         <text class="progress-text">面试进度 {{ currentQuestion }}/{{ totalQuestions }}</text>
@@ -94,7 +78,7 @@
         <text class="stage-text">{{ currentStage }}</text>
       </view>
 
-      <!-- 顶部面试官状态条（横向） -->
+      <!-- 顶部面试官状态条 -->
       <view class="interviewer-status-bar">
         <view class="status-left">
           <view class="avatar-small">
@@ -135,8 +119,8 @@
         </scroll-view>
       </view>
 
-      <!-- 底部面板：左侧技巧 + 右侧控制区 -->
-      <view class="bottom-panel">
+      <!-- 底部面板 - H5环境下特殊布局 -->
+      <view class="bottom-panel" :class="{ 'h5-bottom-panel': isH5 }">
         <!-- 面试技巧卡片 -->
         <view class="tips-card" :class="{ collapsed: tipsCollapsed }">
           <view class="tips-header" @click="toggleTips">
@@ -151,22 +135,48 @@
           </view>
         </view>
 
-        <!-- 控制按钮区 -->
-        <view class="control-buttons">
+        <view v-if="isH5" class="h5-control-area">
+          <div class="h5-ctrl-btn replay-btn" @click="replayQuestion" :class="{ disabled: !currentAudioUrl }">
+            <span class="ctrl-text">重听</span>
+          </div>
+          
+          <div class="h5-text-input-wrapper">
+            <input 
+              type="text" 
+              class="h5-text-input"
+              v-model="tempAnswer"
+              placeholder="输入你的回答..."
+              :disabled="isProcessing || isAIThinking"
+              @keyup.enter="submitTextAnswer"
+            />
+            <div class="h5-send-btn" @click="submitTextAnswer" :class="{ disabled: !tempAnswer.trim() || isProcessing || isAIThinking }">
+              <span class="send-text">发送</span>
+            </div>
+          </div>
+          
+          <div class="h5-ctrl-btn end-btn" @click="confirmEndInterview">
+            <span class="ctrl-text">结束</span>
+          </div>
+        </view>
+
+        <!-- 非H5环境：原有触摸录音布局 -->
+        <view v-else class="control-buttons">
           <button class="ctrl-btn replay-btn" @click="replayQuestion" :disabled="!currentAudioUrl">
-            <image src="/static/ai/replay.png" mode="aspectFit"></image>
             <text>重听</text>
           </button>
 
           <view class="voice-record-wrapper">
-            <button class="voice-main-btn" 
-                    :class="{ recording: isRecording, disabled: isProcessing }"
-                    @touchstart="startRecording"
-                    @touchend="stopRecording"
-                    :disabled="isProcessing">
+            <button 
+              class="voice-main-btn" 
+              :class="{ recording: isRecording, disabled: isProcessing }"
+              @touchstart="startRecording"
+              @touchend="stopRecording"
+              @touchcancel="stopRecording"
+              :disabled="isProcessing">
               <image :src="isRecording ? '/static/ai/recording.png' : '/static/ai/mic.png'" mode="aspectFit"></image>
-              <text>{{ isRecording ? '录音中' : (isProcessing ? '处理中' : '按住说话') }}</text>
+              <text>{{ isRecording ? '录音中' : (isProcessing ? '处理中' : '按住  说话') }}</text>
             </button>
+            
             <view v-if="isRecording" class="recording-tip">
               <view class="pulse-ring-mini"></view>
               <text>{{ recordingTime }}s</text>
@@ -174,14 +184,13 @@
           </view>
 
           <button class="ctrl-btn end-btn" @click="confirmEndInterview">
-            <image src="/static/ai/end.png" mode="aspectFit"></image>
             <text>结束</text>
           </button>
         </view>
       </view>
     </view>
 
-    <!-- 面试报告弹窗  -->
+    <!-- 面试报告弹窗 -->
     <view v-if="showReport" class="report-overlay" @click="closeReport">
       <view class="report-modal" @click.stop>
         <view class="report-header">
@@ -190,7 +199,7 @@
         </view>
 
         <view class="report-content-wrapper">
-          <scroll-view class="report-scroll-view" scroll-y>
+          <view class="report-content">
             <view class="score-section">
               <text class="score-title">综合评分</text>
               <view class="score-circle">
@@ -223,7 +232,7 @@
                 <text>• {{ suggestion }}</text>
               </view>
             </view>
-          </scroll-view>
+          </view>
         </view>
 
         <view class="report-footer">
@@ -241,25 +250,21 @@
           <text class="cascade-close" @click="confirmCascadeSelection">确定</text>
         </view>
         <view class="cascade-body">
-          <!-- 左侧分类列表 -->
           <scroll-view class="category-list" scroll-y>
             <view 
               v-for="category in mainCategories" 
               :key="category.id"
               :class="['category-item', selectedCategoryId === category.id ? 'active' : '']"
-              @click="selectCategory(category)"
-            >
+              @click="selectCategory(category)">
               <text>{{ category.name }}</text>
             </view>
           </scroll-view>
-          <!-- 右侧职位列表 -->
           <scroll-view class="position-list" scroll-y>
             <view 
               v-for="position in currentPositions" 
               :key="position.id"
               :class="['position-item', selectedPositionId === position.id ? 'active' : '']"
-              @click="selectPosition(position)"
-            >
+              @click="selectPosition(position)">
               <text>{{ position.name }}</text>
               <text v-if="selectedPositionId === position.id" class="check-icon">✓</text>
             </view>
@@ -273,12 +278,14 @@
 <script>
 import { getStaticUrl, interviewApi } from '@/common/api/ai.js'
 const BASE_URL = 'http://localhost:5000'
-// 录音管理器
-const recorderManager = uni.getRecorderManager()
 
 export default {
   data() {
     return {
+      // 环境判断
+      isH5: false,
+      isMP: false,
+      
       // 页面状态
       interviewStarted: false,
       isStarting: false,
@@ -299,63 +306,63 @@ export default {
       isLoadingUser: false,
 
       // 职位数据
-     mainCategories: [
-       { id: '101', name: '前端开发' }, 
-       { id: '102', name: '后端开发' }, 
-       { id: '103', name: '移动端开发' }, 
-       { id: '104', name: '数据与AI' }, 
-       { id: '105', name: '运维与测试' }, 
-       { id: '106', name: '产品设计' }, 
-       { id: '107', name: '网络安全' }, 
-       { id: '108', name: '嵌入式开发' }, 
-       { id: '200', name: '产品与设计类' }, 
-       { id: '300', name: '技术管理类' }
-     ],
-     
-     positionDetails: {
-       '101': [
-         { id: '1', name: 'Web前端工程师' }, { id: '2', name: '移动端前端工程师' }, { id: '3', name: '小程序开发工程师' },
-         { id: '4', name: '跨平台开发工程师' }, { id: '5', name: '前端架构师' }, { id: '6', name: 'Node.js全栈工程师' }
-       ],
-       '102': [
-         { id: '7', name: 'Java开发工程师' }, { id: '8', name: 'Python开发工程师' }, { id: '9', name: 'Go开发工程师' },
-         { id: '10', name: 'C++开发工程师' }, { id: '11', name: 'PHP开发工程师' }, { id: '12', name: '微服务架构师' }
-       ],
-       '103': [
-         { id: '13', name: 'Android开发工程师' }, { id: '14', name: 'iOS开发工程师' }, { id: '15', name: '鸿蒙开发工程师' },
-         { id: '16', name: '移动游戏开发工程师' }
-       ],
-       '104': [
-         { id: '17', name: '大数据开发工程师' }, { id: '18', name: '数据仓库工程师' }, { id: '19', name: '机器学习工程师' },
-         { id: '20', name: '深度学习工程师' }, { id: '21', name: '算法工程师（推荐/广告）' }, { id: '22', name: '自然语言处理工程师' },
-         { id: '23', name: '计算机视觉工程师' }, { id: '24', name: '数据分析师' }, { id: '25', name: '数据产品经理' }
-       ],
-       '105': [
-         { id: '26', name: '测试工程师' }, { id: '27', name: '自动化测试工程师' }, { id: '28', name: '性能测试工程师' },
-         { id: '29', name: '测试开发工程师' }, { id: '30', name: '安全测试工程师' }
-       ],
-       '106': [
-         { id: '31', name: '运维工程师' }, { id: '32', name: 'DevOps工程师' }, { id: '33', name: 'SRE工程师' },
-         { id: '34', name: '云原生工程师' }, { id: '35', name: '数据库管理员(DBA)' }, { id: '36', name: '网络工程师' }
-       ],
-       '107': [
-         { id: '37', name: '网络安全工程师' }, { id: '38', name: '渗透测试工程师' }, { id: '39', name: '安全运维工程师' },
-         { id: '40', name: '逆向工程师' }, { id: '41', name: '安全架构师' }
-       ],
-       '108': [
-         { id: '42', name: '嵌入式软件工程师' }, { id: '43', name: 'Linux驱动工程师' }, { id: '44', name: '物联网(IoT)工程师' },
-         { id: '45', name: 'FPGA工程师' }
-       ],
-       '200': [
-         { id: '46', name: '产品经理（技术型）' }, { id: '47', name: 'UI设计师' }, { id: '48', name: '交互设计师(IXD)' },
-         { id: '49', name: 'UX研究员' }
-       ],
-       '300': [
-         { id: '50', name: '技术经理/组长' }, { id: '51', name: '架构师' }, { id: '52', name: '研发总监' },
-         { id: '53', name: 'CTO/技术VP' }
-       ]
-     },
-	 
+      mainCategories: [
+        { id: '101', name: '前端开发' }, 
+        { id: '102', name: '后端开发' }, 
+        { id: '103', name: '移动端开发' }, 
+        { id: '104', name: '数据与AI' }, 
+        { id: '105', name: '运维与测试' }, 
+        { id: '106', name: '产品设计' }, 
+        { id: '107', name: '网络安全' }, 
+        { id: '108', name: '嵌入式开发' }, 
+        { id: '200', name: '产品与设计类' }, 
+        { id: '300', name: '技术管理类' }
+      ],
+      
+      positionDetails: {
+        '101': [
+          { id: '1', name: 'Web前端工程师' }, { id: '2', name: '移动端前端工程师' }, { id: '3', name: '小程序开发工程师' },
+          { id: '4', name: '跨平台开发工程师' }, { id: '5', name: '前端架构师' }, { id: '6', name: 'Node.js全栈工程师' }
+        ],
+        '102': [
+          { id: '7', name: 'Java开发工程师' }, { id: '8', name: 'Python开发工程师' }, { id: '9', name: 'Go开发工程师' },
+          { id: '10', name: 'C++开发工程师' }, { id: '11', name: 'PHP开发工程师' }, { id: '12', name: '微服务架构师' }
+        ],
+        '103': [
+          { id: '13', name: 'Android开发工程师' }, { id: '14', name: 'iOS开发工程师' }, { id: '15', name: '鸿蒙开发工程师' },
+          { id: '16', name: '移动游戏开发工程师' }
+        ],
+        '104': [
+          { id: '17', name: '大数据开发工程师' }, { id: '18', name: '数据仓库工程师' }, { id: '19', name: '机器学习工程师' },
+          { id: '20', name: '深度学习工程师' }, { id: '21', name: '算法工程师（推荐/广告）' }, { id: '22', name: '自然语言处理工程师' },
+          { id: '23', name: '计算机视觉工程师' }, { id: '24', name: '数据分析师' }, { id: '25', name: '数据产品经理' }
+        ],
+        '105': [
+          { id: '26', name: '测试工程师' }, { id: '27', name: '自动化测试工程师' }, { id: '28', name: '性能测试工程师' },
+          { id: '29', name: '测试开发工程师' }, { id: '30', name: '安全测试工程师' }
+        ],
+        '106': [
+          { id: '31', name: '运维工程师' }, { id: '32', name: 'DevOps工程师' }, { id: '33', name: 'SRE工程师' },
+          { id: '34', name: '云原生工程师' }, { id: '35', name: '数据库管理员(DBA)' }, { id: '36', name: '网络工程师' }
+        ],
+        '107': [
+          { id: '37', name: '网络安全工程师' }, { id: '38', name: '渗透测试工程师' }, { id: '39', name: '安全运维工程师' },
+          { id: '40', name: '逆向工程师' }, { id: '41', name: '安全架构师' }
+        ],
+        '108': [
+          { id: '42', name: '嵌入式软件工程师' }, { id: '43', name: 'Linux驱动工程师' }, { id: '44', name: '物联网(IoT)工程师' },
+          { id: '45', name: 'FPGA工程师' }
+        ],
+        '200': [
+          { id: '46', name: '产品经理（技术型）' }, { id: '47', name: 'UI设计师' }, { id: '48', name: '交互设计师(IXD)' },
+          { id: '49', name: 'UX研究员' }
+        ],
+        '300': [
+          { id: '50', name: '技术经理/组长' }, { id: '51', name: '架构师' }, { id: '52', name: '研发总监' },
+          { id: '53', name: 'CTO/技术VP' }
+        ]
+      },
+      
       // 级联选择器状态
       showCascadePicker: false,
       selectedCategoryId: '',
@@ -365,12 +372,12 @@ export default {
 
       // 面试配置
       interviewMethods: [
-        { value: 'resumeText+positionText', label: '简历文本+岗位文本' },
-        { value: 'pdf+positionText', label: 'PDF简历+岗位文本' },
-        { value: 'pdf+position', label: 'PDF简历+岗位ID' },
-        { value: 'user+position', label: '用户ID+岗位ID' },
-        { value: 'user+positionText', label: '用户ID+岗位文本' },
-        { value: 'resumeText+position', label: '简历文本+岗位ID' }
+        { value: 'resumeText+positionText', label: '简历文本+职位文本' },
+        { value: 'pdf+positionText', label: 'PDF简历+职位文本' },
+        { value: 'pdf+position', label: 'PDF简历+职位' },
+        { value: 'user+position', label: '职位' },
+        { value: 'user+positionText', label: '职位文本' },
+        { value: 'resumeText+position', label: '简历文本+职位' }
       ],
 
       // 面试流程状态
@@ -382,6 +389,7 @@ export default {
       jobSource: '',
 
       // 录音状态
+      recorderManager: null,
       isRecording: false,
       isSpeaking: false,
       isAIThinking: false,
@@ -414,7 +422,10 @@ export default {
       overallScore: 85,
       evaluationItems: [],
       suggestions: [],
-      reportData: null
+      reportData: null,
+      
+      // H5文本输入
+      tempAnswer: ''
     }
   },
 
@@ -422,22 +433,31 @@ export default {
     progressPercent() {
       return Math.min((this.currentQuestion / this.totalQuestions) * 100, 100)
     },
-    // 当前分类下的职位列表
     currentPositions() {
       if (!this.selectedCategoryId) return []
       return this.positionDetails[this.selectedCategoryId] || []
     },
-    // 判断是否已获取到用户信息
     hasUserInfo() {
       return !!this.formData.userId
     }
   },
 
   onLoad() {
+    // 判断运行环境
+    // #ifdef H5
+    this.isH5 = true
+    // #endif
+    // #ifdef MP-WEIXIN
+    this.isMP = true
+    // #endif
+    
     this.initializeInterview()
     this.initRecorder()
     this.fetchUserInfo()
-    this.resetPositionSelection() 
+    this.resetPositionSelection()
+    
+    // 调试输出
+    console.log('当前环境:', this.isH5 ? 'H5' : (this.isMP ? '小程序' : 'App'))
   },
 
   onUnload() {
@@ -469,7 +489,6 @@ export default {
           return
         }
       }
-      // 表单中无有效职位ID，且当前未选中任何分类，则默认选中第一个分类的第一个职位
       if (!this.selectedCategoryId) {
         const firstCategory = this.mainCategories[0]
         if (firstCategory) {
@@ -590,26 +609,42 @@ export default {
         this.voiceWaveActive = false
       })
     },
+    
     initRecorder() {
-      recorderManager.onStart(() => {
-        console.log('录音开始')
-        this.isRecording = true
-        this.startRecordingTimer()
-      })
-      recorderManager.onStop((res) => {
-        console.log('录音结束', res)
-        this.isRecording = false
-        this.clearRecordingTimer()
-        this.audioFilePath = res.tempFilePath
-        this.processAudio(res.tempFilePath)
-      })
-      recorderManager.onError((err) => {
-        console.error('录音错误', err)
-        this.isRecording = false
-        this.clearRecordingTimer()
-        uni.showToast({ title: '录音失败: ' + err.message, icon: 'none' })
-      })
+      // 只在非H5环境初始化录音
+      if (!this.isH5) {
+        try {
+          this.recorderManager = uni.getRecorderManager()
+          if (this.recorderManager) {
+            this.recorderManager.onStart(() => {
+              console.log('录音开始')
+              this.isRecording = true
+              this.startRecordingTimer()
+            })
+            this.recorderManager.onStop((res) => {
+              console.log('录音结束', res)
+              this.isRecording = false
+              this.clearRecordingTimer()
+              if (res.tempFilePath) {
+                this.audioFilePath = res.tempFilePath
+                this.processAudio(res.tempFilePath)
+              }
+            })
+            this.recorderManager.onError((err) => {
+              console.error('录音错误', err)
+              this.isRecording = false
+              this.clearRecordingTimer()
+              uni.showToast({ title: '录音失败: ' + (err.errMsg || '未知错误'), icon: 'none' })
+            })
+          } else {
+            console.warn('当前环境不支持录音功能')
+          }
+        } catch (e) {
+          console.error('初始化录音失败:', e)
+        }
+      }
     },
+    
     cleanupInterview() {
       this.resetInterview()
       this.clearRecordingTimer()
@@ -617,10 +652,11 @@ export default {
         this.innerAudioContext.destroy()
         this.innerAudioContext = null
       }
-      if (this.isRecording) {
-        recorderManager.stop()
+      if (this.isRecording && this.recorderManager) {
+        this.recorderManager.stop()
       }
     },
+    
     getInterviewerStatus() {
       if (this.isAIThinking) return '思考中...'
       if (this.isSpeaking) return '说话中...'
@@ -655,12 +691,43 @@ export default {
         this.formData.userId = String(this.userInfo.user_id || this.userInfo.userId || this.userInfo.id)
       }
       if (method.includes('position')) {
-        this.resetPositionSelection() 
+        this.resetPositionSelection()
       }
     },
 
     // ==================== 文件上传 ====================
     chooseResumeFile() {
+      // #ifdef H5
+      const input = document.createElement('input')
+      input.type = 'file'
+      input.accept = '.pdf,application/pdf'
+      input.onchange = (e) => {
+        const file = e.target.files[0]
+        if (!file) return
+        
+        if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
+          uni.showToast({ title: '请选择PDF文件', icon: 'none' })
+          return
+        }
+
+        const reader = new FileReader()
+        reader.onload = (event) => {
+          const base64 = event.target.result.split(',')[1]
+          this.formData.resumePdf = {
+            name: file.name,
+            base64: base64,
+            file: file
+          }
+          uni.showToast({ title: '文件选择成功', icon: 'success', duration: 1500 })
+        }
+        reader.onerror = () => {
+          uni.showToast({ title: '文件读取失败', icon: 'none' })
+        }
+        reader.readAsDataURL(file)
+      }
+      input.click()
+      // #endif
+
       // #ifdef MP-WEIXIN
       wx.chooseMessageFile({
         count: 1,
@@ -669,21 +736,26 @@ export default {
         success: (res) => {
           const file = res.tempFiles[0]
           const fs = uni.getFileSystemManager()
-          fs.readFile({
-            filePath: file.path,
-            encoding: 'base64',
-            success: (readRes) => {
-              this.formData.resumePdf = {
-                name: file.name,
-                path: file.path,
-                base64: readRes.data
+          if (fs) {
+            fs.readFile({
+              filePath: file.path,
+              encoding: 'base64',
+              success: (readRes) => {
+                this.formData.resumePdf = {
+                  name: file.name,
+                  path: file.path,
+                  base64: readRes.data
+                }
+                uni.showToast({ title: '文件选择成功', icon: 'success', duration: 1500 })
+              },
+              fail: (err) => {
+                console.error('读取文件失败', err)
+                uni.showToast({ title: '文件读取失败', icon: 'none' })
               }
-            },
-            fail: (err) => {
-              console.error('读取文件失败', err)
-              uni.showToast({ title: '文件读取失败', icon: 'none' })
-            }
-          })
+            })
+          } else {
+            uni.showToast({ title: '当前环境不支持文件读取', icon: 'none' })
+          }
         },
         fail: (err) => {
           console.log('选择文件取消或失败', err)
@@ -691,29 +763,34 @@ export default {
       })
       // #endif
 
-      // #ifdef APP || H5
+      // #ifdef APP-PLUS
       uni.chooseFile({
         count: 1,
-        type: 'file',
+        type: 'all',
         extension: ['pdf'],
         success: (res) => {
           const file = res.tempFiles[0]
           const fs = uni.getFileSystemManager()
-          fs.readFile({
-            filePath: file.path,
-            encoding: 'base64',
-            success: (readRes) => {
-              this.formData.resumePdf = {
-                name: file.name,
-                path: file.path,
-                base64: readRes.data
+          if (fs) {
+            fs.readFile({
+              filePath: file.path,
+              encoding: 'base64',
+              success: (readRes) => {
+                this.formData.resumePdf = {
+                  name: file.name,
+                  path: file.path,
+                  base64: readRes.data
+                }
+                uni.showToast({ title: '文件选择成功', icon: 'success', duration: 1500 })
+              },
+              fail: (err) => {
+                console.error('读取文件失败', err)
+                uni.showToast({ title: '文件读取失败', icon: 'none' })
               }
-            },
-            fail: (err) => {
-              console.error('读取文件失败', err)
-              uni.showToast({ title: '文件读取失败', icon: 'none' })
-            }
-          })
+            })
+          } else {
+            uni.showToast({ title: '当前环境不支持文件读取', icon: 'none' })
+          }
         },
         fail: (err) => {
           console.log('选择文件取消或失败', err)
@@ -736,7 +813,7 @@ export default {
       }
       if (method.includes('user')) {
         if (!this.formData.userId) {
-          uni.showToast({ title: '未获取到用户信息，请重新登录', icon: 'none', duration: 3000 })
+          uni.showToast({ title: '正在获取...', icon: 'none', duration: 3000 })
           this.fetchUserInfo()
           return false
         }
@@ -748,7 +825,7 @@ export default {
         }
       }
       if (method.includes('positionText') && !this.formData.positionText.trim()) {
-        uni.showToast({ title: '请输入岗位描述', icon: 'none' })
+        uni.showToast({ title: '请输入职位描述', icon: 'none' })
         return false
       }
       return true
@@ -826,12 +903,27 @@ export default {
         uni.showToast({ title: '请等待AI响应', icon: 'none' })
         return
       }
-      recorderManager.start({ duration: 180000, sampleRate: 16000, numberOfChannels: 1, encodeBitRate: 96000, format: 'mp3' })
+      
+      if (this.recorderManager) {
+        this.recorderManager.start({ 
+          duration: 180000, 
+          sampleRate: 16000, 
+          numberOfChannels: 1, 
+          encodeBitRate: 96000, 
+          format: 'mp3' 
+        })
+      } else {
+        uni.showToast({ title: '录音功能不可用', icon: 'none' })
+      }
     },
+    
     stopRecording() {
       if (!this.isRecording) return
-      recorderManager.stop()
+      if (this.recorderManager) {
+        this.recorderManager.stop()
+      }
     },
+    
     startRecordingTimer() {
       this.recordingTime = 0
       this.recordingTimer = setInterval(() => {
@@ -839,26 +931,46 @@ export default {
         if (this.recordingTime >= 180) this.stopRecording()
       }, 1000)
     },
+    
     clearRecordingTimer() {
       if (this.recordingTimer) {
         clearInterval(this.recordingTimer)
         this.recordingTimer = null
       }
     },
+    
+    submitTextAnswer() {
+      if (this.tempAnswer.trim()) {
+        console.log('提交文本回答:', this.tempAnswer.trim())
+        this.addMessage('candidate', this.tempAnswer.trim())
+        this.sendAnswer(this.tempAnswer.trim())
+        this.tempAnswer = ''
+      } else {
+        uni.showToast({ title: '请输入回答内容', icon: 'none' })
+      }
+    },
+    
     async processAudio(filePath) {
       if (!this.sessionId) {
         uni.showToast({ title: '会话异常', icon: 'none' })
         return
       }
+      
       this.isProcessing = true
       try {
+        if (!interviewApi.transcribe) {
+          throw new Error('语音识别功能不可用')
+        }
+        
         const uploadRes = await interviewApi.transcribe(this.sessionId, filePath)
         let transcribeData
+        
         if (typeof uploadRes.data === 'string') {
           transcribeData = JSON.parse(uploadRes.data)
         } else {
           transcribeData = uploadRes.data
         }
+        
         if (transcribeData.code === 200 && transcribeData.text) {
           const userText = transcribeData.text
           this.addMessage('candidate', userText)
@@ -868,7 +980,7 @@ export default {
         }
       } catch (error) {
         console.error('处理录音失败', error)
-        uni.showToast({ title: error.message || '语音识别失败', icon: 'none' })
+        uni.showToast({ title: error.message || '语音识别失败，请使用文本输入', icon: 'none', duration: 3000 })
       } finally {
         this.isProcessing = false
       }
@@ -907,6 +1019,7 @@ export default {
         this.isAIThinking = false
       }
     },
+    
     playAudio(url) {
       if (!this.innerAudioContext) return
       this.isSpeaking = true
@@ -928,21 +1041,26 @@ export default {
       this.innerAudioContext.src = fullUrl
       this.innerAudioContext.play()
     },
+    
     replayQuestion() {
       if (this.currentAudioUrl) this.playAudio(this.currentAudioUrl)
     },
+    
     addMessage(sender, content) {
       this.interviewMessages.push({ sender, content, timestamp: Date.now() })
       this.scrollToBottom()
     },
+    
     updateInterviewStage() {
       const stages = ['自我介绍', '技术能力', '项目经验', '职业规划', '综合能力']
       const stageIndex = Math.floor((this.currentQuestion - 1) / (this.totalQuestions / stages.length))
       this.currentStage = stages[stageIndex] || '综合评估'
     },
+    
     scrollToBottom() {
       this.$nextTick(() => { this.chatScrollTop = this.interviewMessages.length * 1000 })
     },
+    
     formatTime(timestamp) {
       const date = new Date(timestamp)
       return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
@@ -956,6 +1074,7 @@ export default {
         success: (res) => { if (res.confirm) this.endInterview() }
       })
     },
+    
     async endInterview() {
       if (!this.sessionId) {
         this.finishInterview()
@@ -968,10 +1087,16 @@ export default {
       }
       this.finishInterview()
     },
+    
     async finishInterview() {
       if (!this.sessionId) {
         this.generateMockReport()
         this.showReport = true
+        this.$nextTick(() => {
+          setTimeout(() => {
+            this.drawRadarChart()
+          }, 300)
+        })
         return
       }
       uni.showLoading({ title: '生成报告中...' })
@@ -988,7 +1113,7 @@ export default {
         this.$nextTick(() => {
           setTimeout(() => {
             this.drawRadarChart()
-          }, 200)
+          }, 300)
         })
       } catch (error) {
         console.error('获取报告失败', error)
@@ -997,12 +1122,13 @@ export default {
         this.$nextTick(() => {
           setTimeout(() => {
             this.drawRadarChart()
-          }, 200)
+          }, 300)
         })
       } finally {
         uni.hideLoading()
       }
     },
+    
     parseReportData(data) {
       this.overallScore = data.overall_score || data.score || 85
       this.evaluationItems = [
@@ -1015,6 +1141,7 @@ export default {
         '可以增加更多实际项目案例的积累'
       ]
     },
+    
     generateMockReport() {
       this.overallScore = Math.floor(Math.random() * 20) + 75
       this.evaluationItems = [
@@ -1029,19 +1156,22 @@ export default {
         '适当准备一些行为面试问题的回答'
       ]
     },
+    
     toggleTips() {
       this.tipsCollapsed = !this.tipsCollapsed
     },
+    
     closeReport() {
       this.showReport = false
     },
+    
     restartInterview() {
       this.showReport = false
       this.resetInterview()
       this.interviewStarted = false
     },
+    
     async exportReport() {
-      // 构建报告内容
       const htmlContent = `
         <!DOCTYPE html>
         <html>
@@ -1084,129 +1214,147 @@ export default {
         </html>
       `;
     
+      // #ifdef MP-WEIXIN || APP-PLUS
       const fs = uni.getFileSystemManager();
       const filePath = `${uni.env.USER_DATA_PATH}/report_${Date.now()}.doc`;
+      
+      if (fs && fs.writeFile) {
+        fs.writeFile({
+          filePath,
+          data: htmlContent,
+          encoding: 'utf8',
+          success: () => {
+            uni.openDocument({
+              filePath: filePath,
+              success: () => {
+                uni.showToast({ title: '报告已保存并打开', icon: 'success' });
+              },
+              fail: (err) => {
+                console.error('打开文件失败', err);
+                uni.showToast({ title: '报告已保存，但打开失败', icon: 'none' });
+              }
+            });
+          },
+          fail: (err) => {
+            console.error('写入文件失败', err);
+            uni.showToast({ title: '导出失败', icon: 'none' });
+          }
+        });
+      }
+      // #endif
+      
+      // #ifdef H5
+      const blob = new Blob([htmlContent], { type: 'application/msword' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.href = url;
+      link.download = `面试报告_${Date.now()}.doc`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      uni.showToast({ title: '报告导出成功', icon: 'success' });
+      // #endif
+    },
     
-      fs.writeFile({
-        filePath,
-        data: htmlContent,
-        encoding: 'utf8',
-        success: () => {
-          uni.openDocument({
-            filePath: filePath,
-            success: () => {
-              uni.showToast({ title: '报告已保存并打开', icon: 'success' });
-            },
-            fail: (err) => {
-              console.error('打开文件失败', err);
-              uni.showToast({ title: '报告已保存，但打开失败', icon: 'none' });
-            }
-          });
-        },
-        fail: (err) => {
-          console.error('写入文件失败', err);
-          uni.showToast({ title: '导出失败', icon: 'none' });
-        }
-      });
-    },
-	
     drawRadarChart() {
-      const query = uni.createSelectorQuery().in(this)
-      query.select('.radar-canvas').boundingClientRect(rect => {
-        if (!rect || rect.width === 0 || rect.height === 0) {
-          setTimeout(() => this.drawRadarChart(), 100)
-          return
-        }
-        const canvasWidth = rect.width
-        const canvasHeight = rect.height
-        const ctx = uni.createCanvasContext('radarChart', this)
-        ctx.clearRect(0, 0, canvasWidth, canvasHeight)
-        
-        // 定义雷达图参数
-        const centerX = canvasWidth / 2
-        const centerY = canvasHeight / 2
-        const radius = Math.min(canvasWidth, canvasHeight) * 0.35 
-        const points = 6
-        const angleStep = (Math.PI * 2) / points
-        this.drawRadarGrid(ctx, centerX, centerY, radius, points, angleStep)
-        
-        // 绘制数据区域
-        const score = this.overallScore / 100
-        const data = [0.8 * score, 0.85 * score, 0.75 * score, 0.9 * score, 0.8 * score, 0.85 * score]
-        this.drawRadarData(ctx, centerX, centerY, radius, points, angleStep, data)
-        
-        // 绘制标签
-        const labels = ['技术', '沟通', '经验', '态度', '潜力', '稳定']
-        this.drawRadarLabels(ctx, centerX, centerY, radius, points, angleStep, labels)
-        
-        ctx.draw()
-      }).exec()
-    },
-    drawRadarGrid(ctx, centerX, centerY, radius, points, angleStep) {
-      ctx.setStrokeStyle('#e0e0e0')
-      ctx.setLineWidth(1)
-      // 绘制同心圆网格（5层）
-      for (let i = 1; i <= 5; i++) {
-        ctx.beginPath()
-        const r = radius * i / 5
-        for (let j = 0; j <= points; j++) {
-          const angle = j * angleStep - Math.PI / 2
-          const x = centerX + Math.cos(angle) * r
-          const y = centerY + Math.sin(angle) * r
-          if (j === 0) ctx.moveTo(x, y)
-          else ctx.lineTo(x, y)
-        }
-        ctx.closePath()
-        ctx.stroke()
-      }
-      // 绘制从中心到顶点的连线
-      for (let i = 0; i < points; i++) {
-        const angle = i * angleStep - Math.PI / 2
-        ctx.beginPath()
-        ctx.moveTo(centerX, centerY)
-        ctx.lineTo(centerX + Math.cos(angle) * radius, centerY + Math.sin(angle) * radius)
-        ctx.stroke()
-      }
-    },
-    drawRadarData(ctx, centerX, centerY, radius, points, angleStep, data) {
-      ctx.setFillStyle('rgba(0, 122, 255, 0.3)')
-      ctx.setStrokeStyle('#007aff')
-      ctx.setLineWidth(2)
-      ctx.beginPath()
-      for (let i = 0; i <= points; i++) {
-        const angle = i * angleStep - Math.PI / 2
-        const value = data[i % points]
-        const x = centerX + Math.cos(angle) * (radius * value)
-        const y = centerY + Math.sin(angle) * (radius * value)
-        if (i === 0) ctx.moveTo(x, y)
-        else ctx.lineTo(x, y)
-      }
-      ctx.closePath()
-      ctx.fill()
-      ctx.stroke()
-      // 绘制数据点
-      ctx.setFillStyle('#007aff')
-      for (let i = 0; i < points; i++) {
-        const angle = i * angleStep - Math.PI / 2
-        const value = data[i]
-        const x = centerX + Math.cos(angle) * (radius * value)
-        const y = centerY + Math.sin(angle) * (radius * value)
-        ctx.beginPath()
-        ctx.arc(x, y, 4, 0, Math.PI * 2)
-        ctx.fill()
-      }
-    },
-    drawRadarLabels(ctx, centerX, centerY, radius, points, angleStep, labels) {
-      ctx.setFontSize(12)
-      ctx.setFillStyle('#666')
-      const labelRadius = radius + 18
-      for (let i = 0; i < points; i++) {
-        const angle = i * angleStep - Math.PI / 2
-        const x = centerX + Math.cos(angle) * labelRadius
-        const y = centerY + Math.sin(angle) * labelRadius
-        ctx.fillText(labels[i], x - 12, y + 6)
-      }
-    },
+          const query = uni.createSelectorQuery().in(this)
+          query.select('.radar-canvas').boundingClientRect(rect => {
+            if (!rect || rect.width === 0 || rect.height === 0) {
+              setTimeout(() => this.drawRadarChart(), 100)
+              return
+            }
+            const canvasWidth = rect.width
+            const canvasHeight = rect.height
+            const ctx = uni.createCanvasContext('radarChart', this)
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight)
+            
+            // 定义雷达图参数
+            const centerX = canvasWidth / 2
+            const centerY = canvasHeight / 2
+            const radius = Math.min(canvasWidth, canvasHeight) * 0.35 
+            const points = 6
+            const angleStep = (Math.PI * 2) / points
+            this.drawRadarGrid(ctx, centerX, centerY, radius, points, angleStep)
+            
+            // 绘制数据区域
+            const score = this.overallScore / 100
+            const data = [0.8 * score, 0.85 * score, 0.75 * score, 0.9 * score, 0.8 * score, 0.85 * score]
+            this.drawRadarData(ctx, centerX, centerY, radius, points, angleStep, data)
+            
+            // 绘制标签
+            const labels = ['技术', '沟通', '经验', '态度', '潜力', '稳定']
+            this.drawRadarLabels(ctx, centerX, centerY, radius, points, angleStep, labels)
+            
+            ctx.draw()
+          }).exec()
+        },
+        drawRadarGrid(ctx, centerX, centerY, radius, points, angleStep) {
+          ctx.setStrokeStyle('#e0e0e0')
+          ctx.setLineWidth(1)
+          // 绘制同心圆网格（5层）
+          for (let i = 1; i <= 5; i++) {
+            ctx.beginPath()
+            const r = radius * i / 5
+            for (let j = 0; j <= points; j++) {
+              const angle = j * angleStep - Math.PI / 2
+              const x = centerX + Math.cos(angle) * r
+              const y = centerY + Math.sin(angle) * r
+              if (j === 0) ctx.moveTo(x, y)
+              else ctx.lineTo(x, y)
+            }
+            ctx.closePath()
+            ctx.stroke()
+          }
+          // 绘制从中心到顶点的连线
+          for (let i = 0; i < points; i++) {
+            const angle = i * angleStep - Math.PI / 2
+            ctx.beginPath()
+            ctx.moveTo(centerX, centerY)
+            ctx.lineTo(centerX + Math.cos(angle) * radius, centerY + Math.sin(angle) * radius)
+            ctx.stroke()
+          }
+        },
+        drawRadarData(ctx, centerX, centerY, radius, points, angleStep, data) {
+          ctx.setFillStyle('rgba(0, 122, 255, 0.3)')
+          ctx.setStrokeStyle('#007aff')
+          ctx.setLineWidth(2)
+          ctx.beginPath()
+          for (let i = 0; i <= points; i++) {
+            const angle = i * angleStep - Math.PI / 2
+            const value = data[i % points]
+            const x = centerX + Math.cos(angle) * (radius * value)
+            const y = centerY + Math.sin(angle) * (radius * value)
+            if (i === 0) ctx.moveTo(x, y)
+            else ctx.lineTo(x, y)
+          }
+          ctx.closePath()
+          ctx.fill()
+          ctx.stroke()
+          // 绘制数据点
+          ctx.setFillStyle('#007aff')
+          for (let i = 0; i < points; i++) {
+            const angle = i * angleStep - Math.PI / 2
+            const value = data[i]
+            const x = centerX + Math.cos(angle) * (radius * value)
+            const y = centerY + Math.sin(angle) * (radius * value)
+            ctx.beginPath()
+            ctx.arc(x, y, 4, 0, Math.PI * 2)
+            ctx.fill()
+          }
+        },
+        drawRadarLabels(ctx, centerX, centerY, radius, points, angleStep, labels) {
+          ctx.setFontSize(12)
+          ctx.setFillStyle('#666')
+          const labelRadius = radius + 18
+          for (let i = 0; i < points; i++) {
+            const angle = i * angleStep - Math.PI / 2
+            const x = centerX + Math.cos(angle) * labelRadius
+            const y = centerY + Math.sin(angle) * labelRadius
+            ctx.fillText(labels[i], x - 12, y + 6)
+          }
+        },
+
 
     // ==================== 重置 ====================
     resetInterview() {
@@ -1223,9 +1371,11 @@ export default {
       this.audioFilePath = ''
       this.reportData = null
       this.showReport = false
+      this.tempAnswer = ''
       this.clearRecordingTimer()
       if (this.innerAudioContext) this.innerAudioContext.stop()
     },
+    
     resetForm() {
       this.formData = {
         resumeText: '',
@@ -1250,79 +1400,63 @@ export default {
 }
 
 .header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
   background-color: #fff;
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
-  position: relative;
-  z-index: 100;
+  height: 120rpx;
+  display: flex;
+  align-items: center;
+  padding: calc(var(--status-bar-height) + 20rpx) 28rpx 30rpx 30rpx;
 
   .header-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: calc(var(--status-bar-height) + 20rpx) 30rpx 20rpx;
-    max-width: 1200rpx;
-    margin: 0 auto;
+    width: 100%;
   }
 
-  .back-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 16rpx 24rpx;
-    border-radius: 24rpx;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border: 1rpx solid #dee2e6;
-    transition: all 0.3s ease;
-    min-width: 120rpx;
-    z-index: 10;
+  .nav-bar-left {
+    width: 40px;
+  }
 
-    &:active {
-      transform: scale(0.95);
-      background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
-    }
+  .nav-back-icon {
+    font-size: 24px;
+    color: #1E1E1E;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
 
-    image {
-      width: 40rpx;
-      height: 40rpx;
-      margin-right: 12rpx;
-    }
-
-    .back-text {
-      font-size: 28rpx;
-      color: #495057;
-      font-weight: 500;
-    }
+  .nav-back-icon:active {
+    color: #007AFF;
   }
 
   .page-title {
     font-size: 36rpx;
     font-weight: 600;
     color: #333;
-    letter-spacing: 0.5rpx;
     flex: 1;
     text-align: center;
-    margin: 0 20rpx;
-    pointer-events: none;
   }
 
   .header-right {
-    width: 120rpx;
-    height: 56rpx;
-    visibility: hidden;
+    width: 40px;
   }
 }
 
 .config-section {
   flex: 1;
   padding: 32rpx;
-  background-color: #f8f8f8;
+  overflow-y: auto;
 
   .config-card {
     background-color: #fff;
     border-radius: 24rpx;
     padding: 48rpx 40rpx;
     box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.06);
-    border: 1rpx solid rgba(0, 0, 0, 0.05);
 
     .config-title {
       font-size: 40rpx;
@@ -1331,7 +1465,6 @@ export default {
       margin-bottom: 48rpx;
       display: block;
       text-align: center;
-      letter-spacing: 0.5rpx;
     }
 
     .method-tabs {
@@ -1349,17 +1482,11 @@ export default {
         text-align: center;
         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         transition: all 0.3s ease;
-        cursor: pointer;
 
         &.active {
           border-color: #007aff;
           background: linear-gradient(135deg, #e6f2ff 0%, #cce4ff 100%);
           color: #007aff;
-          box-shadow: 0 4rpx 16rpx rgba(0, 122, 255, 0.15);
-        }
-
-        &:active {
-          transform: scale(0.98);
         }
 
         text {
@@ -1381,27 +1508,6 @@ export default {
           color: #495057;
           margin-bottom: 24rpx;
           font-weight: 500;
-          letter-spacing: 0.3rpx;
-        }
-
-        .form-input {
-          width: 100%;
-          padding: 28rpx 24rpx;
-          border: 2rpx solid #e9ecef;
-          border-radius: 20rpx;
-          font-size: 30rpx;
-          background-color: #fff;
-          transition: all 0.3s ease;
-          box-sizing: border-box;
-
-          &:focus {
-            border-color: #007aff;
-            box-shadow: 0 0 0 4rpx rgba(0, 122, 255, 0.1);
-          }
-
-          &::placeholder {
-            color: #adb5bd;
-          }
         }
 
         .form-textarea {
@@ -1412,17 +1518,10 @@ export default {
           border-radius: 20rpx;
           font-size: 30rpx;
           background-color: #fff;
-          transition: all 0.3s ease;
-          resize: vertical;
           box-sizing: border-box;
 
           &:focus {
             border-color: #007aff;
-            box-shadow: 0 0 0 4rpx rgba(0, 122, 255, 0.1);
-          }
-
-          &::placeholder {
-            color: #adb5bd;
           }
         }
 
@@ -1432,13 +1531,6 @@ export default {
           border-radius: 20rpx;
           text-align: center;
           background: linear-gradient(135deg, #f0f8ff 0%, #e6f2ff 100%);
-          transition: all 0.3s ease;
-          cursor: pointer;
-
-          &:active {
-            transform: scale(0.98);
-            background: linear-gradient(135deg, #e6f2ff 0%, #cce4ff 100%);
-          }
 
           image {
             width: 80rpx;
@@ -1455,18 +1547,14 @@ export default {
 
           .file-name {
             color: #28a745;
-            font-size: 28rpx;
-            word-break: break-all;
           }
         }
         
         .user-id-display {
-          width: 90%; 
           padding: 24rpx 28rpx;
           border: 2rpx solid #e9ecef;
           border-radius: 16rpx;
           background-color: #f8f9fa;
-          transition: all 0.3s ease;
           
           &.loading {
             background-color: #fffbeb;
@@ -1487,20 +1575,6 @@ export default {
             font-size: 30rpx;
             color: #007aff;
             font-weight: 500;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16rpx;
-            
-            .auto-tag {
-              display: inline-block;
-              font-size: 22rpx;
-              color: #fff;
-              background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-              padding: 4rpx 12rpx;
-              border-radius: 8rpx;
-              font-weight: 500;
-            }
           }
           
           .error-text {
@@ -1510,11 +1584,6 @@ export default {
             .retry-link {
               color: #007aff;
               text-decoration: underline;
-              font-weight: 500;
-              
-              &:active {
-                opacity: 0.7;
-              }
             }
           }
         }
@@ -1527,21 +1596,11 @@ export default {
           border: 2rpx solid #e9ecef;
           border-radius: 16rpx;
           background-color: #fff;
-          transition: all 0.3s ease;
-          cursor: pointer;
-          
-          &:active {
-            background-color: #f8f9fa;
-            transform: scale(0.98);
-          }
           
           .selector-content {
             flex: 1;
             font-size: 30rpx;
             color: #333;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
             
             &.placeholder {
               color: #adb5bd;
@@ -1551,8 +1610,6 @@ export default {
           .arrow-icon {
             font-size: 32rpx;
             color: #999;
-            margin-left: 16rpx;
-            font-weight: 400;
           }
         }
       }
@@ -1566,18 +1623,6 @@ export default {
       padding: 32rpx;
       font-size: 36rpx;
       font-weight: 600;
-      box-shadow: 0 8rpx 24rpx rgba(0, 122, 255, 0.3);
-      transition: all 0.3s ease;
-      letter-spacing: 1rpx;
-
-      &:active {
-        transform: scale(0.98);
-        box-shadow: 0 4rpx 16rpx rgba(0, 122, 255, 0.2);
-      }
-
-      &[loading] {
-        opacity: 0.8;
-      }
     }
   }
 }
@@ -1612,7 +1657,6 @@ export default {
       .progress-fill {
         height: 100%;
         background: linear-gradient(90deg, #007aff, #00c6ff);
-        border-radius: 4rpx;
         transition: width 0.3s ease;
       }
     }
@@ -1642,15 +1686,13 @@ export default {
         width: 64rpx;
         height: 64rpx;
         border-radius: 50%;
-        overflow: hidden;
         background: linear-gradient(135deg, #eef2ff, #e0e7ff);
         display: flex;
         align-items: center;
         justify-content: center;
         
-        image {
-          width: 100%;
-          height: 100%;
+        .avatar-emoji {
+          font-size: 36rpx;
         }
       }
 
@@ -1676,7 +1718,6 @@ export default {
           height: 24rpx;
           background-color: #007aff;
           border-radius: 2rpx;
-          transition: all 0.2s ease;
           
           &.active {
             animation: waveMini 0.6s infinite ease-in-out;
@@ -1697,12 +1738,11 @@ export default {
   .chat-section-main {
     flex: 1;
     overflow: hidden;
-    margin: 0 20rpx;
     
     .chat-messages {
       height: 100%;
-      padding: 20rpx 10rpx;
-	  box-sizing: border-box;
+      padding: 20rpx;
+      
       .chat-message {
         margin-bottom: 30rpx;
 
@@ -1712,8 +1752,6 @@ export default {
             border: 1rpx solid #e9edf2;
             border-radius: 24rpx 24rpx 24rpx 12rpx;
             margin-right: 80rpx;
-			margin-left: 0;
-            box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.02);
           }
         }
 
@@ -1727,8 +1765,6 @@ export default {
             color: #fff;
             border-radius: 24rpx 24rpx 12rpx 24rpx;
             margin-left: 80rpx;
-			margin-right: 0;  
-			max-width: 85%;
           }
         }
 
@@ -1741,7 +1777,6 @@ export default {
           text {
             font-size: 30rpx;
             line-height: 1.45;
-            word-break: break-word;
           }
         }
 
@@ -1791,19 +1826,15 @@ export default {
       background-color: #f8fafd;
       border-radius: 24rpx;
       padding: 20rpx 24rpx;
-      transition: all 0.2s ease;
       
       &.collapsed {
         flex: 0.4;
-        background-color: #f8fafd;
-        padding: 20rpx 24rpx;
       }
       
       .tips-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        cursor: pointer;
         
         .tips-title {
           font-size: 28rpx;
@@ -1828,7 +1859,6 @@ export default {
           text {
             font-size: 26rpx;
             color: #5e6f8d;
-            line-height: 1.4;
           }
         }
       }
@@ -1845,12 +1875,10 @@ export default {
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
         background: transparent;
-        border: 3rpx solid #e0e0e0;  
+        border: 3rpx solid #e0e0e0;
         padding: 12rpx 20rpx;
         border-radius: 40rpx;
-        transition: all 0.2s;
         
         image {
           width: 44rpx;
@@ -1863,34 +1891,22 @@ export default {
           color: #5e6f8d;
         }
         
-        &:active {
-          background-color: #f0f3f8;
-          transform: scale(0.96);
-        }
-        
         &.end-btn {
-          border: 3rpx solid #ff6b6b;  
+          border: 3rpx solid #ff6b6b;
           text {
             color: #ff6b6b;
-          }
-          image {
-            filter: brightness(0) saturate(100%) invert(47%) sepia(98%) saturate(1175%) hue-rotate(328deg) brightness(101%) contrast(101%);
           }
         }
         
         &.replay-btn {
-          border: 3rpx solid #007aff;  
+          border: 3rpx solid #007aff;
           text {
             color: #007aff;
-          }
-          image {
-            filter: brightness(0) saturate(100%) invert(30%) sepia(98%) saturate(2000%) hue-rotate(200deg) brightness(95%) contrast(95%);
           }
         }
         
         &[disabled] {
           opacity: 0.5;
-          pointer-events: none;
         }
       }
       
@@ -1907,12 +1923,15 @@ export default {
           align-items: center;
           justify-content: center;
           border: none;
-          box-shadow: 0 8rpx 20rpx rgba(0,122,255,0.3);
-          transition: all 0.2s;
+          cursor: pointer;
           
           &.recording {
             background: linear-gradient(135deg, #ff4757, #e33e4c);
             animation: pulse 1s infinite;
+          }
+          
+          &.disabled {
+            opacity: 0.6;
           }
           
           image {
@@ -1938,7 +1957,6 @@ export default {
           left: 50%;
           transform: translateX(-50%);
           background-color: rgba(0,0,0,0.7);
-          backdrop-filter: blur(20rpx);
           padding: 8rpx 20rpx;
           border-radius: 60rpx;
           display: flex;
@@ -1961,106 +1979,218 @@ export default {
         }
       }
     }
-  }
-}
-
-@media (max-width: 768px) {
-  .interview-area .bottom-panel {
-    flex-direction: column;
-    gap: 20rpx;
     
-    .tips-card {
-      flex: auto;
-      &.collapsed {
-        flex: auto;
+    &.h5-bottom-panel {
+      flex-direction: column;
+      
+      .tips-card {
+        flex: none;
+        margin-bottom: 16rpx;
       }
     }
     
-    .control-buttons {
-      justify-content: space-around;
-      padding-top: 8rpx;
+    .h5-control-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      
+      .h5-ctrl-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-width: 70px;
+        height: 70px;
+        border-radius: 35px;
+        background: #f5f5f5;
+        border: 1px solid #e0e0e0;
+        cursor: pointer;
+        transition: all 0.2s;
+        
+        &:active {
+          transform: scale(0.95);
+        }
+        
+        &.disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+        
+        &.replay-btn {
+          border-color: #007aff;
+          background: rgba(0, 122, 255, 0.1);
+        }
+        
+        &.end-btn {
+          border-color: #ff6b6b;
+          background: rgba(255, 107, 107, 0.1);
+        }
+        
+        .ctrl-icon {
+          width: 28px;
+          height: 28px;
+          margin-bottom: 4px;
+        }
+        
+        .ctrl-text {
+          font-size: 12px;
+          font-weight: 500;
+          color: #333;
+        }
+        
+        &.replay-btn .ctrl-text {
+          color: #007aff;
+        }
+        
+        &.end-btn .ctrl-text {
+          color: #ff6b6b;
+        }
+      }
+      
+      .h5-text-input-wrapper {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #f5f7fa;
+        border-radius: 40px;
+        padding: 4px 4px 4px 16px;
+        border: 1px solid #e9ecef;
+        
+        .h5-text-input {
+          flex: 1;
+          height: 44px;
+          font-size: 15px;
+          background: transparent;
+          border: none;
+          outline: none;
+          padding: 0;
+          font-family: inherit;
+          
+          &::placeholder {
+            color: #adb5bd;
+          }
+          
+          &:disabled {
+            opacity: 0.6;
+          }
+        }
+        
+        .h5-send-btn {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          min-width: 70px;
+          height: 44px;
+          border-radius: 22px;
+          background: linear-gradient(135deg, #007aff, #0051d5);
+          cursor: pointer;
+          transition: all 0.2s;
+          
+          &:active {
+            transform: scale(0.95);
+          }
+          
+          &.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #adb5bd;
+          }
+          
+          .send-icon {
+            width: 20px;
+            height: 20px;
+            margin-bottom: 2px;
+          }
+          
+          .send-text {
+            font-size: 11px;
+            font-weight: 500;
+            color: #fff;
+          }
+        }
+      }
     }
   }
 }
 
-@keyframes waveMini {
-  0%, 100% { height: 16rpx; opacity: 0.6; }
-  50% { height: 32rpx; opacity: 1; }
-}
-
-@keyframes thinking {
-  0%, 60%, 100% { transform: scale(1); opacity: 0.5; }
-  30% { transform: scale(1.3); opacity: 1; }
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); box-shadow: 0 8rpx 20rpx rgba(255,71,87,0.3); }
-  50% { transform: scale(1.05); box-shadow: 0 12rpx 28rpx rgba(255,71,87,0.5); }
-  100% { transform: scale(1); box-shadow: 0 8rpx 20rpx rgba(255,71,87,0.3); }
-}
-
-@keyframes pulse-ring {
-  0% { transform: scale(0.8); opacity: 1; }
-  100% { transform: scale(1.4); opacity: 0; }
-}
-
-// ==================== 报告弹窗样式 ====================
 .report-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10rpx);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2000;
+}
 
-  .report-modal {
-    width: 90%;
-    max-width: 700rpx;
-    height: 85vh;
-    max-height: 85vh;
-    background-color: #fff;
-    border-radius: 20rpx;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    animation: modalSlideUp 0.3s ease-out;
+.report-modal {
+  width: 90%;
+  max-width: 700rpx;
+  max-height: 85vh;
+  background-color: #fff;
+  border-radius: 32rpx;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20rpx 40rpx rgba(0, 0, 0, 0.2);
+}
 
-    .report-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 30rpx;
-      border-bottom: 2rpx solid #e0e0e0;
-      flex-shrink: 0;
-
-      .report-title {
-        font-size: 36rpx;
-        font-weight: bold;
-        color: #333;
-      }
-
-      .close-report {
-        width: 40rpx;
-        height: 40rpx;
-      }
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx 32rpx;
+  border-bottom: 2rpx solid #eef2f6;
+  flex-shrink: 0;
+  background: #fff;
+  
+  .report-title {
+    font-size: 36rpx;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .close-report {
+    width: 40rpx;
+    height: 40rpx;
+    padding: 10rpx;
+    opacity: 0.6;
+    
+    &:active {
+      opacity: 1;
     }
+  }
+}
 
-    .report-content-wrapper {
-      flex: 1;
-      min-height: 0;
-      overflow: hidden;
-    }
+.report-content-wrapper {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background-color: #fff;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+    background: #f0f0f0;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+  }
+}
 
-    .report-scroll-view {
-      height: 100%;
-      padding: 0 30rpx;
-    }
+.report-content {
+  padding: 0 32rpx 32rpx 32rpx;
+}
 
-    .score-section {
+.score-section {
       text-align: center;
       margin-bottom: 30rpx;
       padding-top: 20rpx;
@@ -2109,341 +2239,322 @@ export default {
       }
     }
 
-    .radar-section {
-      margin-bottom: 30rpx;
-      flex-shrink: 0;
+.radar-section {
+  margin: 40rpx 0 30rpx;
+  
+  .section-title {
+    font-size: 32rpx;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 24rpx;
+    display: block;
+    text-align: center;
+  }
+  
+  .radar-chart {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 350px;
+    padding: 20rpx;
+    background: #fafbfc;  
+    border-radius: 24rpx;
+    margin-top: 10rpx;
+    
+    .radar-canvas {
+      width: 300px;
+      height: 300px;
+      max-width: 100%;
+      background: transparent;  
+      border-radius: 16rpx;
+      display: block;
+    }
+  }
+}
 
-      .section-title {
-        font-size: 32rpx;
-        font-weight: bold;
-        color: #333;
-        margin-bottom: 20rpx;
-        display: block;
+.evaluation-section {
+  margin: 40rpx 0 30rpx;
+  
+  .section-title {
+    font-size: 32rpx;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 24rpx;
+    display: block;
+    padding-left: 8rpx;
+  }
+  
+  .evaluation-item {
+    margin-bottom: 24rpx;
+    padding: 28rpx 24rpx;
+    background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+    border-radius: 20rpx;
+    border: 1rpx solid #eef2f6;
+    
+    .item-title {
+      font-size: 30rpx;
+      font-weight: 600;
+      color: #007aff;
+      margin-bottom: 16rpx;
+      display: block;
+    }
+    
+    .item-content {
+      font-size: 28rpx;
+      color: #555;
+      line-height: 1.5;
+    }
+  }
+}
+
+.suggestions-section {
+  margin: 40rpx 0 30rpx;
+  padding-bottom: 20rpx;
+  
+  .section-title {
+    font-size: 32rpx;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 24rpx;
+    display: block;
+    padding-left: 8rpx;
+  }
+  
+  .suggestion-item {
+    margin-bottom: 20rpx;
+    padding: 16rpx 24rpx;
+    background: #f8f9fa;
+    border-radius: 16rpx;
+    
+    text {
+      font-size: 28rpx;
+      color: #555;
+      line-height: 1.5;
+    }
+  }
+}
+
+.report-footer {
+  display: flex;
+  padding: 24rpx 32rpx;
+  border-top: 2rpx solid #eef2f6;
+  gap: 24rpx;
+  flex-shrink: 0;
+  background: #fff;
+  
+  .report-btn {
+    flex: 1;
+    padding: 28rpx;
+    border-radius: 60rpx;
+    font-size: 30rpx;
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.2s ease;
+    
+    &:active {
+      transform: scale(0.98);
+    }
+    
+    &.restart-btn {
+      background: #f8f9fa;
+      color: #007aff;
+      border: 2rpx solid #e9ecef;
+      
+      &:active {
+        background: #e9ecef;
       }
+    }
+    
+    &.export-btn {
+      background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+      color: #fff;
+      border: none;
+      
+      &:active {
+        opacity: 0.9;
+      }
+    }
+  }
+}
 
-      .radar-chart {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 320rpx;
+.cascade-modal {
+  width: 100%;
+  height: 70vh;
+  background-color: #fff;
+  border-radius: 32rpx 32rpx 0 0;
+  display: flex;
+  flex-direction: column;
+  
+  .cascade-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 32rpx 36rpx;
+    border-bottom: 1rpx solid #f0f0f0;
+    
+    .cascade-title {
+      font-size: 36rpx;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .cascade-close {
+      font-size: 30rpx;
+      color: #007aff;
+      padding: 12rpx 20rpx;
+    }
+  }
+  
+  .cascade-body {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    
+    .category-list {
+      width: 35%;
+      background-color: #f8f9fa;
+      border-right: 1rpx solid #e9ecef;
+      
+      .category-item {
+        padding: 28rpx 24rpx;
+        font-size: 28rpx;
+        color: #666;
+        border-left: 4rpx solid transparent;
         
-        .radar-canvas {
-          width: 300rpx;
-          height: 300rpx;
-        }
-      }
-    }
-
-    .evaluation-section {
-      margin-bottom: 30rpx;
-
-      .section-title {
-        font-size: 32rpx;
-        font-weight: bold;
-        color: #333;
-        margin-bottom: 20rpx;
-        display: block;
-      }
-
-      .evaluation-item {
-        margin-bottom: 20rpx;
-        padding: 20rpx;
-        background-color: #f8f9fa;
-        border-radius: 12rpx;
-
-        .item-title {
-          font-size: 28rpx;
-          font-weight: 600;
-          color: #333;
-          margin-bottom: 10rpx;
-          display: block;
-        }
-
-        .item-content {
-          font-size: 26rpx;
-          color: #666;
-          line-height: 1.5;
-        }
-      }
-    }
-
-    .suggestions-section {
-      margin-bottom: 30rpx;
-
-      .section-title {
-        font-size: 32rpx;
-        font-weight: bold;
-        color: #333;
-        margin-bottom: 20rpx;
-        display: block;
-      }
-
-      .suggestion-item {
-        margin-bottom: 15rpx;
-
-        text {
-          font-size: 26rpx;
-          color: #666;
-          line-height: 1.5;
-        }
-      }
-    }
-
-    .report-footer {
-      display: flex;
-      padding: 20rpx 30rpx;
-      border-top: 2rpx solid #e0e0e0;
-      gap: 20rpx;
-      flex-shrink: 0;
-      background-color: #fff;
-
-      .report-btn {
-        flex: 1;
-        padding: 24rpx;
-        border-radius: 20rpx;
-        font-size: 30rpx;
-        font-weight: 500;
-
-        &.restart-btn {
-          background: linear-gradient(135deg, #f0f8ff 0%, #e6f2ff 100%);
+        &.active {
+          background-color: #fff;
           color: #007aff;
-          border: 2rpx solid #007aff;
+          font-weight: 600;
+          border-left-color: #007aff;
         }
-
-        &.export-btn {
-          background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
-          color: #fff;
+      }
+    }
+    
+    .position-list {
+      flex: 1;
+      
+      .position-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 28rpx 32rpx;
+        font-size: 30rpx;
+        color: #333;
+        border-bottom: 1rpx solid #f5f5f5;
+        
+        &.active {
+          color: #007aff;
+          font-weight: 500;
+          background-color: #f0f8ff;
+        }
+        
+        .check-icon {
+          font-size: 28rpx;
+          color: #007aff;
         }
       }
     }
   }
 }
 
-.cascade-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(10rpx);
-  display: flex;
-  align-items: flex-end;
-  z-index: 2000;
-  
-  .cascade-modal {
-    width: 100%;
-    height: 70vh;
-    background-color: #fff;
-    border-radius: 32rpx 32rpx 0 0;
-    animation: slideUp 0.3s ease-out;
-    display: flex;
+@keyframes waveMini {
+  0%, 100% { height: 16rpx; }
+  50% { height: 32rpx; }
+}
+
+@keyframes thinking {
+  0%, 60%, 100% { transform: scale(1); opacity: 0.5; }
+  30% { transform: scale(1.3); opacity: 1; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+// 响应式
+@media (max-width: 768px) {
+  .interview-area .bottom-panel {
     flex-direction: column;
     
-    .cascade-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 32rpx 36rpx;
-      border-bottom: 1rpx solid #f0f0f0;
-      background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
-      
-      .cascade-title {
-        font-size: 36rpx;
-        font-weight: 600;
-        color: #333;
-      }
-      
-      .cascade-close {
-        font-size: 30rpx;
-        color: #007aff;
-        padding: 12rpx 20rpx;
-        
-        &:active {
-          opacity: 0.7;
-        }
-      }
+    .tips-card.collapsed {
+      flex: auto;
     }
     
-    .cascade-body {
-      flex: 1;
-      display: flex;
-      overflow: hidden;
-      
-      .category-list {
-        width: 35%;
-        background-color: #f8f9fa;
-        border-right: 1rpx solid #e9ecef;
-        
-        .category-item {
-          padding: 28rpx 24rpx;
-          font-size: 28rpx;
-          color: #666;
-          transition: all 0.2s ease;
-          border-left: 4rpx solid transparent;
-          
-          &:active {
-            background-color: #e9ecef;
-          }
-          
-          &.active {
-            background-color: #fff;
-            color: #007aff;
-            font-weight: 600;
-            border-left-color: #007aff;
-          }
-          
-          text {
-            display: block;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-          }
-        }
-      }
-      
-      .position-list {
-        flex: 1;
-        background-color: #fff;
-        
-        .position-item {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 28rpx 32rpx;
-          font-size: 30rpx;
-          color: #333;
-          border-bottom: 1rpx solid #f5f5f5;
-          transition: all 0.2s ease;
-          
-          &:active {
-            background-color: #f8f9fa;
-          }
-          
-          &.active {
-            color: #007aff;
-            font-weight: 500;
-            background-color: #f0f8ff;
-          }
-          
-          text {
-            flex: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-          }
-          
-          .check-icon {
-            font-size: 28rpx;
-            color: #007aff;
-            margin-left: 16rpx;
-            font-weight: 600;
-          }
-        }
-      }
+    .control-buttons {
+      justify-content: space-around;
     }
   }
 }
 
-@keyframes modalSlideUp {
-  from {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
-
-// 暗黑模式支持
+// 暗黑模式
 @media (prefers-color-scheme: dark) {
   .interview-container {
     background-color: #1a1a1a;
   }
   
-  .header {
+  .header, .progress-section, .interviewer-status-bar, .bottom-panel {
     background-color: #2d2d2d;
+  }
+  
+  .config-card, .report-modal, .cascade-modal {
+    background-color: #2d2d2d;
+  }
+  
+  .page-title, .config-title, .form-label, .report-title, .section-title, .score-title,
+  .tips-title, .interviewer-name {
+    color: #fff;
+  }
+  
+  .message-bubble {
+    background-color: #3d3d3d;
+    color: #fff;
+  }
+  
+  .form-textarea, .cascade-selector, .user-id-display {
+    background-color: #3d3d3d;
+    border-color: #4d4d4d;
+    color: #fff;
+  }
+  
+  .evaluation-item {
+    background-color: #1e1e1e;
+  }
+  
+  .h5-text-input-wrapper {
+    background: #3d3d3d !important;
+    border-color: #4d4d4d !important;
     
-    .page-title {
-      color: #ffffff;
-    }
-    
-    .back-btn {
-      background: linear-gradient(135deg, #3d3d3d 0%, #2d2d2d 100%);
-      border-color: #4d4d4d;
+    .h5-text-input {
+      color: #fff;
       
-      .back-text {
-        color: #ffffff;
+      &::placeholder {
+        color: #8f9bb3;
       }
     }
   }
   
-  .interview-area {
-    background-color: #141414;
+  .h5-ctrl-btn {
+    background: #3d3d3d !important;
+    border-color: #4d4d4d !important;
     
-    .progress-section {
-      background-color: #222;
-      border-bottom-color: #333;
-      .progress-text, .stage-text { color: #ddd; }
-      .progress-bar { background-color: #333; }
+    .ctrl-text {
+      color: #fff !important;
     }
     
-    .interviewer-status-bar {
-      background-color: #222;
-      border-bottom-color: #333;
-      .interviewer-name { color: #eee; }
-      .status-right .interviewer-status-text { background-color: #2c2c2c; color: #aaa; }
+    &.replay-btn .ctrl-text {
+      color: #007aff !important;
     }
     
-    .chat-section-main .chat-messages .chat-message {
-      &.interviewer .message-bubble {
-        background-color: #2a2a2a;
-        border-color: #3a3a3a;
-        color: #e0e0e0;
-      }
-      &.candidate .message-bubble {
-        background: linear-gradient(135deg, #0051d5, #003d99);
-      }
+    &.end-btn .ctrl-text {
+      color: #ff6b6b !important;
     }
-    
-    .bottom-panel {
-      background-color: #222;
-      border-top-color: #333;
-      .tips-card {
-        background-color: #2c2c2c;
-        .tips-header .tips-title { color: #eee; }
-        .tip-item text { color: #bbb; }
-      }
-      .control-buttons .ctrl-btn {
-        border: 3rpx solid #4a4a4a;  
-        &.end-btn {
-          border: 3rpx solid #ff6b6b;
-        }
-        &.replay-btn {
-          border: 3rpx solid #007aff;
-        }
-        text { color: #aaa; }
-      }
-    }
-  }
-  
-  .config-card {
-    background-color: #2d2d2d !important;
-    .config-title, .form-label { color: #fff !important; }
-    .form-textarea, .cascade-selector, .user-id-display { background-color: #3d3d3d; border-color: #4d4d4d; color: #fff; }
-  }
-  
-  .report-modal {
-    background-color: #2d2d2d !important;
-    .report-header, .report-footer { border-color: #444; }
-    .report-title, .section-title, .score-title { color: #fff; }
-    .evaluation-item { background-color: #1e1e1e; }
   }
 }
 </style>

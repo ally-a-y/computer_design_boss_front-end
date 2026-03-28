@@ -1,13 +1,13 @@
 
 /* 全局样式 */
-.login-page.data-v-e4e4508d {
+.login-page.data-v-b237504c {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   background-color: #F8FAFD;
   font-family: -apple-system, Helvetica, Roboto, sans-serif;
 }
-.login-container.data-v-e4e4508d {
+.login-container.data-v-b237504c {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -15,7 +15,7 @@
 }
 
 /* 导航栏样式 */
-.nav-bar.data-v-e4e4508d {
+.nav-bar.data-v-b237504c {
   background-color: #ffffff;
   box-shadow: 0 1px 2px rgba(0,0,0,0.02);
   height: 80px;
@@ -25,42 +25,42 @@
   position: relative;
   margin-bottom: 12px;
 }
-.nav-bar-left.data-v-e4e4508d {
+.nav-bar-left.data-v-b237504c {
   flex: 0 0 auto;
   padding: 8px;
 }
-.nav-bar-center.data-v-e4e4508d {
+.nav-bar-center.data-v-b237504c {
   flex: 1;
   text-align: center;
 }
-.nav-bar-title.data-v-e4e4508d {
+.nav-bar-title.data-v-b237504c {
   font-size: 17px;
   font-weight: 600;
   color: #1E1E1E;
 }
-.nav-bar-right.data-v-e4e4508d {
+.nav-bar-right.data-v-b237504c {
   flex: 0 0 auto;
   padding: 8px;
 }
 
 /* 页面标题 */
-.login-header.data-v-e4e4508d {
+.login-header.data-v-b237504c {
   margin: 24px 0 16px 0;
   text-align: center;
 }
-.login-title.data-v-e4e4508d {
+.login-title.data-v-b237504c {
   font-size: 28px;
   font-weight: bold;
   color: #1E1E1E;
   margin-bottom: 8px;
 }
-.login-subtitle.data-v-e4e4508d {
+.login-subtitle.data-v-b237504c {
   font-size: 14px;
   color: #6C757D;
 }
 
 /* 选项卡样式 */
-.tab-container.data-v-e4e4508d {
+.tab-container.data-v-b237504c {
   display: flex;
   background-color: #fff;
   border-radius: 16px;
@@ -68,17 +68,17 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   overflow: hidden;
 }
-.tab-item.data-v-e4e4508d {
+.tab-item.data-v-b237504c {
   flex: 1;
   text-align: center;
   padding: 16px 0;
   position: relative;
   transition: all 0.3s ease;
 }
-.tab-item.data-v-e4e4508d:active {
+.tab-item.data-v-b237504c:active {
   background-color: #F0F4FF;
 }
-.tab-item.active.data-v-e4e4508d::after {
+.tab-item.active.data-v-b237504c::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -91,18 +91,18 @@
   /* 宽度与文字等宽 */
   width: 24px;
 }
-.tab-text.data-v-e4e4508d {
+.tab-text.data-v-b237504c {
   font-size: 15px;
   color: #6C757D;
   transition: all 0.3s ease;
 }
-.tab-item.active .tab-text.data-v-e4e4508d {
+.tab-item.active .tab-text.data-v-b237504c {
   color: #007aff;
   font-weight: 600;
 }
 
 /* 表单容器 */
-.form-container.data-v-e4e4508d {
+.form-container.data-v-b237504c {
   background-color: #fff;
   border-radius: 16px;
   padding: 24px 20px;
@@ -111,22 +111,22 @@
 }
 
 /* 登录方式切换 */
-.login-method.data-v-e4e4508d {
+.login-method.data-v-b237504c {
   display: flex;
   margin-bottom: 16px;
   border-bottom: 1px solid #F0F2F5;
 }
-.method-item.data-v-e4e4508d {
+.method-item.data-v-b237504c {
   flex: 1;
   text-align: center;
   padding: 12px 0;
   position: relative;
   transition: all 0.3s ease;
 }
-.method-item.data-v-e4e4508d:active {
+.method-item.data-v-b237504c:active {
   background-color: #F0F4FF;
 }
-.method-item.active.data-v-e4e4508d::after {
+.method-item.active.data-v-b237504c::after {
   content: '';
   position: absolute;
   bottom: -1px;
@@ -139,21 +139,21 @@
   /* 宽度与文字等宽 */
   width: 60px;
 }
-.method-text.data-v-e4e4508d {
+.method-text.data-v-b237504c {
   font-size: 14px;
   color: #6C757D;
   transition: all 0.3s ease;
 }
-.method-item.active .method-text.data-v-e4e4508d {
+.method-item.active .method-text.data-v-b237504c {
   color: #007aff;
   font-weight: 600;
 }
 
 /* 表单样式 */
-.form-item.data-v-e4e4508d {
+.form-item.data-v-b237504c {
   margin-bottom: 16px;
 }
-.form-input-wrapper.data-v-e4e4508d {
+.form-input-wrapper.data-v-b237504c {
   display: flex;
   align-items: center;
   border-radius: 12px;
@@ -162,10 +162,10 @@
   height: 48px;
   transition: all 0.3s ease;
 }
-.form-input-wrapper.data-v-e4e4508d:focus-within {
+.form-input-wrapper.data-v-b237504c:focus-within {
   box-shadow: 0 0 0 2px rgba(0,122,255,0.2);
 }
-.form-input.data-v-e4e4508d {
+.form-input.data-v-b237504c {
   flex: 1;
   font-size: 15px;
   color: #1E1E1E;
@@ -174,15 +174,15 @@
   border: none;
   outline: none;
 }
-.form-input.data-v-e4e4508d::-webkit-input-placeholder {
+.form-input.data-v-b237504c::-webkit-input-placeholder {
   color: #ADB5BD;
 }
-.form-input.data-v-e4e4508d::placeholder {
+.form-input.data-v-b237504c::placeholder {
   color: #ADB5BD;
 }
 
 /* 验证码按钮 */
-.sms-btn.data-v-e4e4508d {
+.sms-btn.data-v-b237504c {
   height: 40px;
   background-color: #F0F4FF;
   color: #007aff;
@@ -193,21 +193,21 @@
   transition: all 0.3s ease;
   border: none;
 }
-.sms-btn.data-v-e4e4508d:active {
+.sms-btn.data-v-b237504c:active {
   background-color: #E0E9FF;
   transform: scale(0.95);
 }
-.sms-btn.counting.data-v-e4e4508d {
+.sms-btn.counting.data-v-b237504c {
   background-color: #E9ECEF;
   color: #ADB5BD;
 }
-.sms-btn.data-v-e4e4508d:disabled {
+.sms-btn.data-v-b237504c:disabled {
   background-color: #E9ECEF;
   color: #ADB5BD;
 }
 
 /* 登录按钮 */
-.login-btn.data-v-e4e4508d {
+.login-btn.data-v-b237504c {
   width: 100%;
   height: 48px;
   background-color: #007aff;
@@ -219,17 +219,17 @@
   transition: all 0.3s ease;
   border: none;
 }
-.login-btn.data-v-e4e4508d:active {
+.login-btn.data-v-b237504c:active {
   background-color: #0056b3;
   transform: scale(0.98);
 }
-.login-btn.data-v-e4e4508d:disabled {
+.login-btn.data-v-b237504c:disabled {
   background-color: #E9ECEF;
   color: #ADB5BD;
 }
 
 /* 注册按钮 */
-.register-btn.data-v-e4e4508d {
+.register-btn.data-v-b237504c {
   width: 100%;
   height: 48px;
   background-color: #007aff;
@@ -241,17 +241,17 @@
   transition: all 0.3s ease;
   border: none;
 }
-.register-btn.data-v-e4e4508d:active {
+.register-btn.data-v-b237504c:active {
   background-color: #0056b3;
   transform: scale(0.98);
 }
-.register-btn.data-v-e4e4508d:disabled {
+.register-btn.data-v-b237504c:disabled {
   background-color: #E9ECEF;
   color: #ADB5BD;
 }
 
 /* 错误提示 */
-.error-text.data-v-e4e4508d {
+.error-text.data-v-b237504c {
   font-size: 13px;
   color: #e54d42;
   margin-top: 8px;
@@ -259,37 +259,37 @@
 }
 
 /* 忘记密码链接 */
-.forget-password.data-v-e4e4508d {
+.forget-password.data-v-b237504c {
   text-align: right;
   margin-top: 8px;
 }
-.forget-link.data-v-e4e4508d {
+.forget-link.data-v-b237504c {
   font-size: 13px;
   color: #007aff;
   transition: all 0.3s ease;
 }
-.forget-link.data-v-e4e4508d:active {
+.forget-link.data-v-b237504c:active {
   opacity: 0.7;
 }
 
 /* 已有账号链接 */
-.have-account.data-v-e4e4508d {
+.have-account.data-v-b237504c {
   text-align: center;
   margin-top: 16px;
   font-size: 13px;
   color: #6C757D;
 }
-.login-link.data-v-e4e4508d {
+.login-link.data-v-b237504c {
   color: #007aff;
   margin-left: 4px;
   transition: all 0.3s ease;
 }
-.login-link.data-v-e4e4508d:active {
+.login-link.data-v-b237504c:active {
   opacity: 0.7;
 }
 
 /* 动画效果 */
-@keyframes fadeIn-e4e4508d {
+@keyframes fadeIn-b237504c {
 from {
     opacity: 0;
     transform: translateY(12px);
@@ -301,10 +301,10 @@ to {
 }
 
 /* 注册步骤 */
-.register-step.data-v-e4e4508d {
+.register-step.data-v-b237504c {
   display: none;
-  animation: fadeIn-e4e4508d 0.3s ease-in-out;
+  animation: fadeIn-b237504c 0.3s ease-in-out;
 }
-.register-step.active.data-v-e4e4508d {
+.register-step.active.data-v-b237504c {
   display: block;
 }

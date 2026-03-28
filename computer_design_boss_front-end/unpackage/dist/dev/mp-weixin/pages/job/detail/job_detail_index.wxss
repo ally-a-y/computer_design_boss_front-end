@@ -3,24 +3,31 @@
 .job-detail-page {
   background-color: #F8FAFD;
   min-height: 100vh;
-  padding: 0 0 100rpx 0;
+  padding: 80px 0 100rpx 0;
   font-family: -apple-system, Helvetica, Roboto, sans-serif;
+  box-sizing: border-box;
 }
 
 /* 导航栏样式 */
 .nav-bar {
-  background-color: #ffffff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  height: 80px;
   display: flex;
+  justify-content: space-between;
   align-items: center;
+  background-color: #fff;
+  height: 80px;
   padding: 0 16px;
-  position: relative;
-  margin-bottom: 12rpx;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  position: fixed;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  margin: 0;
+  left: 0;
+  right: 0;
+  box-sizing: border-box;
 }
 .nav-bar-left {
-  flex: 0 0 auto;
-  padding: 8px;
+  width: 40px;
 }
 .nav-bar-center {
   flex: 1;
@@ -32,15 +39,16 @@
   color: #1E1E1E;
 }
 .nav-bar-right {
-  flex: 0 0 auto;
-  padding: 8px;
+  width: 40px;
 }
 .nav-back-icon {
+  font-size: 24px;
   color: #1E1E1E;
-  transition: all 0.3s ease;
+  cursor: pointer;
+  transition: color 0.3s ease;
 }
 .nav-back-icon:active {
-  color: #007aff;
+  color: #007AFF;
 }
 
 

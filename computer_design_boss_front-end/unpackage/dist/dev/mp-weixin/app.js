@@ -1,10 +1,11 @@
 "use strict";
-Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-const common_vendor = require("./common/vendor.js");
-const common_utils_themeSimple = require("./common/utils/theme-simple.js");
+Object.defineProperty(exports, "__esModule", { value: true });
+exports[Symbol.toStringTag] = "Module";
+var common_vendor = require("./common/vendor.js");
+var common_utils_themeSimple = require("./common/utils/theme-simple.js");
 if (!Math) {
-  "./pages/login/login.js";
   "./pages/splash/splash.js";
+  "./pages/login/login.js";
   "./pages/login/register/login_reister.js";
   "./pages/login/forget/login_forget.js";
   "./pages/index/index_index.js";
@@ -32,53 +33,45 @@ if (!Math) {
 }
 const _sfc_main = {
   onLaunch: function() {
-    common_vendor.index.__f__("log", "at App.vue:6", "App Launch");
+    console.log("App Launch");
     this.initAppTheme();
     this.listenSystemThemeChange();
   },
   onShow: function() {
-    common_vendor.index.__f__("log", "at App.vue:13", "App Show");
+    console.log("App Show");
     this.initAppTheme();
   },
   onHide: function() {
-    common_vendor.index.__f__("log", "at App.vue:18", "App Hide");
+    console.log("App Hide");
   },
   methods: {
-    /**
-     * 初始化应用主题
-     */
     initAppTheme() {
       try {
         const currentTheme = common_utils_themeSimple.themeManager.getCurrentTheme();
         const themeMode = common_utils_themeSimple.themeManager.getThemeMode();
-        common_vendor.index.__f__("log", "at App.vue:30", "当前主题:", currentTheme, "主题模式:", themeMode);
+        console.log("\u5F53\u524D\u4E3B\u9898:", currentTheme, "\u4E3B\u9898\u6A21\u5F0F:", themeMode);
         this.applyGlobalTheme(currentTheme);
         common_utils_themeSimple.themeManager.notifyThemeChange(currentTheme);
       } catch (error) {
-        common_vendor.index.__f__("error", "at App.vue:39", "初始化主题失败:", error);
+        console.error("\u521D\u59CB\u5316\u4E3B\u9898\u5931\u8D25:", error);
       }
     },
-    /**
-     * 应用全局主题
-     */
     applyGlobalTheme(theme) {
-      common_vendor.index.__f__("log", "at App.vue:49", "应用主题:", theme);
+      console.log("\u5E94\u7528\u4E3B\u9898:", theme);
     },
-    /**
-     * 监听系统主题变化
-     */
     listenSystemThemeChange() {
       common_utils_themeSimple.themeManager.onSystemThemeChange((newTheme) => {
-        common_vendor.index.__f__("log", "at App.vue:57", "系统主题变化:", newTheme);
+        console.log("\u7CFB\u7EDF\u4E3B\u9898\u53D8\u5316:", newTheme);
         this.applyGlobalTheme(newTheme);
       });
     }
   }
 };
+var App = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/App.vue"]]);
 const uniIcons = () => "./node-modules/@dcloudio/uni-ui/lib/uni-icons/uni-icons.js";
 const uniDrawer = () => "./node-modules/@dcloudio/uni-ui/lib/uni-drawer/uni-drawer.js";
 function createApp() {
-  const app = common_vendor.createSSRApp(_sfc_main);
+  const app = common_vendor.createSSRApp(App);
   app.component("uni-icons", uniIcons);
   app.component("uni-drawer", uniDrawer);
   return {
@@ -87,4 +80,3 @@ function createApp() {
 }
 createApp().app.mount("#app");
 exports.createApp = createApp;
-//# sourceMappingURL=../.sourcemap/mp-weixin/app.js.map

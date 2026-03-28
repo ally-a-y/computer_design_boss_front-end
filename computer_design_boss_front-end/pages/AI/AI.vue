@@ -1,12 +1,14 @@
 <template>
-  <view class="ai-chat-container">
+  <view class="ai-chat-container" :class="currentTheme + '-theme'">
     <!-- 顶部导航栏 -->
     <view class="header header-fixed">
       <view class="logo-section">
         <image class="logo" src="/static/ai/logo.png" mode="aspectFit"></image>
         <text class="app-title">AI求职助手</text>
       </view>
-      <button class="interview-btn" @click="goToInterview">模拟面试</button>
+      <view class="nav-actions">
+        <button class="interview-btn" @click="goToInterview">模拟面试</button>
+      </view>
     </view>
 
     <!-- 对话区域 -->
@@ -104,7 +106,7 @@
             </view>
             
             <view class="input-fields">
-              <view v-show="currentMethod.includes('user')" class="input-group user-id-group">
+              <!-- <view v-show="currentMethod.includes('user')" class="input-group user-id-group">
                 <text class="input-label">用户ID</text>
                 <view class="user-id-display" :class="{ 'loading': isLoadingUser, 'error': !currentUserId && !isLoadingUser }">
                   <text v-if="isLoadingUser" class="loading-text">获取用户信息中...</text>
@@ -117,7 +119,7 @@
                     或重新登录
                   </text>
                 </view>
-              </view>
+              </view> -->
               
               <view v-show="currentMethod.includes('position')" class="input-group">
                 <text class="input-label">职位选择</text>
@@ -148,10 +150,10 @@
           <view v-if="currentPanel === 'resumeEvaluation'">
             <view class="method-selector">
               <radio-group :value="currentMethod" @change="onMethodChange">
-                <label class="radio-item">
+                <!-- <label class="radio-item">
                   <radio value="user" />
                   <text>用户ID</text>
-                </label>
+                </label> -->
                 <label class="radio-item">
                   <radio value="pdf" />
                   <text>PDF上传</text>
@@ -160,7 +162,7 @@
             </view>
             
             <view class="input-fields">
-              <view v-show="currentMethod === 'user'" class="input-group" key="user-group">
+              <!-- <view v-show="currentMethod === 'user'" class="input-group" key="user-group">
                 <text class="input-label">用户ID</text>
                 <view class="user-id-display" :class="{ 'loading': isLoadingUser, 'error': !currentUserId && !isLoadingUser }">
                   <text v-if="isLoadingUser" class="loading-text">获取用户信息中...</text>
@@ -173,7 +175,7 @@
                     或重新登录
                   </text>
                 </view>
-              </view>
+              </view> -->
               <view v-show="currentMethod === 'pdf'" class="input-group" key="pdf-group">
                 <text class="input-label">PDF文件</text>
                 <view class="file-upload" @click="chooseFile">
@@ -189,17 +191,17 @@
               <radio-group :value="currentMethod" @change="onMethodChange">
                 <label class="radio-item">
                   <radio value="pdf+position" />
-                  <text>PDF+职位ID</text>
+                  <text>PDF+职位</text>
                 </label>
                 <label class="radio-item">
                   <radio value="user+text" />
-                  <text>用户ID+职位描述</text>
+                  <text>职位描述</text>
                 </label>
               </radio-group>
             </view>
             
             <view class="input-fields">
-              <view v-show="currentMethod.includes('user')" class="input-group" key="user-group">
+              <!-- <view v-show="currentMethod.includes('user')" class="input-group" key="user-group">
                 <text class="input-label">用户ID</text>
                 <view class="user-id-display" :class="{ 'loading': isLoadingUser, 'error': !currentUserId && !isLoadingUser }">
                   <text v-if="isLoadingUser" class="loading-text">获取用户信息中...</text>
@@ -212,7 +214,7 @@
                     或重新登录
                   </text>
                 </view>
-              </view>
+              </view> -->
               
               <view v-show="currentMethod.includes('position')" class="input-group" key="position-group">
                 <text class="input-label">职位选择</text>
@@ -245,17 +247,17 @@
               <radio-group :value="currentMethod" @change="onMethodChange">
                 <label class="radio-item">
                   <radio value="pdf+position" />
-                  <text>PDF+职位ID</text>
+                  <text>PDF+职位</text>
                 </label>
                 <label class="radio-item">
                   <radio value="user+text" />
-                  <text>用户ID+职位描述</text>
+                  <text>职位描述</text>
                 </label>
               </radio-group>
             </view>
             
             <view class="input-fields">
-              <view v-show="currentMethod.includes('user')" class="input-group" key="user-group">
+              <!-- <view v-show="currentMethod.includes('user')" class="input-group" key="user-group">
                 <text class="input-label">用户ID</text>
                 <view class="user-id-display" :class="{ 'loading': isLoadingUser, 'error': !currentUserId && !isLoadingUser }">
                   <text v-if="isLoadingUser" class="loading-text">获取用户信息中...</text>
@@ -268,7 +270,7 @@
                     或重新登录
                   </text>
                 </view>
-              </view>
+              </view> -->
               
               <view v-show="currentMethod.includes('position')" class="input-group" key="position-group">
                 <text class="input-label">职位选择</text>
@@ -339,6 +341,7 @@
 
 <script>
 import { aiApi } from '@/common/api/ai.js'
+import { themeManager } from '@/common/utils/theme-simple.js'
 const BASE_URL = 'http://localhost:5000'
 
 export default {
@@ -360,6 +363,7 @@ export default {
       isLoadingUser: false,
       userInfo: null, 
       currentUserId: null,
+      currentTheme: themeManager.getCurrentTheme(),
       formData: {
         positionId: '',
         positionText: '',
@@ -435,8 +439,8 @@ export default {
       },
       
       analysisMethods: [
-        { value: 'user+position', label: '我的简历+职位' },
-        { value: 'user+text', label: '我的简历+职位文本' },
+        { value: 'user+position', label: '职位' },
+        { value: 'user+text', label: '职位文本' },
         { value: 'pdf+position', label: 'PDF+职位' },
         { value: 'pdf+text', label: 'PDF+职位文本' }
       ]
@@ -465,10 +469,17 @@ export default {
     this.initializeChat()
     this.fetchUserInfo()
     this.initializeDefaultSelection()
+    // 监听主题变化
+    this.themeChangeHandler = (data) => {
+      this.currentTheme = data.theme
+    }
+    uni.$on('globalThemeChange', this.themeChangeHandler)
   },
   
   onUnload() {
     this.cleanup()
+    // 移除主题监听
+    uni.$off('globalThemeChange', this.themeChangeHandler)
   },
   
   methods: {
@@ -1321,9 +1332,8 @@ export default {
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
   
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: calc(var(--status-bar-height) + 20rpx) 30rpx 30rpx;
+  padding: calc(var(--status-bar-height) + 20rpx) 28rpx 30rpx 30rpx;
   height: 120rpx;
   
   .logo-section {
@@ -1344,11 +1354,17 @@ export default {
     }
   }
   
+  .nav-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+  }
+  
   .interview-btn {
     background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
     color: #fff;
     border-radius: 24rpx;
-    padding: 16rpx 28rpx;
+    padding: 16rpx 32rpx;
     font-size: 26rpx;
     font-weight: 500;
     box-shadow: 0 4rpx 12rpx rgba(0, 122, 255, 0.3);
@@ -1576,6 +1592,37 @@ export default {
           }
         }
       }
+
+/* 深色主题下的 markdown 内容样式 */
+.dark-theme .markdown-content {
+  color: #ffffff;
+  
+  ::v-deep {
+    strong {
+      color: #ffffff;
+    }
+    
+    em {
+      color: #cccccc;
+    }
+    
+    pre {
+      background: #3d3d3d;
+    }
+    
+    code {
+      color: #e83e8c;
+    }
+    
+    blockquote {
+      background: #2d2d2d;
+    }
+    
+    hr {
+      border-top: 2rpx solid #4d4d4d;
+    }
+  }
+}
       
       .message-time {
         font-size: 24rpx;
@@ -1583,6 +1630,11 @@ export default {
         margin-top: 12rpx;
         padding: 0 8rpx;
       }
+
+/* 深色主题下的消息时间样式 */
+.dark-theme .message-time {
+  color: #666;
+}
     }
     
     .skeleton-message {
@@ -1599,6 +1651,13 @@ export default {
         border-radius: 24rpx;
       }
     }
+
+/* 深色主题下的骨架屏样式 */
+.dark-theme .skeleton-message {
+  .skeleton-bubble {
+    background: linear-gradient(90deg, #3d3d3d 0%, #2d2d2d 50%, #3d3d3d 100%);
+  }
+}
   }
 }
 
@@ -2142,76 +2201,75 @@ export default {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-@media (prefers-color-scheme: dark) {
-  .ai-chat-container {
+/* 深色主题样式 */
+.dark-theme .ai-chat-container {
+  background-color: #1a1a1a;
+}
+
+.dark-theme .header {
+  background-color: #2d2d2d;
+  
+  .app-title {
+    color: #ffffff;
+  }
+}
+
+.dark-theme .chat-area {
+  background-color: #1a1a1a;
+}
+
+.dark-theme .message-bubble {
+  &.ai-message {
+    background-color: #2d2d2d;
+    color: #ffffff;
+  }
+}
+
+.dark-theme .input-area {
+  background-color: #2d2d2d;
+  
+  .text-input {
+    background-color: #3d3d3d;
+    border-color: #4d4d4d;
+    color: #ffffff;
+  }
+}
+
+.dark-theme .cascade-modal {
+  background-color: #2d2d2d;
+  
+  .cascade-header {
+    background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+    border-bottom-color: #4d4d4d;
+    
+    .cascade-title {
+      color: #ffffff;
+    }
+  }
+  
+  .category-list {
     background-color: #1a1a1a;
-  }
-  
-  .header {
-    background-color: #2d2d2d;
+    border-right-color: #4d4d4d;
     
-    .app-title {
-      color: #ffffff;
+    .category-item {
+      color: #999;
+      
+      &.active {
+        background-color: #2d2d2d;
+        color: #007aff;
+      }
     }
   }
   
-  .chat-area {
-    background-color: #1a1a1a;
-  }
-  
-  .message-bubble {
-    &.ai-message {
-      background-color: #2d2d2d;
-      color: #ffffff;
-    }
-  }
-  
-  .input-area {
+  .position-list {
     background-color: #2d2d2d;
     
-    .text-input {
-      background-color: #3d3d3d;
-      border-color: #4d4d4d;
+    .position-item {
       color: #ffffff;
-    }
-  }
-  
-  .cascade-modal {
-    background-color: #2d2d2d;
-    
-    .cascade-header {
-      background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
       border-bottom-color: #4d4d4d;
       
-      .cascade-title {
-        color: #ffffff;
-      }
-    }
-    
-    .category-list {
-      background-color: #1a1a1a;
-      border-right-color: #4d4d4d;
-      
-      .category-item {
-        color: #999;
-        
-        &.active {
-          background-color: #2d2d2d;
-          color: #007aff;
-        }
-      }
-    }
-    
-    .position-list {
-      background-color: #2d2d2d;
-      
-      .position-item {
-        color: #ffffff;
-        border-bottom-color: #4d4d4d;
-        
-        &.active {
-          background-color: #1a1a1a;
-        }
+      &.active {
+        background-color: #1a1a1a;
       }
     }
   }

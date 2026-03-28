@@ -41,7 +41,7 @@ const base64ToFile = (base64Data, fileName = 'resume.pdf') => {
         filePath,
         data: base64,
         encoding: 'base64',
-        success: () => resolve(filePath),
+        success: () => resolve({ type: 'path', data: filePath }),
         fail: reject
       })
     } catch (e) {
@@ -59,7 +59,8 @@ const base64ToFile = (base64Data, fileName = 'resume.pdf') => {
       const byteArray = new Uint8Array(byteNumbers)
       const blob = new Blob([byteArray], { type: 'application/pdf' })
       const file = new File([blob], fileName, { type: 'application/pdf' })
-      resolve(file)
+      // H5 环境下返回 File 对象，但不使用 uni.uploadFile
+      resolve({ type: 'file', data: file, blob: blob })
     } catch (e) {
       reject(e)
     }
@@ -75,7 +76,7 @@ const base64ToFile = (base64Data, fileName = 'resume.pdf') => {
         filePath,
         data: base64,
         encoding: 'base64',
-        success: () => resolve(filePath),
+        success: () => resolve({ type: 'path', data: filePath }),
         fail: reject
       })
     } catch (e) {
@@ -92,24 +93,59 @@ const base64ToFile = (base64Data, fileName = 'resume.pdf') => {
  * @param {Object} formData - 额外的表单数据
  */
 const uploadPdf = async (url, fileData, formData = {}) => {
-  const tempPath = await base64ToFile(fileData.base64, fileData.name)
+  const fileResult = await base64ToFile(fileData.base64, fileData.name)
   
+  // #ifdef H5
+  // H5 环境下，使用 fetch 或 XMLHttpRequest 上传
+  return new Promise((resolve, reject) => {
+    const uploadFormData = new FormData()
+    uploadFormData.append('pdf_file', fileResult.data)
+    
+    // 添加额外的表单字段
+    Object.keys(formData).forEach(key => {
+      uploadFormData.append(key, formData[key])
+    })
+    
+    fetch(getFullUrl(url), {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${uni.getStorageSync('token')}`
+      },
+      body: uploadFormData
+    })
+    .then(async response => {
+      const text = await response.text()
+      try {
+        const data = JSON.parse(text)
+        resolve(data)
+      } catch (e) {
+        resolve({ code: response.status, data: text })
+      }
+    })
+    .catch(error => {
+      console.error('上传失败:', error)
+      reject(error)
+    })
+  })
+  // #endif
+
+  // #ifdef MP-WEIXIN || APP-PLUS
+  // 小程序和App环境下，使用 uni.uploadFile
   return new Promise((resolve, reject) => {
     const uploadTask = uni.uploadFile({
       url: getFullUrl(url),
-      filePath: tempPath,
+      filePath: fileResult.data,  
       name: 'pdf_file',
-	  timeout: 120000,
+      timeout: 120000,
       formData,
       header: { 
         'Authorization': `Bearer ${uni.getStorageSync('token')}` 
       },
       success: (res) => {
-        // #ifdef MP-WEIXIN || APP-PLUS
+        // 清理临时文件
         try {
-          uni.getFileSystemManager().unlink({ filePath: tempPath })
+          uni.getFileSystemManager().unlink({ filePath: fileResult.data })
         } catch (e) {}
-        // #endif
         
         try {
           const data = JSON.parse(res.data)
@@ -118,9 +154,16 @@ const uploadPdf = async (url, fileData, formData = {}) => {
           resolve({ code: 200, data: res.data })
         }
       },
-      fail: reject
+      fail: (err) => {
+        // 清理临时文件
+        try {
+          uni.getFileSystemManager().unlink({ filePath: fileResult.data })
+        } catch (e) {}
+        reject(err)
+      }
     })
   })
+  // #endif
 }
 
 // AI求职助手API
