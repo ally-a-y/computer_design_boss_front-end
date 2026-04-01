@@ -1,22 +1,22 @@
 <template>
-  <view class="change-password-page">
+  <view class="change-password-page" :style="{ background: isDarkMode ? '#1a1a1a' : 'linear-gradient(135deg, #e6f0ff 0%, #ffffff 100%)' }">
     <!-- 顶部导航 -->
-    <view class="nav-bar">
-      <text class="back-btn" @click="goBack">←</text>
-      <text class="title">密码设置</text>
+    <view class="nav-bar" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'linear-gradient(135deg, rgba(230, 240, 255, 0.8), rgba(255, 255, 255, 0.8))', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
+      <text class="back-btn" @click="goBack" :style="{ color: isDarkMode ? '#ffffff' : '#333' }">←</text>
+      <text class="title" :style="{ color: isDarkMode ? '#ffffff' : '#333' }">密码设置</text>
     </view>
     
     <!-- 修改内容 -->
-    <view class="change-content">
+    <view class="change-content" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
       <view class="form-item">
-        <text class="label">当前手机号</text>
+        <text class="label" :style="{ color: isDarkMode ? '#ffffff' : '#333' }">当前手机号</text>
         <text class="current-phone">{{ currentPhone }}</text>
       </view>
       
       <view class="form-item">
-        <text class="label">验证码</text>
+        <text class="label" :style="{ color: isDarkMode ? '#ffffff' : '#333' }">验证码</text>
         <view class="code-input">
-          <input type="number" v-model="verificationCode" placeholder="请输入验证码" />
+          <input type="number" v-model="verificationCode" placeholder="请输入验证码" placeholder-style="color: #999" :style="{ background: isDarkMode ? '#404040' : '#fff', borderColor: isDarkMode ? '#404040' : '#eee', color: isDarkMode ? '#ffffff' : '#333' }" />
           <button class="send-code-btn" @click="sendCode" :disabled="countdown > 0">
             {{ countdown > 0 ? `${countdown}秒后重新发送` : '发送验证码' }}
           </button>
@@ -24,13 +24,13 @@
       </view>
       
       <view class="form-item">
-        <text class="label">新密码</text>
-        <input type="password" v-model="newPassword" placeholder="请输入新密码" />
+        <text class="label" :style="{ color: isDarkMode ? '#ffffff' : '#333' }">新密码</text>
+        <input type="password" v-model="newPassword" placeholder="请输入新密码" placeholder-style="color: #999" :style="{ background: isDarkMode ? '#404040' : '#fff', borderColor: isDarkMode ? '#404040' : '#eee', color: isDarkMode ? '#ffffff' : '#333' }" />
       </view>
       
       <view class="form-item">
-        <text class="label">确认密码</text>
-        <input type="password" v-model="confirmPassword" placeholder="请再次输入新密码" />
+        <text class="label" :style="{ color: isDarkMode ? '#ffffff' : '#333' }">确认密码</text>
+        <input type="password" v-model="confirmPassword" placeholder="请再次输入新密码" placeholder-style="color: #999" :style="{ background: isDarkMode ? '#404040' : '#fff', borderColor: isDarkMode ? '#404040' : '#eee', color: isDarkMode ? '#ffffff' : '#333' }" />
       </view>
       
       <button class="confirm-btn" @click="confirmChange">确认修改</button>
@@ -39,6 +39,8 @@
 </template>
 
 <script>
+import { themeManager } from '@/common/utils/theme-simple.js'
+
 export default {
   data() {
     return {
@@ -46,10 +48,44 @@ export default {
       verificationCode: '',
       newPassword: '',
       confirmPassword: '',
-      countdown: 0
+      countdown: 0,
+      // 主题相关
+      currentTheme: 'light',
+      isDarkMode: false
     }
   },
+  
+  onLoad() {
+    // 初始化主题
+    this.initTheme()
+  },
+  
+  onUnload() {
+    // 清理主题监听
+    uni.$off('globalThemeChange', this.handleGlobalThemeChange)
+  },
+  
   methods: {
+    /**
+     * 初始化主题
+     */
+    initTheme() {
+      // 获取当前主题
+      this.currentTheme = themeManager.getCurrentTheme()
+      this.isDarkMode = this.currentTheme === 'dark'
+      
+      // 监听全局主题变化
+      uni.$on('globalThemeChange', this.handleGlobalThemeChange)
+    },
+    
+    /**
+     * 处理全局主题变化
+     */
+    handleGlobalThemeChange(data) {
+      this.currentTheme = data.theme
+      this.isDarkMode = data.isDark
+    },
+    
     goBack() {
       uni.navigateBack()
     },

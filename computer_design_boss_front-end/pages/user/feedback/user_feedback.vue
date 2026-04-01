@@ -1,60 +1,59 @@
-xu<template>
-  <view class="feedback-page">
+<template>
+  <view class="feedback-page" :style="{ background: isDarkMode ? '#1a1a1a' : 'linear-gradient(135deg, #e6f0ff 0%, #ffffff 100%)' }">
     <!-- 顶部导航 -->
-    <view class="nav-bar">
+    <view class="nav-bar" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'linear-gradient(135deg, rgba(230, 240, 255, 0.8), rgba(255, 255, 255, 0.8))', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
       <view class="nav-bar-left">
-        <text class="nav-back-icon" @click="goBack">←</text>
+        <text class="nav-back-icon" @click="goBack" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">←</text>
       </view>
       <view class="nav-bar-center">
-        <text class="nav-bar-title">投诉反馈</text>
+        <text class="nav-bar-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">投诉反馈</text>
       </view>
       <view class="nav-bar-right">
-        <text class="add-btn" @click="addFeedback">+</text>
       </view>
     </view>
     
     <!-- 反馈列表 -->
     <view class="feedback-list">
-      <view v-for="(item, index) in feedbacks" :key="index" class="feedback-item">
+      <view v-for="(item, index) in feedbacks" :key="index" class="feedback-item" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
         <view class="feedback-info">
-          <text class="feedback-type">类型：{{ item.type }}</text>
-          <text class="feedback-time">提交时间：{{ item.submitTime }}</text>
+          <text class="feedback-type" :style="{ color: isDarkMode ? '#ffffff' : '#333' }">类型：{{ item.type }}</text>
+          <text class="feedback-time" :style="{ color: isDarkMode ? '#666' : '#999' }">提交时间：{{ item.submitTime }}</text>
           <view class="status">
             <text class="status-text" :class="item.status">{{ item.statusText }}</text>
           </view>
-          <text class="description">描述：{{ item.description }}</text>
-          <text v-if="item.response" class="response">处理反馈：{{ item.response }}</text>
+          <text class="description" :style="{ color: isDarkMode ? '#999' : '#666' }">描述：{{ item.description }}</text>
+          <text v-if="item.response" class="response" :style="{ color: '#007aff' }">处理反馈：{{ item.response }}</text>
         </view>
       </view>
       
       <!-- 空状态 -->
       <view v-if="feedbacks.length === 0" class="empty-state">
-        <uni-icons type="chatbubble" size="80" color="#ccc"></uni-icons>
-        <text>暂无反馈记录</text>
+        <uni-icons type="chatbubble" size="80" :color="isDarkMode ? '#404040' : '#ccc'"></uni-icons>
+        <text :style="{ color: isDarkMode ? '#666' : '#999' }">暂无反馈记录</text>
       </view>
     </view>
     
     <!-- 添加反馈弹窗 -->
     <uni-popup ref="addPopup" type="bottom">
-      <view class="popup-content">
+      <view class="popup-content" :style="{ background: isDarkMode ? '#2c2c2c' : '#fff' }">
         <view class="popup-header">
-          <text class="popup-title">添加投诉反馈</text>
-          <text class="close-btn" @click="closePopup">×</text>
+          <text class="popup-title" :style="{ color: isDarkMode ? '#ffffff' : '#333' }">添加投诉反馈</text>
+          <text class="close-btn" @click="closePopup" :style="{ color: isDarkMode ? '#666' : '#999' }">×</text>
         </view>
         <view class="popup-body">
           <view class="form-item">
-            <text class="label">投诉类型</text>
-            <picker class="input" @change="onTypeChange" :value="typeIndex" :range="typeOptions">
-              <view>{{ typeOptions[typeIndex] }}</view>
+            <text class="label" :style="{ color: isDarkMode ? '#ffffff' : '#333' }">投诉类型</text>
+            <picker class="input" @change="onTypeChange" :value="typeIndex" :range="typeOptions" :style="{ background: isDarkMode ? '#404040' : '#f5f5f5', borderColor: isDarkMode ? '#404040' : '#eee' }">
+              <view :style="{ color: isDarkMode ? '#ffffff' : '#333' }">{{ typeOptions[typeIndex] }}</view>
             </picker>
           </view>
           <view class="form-item">
-            <text class="label">投诉描述</text>
-            <textarea class="textarea" v-model="newFeedback.description" placeholder="请详细描述您的问题" />
+            <text class="label" :style="{ color: isDarkMode ? '#ffffff' : '#333' }">投诉描述</text>
+            <textarea class="textarea" v-model="newFeedback.description" placeholder="请详细描述您的问题" placeholder-style="color: #999" :style="{ background: isDarkMode ? '#404040' : '#f5f5f5', borderColor: isDarkMode ? '#404040' : '#eee', color: isDarkMode ? '#ffffff' : '#333' }" />
           </view>
         </view>
         <view class="popup-footer">
-          <button class="submit-btn" @click="submitFeedback">提交</button>
+          <button class="submit-btn" @click="submitFeedback" :style="{ background: 'linear-gradient(120deg, #4facfe, #00f2fe)', color: '#ffffff' }">提交</button>
         </view>
       </view>
     </uni-popup>
@@ -67,6 +66,7 @@ import {
   getFeedbackList,
   submitFeedback
 } from '@/common/api/feedback.js'
+import { themeManager } from '@/common/utils/theme-simple.js'
 
 export default {
   data() {
@@ -80,16 +80,46 @@ export default {
         description: ''
       },
       page: 1,
-      limit: 20
+      limit: 20,
+      // 主题相关
+      currentTheme: 'light',
+      isDarkMode: false
     }
   },
 
   async onLoad() {
     await this.loadComplaintTypes()
     await this.loadFeedbackList()
+    // 初始化主题
+    this.initTheme()
   },
-
+  
+  onUnload() {
+    // 清理主题监听
+    uni.$off('globalThemeChange', this.handleGlobalThemeChange)
+  },
+  
   methods: {
+    /**
+     * 初始化主题
+     */
+    initTheme() {
+      // 获取当前主题
+      this.currentTheme = themeManager.getCurrentTheme()
+      this.isDarkMode = this.currentTheme === 'dark'
+      
+      // 监听全局主题变化
+      uni.$on('globalThemeChange', this.handleGlobalThemeChange)
+    },
+    
+    /**
+     * 处理全局主题变化
+     */
+    handleGlobalThemeChange(data) {
+      this.currentTheme = data.theme
+      this.isDarkMode = data.isDark
+    },
+    
     goBack() {
       uni.navigateBack()
     },

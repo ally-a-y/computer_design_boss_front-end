@@ -1,7 +1,7 @@
 <template>
-  <view class="user-page" :style="{ backgroundColor: isDarkMode ? '#1a1a1a' : '#F8FAFD' }">
+  <view class="user-page" :style="{ background: isDarkMode ? '#1a1a1a' : 'linear-gradient(135deg, #e6f0ff 0%, #ffffff 100%)' }">
     <!-- 顶部导航 -->
-    <view class="nav-bar" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : 'transparent' }">
+    <view class="nav-bar" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'linear-gradient(135deg, rgba(230, 240, 255, 0.8), rgba(255, 255, 255, 0.8))', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
       <view class="nav-bar-left">
         <!-- 左侧预留空间 -->
       </view>
@@ -14,7 +14,7 @@
     </view>
     
     <!-- 顶部卡片 -->
-    <view class="top-card" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#fff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
+    <view class="top-card" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
       <view class="user-header">
         <image class="avatar" :src="userInfo.avatar ? 'data:image/jpeg;base64,' + userInfo.avatar.replace(/\s+/g, '') : '/static/default-avatar.png'" mode="aspectFill"></image>
         <view class="user-info">
@@ -24,7 +24,7 @@
       </view>
       
       <!-- 功能图标 -->
-      <view class="function-icons" :style="{ borderTop: isDarkMode ? '1px solid #404040' : '1px solid #F2F5F9' }">
+      <view class="function-icons" :style="{ borderTop: isDarkMode ? '1px solid #404040' : '1px solid #E6F0FF' }">
         <view class="icon-item" @click="navigateToCollection" :style="{ color: isDarkMode ? '#999' : '#6C757D' }">
           <uni-icons type="star" size="40" :color="isDarkMode ? '#ffb800' : '#ff9500'"></uni-icons>
           <text :style="{ color: isDarkMode ? '#999' : '#6C757D' }">收藏职位</text>

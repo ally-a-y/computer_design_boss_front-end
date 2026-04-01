@@ -1,9 +1,9 @@
 <template>
-  <view class="chart-page" :style="{ backgroundColor: isDarkMode ? '#1a1a1a' : '#F8FAFD' }">
+  <view class="chart-page" :style="{ background: isDarkMode ? '#1a1a1a' : 'linear-gradient(135deg, #e6f0ff 0%, #ffffff 100%)' }">
     <!-- 顶部导航栏 -->
-    <view class="nav-bar" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
+    <view class="nav-bar" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'linear-gradient(135deg, rgba(230, 240, 255, 0.8), rgba(255, 255, 255, 0.8))', backdropFilter: 'blur(10px)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
       <view class="nav-bar-left">
-        <text class="nav-back-icon" @click="goBack" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">←</text>
+        <text class="nav-back-icon" @click="goBack" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">&lt;</text>
       </view>
       <view class="nav-bar-center">
         <text class="nav-bar-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">竞争力分析</text>
@@ -14,27 +14,27 @@
     </view>
     
     <!-- 用户信息卡片 -->
-    <view class="user-card" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
+    <view class="user-card" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(10px)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
       <view class="user-header">
         <image class="avatar" src="/static/logo.png" mode="aspectFill"></image>
         <view class="user-info">
           <text class="user-name" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">张三</text>
           <text class="user-title" :style="{ color: isDarkMode ? '#999' : '#6C757D' }">资深产品经理</text>
         </view>
-        <view class="competitive-tag" :style="{ backgroundColor: isDarkMode ? '#3a3a3a' : '#E8F0FE' }">
-          <text class="tag-text" :style="{ color: '#007AFF' }">竞争力评级 S+</text>
-          <text class="arrow-icon" :style="{ color: '#007AFF' }">↑</text>
+        <view class="competitive-tag" :style="{ background: isDarkMode ? 'linear-gradient(120deg, #3a3a3a, #4a4a4a)' : 'linear-gradient(120deg, #4facfe, #00f2fe)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(79, 172, 254, 0.3)' }">
+          <text class="tag-text" :style="{ color: '#ffffff' }">竞争力评级 S+</text>
+          <text class="arrow-icon" :style="{ color: '#ffffff' }">↑</text>
         </view>
       </view>
     </view>
     
     <!-- 综合竞争力环形图 -->
-    <view class="competitive-card" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
+    <view class="competitive-card" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(10px)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
       <view class="ring-chart-container">
         <view class="ring-chart">
           <view class="ring-background" :style="{ borderColor: isDarkMode ? '#404040' : '#E5E5EA' }"></view>
-          <view class="ring-progress" :style="{ borderTopColor: '#007AFF', borderRightColor: '#007AFF' }"></view>
-          <view class="ring-center">
+          <view class="ring-progress" :style="{ borderTopColor: '#4facfe', borderRightColor: '#00f2fe' }"></view>
+          <view class="ring-center" :style="{ background: isDarkMode ? 'rgba(58, 58, 58, 0.8)' : 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(10px)' }">
             <text class="score" :style="{ color: '#007AFF' }">{{ score }}</text>
             <text class="score-label" :style="{ color: isDarkMode ? '#999' : '#6C757D' }">综合竞争力百分位</text>
           </view>
@@ -45,7 +45,7 @@
     
     <!-- 关键指标卡片组 -->
     <view class="metrics-container">
-      <view class="metric-card" v-for="(metric, index) in metrics" :key="index" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
+      <view class="metric-card" v-for="(metric, index) in metrics" :key="index" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(10px)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
         <text class="metric-value" :style="{ color: '#007AFF' }">{{ metric.value }} <text class="metric-change" v-if="metric.change">↑ {{ metric.change }}</text></text>
         <text class="metric-label" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">{{ metric.label }}</text>
         <text class="metric-desc" :style="{ color: isDarkMode ? '#999' : '#6C757D' }">{{ metric.desc }}</text>
@@ -55,48 +55,48 @@
     <!-- 双栏图表区 -->
     <view class="chart-section">
       <!-- 左侧饼图 -->
-      <view class="chart-card" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
+      <view class="chart-card" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(10px)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
         <text class="chart-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">技能权重分布</text>
         <view class="pie-chart-container">
           <view class="pie-chart">
             <view class="pie-sector" v-for="(sector, index) in skillDistribution" :key="index" :style="{ '--percentage': sector.percentage, '--color': sector.color, '--offset': sector.offset }"></view>
-            <view class="pie-center" :style="{ backgroundColor: isDarkMode ? '#3a3a3a' : '#ffffff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.1)' }">
+            <view class="pie-center" :style="{ background: isDarkMode ? 'rgba(58, 58, 58, 0.8)' : 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(10px)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.1)' }">
               <text class="pie-center-text" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">技能</text>
               <text class="pie-center-subtext" :style="{ color: isDarkMode ? '#999' : '#6C757D' }">分布</text>
             </view>
           </view>
           <view class="pie-legend">
             <view class="legend-item" v-for="(sector, index) in skillDistribution" :key="index">
-              <view class="legend-color" :style="{ backgroundColor: sector.color }"></view>
+              <view class="legend-color" :style="{ background: 'linear-gradient(120deg, ' + sector.color + ', ' + sector.color + '80)', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }"></view>
               <text class="legend-text" :style="{ color: isDarkMode ? '#999' : '#6C757D' }">{{ sector.name }} {{ sector.percentage }}%</text>
             </view>
           </view>
         </view>
-        <text class="chart-insight" :style="{ color: isDarkMode ? '#999' : '#6C757D', backgroundColor: isDarkMode ? '#3a3a3a' : '#F8FAFD' }">产品规划与用户研究构成核心优势，占总技能权重 60%。</text>
+        <text class="chart-insight" :style="{ color: isDarkMode ? '#999' : '#6C757D', background: isDarkMode ? 'rgba(58, 58, 58, 0.8)' : 'rgba(248, 250, 253, 0.8)', backdropFilter: 'blur(10px)' }">产品规划与用户研究构成核心优势，占总技能权重 60%。</text>
       </view>
       
       <!-- 右侧水平堆叠条 -->
-      <view class="chart-card" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
+      <view class="chart-card" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(10px)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
         <text class="chart-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">核心优势对比</text>
         <view class="bar-chart-container">
           <view class="bar-item" v-for="(item, index) in coreAdvantages" :key="index">
             <text class="bar-label" :style="{ color: isDarkMode ? '#999' : '#6C757D' }">{{ item.label }}</text>
-            <view class="bar-wrapper" :style="{ backgroundColor: isDarkMode ? '#404040' : '#E9ECF1' }">
-              <view class="bar-fill" :style="{ width: item.value, background: 'linear-gradient(90deg, #007AFF 0%, #5E9EFF 100%)' }"></view>
+            <view class="bar-wrapper" :style="{ background: isDarkMode ? 'rgba(64, 64, 64, 0.8)' : 'rgba(233, 236, 241, 0.8)', backdropFilter: 'blur(10px)' }">
+              <view class="bar-fill" :style="{ width: item.value, background: 'linear-gradient(90deg, #4facfe, #00f2fe)' }"></view>
             </view>
             <text class="bar-value" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">{{ item.score }}</text>
           </view>
         </view>
-        <text class="chart-insight" :style="{ color: isDarkMode ? '#999' : '#6C757D', backgroundColor: isDarkMode ? '#3a3a3a' : '#F8FAFD' }">跨部门协同力为最强优势，可重点在面试中举例。</text>
+        <text class="chart-insight" :style="{ color: isDarkMode ? '#999' : '#6C757D', background: isDarkMode ? 'rgba(58, 58, 58, 0.8)' : 'rgba(248, 250, 253, 0.8)', backdropFilter: 'blur(10px)' }">跨部门协同力为最强优势，可重点在面试中举例。</text>
       </view>
     </view>
     
     <!-- 底部区域：机会洞察 + 行动建议 -->
-    <view class="insight-section" :style="{ background: isDarkMode ? 'linear-gradient(180deg, #2c2c2c 0%, #1a1a1a 100%)' : 'linear-gradient(180deg, #E8F0FE 0%, #FFFFFF 100%)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
+    <view class="insight-section" :style="{ background: isDarkMode ? 'linear-gradient(180deg, rgba(44, 44, 44, 0.8), rgba(26, 26, 26, 0.8))' : 'linear-gradient(180deg, rgba(232, 240, 254, 0.8), rgba(255, 255, 255, 0.8))', backdropFilter: 'blur(10px)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
       <view class="insight-left">
         <text class="insight-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">机会雷达</text>
         <view class="insight-list">
-          <view class="insight-item" v-for="(item, index) in opportunities" :key="index" :style="{ backgroundColor: isDarkMode ? '#3a3a3a' : 'rgba(255,255,255,0.8)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 1px 3px rgba(0,0,0,0.05)' }">
+          <view class="insight-item" v-for="(item, index) in opportunities" :key="index" :style="{ background: isDarkMode ? 'rgba(58, 58, 58, 0.8)' : 'rgba(255,255,255,0.8)', backdropFilter: 'blur(10px)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 1px 3px rgba(0,0,0,0.05)' }">
             <text class="insight-dot" :style="{ color: '#007AFF' }">{{ item.icon }}</text>
             <text class="insight-text" :style="{ color: isDarkMode ? '#ffffff' : '#3A3A3A' }">{{ item.text }}</text>
           </view>
@@ -105,7 +105,7 @@
       <view class="insight-right">
         <text class="insight-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">行动建议</text>
         <view class="action-list">
-          <view class="action-item" v-for="(item, index) in actions" :key="index" :style="{ backgroundColor: isDarkMode ? '#3a3a3a' : 'rgba(255,255,255,0.9)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 1px 3px rgba(0,0,0,0.05)' }">
+          <view class="action-item" v-for="(item, index) in actions" :key="index" :style="{ background: isDarkMode ? 'rgba(58, 58, 58, 0.8)' : 'rgba(255,255,255,0.9)', backdropFilter: 'blur(10px)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 1px 3px rgba(0,0,0,0.05)' }">
             <text class="action-text" :style="{ color: isDarkMode ? '#ffffff' : '#3A3A3A' }">{{ item }}</text>
           </view>
         </view>

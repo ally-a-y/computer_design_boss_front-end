@@ -42,6 +42,12 @@ const userApi = {
       method: "GET"
     });
   },
+  getUserNameAndAvatar: () => {
+    return common_api_request.requestWithRetry({
+      url: "/api/user/get_name_and_avatar",
+      method: "GET"
+    });
+  },
   updateUserProfile: (profileData) => {
     return common_api_request.requestWithRetry({
       url: "/api/user/profile",

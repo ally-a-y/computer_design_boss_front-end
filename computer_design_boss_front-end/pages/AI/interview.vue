@@ -1,68 +1,89 @@
 <template>
-  <view class="interview-container">
+  <view class="interview-container" :style="{ background: isDarkMode ? '#1a1a1a' : 'linear-gradient(135deg, #e6f0ff 0%, #ffffff 100%)' }">
     <!-- 顶部导航栏 -->
-    <view class="header">
+    <view class="header" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'linear-gradient(135deg, rgba(230, 240, 255, 0.8), rgba(255, 255, 255, 0.8))', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
       <view class="header-content">
         <view class="nav-bar-left">
-          <text class="nav-back-icon" @click="goBack">←</text>
+          <text class="nav-back-icon" @click="goBack" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">←</text>
         </view>
-        <text class="page-title">AI模拟面试</text>
+        <text class="page-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">AI模拟面试</text>
         <view class="header-right"></view>
       </view>
     </view>
 
     <!-- 面试信息配置区 -->
     <view v-if="!interviewStarted" class="config-section">
-      <view class="config-card">
-        <text class="config-title">面试配置</text>
+      <view class="config-card" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
+        <text class="config-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">面试配置</text>
 
         <!-- 方式选择 -->
         <view class="method-tabs">
           <view v-for="(method, index) in interviewMethods" :key="index"
                 :class="['tab-item', { active: currentMethod === method.value }]"
-                @click="selectMethod(method.value)">
+                @click="selectMethod(method.value)"
+                :style="{ background: currentMethod === method.value ? 'linear-gradient(120deg, #4facfe, #00f2fe)' : (isDarkMode ? 'rgba(64, 64, 64, 0.8)' : 'rgba(255, 255, 255, 0.8)'), color: currentMethod === method.value ? '#ffffff' : (isDarkMode ? '#ffffff' : '#1E1E1E') }">
             <text>{{ method.label }}</text>
           </view>
         </view>
 
         <!-- 动态表单 -->
         <view class="form-fields">
+		  
           <view v-if="currentMethod.includes('resumeText')" class="form-group">
-            <text class="form-label">简历文本</text>
+            <text class="form-label" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">简历文本</text>
             <textarea class="form-textarea" 
                       v-model="formData.resumeText" 
-                      placeholder="请粘贴您的简历内容"></textarea>
+                      placeholder="请粘贴您的简历内容"
+                      placeholder-style="color: #999"
+                      :style="{ background: isDarkMode ? '#404040' : '#fff', borderColor: isDarkMode ? '#404040' : '#eee', color: isDarkMode ? '#ffffff' : '#1E1E1E' }"></textarea>
           </view>
 
           <view v-if="currentMethod.includes('pdf')" class="form-group">
-            <text class="form-label">PDF简历</text>
-            <view class="file-upload-area" @click="chooseResumeFile">
+            <text class="form-label" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">PDF简历</text>
+            <view class="file-upload-area" @click="chooseResumeFile" :style="{ background: isDarkMode ? 'rgba(64, 64, 64, 0.8)' : 'rgba(255, 255, 255, 0.8)', borderColor: isDarkMode ? '#404040' : '#eee' }">
               <image v-if="!formData.resumePdf" src="/static/ai/upload.png" mode="aspectFit"></image>
-              <text v-if="!formData.resumePdf">点击上传PDF简历</text>
-              <text v-else class="file-name">{{ formData.resumePdf.name }}</text>
+              <text v-if="!formData.resumePdf" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">点击上传PDF简历</text>
+              <text v-else class="file-name" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">{{ formData.resumePdf.name }}</text>
             </view>
           </view>
+		  
+		  <!-- <view v-if="currentMethod.includes('user')" class="form-group">
+		    <text class="form-label">用户ID</text>
+		    <view class="user-id-display" :class="{ 'loading': isLoadingUser, 'error': !formData.userId && !isLoadingUser }">
+		      <text v-if="isLoadingUser" class="loading-text">获取用户信息中...</text>
+		      <text v-else-if="formData.userId" class="user-id-text">
+		        {{ formData.userId }}
+		      </text>
+		      <text v-else class="error-text">
+		        未获取到用户信息，请
+		        <text class="retry-link" @click.stop="fetchUserInfo">点击重试</text>
+		        或重新登录
+		      </text>
+		    </view>
+		  </view> -->
 
-          <view v-if="currentMethod.includes('position')" class="form-group">
-            <text class="form-label">职位选择</text>
-            <view class="cascade-selector" @click="openCascadePicker">
-              <view class="selector-content" :class="{ 'placeholder': !selectedPositionId }">
+          <view v-if="currentMethod.includes('position') && !currentMethod.includes('positionText')" class="form-group">
+            <text class="form-label" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">职位选择</text>
+            <view class="cascade-selector" @click="openCascadePicker" :style="{ background: isDarkMode ? '#404040' : '#fff', borderColor: isDarkMode ? '#404040' : '#eee' }">
+              <view class="selector-content" :class="{ 'placeholder': !selectedPositionId }" :style="{ color: !selectedPositionId ? '#999' : (isDarkMode ? '#ffffff' : '#1E1E1E') }">
                 <text v-if="selectedPositionId">{{ selectedCategoryName }} - {{ selectedPositionName }}</text>
                 <text v-else>请选择职位</text>
               </view>
-              <text class="arrow-icon">›</text>
+              <text class="arrow-icon" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">›</text>
             </view>
           </view>
 
           <view v-if="currentMethod.includes('positionText')" class="form-group">
-            <text class="form-label">职位描述</text>
+            <text class="form-label" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">职位描述</text>
             <textarea class="form-textarea" 
                       v-model="formData.positionText" 
-                      placeholder="请输入职位描述"></textarea>
+                      placeholder="请输入职位描述"
+                      placeholder-style="color: #999"
+                      :style="{ background: isDarkMode ? '#404040' : '#fff', borderColor: isDarkMode ? '#404040' : '#eee', color: isDarkMode ? '#ffffff' : '#1E1E1E' }"></textarea>
           </view>
         </view>
 
-        <button class="start-btn" @click="startInterview" :loading="isStarting">
+        <button class="start-btn" @click="startInterview" :loading="isStarting" :style="{ background: 'linear-gradient(120deg, #4facfe, #00f2fe)', color: '#ffffff' }">
           {{ isStarting ? '启动中...' : '开始面试' }}
         </button>
       </view>
@@ -70,23 +91,23 @@
 
     <!-- 面试交互区 -->
     <view v-else class="interview-area">
-      <view class="progress-section">
-        <text class="progress-text">面试进度 {{ currentQuestion }}/{{ totalQuestions }}</text>
-        <view class="progress-bar">
-          <view class="progress-fill" :style="{ width: progressPercent + '%' }"></view>
+      <view class="progress-section" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
+        <text class="progress-text" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">面试进度 {{ currentQuestion }}/{{ totalQuestions }}</text>
+        <view class="progress-bar" :style="{ background: isDarkMode ? '#404040' : '#eee' }">
+          <view class="progress-fill" :style="{ width: progressPercent + '%', background: 'linear-gradient(120deg, #4facfe, #00f2fe)' }"></view>
         </view>
-        <text class="stage-text">{{ currentStage }}</text>
+        <text class="stage-text" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">{{ currentStage }}</text>
       </view>
 
       <!-- 顶部面试官状态条 -->
-      <view class="interviewer-status-bar">
+      <view class="interviewer-status-bar" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
         <view class="status-left">
           <view class="avatar-small">
             <view class="avatar-gradient">
               <text class="avatar-emoji">🤖</text>
             </view>
           </view>
-          <text class="interviewer-name">AI面试官</text>
+          <text class="interviewer-name" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">AI面试官</text>
         </view>
         <view class="status-right">
           <view class="voice-wave-mini" v-if="isSpeaking">
@@ -94,7 +115,7 @@
                   :class="['wave-bar-mini', { active: voiceWaveActive }]"
                   :style="{ animationDelay: (i * 0.1) + 's' }"></view>
           </view>
-          <text class="interviewer-status-text">{{ getInterviewerStatus() }}</text>
+          <text class="interviewer-status-text" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">{{ getInterviewerStatus() }}</text>
         </view>
       </view>
 
@@ -103,10 +124,10 @@
         <scroll-view class="chat-messages" scroll-y :scroll-top="chatScrollTop" scroll-with-animation>
           <view v-for="(message, index) in interviewMessages" :key="index"
                 :class="['chat-message', message.sender]">
-            <view class="message-bubble">
+            <view class="message-bubble" :style="message.sender === 'user' ? { background: 'linear-gradient(120deg, #4facfe, #00f2fe)', color: '#ffffff' } : { background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', color: isDarkMode ? '#ffffff' : '#1E1E1E', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
               <text>{{ message.content }}</text>
             </view>
-            <text class="message-time">{{ formatTime(message.timestamp) }}</text>
+            <text class="message-time" :style="{ color: isDarkMode ? '#999' : '#999' }">{{ formatTime(message.timestamp) }}</text>
           </view>
 
           <!-- AI思考中 -->
@@ -277,6 +298,7 @@
 
 <script>
 import { getStaticUrl, interviewApi } from '@/common/api/ai.js'
+import { themeManager } from '@/common/utils/theme-simple.js'
 const BASE_URL = 'http://localhost:5000'
 
 export default {
@@ -289,7 +311,7 @@ export default {
       // 页面状态
       interviewStarted: false,
       isStarting: false,
-      currentMethod: 'resumeText+positionText',
+      currentMethod: 'user+position',
 
       // 表单数据
       formData: {
@@ -369,15 +391,19 @@ export default {
       selectedCategoryName: '',
       selectedPositionId: '',
       selectedPositionName: '',
+      
+      // 主题相关
+      currentTheme: themeManager.getCurrentTheme(),
+      isDarkMode: false,
 
       // 面试配置
       interviewMethods: [
-        { value: 'resumeText+positionText', label: '简历文本+职位文本' },
-        { value: 'pdf+positionText', label: 'PDF简历+职位文本' },
-        { value: 'pdf+position', label: 'PDF简历+职位' },
-        { value: 'user+position', label: '职位' },
-        { value: 'user+positionText', label: '职位文本' },
-        { value: 'resumeText+position', label: '简历文本+职位' }
+		{ value: 'user+position', label: '职位' },
+		{ value: 'user+positionText', label: '职位文本' },
+		{ value: 'pdf+position', label: 'PDF简历+职位' },
+		// { value: 'resumeText+position', label: '简历文本+职位' },
+		{ value: 'pdf+positionText', label: 'PDF简历+职位文本' },
+        // { value: 'resumeText+positionText', label: '简历文本+职位文本' },
       ],
 
       // 面试流程状态
@@ -456,12 +482,24 @@ export default {
     this.fetchUserInfo()
     this.resetPositionSelection()
     
+    // 初始化主题
+    this.currentTheme = themeManager.getCurrentTheme()
+    this.isDarkMode = this.currentTheme === 'dark'
+    // 监听主题变化
+    this.themeChangeHandler = (data) => {
+      this.currentTheme = data.theme
+      this.isDarkMode = data.isDark
+    }
+    uni.$on('globalThemeChange', this.themeChangeHandler)
+    
     // 调试输出
     console.log('当前环境:', this.isH5 ? 'H5' : (this.isMP ? '小程序' : 'App'))
   },
 
   onUnload() {
     this.cleanupInterview()
+    // 移除主题监听
+    uni.$off('globalThemeChange', this.themeChangeHandler)
   },
 
   methods: {
@@ -818,7 +856,7 @@ export default {
           return false
         }
       }
-      if (method.includes('position')) {
+      if (method.includes('position')&& !method.includes('positionText')) {
         if (!this.selectedPositionId) {
           uni.showToast({ title: '请选择职位', icon: 'none' })
           return false
@@ -1396,7 +1434,21 @@ export default {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #f8f8f8;
+  background: linear-gradient(145deg, #eef5ff 0%, #ffffff 100%);
+  position: relative;
+}
+
+/* 装饰性元素 */
+.interview-container::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 300rpx;
+  height: 300rpx;
+  background: radial-gradient(circle, rgba(43, 110, 240, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
 }
 
 .header {
@@ -1405,8 +1457,10 @@ export default {
   left: 0;
   right: 0;
   z-index: 100;
-  background-color: #fff;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
+  background: linear-gradient(135deg, rgba(230, 240, 255, 0.8), rgba(255, 255, 255, 0.8));
+  box-shadow: 0 4rpx 16rpx rgba(79, 172, 254, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   height: 120rpx;
   display: flex;
   align-items: center;
@@ -1437,9 +1491,12 @@ export default {
   .page-title {
     font-size: 36rpx;
     font-weight: 600;
-    color: #333;
     flex: 1;
     text-align: center;
+    background: linear-gradient(120deg, #2b6ef0, #00b4ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   .header-right {
@@ -1453,10 +1510,10 @@ export default {
   overflow-y: auto;
 
   .config-card {
-    background-color: #fff;
+    background: rgba(255, 255, 255, 0.9);
     border-radius: 24rpx;
     padding: 48rpx 40rpx;
-    box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.06);
+    box-shadow: 0 8rpx 32rpx rgba(79, 172, 254, 0.15);
 
     .config-title {
       font-size: 40rpx;
@@ -1477,10 +1534,11 @@ export default {
         flex: 1;
         min-width: 280rpx;
         padding: 24rpx 20rpx;
-        border: 2rpx solid #e9ecef;
+        border: 2rpx solid transparent;
         border-radius: 20rpx;
         text-align: center;
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        background: linear-gradient(135deg, #E6F0FF, #F0F4FF);
+        border-image: linear-gradient(120deg, #a0c4ff, #cfe2ff) 1;
         transition: all 0.3s ease;
 
         &.active {
@@ -1514,14 +1572,17 @@ export default {
           width: 100%;
           min-height: 200rpx;
           padding: 28rpx 24rpx;
-          border: 2rpx solid #e9ecef;
+          border: 2rpx solid transparent;
           border-radius: 20rpx;
           font-size: 30rpx;
-          background-color: #fff;
+          background: linear-gradient(135deg, #E6F0FF, #F0F4FF);
+          border-image: linear-gradient(120deg, #a0c4ff, #cfe2ff) 1;
           box-sizing: border-box;
 
           &:focus {
-            border-color: #007aff;
+            border-color: transparent;
+            border-image: linear-gradient(120deg, #4f9eff, #a0d0ff) 1;
+            box-shadow: 0 0 12px rgba(79, 158, 255, 0.3);
           }
         }
 
@@ -1536,6 +1597,9 @@ export default {
             width: 80rpx;
             height: 80rpx;
             margin-bottom: 24rpx;
+            background: radial-gradient(circle, rgba(160, 196, 255, 0.3) 0%, rgba(207, 226, 255, 0.1) 100%);
+            border-radius: 50%;
+            padding: 10rpx;
           }
 
           text {
@@ -1552,18 +1616,19 @@ export default {
         
         .user-id-display {
           padding: 24rpx 28rpx;
-          border: 2rpx solid #e9ecef;
+          border: 2rpx solid transparent;
           border-radius: 16rpx;
-          background-color: #f8f9fa;
+          background: linear-gradient(135deg, #E6F0FF, #F0F4FF);
+          border-image: linear-gradient(120deg, #a0c4ff, #cfe2ff) 1;
           
           &.loading {
-            background-color: #fffbeb;
-            border-color: #f59e0b;
+            background: linear-gradient(135deg, #fffbeb, #fef3c7);
+            border-image: linear-gradient(120deg, #fcd34d, #fbbf24) 1;
           }
           
           &.error {
-            background-color: #fef2f2;
-            border-color: #ef4444;
+            background: linear-gradient(135deg, #fef2f2, #fee2e2);
+            border-image: linear-gradient(120deg, #fca5a5, #f87171) 1;
           }
           
           .loading-text {
@@ -1593,9 +1658,17 @@ export default {
           justify-content: space-between;
           align-items: center;
           padding: 24rpx 28rpx;
-          border: 2rpx solid #e9ecef;
+          border: 2rpx solid transparent;
           border-radius: 16rpx;
-          background-color: #fff;
+          background: linear-gradient(135deg, #E6F0FF, #F0F4FF);
+          border-image: linear-gradient(120deg, #a0c4ff, #cfe2ff) 1;
+          transition: all 0.3s ease;
+          
+          &:focus {
+            border-color: transparent;
+            border-image: linear-gradient(120deg, #4f9eff, #a0d0ff) 1;
+            box-shadow: 0 0 12px rgba(79, 158, 255, 0.3);
+          }
           
           .selector-content {
             flex: 1;
@@ -1603,7 +1676,7 @@ export default {
             color: #333;
             
             &.placeholder {
-              color: #adb5bd;
+              color: #94a3b8;
             }
           }
           
@@ -1613,16 +1686,39 @@ export default {
           }
         }
       }
+
+      .divider {
+        height: 2rpx;
+        background: linear-gradient(90deg, transparent, #a0c4ff, transparent);
+        margin: 40rpx 0;
+      }
     }
 
     .start-btn {
       width: 100%;
-      background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+      background: linear-gradient(135deg, #2b6ef0, #0099ff);
       color: #fff;
-      border-radius: 28rpx;
+      border-radius: 16px;
       padding: 32rpx;
       font-size: 36rpx;
       font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 12px rgba(43, 110, 240, 0.4);
+      animation: breathe 3s infinite ease-in-out;
+      
+      &:active {
+        background: linear-gradient(135deg, #0099ff, #2b6ef0);
+        box-shadow: 0 0 16px rgba(43, 110, 240, 0.6);
+      }
+    }
+
+    @keyframes breathe {
+      0%, 100% {
+        box-shadow: 0 0 12px rgba(43, 110, 240, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 20px rgba(43, 110, 240, 0.6);
+      }
     }
   }
 }

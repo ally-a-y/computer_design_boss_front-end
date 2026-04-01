@@ -1,7 +1,7 @@
 <template>
-  <view class="container" :style="{ backgroundColor: isDarkMode ? '#1a1a1a' : '#F8FAFD' }">
+  <view class="container" :style="{ background: isDarkMode ? '#1a1a1a' : 'linear-gradient(135deg, #e6f0ff 0%, #ffffff 100%)' }">
     <!-- 顶部导航 -->
-    <view class="nav-bar" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
+    <view class="nav-bar" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'linear-gradient(135deg, rgba(230, 240, 255, 0.8), rgba(255, 255, 255, 0.8))', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
       <view class="nav-bar-left">
         <!-- 左侧预留空间 -->
       </view>
@@ -14,7 +14,7 @@
     </view>
     
     <!-- 顶部搜索栏 -->
-    <view class="search-bar" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#F2F5F9' }">
+    <view class="search-bar" :style="{ background: isDarkMode ? '#2c2c2c' : 'rgba(255, 255, 255, 0.8)' }">
       <uni-icons type="search" size="30" :color="isDarkMode ? '#999' : '#999'"></uni-icons>
       <input type="text" placeholder="搜索职位、公司名称" v-model="keyword" @input="onSearchInput" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }" />
     </view>
@@ -27,7 +27,7 @@
     </swiper>
     
     <!-- 分类入口 -->
-    <view class="category-section" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#fff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
+    <view class="category-section" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
       <view class="category-item" v-for="category in categoryList" :key="category.id" @click="goToCategory(category.id)">
         <image :src="category.icon" class="category-icon"></image>
         <text class="category-name" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">{{ category.name }}</text>
@@ -42,17 +42,20 @@
         :key="category.id"
         @click="selectSubCategory(category.id)"
         :class="{ active: selectedSubCategories.includes(category.id) }"
-        :style="{ backgroundColor: isDarkMode ? '#3a3a3a' : '#F0F4FF', color: '#007aff' }"
+        :style="{ background: isDarkMode ? '#3a3a3a' : 'linear-gradient(135deg, #E6F0FF, #F0F4FF)', color: '#007aff' }"
       >
         <text>{{ category.name }}</text>
       </view>
     </view>
     
     <!-- 推荐职位区域 -->
-    <view class="job-section" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#fff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
+    <view class="job-section" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
       <view class="section-header">
-        <text class="section-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">{{ categoryName || '推荐职位' }}</text>
-        <text class="more-btn" @click="scrollToJobList" :style="{ color: '#007aff' }">查看更多</text>
+        <view class="title-container">
+          <view class="title-dot"></view>
+          <text class="section-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">{{ categoryName || '推荐职位' }}</text>
+        </view>
+        <text class="more-btn" @click="scrollToJobList">查看更多</text>
       </view>
       
       <!-- 职位列表 -->
@@ -607,7 +610,7 @@ export default {
 
 <style>
 .container {
-  background-color: #F8FAFD;
+  background: linear-gradient(135deg, #e6f0ff 0%, #ffffff 100%);
   min-height: 100vh;
   padding: 80px 16px 0;
   font-family: -apple-system, Helvetica, Roboto, sans-serif;
@@ -616,7 +619,7 @@ export default {
 
 /* 导航栏样式 */
 .nav-bar {
-  background-color: #ffffff;
+  background: linear-gradient(135deg, rgba(230, 240, 255, 0.8), rgba(255, 255, 255, 0.8));
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   height: 80px;
   display: flex;
@@ -630,6 +633,8 @@ export default {
   left: 0;
   right: 0;
   box-sizing: border-box;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .nav-bar-left {
@@ -665,16 +670,19 @@ export default {
 .search-bar {
   display: flex;
   align-items: center;
-  background-color: #F2F5F9;
+  background: rgba(255, 255, 255, 0.8);
   border-radius: 30px;
   height: 44px;
   padding: 0 16px;
   margin: 12px 0;
   transition: all 0.3s ease;
+  border: 1px solid rgba(230, 240, 255, 0.5);
 }
 
 .search-bar:focus-within {
-  box-shadow: 0 0 0 2px #007aff;
+  box-shadow: 0 0 20px rgba(79, 172, 254, 0.3);
+  border: 1px solid transparent;
+  background: linear-gradient(135deg, #ffffff, #f8faff);
 }
 
 .search-bar input {
@@ -701,11 +709,13 @@ export default {
 .category-section {
   display: flex;
   justify-content: space-around;
-  background-color: #fff;
+  background: rgba(255, 255, 255, 0.8);
   padding: 30rpx 0;
   margin: 16rpx 0;
   border-radius: 16rpx;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
 }
 
 .category-item {
@@ -733,11 +743,26 @@ export default {
 }
 
 .job-section {
-  background-color: #fff;
+  background: rgba(255, 255, 255, 0.8);
   padding: 16px;
   border-radius: 16px;
   margin: 12px 0;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  position: relative;
+  overflow: hidden;
+}
+
+.job-section::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #4facfe, #00f2fe, transparent);
+  border-radius: 0 0 16px 16px;
 }
 
 .section-header {
@@ -746,23 +771,59 @@ export default {
   align-items: center;
   margin-bottom: 16px;
   padding: 8px 0;
+  position: relative;
+}
+
+.title-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.title-dot {
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  border-radius: 50%;
+  margin-right: 8px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(79, 172, 254, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(79, 172, 254, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(79, 172, 254, 0);
+  }
 }
 
 .section-title {
   font-size: 18px;
   font-weight: 600;
   color: #1E1E1E;
+  position: relative;
 }
 
 .more-btn {
   font-size: 13px;
   color: #007aff;
   transition: all 0.3s ease;
+  background: linear-gradient(120deg, #4facfe, #00f2fe);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  padding: 6px 12px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
 }
 
 .more-btn:active {
-  color: #007aff;
   opacity: 0.7;
+  transform: scale(0.95);
 }
 
 .job-list {
@@ -777,6 +838,16 @@ export default {
   padding: 20rpx;
   color: #999999;
   font-size: 28rpx;
+  background: linear-gradient(120deg, #4facfe, #00f2fe);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transition: all 0.3s ease;
+}
+
+.load-more:active {
+  opacity: 0.7;
+  transform: scale(0.95);
 }
 
 /* 子分类标签区域 */
@@ -793,7 +864,7 @@ export default {
 
 .sub-category-tab {
   padding: 8px 16px;
-  background-color: #F0F4FF;
+  background: linear-gradient(135deg, #E6F0FF, #F0F4FF);
   border-radius: 30px;
   font-size: 14px;
   color: #007aff;
@@ -803,7 +874,7 @@ export default {
 }
 
 .sub-category-tab.active {
-  background-color: #007aff;
+  background: linear-gradient(120deg, #4facfe, #00f2fe);
   color: #ffffff;
   font-weight: 500;
   box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
@@ -811,20 +882,22 @@ export default {
 
 .sub-category-tab:active {
   transform: scale(0.95);
-  background-color: #007aff;
+  background: linear-gradient(120deg, #4facfe, #00f2fe);
   color: #ffffff;
   opacity: 0.8;
 }
 
 /* 就业类型筛选区域 */
 .emp-type-section {
-  background-color: #fff;
+  background: rgba(255, 255, 255, 0.8);
   padding: 20rpx;
   margin: 0 16rpx 16rpx;
   border-radius: 16rpx;
   display: flex;
   justify-content: space-around;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
 }
 
 .emp-type-item {
@@ -832,15 +905,27 @@ export default {
   font-size: 28rpx;
   color: #6C757D;
   transition: all 0.3s ease;
+  position: relative;
 }
 
 .emp-type-item.active {
   color: #007aff;
-  border-bottom: 2rpx solid #007aff;
+  border-bottom: 2rpx solid transparent;
+  background: linear-gradient(90deg, #4facfe, #00f2fe);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .emp-type-item:active {
   color: #007aff;
+}
+
+/* 分割线 */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #e6f0ff, transparent);
+  margin: 16px 0;
 }
 
 

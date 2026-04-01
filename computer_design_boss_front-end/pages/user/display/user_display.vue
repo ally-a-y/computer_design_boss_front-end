@@ -1,12 +1,12 @@
 <template>
-  <view class="display-page" :style="{ backgroundColor: pageBackground, color: pageTextColor }">
+  <view class="display-page" :style="{ background: isDarkMode ? '#1a1a1a' : 'linear-gradient(135deg, #e6f0ff 0%, #ffffff 100%)', color: pageTextColor }">
     <!-- 顶部导航 -->
-    <view class="nav-bar" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#fff', borderBottomColor: isDarkMode ? '#404040' : '#eee' }">
+    <view class="nav-bar" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'linear-gradient(135deg, rgba(230, 240, 255, 0.8), rgba(255, 255, 255, 0.8))', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
       <view class="nav-bar-left">
-        <text class="nav-back-icon" @click="goBack" :style="{ color: pageTextColor }">←</text>
+        <text class="nav-back-icon" @click="goBack" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">←</text>
       </view>
       <view class="nav-bar-center">
-        <text class="nav-bar-title" :style="{ color: pageTextColor }">显示设置</text>
+        <text class="nav-bar-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">显示设置</text>
       </view>
       <view class="nav-bar-right">
         <!-- 右侧预留空间 -->
@@ -14,7 +14,7 @@
     </view>
     
     <!-- 设置内容 -->
-    <view class="setting-content" :style="{ backgroundColor: isDarkMode ? '#2a2a2a' : '#fff' }">
+    <view class="setting-content" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
       <!-- 主题模式 -->
       <view class="setting-item" :style="{ borderBottomColor: isDarkMode ? '#404040' : '#eee' }">
         <text class="setting-title" :style="{ color: pageTextColor }">主题模式</text>

@@ -1,22 +1,22 @@
 <template>
-  <view class="resume-page">
+  <view class="resume-page" :style="{ background: isDarkMode ? '#1a1a1a' : 'linear-gradient(135deg, #e6f0ff 0%, #ffffff 100%)' }">
     <!-- 顶部导航 -->
-    <view class="nav-bar">
+    <view class="nav-bar" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'linear-gradient(135deg, rgba(230, 240, 255, 0.8), rgba(255, 255, 255, 0.8))', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
       <view class="nav-bar-left">
-        <text class="nav-back-icon" @click="goBack">←</text>
+        <text class="nav-back-icon" @click="goBack" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">←</text>
       </view>
       <view class="nav-bar-center">
-        <text class="nav-bar-title">我的简历</text>
+        <text class="nav-bar-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">我的简历</text>
       </view>
       <view class="nav-bar-right">
-        <text class="save-btn" @click="saveResume">保存</text>
+        <text class="save-btn" @click="saveResume" :style="{ color: '#007aff' }">保存</text>
       </view>
     </view>
     
     <!-- 简历内容 -->
     <scroll-view scroll-y class="resume-content">
       <!-- 基本信息 -->
-      <view class="section">
+      <view class="section" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
         <text class="section-title">基本信息</text>
         <view class="form-item">
           <text class="label">姓名</text>
@@ -79,8 +79,8 @@
       </view>
       
       <!-- 求职意向 -->
-      <view class="section">
-        <text class="section-title">求职意向</text>
+      <view class="section" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
+        <text class="section-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">求职意向</text>
         <view class="form-item">
           <text class="label">期望行业</text>
           <input class="input" v-model="resume.intention.industry" placeholder="请输入期望行业" />
@@ -121,8 +121,8 @@
       </view>
       
       <!-- 求职偏好 -->
-      <view class="section">
-        <text class="section-title">求职偏好</text>
+      <view class="section" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
+        <text class="section-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">求职偏好</text>
         <view class="preference-group">
           <view class="preference-item" @click="togglePreference('internship_conversion')">
             <text class="preference-label">接受实习转正</text>
@@ -185,8 +185,8 @@
       </view>
       
 		<!-- 校园经历 -->
-		<view class="section">
-		  <text class="section-title">校园经历</text>
+		<view class="section" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
+		  <text class="section-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">校园经历</text>
 		  
 		  <!-- 学生会 -->
 		  <view class="campus-group">
@@ -274,10 +274,10 @@
 		</view>
 			  
       <!-- 证书管理 -->
-      <view class="section">
+      <view class="section" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
         <view class="section-header">
-          <text class="section-title">证书管理</text>
-          <text class="add-btn" @click="addCertificate">+ 添加证书</text>
+          <text class="section-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">证书管理</text>
+          <text class="add-btn" @click="addCertificate" :style="{ color: '#007aff' }">+ 添加证书</text>
         </view>
         
         <view v-for="(certificate, index) in resume.certificates" :key="index" class="certificate-item">
@@ -323,6 +323,7 @@
 
 <script>
 import { resumeApi } from '@/common/api/resume.js'
+import { themeManager } from '@/common/utils/theme-simple.js'
 
 export default {
   data() {
@@ -337,6 +338,9 @@ export default {
       workTypeIndex: 0,
 
       certTypeOptions: ['技能类', '资格类', '语言类', '其他'],
+      // 主题相关
+      currentTheme: 'light',
+      isDarkMode: false,
 
       resume: {
         real_name: '',
@@ -388,10 +392,36 @@ export default {
 
   async onLoad() {
     await this.loadResume()
+    // 初始化主题
+    this.initTheme()
   },
-
+  
+  onUnload() {
+    // 清理主题监听
+    uni.$off('globalThemeChange', this.handleGlobalThemeChange)
+  },
+  
   methods: {
-
+    /**
+     * 初始化主题
+     */
+    initTheme() {
+      // 获取当前主题
+      this.currentTheme = themeManager.getCurrentTheme()
+      this.isDarkMode = this.currentTheme === 'dark'
+      
+      // 监听全局主题变化
+      uni.$on('globalThemeChange', this.handleGlobalThemeChange)
+    },
+    
+    /**
+     * 处理全局主题变化
+     */
+    handleGlobalThemeChange(data) {
+      this.currentTheme = data.theme
+      this.isDarkMode = data.isDark
+    },
+    
     goBack() {
       uni.navigateBack()
     },

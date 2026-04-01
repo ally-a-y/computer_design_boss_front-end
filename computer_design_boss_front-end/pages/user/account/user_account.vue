@@ -1,12 +1,12 @@
 <template>
-  <view class="account-page">
+  <view class="account-page" :style="{ background: isDarkMode ? '#1a1a1a' : 'linear-gradient(135deg, #e6f0ff 0%, #ffffff 100%)' }">
     <!-- 顶部导航 -->
-    <view class="nav-bar">
+    <view class="nav-bar" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'linear-gradient(135deg, rgba(230, 240, 255, 0.8), rgba(255, 255, 255, 0.8))', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
       <view class="nav-bar-left">
-        <text class="nav-back-icon" @click="goBack">←</text>
+        <text class="nav-back-icon" @click="goBack" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">←</text>
       </view>
       <view class="nav-bar-center">
-        <text class="nav-bar-title">我的账号</text>
+        <text class="nav-bar-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">我的账号</text>
       </view>
       <view class="nav-bar-right">
         <!-- 右侧预留空间 -->
@@ -14,34 +14,34 @@
     </view>
     
     <!-- 账号设置列表 -->
-    <view class="account-list">
-      <view class="account-item" @click="navigateToNumber">
-        <text class="item-text">修改手机</text>
+    <view class="account-list" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
+      <view class="account-item" @click="navigateToNumber" :style="{ borderBottom: isDarkMode ? '1px solid #404040' : '1px solid #eee' }">
+        <text class="item-text" :style="{ color: isDarkMode ? '#ffffff' : '#333' }">修改手机</text>
         <view class="item-right">
-          <text class="current-info">{{ currentPhone }}</text>
-          <uni-icons type="right" size="20" color="#999"></uni-icons>
+          <text class="current-info" :style="{ color: isDarkMode ? '#666' : '#999' }">{{ currentPhone }}</text>
+          <uni-icons type="right" size="20" :color="isDarkMode ? '#666' : '#999'"></uni-icons>
         </view>
       </view>
       
-      <view class="account-item" @click="navigateToEmail">
-        <text class="item-text">邮箱设置</text>
+      <view class="account-item" @click="navigateToEmail" :style="{ borderBottom: isDarkMode ? '1px solid #404040' : '1px solid #eee' }">
+        <text class="item-text" :style="{ color: isDarkMode ? '#ffffff' : '#333' }">邮箱设置</text>
         <view class="item-right">
-          <text class="current-info">{{ currentEmail }}</text>
-          <uni-icons type="right" size="20" color="#999"></uni-icons>
+          <text class="current-info" :style="{ color: isDarkMode ? '#666' : '#999' }">{{ currentEmail }}</text>
+          <uni-icons type="right" size="20" :color="isDarkMode ? '#666' : '#999'"></uni-icons>
         </view>
       </view>
       
-      <view class="account-item" @click="navigateToPassword">
-        <text class="item-text">密码设置</text>
+      <view class="account-item" @click="navigateToPassword" :style="{ borderBottom: isDarkMode ? '1px solid #404040' : '1px solid #eee' }">
+        <text class="item-text" :style="{ color: isDarkMode ? '#ffffff' : '#333' }">密码设置</text>
         <view class="item-right">
-          <text class="current-info">********</text>
-          <uni-icons type="right" size="20" color="#999"></uni-icons>
+          <text class="current-info" :style="{ color: isDarkMode ? '#666' : '#999' }">********</text>
+          <uni-icons type="right" size="20" :color="isDarkMode ? '#666' : '#999'"></uni-icons>
         </view>
       </view>
       
       <view class="account-item delete-account" @click="deleteAccount">
-        <text class="item-text">注销账号</text>
-        <uni-icons type="right" size="20" color="#999"></uni-icons>
+        <text class="item-text" :style="{ color: '#ff3b30' }">注销账号</text>
+        <uni-icons type="right" size="20" :color="isDarkMode ? '#666' : '#999'"></uni-icons>
       </view>
     </view>
   </view>
@@ -49,20 +49,51 @@
 
 <script>
 	import { userApi } from '../../../common/api/user.js'
+import { themeManager } from '@/common/utils/theme-simple.js'
 export default {
   data() {
     return {
       currentPhone: '',
-      currentEmail: ''
+      currentEmail: '',
+      // 主题相关
+      currentTheme: 'light',
+      isDarkMode: false
     }
   },
   
   onLoad() {
     this.getUserInfo()
+    // 初始化主题
+    this.initTheme()
+  },
+  
+  onUnload() {
+    // 清理主题监听
+    uni.$off('globalThemeChange', this.handleGlobalThemeChange)
   },
   
   methods: {
-async getUserInfo() {
+    /**
+     * 初始化主题
+     */
+    initTheme() {
+      // 获取当前主题
+      this.currentTheme = themeManager.getCurrentTheme()
+      this.isDarkMode = this.currentTheme === 'dark'
+      
+      // 监听全局主题变化
+      uni.$on('globalThemeChange', this.handleGlobalThemeChange)
+    },
+    
+    /**
+     * 处理全局主题变化
+     */
+    handleGlobalThemeChange(data) {
+      this.currentTheme = data.theme
+      this.isDarkMode = data.isDark
+    },
+    
+    async getUserInfo() {
   console.log('======== 开始请求用户信息 ========')
   
   try {

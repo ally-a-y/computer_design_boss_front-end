@@ -55,10 +55,13 @@ const requestWithRetry = (options, retryCount = 3) => {
         sslVerify: false,
         header: __spreadValues({
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${common_vendor.index.getStorageSync("token") || ""}`,
           "Cache-Control": "no-cache"
         }, options.header)
       };
+      const token = common_vendor.index.getStorageSync("token");
+      if (token) {
+        requestConfig.header["Authorization"] = `Bearer ${token}`;
+      }
       if (!isGet && options.data) {
         requestConfig.data = options.data;
       }

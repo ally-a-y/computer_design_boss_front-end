@@ -45,7 +45,10 @@
     
     <!-- 职位描述 -->
     <view class="job-section">
-      <view class="section-title">职位描述</view>
+      <view class="section-title">
+        <view class="title-dot"></view>
+        <text>职位描述</text>
+      </view>
       <view class="section-content">
         <text>{{ jobDetail?.description || '暂无描述' }}</text>
       </view>
@@ -53,7 +56,10 @@
     
     <!-- 任职要求 -->
     <view class="job-section">
-      <view class="section-title">任职要求</view>
+      <view class="section-title">
+        <view class="title-dot"></view>
+        <text>任职要求</text>
+      </view>
       <view class="section-content">
         <view v-if="Array.isArray(jobDetail?.require_list) && jobDetail.require_list.length > 0">
           <view v-for="(req, index) in jobDetail.require_list" :key="index" class="requirement-item">
@@ -67,7 +73,10 @@
     
     <!-- 福利待遇 -->
     <view class="job-section" v-if="jobDetail?.welfare_list">
-      <view class="section-title">福利待遇</view>
+      <view class="section-title">
+        <view class="title-dot"></view>
+        <text>福利待遇</text>
+      </view>
       <view class="section-content">
         <view v-if="Array.isArray(jobDetail?.welfare_list) && jobDetail.welfare_list.length > 0">
           <view v-for="(welfare, index) in jobDetail.welfare_list" :key="index" class="welfare-item">
@@ -81,7 +90,10 @@
     
     <!-- 薪资详情 -->
     <view class="job-section" v-if="jobDetail?.salary_desc">
-      <view class="section-title">薪资详情</view>
+      <view class="section-title">
+        <view class="title-dot"></view>
+        <text>薪资详情</text>
+      </view>
       <view class="section-content">
         <text>{{ jobDetail.salary_desc }}</text>
       </view>
@@ -89,7 +101,10 @@
     
     <!-- 发布时间 -->
     <view class="job-section" v-if="jobDetail?.publish_time">
-      <view class="section-title">发布时间</view>
+      <view class="section-title">
+        <view class="title-dot"></view>
+        <text>发布时间</text>
+      </view>
       <view class="section-content">
         <text>{{ formatDate(jobDetail.publish_time) }}</text>
       </view>
@@ -223,8 +238,8 @@ export default {
 
     /* ================= 点击投递 ================= */
     applyForJob() {
-      // 使用boss_job_id作为主要ID，如果不存在则使用id
-      const jobId = this.jobDetail?.boss_job_id || this.jobDetail?.id
+      // 统一使用id作为职位标识，与职位列表页面保持一致
+      const jobId = this.jobDetail?.id
       if (!jobId) {
         uni.showToast({ title: '职位信息不完整', icon: 'none' })
         return
@@ -242,12 +257,21 @@ export default {
           icon: 'success'
         })
       } else {
+        // 检查是否已经投递
+        const isAlreadyApplied = delivers.some(item => item.id === jobId)
+        if (isAlreadyApplied) {
+          uni.showToast({
+            title: '该职位已投递',
+            icon: 'none'
+          })
+          return
+        }
         // 添加投递
         const newDeliver = {
           id: jobId,
           jobTitle: this.jobDetail.title,
           company: this.jobDetail.company || '未知公司',
-          salary: this.jobDetail.salary || '',
+          salary: this.formatSalary(this.jobDetail.salary_min, this.jobDetail.salary_max),
           deliverTime: new Date().toLocaleString(),
           status: 'pending',
           statusText: '待处理'
@@ -266,7 +290,9 @@ export default {
 
     /* ================= 点击收藏 ================= */
     favoriteJob() {
-      if (!this.jobDetail?.boss_job_id) {
+      // 统一使用id作为职位标识，与职位列表页面保持一致
+      const jobId = this.jobDetail?.id
+      if (!jobId) {
         uni.showToast({ title: '职位信息不完整', icon: 'none' })
         return
       }
@@ -276,7 +302,7 @@ export default {
       
       if (this.isFavorited) {
         // 取消收藏
-        collections = collections.filter(item => item.id !== this.jobDetail.boss_job_id)
+        collections = collections.filter(item => item.id !== jobId)
         this.isFavorited = false
         uni.showToast({
           title: '已取消收藏',
@@ -284,7 +310,7 @@ export default {
         })
       } else {
         // 检查是否已经收藏
-        const isAlreadyFavorited = collections.some(item => item.id === this.jobDetail.boss_job_id)
+        const isAlreadyFavorited = collections.some(item => item.id === jobId)
         if (isAlreadyFavorited) {
           uni.showToast({
             title: '该职位已收藏',
@@ -294,10 +320,10 @@ export default {
         }
         // 添加收藏
         const newCollection = {
-          id: this.jobDetail.boss_job_id,
+          id: jobId,
           jobTitle: this.jobDetail.title,
           company: this.jobDetail.company || '未知公司',
-          salary: this.jobDetail.salary || '',
+          salary: this.formatSalary(this.jobDetail.salary_min, this.jobDetail.salary_max),
           collectionTime: new Date().toLocaleString()
         }
         collections.push(newCollection)
@@ -317,22 +343,33 @@ export default {
 
     /* ================= 检查收藏状态 ================= */
     checkFavoriteStatus() {
-      if (!this.jobDetail?.boss_job_id) return
+      const jobId = this.jobDetail?.id
+      if (!jobId) return
 
       // 从本地存储获取收藏列表
       const collections = uni.getStorageSync('collections') || []
-      this.isFavorited = collections.some(item => item.id === this.jobDetail.boss_job_id)
+      this.isFavorited = collections.some(item => item.id === jobId)
     },
 
     /* ================= 检查投递状态 ================= */
     checkDeliverStatus() {
-      // 使用boss_job_id作为主要ID，如果不存在则使用id
-      const jobId = this.jobDetail?.boss_job_id || this.jobDetail?.id
+      const jobId = this.jobDetail?.id
       if (!jobId) return
 
       // 从本地存储获取投递列表
       const delivers = uni.getStorageSync('delivers') || []
       this.isApplied = delivers.some(item => item.id === jobId)
+    },
+
+    /* ================= 格式化薪资 ================= */
+    formatSalary(min, max) {
+      if (min && max) {
+        // 处理后端返回的Decimal类型数据，转换为数字
+        const minNum = typeof min === 'number' ? min : parseFloat(min)
+        const maxNum = typeof max === 'number' ? max : parseFloat(max)
+        return `${(minNum/1000).toFixed(0)}-${(maxNum/1000).toFixed(0)}K`
+      }
+      return '薪资面议'
     },
 
     /* ================= 工具方法 ================= */
@@ -365,7 +402,7 @@ export default {
 <style>
 /* 全局样式 */
 .job-detail-page {
-  background-color: #F8FAFD;
+  background: linear-gradient(135deg, #e6f0ff 0%, #ffffff 100%);
   min-height: 100vh;
   padding: 80px 0 100rpx 0;
   font-family: -apple-system, Helvetica, Roboto, sans-serif;
@@ -377,7 +414,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #fff;
+  background: linear-gradient(135deg, rgba(230, 240, 255, 0.8), rgba(255, 255, 255, 0.8));
   height: 80px;
   padding: 0 16px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
@@ -389,6 +426,8 @@ export default {
   left: 0;
   right: 0;
   box-sizing: border-box;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .nav-bar-left {
@@ -418,19 +457,32 @@ export default {
 }
 
 .nav-back-icon:active {
-  color: #007AFF;
+  color: #4facfe;
 }
 
 
 
 /* 职位核心信息区 */
 .job-header {
-  background-color: #fff;
+  background: linear-gradient(135deg, #ffffff, #f8faff);
   padding: 20px;
   margin-bottom: 12px;
   border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 16px rgba(79, 172, 254, 0.15);
   margin: 12px 12px 0 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.job-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #4facfe, #00f2fe, transparent);
+  border-radius: 0 0 16px 16px;
 }
 
 .job-title {
@@ -440,6 +492,10 @@ export default {
   line-height: 1.3;
   margin-bottom: 12px;
   display: block;
+  background: linear-gradient(90deg, #1E1E1E, #4a4a4a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .salary-container {
@@ -451,8 +507,11 @@ export default {
 .job-salary {
   font-size: 24px;
   font-weight: bold;
-  color: #007aff;
   margin-right: 8px;
+  background: linear-gradient(120deg, #4facfe, #00f2fe);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .salary-unit {
@@ -490,19 +549,37 @@ export default {
 }
 
 .job-tag {
-  background-color: #F0F4FF;
-  color: #007aff;
   font-size: 14px;
   padding: 6px 10px;
   border-radius: 16px;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.job-tag:nth-child(1) {
+  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+  color: #fff;
+}
+
+.job-tag:nth-child(2) {
+  background: linear-gradient(135deg, #a8edea, #fed6e3);
+  color: #333;
+}
+
+.job-tag:nth-child(3) {
+  background: linear-gradient(135deg, #fad0c4, #ffd1ff);
+  color: #333;
 }
 
 /* 工作地址 */
 .address-section {
-  background-color: #F2F5F9;
+  background: rgba(255, 255, 255, 0.8);
   margin: 12px;
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
 }
 
 .address-content {
@@ -512,6 +589,7 @@ export default {
 
 .address-icon {
   margin-right: 12px;
+  color: #4facfe;
 }
 
 .address-text {
@@ -523,29 +601,66 @@ export default {
 
 .address-action {
   margin-left: 12px;
+  color: #4facfe;
 }
 
 .address-action:active {
   opacity: 0.7;
+  transform: scale(0.95);
 }
 
 /* 通用卡片样式 */
 .job-section {
-  background-color: #fff;
+  background: rgba(255, 255, 255, 0.8);
   margin: 12px;
   border-radius: 16px;
   padding: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 16px rgba(79, 172, 254, 0.15);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  position: relative;
+  overflow: hidden;
+}
+
+.job-section::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #4facfe, #00f2fe, transparent);
+  border-radius: 0 0 16px 16px;
 }
 
 .section-title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
   font-size: 16px;
   font-weight: 600;
   color: #1E1E1E;
-  margin-bottom: 8px;
-  padding-left: 12px;
-  border-left: 3px solid #007aff;
-  display: block;
+}
+
+.title-dot {
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  border-radius: 50%;
+  margin-right: 8px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(79, 172, 254, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(79, 172, 254, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(79, 172, 254, 0);
+  }
 }
 
 .section-content {
@@ -564,7 +679,7 @@ export default {
 .requirement-dot {
   width: 6px;
   height: 6px;
-  background-color: #007aff;
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
   border-radius: 50%;
   margin-right: 10px;
   margin-top: 6px;
@@ -586,7 +701,7 @@ export default {
 .welfare-dot {
   width: 6px;
   height: 6px;
-  background-color: #007aff;
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
   border-radius: 50%;
   margin-right: 10px;
   margin-top: 6px;
@@ -605,20 +720,22 @@ export default {
   left: 0;
   right: 0;
   height: 80px;
-  background-color: #fff;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(230, 240, 255, 0.8));
   box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
   display: flex;
   align-items: center;
   padding: 0 24px;
   z-index: 100;
-  border-top: 1px solid #F0F0F0;
+  border-top: 1px solid rgba(79, 172, 254, 0.1);
   gap: 16px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .collect-button {
   flex: 0 0 120px;
   height: 52px;
-  background-color: #F5F5F5;
+  background: linear-gradient(135deg, #ffffff, #f8faff);
   border: none;
   border-radius: 26px;
   display: flex;
@@ -626,15 +743,16 @@ export default {
   justify-content: center;
   gap: 8px;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .collect-button:active {
-  background-color: #E8E8E8;
   transform: scale(0.98);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 
 .collect-button.collected {
-  background-color: #E3F2FD;
+  background: linear-gradient(135deg, #E3F2FD, #F0F8FF);
 }
 
 .collect-icon {
@@ -648,13 +766,13 @@ export default {
 }
 
 .collect-button.collected .collect-text {
-  color: #007aff;
+  color: #4facfe;
 }
 
 .apply-button {
   flex: 1;
   height: 52px;
-  background-color: #007aff;
+  background: linear-gradient(120deg, #4facfe, #00f2fe);
   color: #fff;
   font-size: 16px;
   font-weight: 600;
@@ -665,18 +783,17 @@ export default {
   justify-content: center;
   padding: 0 32px;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
 }
 
 .apply-button:active:not(.applied) {
-  background-color: #0056b3;
   transform: scale(0.98);
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(79, 172, 254, 0.4);
 }
 
 .apply-button.applied {
-  background-color: #E3F2FD;
-  color: #007aff;
+  background: linear-gradient(135deg, #E3F2FD, #F0F8FF);
+  color: #4facfe;
   box-shadow: none;
 }
 

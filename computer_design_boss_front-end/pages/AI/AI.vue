@@ -1,13 +1,13 @@
 <template>
-  <view class="ai-chat-container" :class="currentTheme + '-theme'">
+  <view class="ai-chat-container" :class="currentTheme + '-theme'" :style="{ background: isDarkMode ? '#1a1a1a' : 'linear-gradient(135deg, #e6f0ff 0%, #ffffff 100%)' }">
     <!-- 顶部导航栏 -->
-    <view class="header header-fixed">
+    <view class="header header-fixed" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'linear-gradient(135deg, rgba(230, 240, 255, 0.8), rgba(255, 255, 255, 0.8))', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
       <view class="logo-section">
         <image class="logo" src="/static/ai/logo.png" mode="aspectFit"></image>
-        <text class="app-title">AI求职助手</text>
+        <text class="app-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">AI求职助手</text>
       </view>
       <view class="nav-actions">
-        <button class="interview-btn" @click="goToInterview">模拟面试</button>
+        <button class="interview-btn" @click="goToInterview" :style="{ background: 'linear-gradient(120deg, #4facfe, #00f2fe)', color: '#ffffff' }">模拟面试</button>
       </view>
     </view>
 
@@ -16,7 +16,7 @@
       <view class="message-list">
         <view v-for="(message, index) in messages" :key="index" 
               :class="['message-item', message.sender === 'user' ? 'user-message' : 'ai-message']">
-          <view class="message-bubble">
+          <view class="message-bubble" :style="message.sender === 'user' ? { background: 'linear-gradient(120deg, #4facfe, #00f2fe)', color: '#ffffff' } : { background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', color: isDarkMode ? '#ffffff' : '#1E1E1E', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
             <view v-if="!needMarkdownRender(message.content)" class="message-text">
                 <text>{{ message.content }}</text>
               </view>
@@ -67,29 +67,41 @@
     </scroll-view>
 
     <!-- 底部输入区域 -->
-    <view class="input-area input-fixed">
+    <view class="input-area input-fixed" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', boxShadow: isDarkMode ? '0 -2px 8px rgba(0,0,0,0.3)' : '0 -4px 16px rgba(79, 172, 254, 0.15)' }">
       <view class="function-buttons">
-        <button class="func-btn" @click="openPanel('resumeAnalysis')">简历分析</button>
-        <button class="func-btn" @click="openPanel('resumeEvaluation')">简历评估</button>
-        <button class="func-btn" @click="openPanel('successRate')">成功率分析</button>
-        <button class="func-btn" @click="openPanel('studentPlan')">大学生规划</button>
+        <button class="func-btn" @click="openPanel('resumeAnalysis')" :style="{ background: isDarkMode ? 'rgba(64, 64, 64, 0.8)' : 'rgba(255, 255, 255, 0.8)', color: isDarkMode ? '#ffffff' : '#1E1E1E', boxShadow: isDarkMode ? '0 2px 4px rgba(0,0,0,0.3)' : '0 2px 8px rgba(79, 172, 254, 0.15)' }">简历分析</button>
+        <button class="func-btn" @click="openPanel('resumeEvaluation')" :style="{ background: isDarkMode ? 'rgba(64, 64, 64, 0.8)' : 'rgba(255, 255, 255, 0.8)', color: isDarkMode ? '#ffffff' : '#1E1E1E', boxShadow: isDarkMode ? '0 2px 4px rgba(0,0,0,0.3)' : '0 2px 8px rgba(79, 172, 254, 0.15)' }">简历评估</button>
+        <button class="func-btn" @click="openPanel('successRate')" :style="{ background: isDarkMode ? 'rgba(64, 64, 64, 0.8)' : 'rgba(255, 255, 255, 0.8)', color: isDarkMode ? '#ffffff' : '#1E1E1E', boxShadow: isDarkMode ? '0 2px 4px rgba(0,0,0,0.3)' : '0 2px 8px rgba(79, 172, 254, 0.15)' }">成功率分析</button>
+        <button class="func-btn" @click="openPanel('studentPlan')" :style="{ background: isDarkMode ? 'rgba(64, 64, 64, 0.8)' : 'rgba(255, 255, 255, 0.8)', color: isDarkMode ? '#ffffff' : '#1E1E1E', boxShadow: isDarkMode ? '0 2px 4px rgba(0,0,0,0.3)' : '0 2px 8px rgba(79, 172, 254, 0.15)' }">大学生规划</button>
       </view>
       
-      <view class="input-container">
-        <textarea class="text-input" 
-                  v-model="inputText" 
-                  placeholder="请输入您的问题..."
-                  :auto-height="true"
-                  @confirm="sendMessage"></textarea>
-        <button class="send-btn" @click="sendMessage" :disabled="!inputText.trim()">发送</button>
+      <view class="input-container-merged">
+        <textarea 
+          class="text-input-merged" 
+          v-model="inputText" 
+          placeholder="输入您的问题..."
+          placeholder-style="color: #999"
+          :auto-height="true"
+          @confirm="sendMessage"
+          :disabled="isLoading"
+          :style="{ background: isDarkMode ? '#404040' : '#fff', borderColor: isDarkMode ? '#404040' : '#eee', color: isDarkMode ? '#ffffff' : '#1E1E1E' }"
+        ></textarea>
+        <view 
+          class="send-icon" 
+          @click="sendMessage" 
+          :class="{ 'disabled': !inputText.trim() || isLoading }"
+          :style="{ background: !inputText.trim() || isLoading ? '#ccc' : 'linear-gradient(120deg, #4facfe, #00f2fe)', color: '#ffffff' }"
+        >
+	  <span class="send-text">发送</span>
+        </view>
       </view>
     </view>
 
     <!-- 功能面板 -->
-    <view v-if="currentPanel" class="panel-overlay" @click="closePanel">
-      <view class="function-panel" @click.stop>
-        <view class="panel-header">
-          <text class="panel-title">{{ panelTitle }}</text>
+    <view v-if="currentPanel" class="panel-overlay" @click="closePanel" :style="{ background: 'rgba(0, 0, 0, 0.5)' }">
+      <view class="function-panel" @click.stop :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.95)' : 'rgba(255, 255, 255, 0.95)', boxShadow: isDarkMode ? '0 4px 16px rgba(0,0,0,0.4)' : '0 4px 16px rgba(79, 172, 254, 0.2)' }">
+        <view class="panel-header" :style="{ borderBottom: isDarkMode ? '1px solid #404040' : '1px solid #eee' }">
+          <text class="panel-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">{{ panelTitle }}</text>
           <image class="close-btn" src="/static/ai/close.png" @click="closePanel" mode="aspectFit"></image>
         </view>
         
@@ -106,7 +118,7 @@
             </view>
             
             <view class="input-fields">
-              <!-- <view v-show="currentMethod.includes('user')" class="input-group user-id-group">
+               <!-- <view v-show="currentMethod.includes('user')" class="input-group user-id-group">
                 <text class="input-label">用户ID</text>
                 <view class="user-id-display" :class="{ 'loading': isLoadingUser, 'error': !currentUserId && !isLoadingUser }">
                   <text v-if="isLoadingUser" class="loading-text">获取用户信息中...</text>
@@ -148,18 +160,18 @@
           
           <!-- 简历评估面板 -->
           <view v-if="currentPanel === 'resumeEvaluation'">
-            <view class="method-selector">
+            <!-- <view class="method-selector">
               <radio-group :value="currentMethod" @change="onMethodChange">
-                <!-- <label class="radio-item">
+                <label class="radio-item">
                   <radio value="user" />
                   <text>用户ID</text>
-                </label> -->
+                </label>
                 <label class="radio-item">
                   <radio value="pdf" />
                   <text>PDF上传</text>
                 </label>
               </radio-group>
-            </view>
+            </view> -->
             
             <view class="input-fields">
               <!-- <view v-show="currentMethod === 'user'" class="input-group" key="user-group">
@@ -177,7 +189,7 @@
                 </view>
               </view> -->
               <view v-show="currentMethod === 'pdf'" class="input-group" key="pdf-group">
-                <text class="input-label">PDF文件</text>
+                <text class="input-label">请上传PDF简历</text>
                 <view class="file-upload" @click="chooseFile">
                   <text>{{ formData.pdfFile ? formData.pdfFile.name : '点击选择PDF文件' }}</text>
                 </view>
@@ -191,7 +203,7 @@
               <radio-group :value="currentMethod" @change="onMethodChange">
                 <label class="radio-item">
                   <radio value="pdf+position" />
-                  <text>PDF+职位</text>
+                  <text>PDF简历+职位</text>
                 </label>
                 <label class="radio-item">
                   <radio value="user+text" />
@@ -247,7 +259,7 @@
               <radio-group :value="currentMethod" @change="onMethodChange">
                 <label class="radio-item">
                   <radio value="pdf+position" />
-                  <text>PDF+职位</text>
+                  <text>PDF简历+职位</text>
                 </label>
                 <label class="radio-item">
                   <radio value="user+text" />
@@ -364,6 +376,7 @@ export default {
       userInfo: null, 
       currentUserId: null,
       currentTheme: themeManager.getCurrentTheme(),
+      isDarkMode: false,
       formData: {
         positionId: '',
         positionText: '',
@@ -441,8 +454,8 @@ export default {
       analysisMethods: [
         { value: 'user+position', label: '职位' },
         { value: 'user+text', label: '职位文本' },
-        { value: 'pdf+position', label: 'PDF+职位' },
-        { value: 'pdf+text', label: 'PDF+职位文本' }
+        { value: 'pdf+position', label: 'PDF简历+职位' },
+        { value: 'pdf+text', label: 'PDF简历+职位文本' }
       ]
     }
   },
@@ -469,9 +482,13 @@ export default {
     this.initializeChat()
     this.fetchUserInfo()
     this.initializeDefaultSelection()
+    // 初始化主题
+    this.currentTheme = themeManager.getCurrentTheme()
+    this.isDarkMode = this.currentTheme === 'dark'
     // 监听主题变化
     this.themeChangeHandler = (data) => {
       this.currentTheme = data.theme
+      this.isDarkMode = data.isDark
     }
     uni.$on('globalThemeChange', this.themeChangeHandler)
   },
@@ -722,7 +739,7 @@ export default {
     getDefaultMethod(panelType) {
       const defaults = {
         resumeAnalysis: 'user+position',
-        resumeEvaluation: 'user',
+        resumeEvaluation: 'pdf',
         successRate: 'pdf+position',
         studentPlan: 'pdf+position'
       }
@@ -1388,142 +1405,156 @@ export default {
   
   .message-list {
     .message-item {
-      margin-bottom: 32rpx;
-      display: flex;
-      
-      &.user-message {
-        justify-content: flex-end;
+        margin-bottom: 32rpx;
+        display: flex;
         
-        .message-bubble {
-          background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
-          color: #fff;
-          border-bottom-right-radius: 12rpx;
-          box-shadow: 0 4rpx 16rpx rgba(0, 122, 255, 0.25);
-        }
-      }
-      
-      &.ai-message {
-        justify-content: flex-start;
-        
-        .message-bubble {
-          background-color: #fff;
-          color: #333;
-          border-bottom-left-radius: 12rpx;
-          box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
-        }
-      }
-      
-      .message-bubble {
-        max-width: 72%;
-        padding: 24rpx 28rpx;
-        border-radius: 24rpx;
-        animation: slideIn 0.4s ease-out;
-        
-        .message-text {
-          font-size: 32rpx;
-          line-height: 1.6;
-          word-break: break-word;
-        }
-        
-        .file-card {
-          display: flex;
-          align-items: center;
-          margin-top: 24rpx;
-          padding: 24rpx;
-          background-color: rgba(255, 255, 255, 0.9);
-          border-radius: 16rpx;
+        &.user-message {
+          justify-content: flex-end;
           
-          .file-icon {
-            width: 48rpx;
-            height: 48rpx;
-            margin-right: 20rpx;
-            flex-shrink: 0;
-          }
-          
-          .file-info {
-            flex: 1;
-            min-width: 0;
-            
-            .file-name {
-              display: block;
-              font-size: 28rpx;
-              margin-bottom: 8rpx;
-              color: #333;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-            }
-            
-            .file-size {
-              display: block;
-              font-size: 24rpx;
-              color: #999;
-            }
+          .message-bubble {
+            background: linear-gradient(135deg, #2b6ef0, #0099ff);
+            color: #fff;
+            border-bottom-right-radius: 12rpx;
+            box-shadow: 0 4rpx 16rpx rgba(43, 110, 240, 0.3);
           }
         }
         
-        .analysis-card {
-          margin-top: 24rpx;
-          background-color: #fff;
-          border-radius: 20rpx;
-          overflow: hidden;
-          box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
-          border: 1rpx solid rgba(0, 122, 255, 0.1);
+        &.ai-message {
+          justify-content: flex-start;
           
-          .card-header {
+          .message-bubble {
+            background: rgba(255, 255, 255, 0.95);
+            color: #495057;
+            border-bottom-left-radius: 12rpx;
+            box-shadow: 0 4rpx 16rpx rgba(79, 172, 254, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+          }
+        }
+        
+        .message-bubble {
+          max-width: 72%;
+          padding: 24rpx 28rpx;
+          border-radius: 24rpx;
+          animation: slideIn 0.4s ease-out;
+          
+          .message-text {
+            font-size: 32rpx;
+            line-height: 1.6;
+            word-break: break-word;
+          }
+          
+          .file-card {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 24rpx 28rpx;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            cursor: pointer;
+            margin-top: 24rpx;
+            padding: 24rpx;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(230, 240, 255, 0.8));
+            border-radius: 16rpx;
+            border: 1rpx solid rgba(160, 196, 255, 0.3);
+            box-shadow: 0 4rpx 12rpx rgba(79, 172, 254, 0.15);
             
-            .card-title {
-              font-size: 30rpx;
-              font-weight: 600;
-              color: #333;
+            .file-icon {
+              width: 48rpx;
+              height: 48rpx;
+              margin-right: 20rpx;
+              flex-shrink: 0;
             }
             
-            .expand-icon {
-              width: 32rpx;
-              height: 32rpx;
-              transition: transform 0.3s ease;
+            .file-info {
+              flex: 1;
+              min-width: 0;
+              
+              .file-name {
+                display: block;
+                font-size: 28rpx;
+                margin-bottom: 8rpx;
+                color: #495057;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                font-weight: 500;
+              }
+              
+              .file-size {
+                display: block;
+                font-size: 24rpx;
+                color: #94a3b8;
+              }
             }
           }
           
-          .card-content {
-            padding: 24rpx 28rpx;
-            background-color: #fff;
+          .analysis-card {
+            margin-top: 24rpx;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20rpx;
+            overflow: hidden;
+            box-shadow: 0 4rpx 16rpx rgba(79, 172, 254, 0.15);
+            border: 1rpx solid rgba(160, 196, 255, 0.3);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             
-            rich-text {
-              font-size: 28rpx;
-              line-height: 1.8;
-              color: #555;
+            .card-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              padding: 24rpx 28rpx;
+              background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(230, 240, 255, 0.8));
+              cursor: pointer;
               
-              &::v-deep {
-                p {
-                  margin-bottom: 16rpx;
-                }
+              .card-title {
+                font-size: 30rpx;
+                font-weight: 600;
+                color: #333;
+                background: linear-gradient(120deg, #2b6ef0, #00b4ff);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+              }
+              
+              .expand-icon {
+                width: 32rpx;
+                height: 32rpx;
+                transition: transform 0.3s ease;
+                background: radial-gradient(circle, rgba(160, 196, 255, 0.3) 0%, rgba(207, 226, 255, 0.1) 100%);
+                border-radius: 50%;
+                padding: 4rpx;
+              }
+            }
+            
+            .card-content {
+              padding: 24rpx 28rpx;
+              background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(230, 240, 255, 0.8));
+              
+              rich-text {
+                font-size: 28rpx;
+                line-height: 1.8;
+                color: #555;
                 
-                ul, ol {
-                  margin: 16rpx 0;
-                  padding-left: 40rpx;
-                }
-                
-                li {
-                  margin-bottom: 8rpx;
-                  line-height: 1.6;
-                }
-                
-                strong {
-                  color: #333;
-                  font-weight: 600;
+                &::v-deep {
+                  p {
+                    margin-bottom: 16rpx;
+                  }
+                  
+                  ul, ol {
+                    margin: 16rpx 0;
+                    padding-left: 40rpx;
+                  }
+                  
+                  li {
+                    margin-bottom: 8rpx;
+                    line-height: 1.6;
+                  }
+                  
+                  strong {
+                    color: #495057;
+                    font-weight: 600;
+                  }
                 }
               }
             }
           }
         }
-      }
       
       .markdown-content {
         font-size: 32rpx;
@@ -1674,19 +1705,39 @@ export default {
     gap: 16rpx;
     
     .func-btn {
-      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      background: linear-gradient(135deg, #E6F0FF, #F0F4FF);
       color: #495057;
-      border: 1rpx solid #dee2e6;
-      border-radius: 20rpx;
+      border: 2rpx solid transparent;
+      border-radius: 16rpx;
       padding: 18rpx 16rpx;
       font-size: 24rpx;
       flex: 1;
       font-weight: 500;
       transition: all 0.3s ease;
+      border-image: linear-gradient(120deg, #a0c4ff, #cfe2ff) 1;
+      box-shadow: 0 4rpx 12rpx rgba(79, 172, 254, 0.15);
+      position: relative;
+      overflow: hidden;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transition: left 0.5s ease;
+      }
       
       &:active {
         transform: scale(0.95);
-        background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+        background: linear-gradient(135deg, #cfe2ff, #E6F0FF);
+        box-shadow: 0 2rpx 8rpx rgba(79, 172, 254, 0.2);
+      }
+      
+      &:hover::before {
+        left: 100%;
       }
       
       &:first-child {
@@ -1695,57 +1746,94 @@ export default {
       
       &:last-child {
         margin-right: 0;
+      }
     }
   }
-} 
-  .input-container {
+  .input-container-merged {
     display: flex;
     align-items: flex-end;
-    gap: 16rpx;
+    gap: 12rpx;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 48rpx;
+    padding: 8rpx 12rpx 8rpx 24rpx;
+    border: 1.5rpx solid transparent;
+    border-image: linear-gradient(120deg, #a0c4ff, #cfe2ff) 1;
+    transition: all 0.3s ease;
+    box-shadow: 0 4rpx 12rpx rgba(79, 172, 254, 0.15);
     
-    .text-input {
+    &:focus-within {
+      border-color: transparent;
+      border-image: linear-gradient(120deg, #4f9eff, #a0d0ff) 1;
+      background: #fff;
+      box-shadow: 0 0 12px rgba(79, 158, 255, 0.3);
+    }
+    
+    .text-input-merged {
       flex: 1;
-      min-height: 88rpx;
-      max-height: 240rpx;
-      padding: 24rpx;
-      border: 2rpx solid #e9ecef;
-      border-radius: 24rpx;
-      font-size: 32rpx;
-      background-color: #f8f9fa;
-      transition: all 0.3s ease;
-      
-      &:focus {
-        border-color: #007aff;
-        background-color: #fff;
-        box-shadow: 0 0 0 4rpx rgba(0, 122, 255, 0.1);
-      }
+      min-height: 36rpx;
+      max-height: 200rpx;
+      padding: 20rpx 0;
+      font-size: 30rpx;
+      background: transparent;
+      color: #495057;
+      line-height: 1.5;
       
       &::placeholder {
-        color: #adb5bd;
+        color: #94a3b8;
         font-size: 30rpx;
       }
     }
     
-    .send-btn {
-      background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
-      color: #fff;
-      border-radius: 24rpx;
-      padding: 24rpx 36rpx;
-      font-size: 28rpx;
-      font-weight: 500;
-      min-width: 120rpx;
+    .send-icon {
+      width: 72rpx;
+      height: 72rpx;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #2b6ef0, #0099ff);
+      border-radius: 50%;
       transition: all 0.3s ease;
-      box-shadow: 0 4rpx 16rpx rgba(0, 122, 255, 0.3);
-      
+      flex-shrink: 0;
+      box-shadow: 0 4rpx 12rpx rgba(43, 110, 240, 0.3);
+      position: relative;
+      overflow: hidden;
+	  
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transition: left 0.5s ease;
+      }
+	  
+      .send-text {
+        font-size: 11px;
+        font-weight: 500;
+        color: #fff;
+        z-index: 1;
+	  }
+    
       &:active {
-        transform: scale(0.95);
-        box-shadow: 0 2rpx 8rpx rgba(0, 122, 255, 0.2);
+        transform: scale(0.92);
+        background: linear-gradient(135deg, #0099ff, #2b6ef0);
+        box-shadow: 0 2rpx 8rpx rgba(43, 110, 240, 0.4);
       }
       
-      &:disabled {
+      &:hover::before {
+        left: 100%;
+      }
+      
+      &.disabled {
         background: #dee2e6;
+        transform: none;
         box-shadow: none;
-        color: #adb5bd;
+        
+        &:active {
+          transform: none;
+        }
       }
     }
   }
@@ -1766,24 +1854,30 @@ export default {
   .function-panel {
     width: 100%;
     max-height: 80vh;
-    background-color: #fff;
+    background: rgba(255, 255, 255, 0.95);
     border-radius: 32rpx 32rpx 0 0;
     animation: slideUp 0.4s ease-out;
-    box-shadow: 0 -8rpx 32rpx rgba(0, 0, 0, 0.1);
+    box-shadow: 0 -8rpx 32rpx rgba(79, 172, 254, 0.2);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     
     .panel-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 32rpx 36rpx;
-      border-bottom: 1rpx solid #f0f0f0;
-      background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+      border-bottom: 1rpx solid rgba(160, 196, 255, 0.3);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(230, 240, 255, 0.8));
       
       .panel-title {
         font-size: 36rpx;
         font-weight: 600;
         color: #333;
         letter-spacing: 0.5rpx;
+        background: linear-gradient(120deg, #2b6ef0, #00b4ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
       }
       
       .close-btn {
@@ -1791,6 +1885,8 @@ export default {
         height: 48rpx;
         padding: 8rpx;
         transition: transform 0.3s ease;
+        background: radial-gradient(circle, rgba(160, 196, 255, 0.3) 0%, rgba(207, 226, 255, 0.1) 100%);
+        border-radius: 50%;
         
         &:active {
           transform: scale(0.9);
@@ -1802,14 +1898,16 @@ export default {
       padding: 32rpx 36rpx;
       max-height: 50vh;
       overflow-y: auto;
-      background-color: #fafbfc;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(230, 240, 255, 0.8));
       
       .method-selector {
         margin-bottom: 32rpx;
-        background-color: #fff;
+        background: rgba(255, 255, 255, 0.8);
         border-radius: 20rpx;
         padding: 24rpx;
-        box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+        box-shadow: 0 4rpx 16rpx rgba(79, 172, 254, 0.15);
+        border: 2rpx solid transparent;
+        border-image: linear-gradient(120deg, #a0c4ff, #cfe2ff) 1;
         
         .radio-item {
           display: flex;
@@ -1823,7 +1921,7 @@ export default {
           }
           
           &:active {
-            background-color: #f8f9fa;
+            background-color: rgba(230, 240, 255, 0.5);
             border-radius: 12rpx;
           }
           
@@ -1851,19 +1949,21 @@ export default {
           .input-field {
             width: 100%;
             padding: 24rpx 28rpx;
-            border: 2rpx solid #e9ecef;
+            border: 2rpx solid transparent;
             border-radius: 16rpx;
             font-size: 30rpx;
-            background-color: #fff;
+            background: linear-gradient(135deg, #E6F0FF, #F0F4FF);
+            border-image: linear-gradient(120deg, #a0c4ff, #cfe2ff) 1;
             transition: all 0.3s ease;
             
             &:focus {
-              border-color: #007aff;
-              box-shadow: 0 0 0 4rpx rgba(0, 122, 255, 0.1);
+              border-color: transparent;
+              border-image: linear-gradient(120deg, #4f9eff, #a0d0ff) 1;
+              box-shadow: 0 0 12px rgba(79, 158, 255, 0.3);
             }
             
             &::placeholder {
-              color: #adb5bd;
+              color: #94a3b8;
             }
           }
           
@@ -1928,18 +2028,21 @@ export default {
           
           .file-upload {
             padding: 40rpx;
-            border: 2rpx dashed #007aff;
+            border: 2rpx dashed transparent;
             border-radius: 16rpx;
             text-align: center;
             color: #007aff;
             font-size: 30rpx;
-            background-color: #f0f8ff;
+            background: linear-gradient(135deg, #f0f8ff, #e6f2ff);
+            border-image: linear-gradient(120deg, #4facfe, #00f2fe) 1;
             transition: all 0.3s ease;
             font-weight: 500;
+            box-shadow: 0 4rpx 12rpx rgba(79, 172, 254, 0.15);
             
             &:active {
-              background-color: #e6f2ff;
+              background: linear-gradient(135deg, #e6f2ff, #f0f8ff);
               transform: scale(0.98);
+              box-shadow: 0 2rpx 8rpx rgba(79, 172, 254, 0.2);
             }
           }
         }
@@ -1949,41 +2052,62 @@ export default {
     .panel-footer {
       display: flex;
       padding: 32rpx 36rpx;
-      border-top: 1rpx solid #f0f0f0;
-      background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+      border-top: 1rpx solid rgba(160, 196, 255, 0.3);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(230, 240, 255, 0.8));
       gap: 20rpx;
       
       .submit-btn {
         flex: 1;
-        background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+        background: linear-gradient(135deg, #2b6ef0, #0099ff);
         color: #fff;
-        border-radius: 24rpx;
+        border-radius: 16rpx;
         padding: 28rpx;
         font-size: 32rpx;
-        font-weight: 500;
-        box-shadow: 0 4rpx 16rpx rgba(0, 122, 255, 0.3);
+        font-weight: 600;
+        box-shadow: 0 4rpx 12rpx rgba(43, 110, 240, 0.3);
         transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+          transition: left 0.5s ease;
+        }
         
         &:active {
           transform: scale(0.95);
-          box-shadow: 0 2rpx 8rpx rgba(0, 122, 255, 0.2);
+          background: linear-gradient(135deg, #0099ff, #2b6ef0);
+          box-shadow: 0 2rpx 8rpx rgba(43, 110, 240, 0.4);
+        }
+        
+        &:hover::before {
+          left: 100%;
         }
       }
       
       .cancel-btn {
         flex: 1;
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        color: #6c757d;
-        border-radius: 24rpx;
+        background: linear-gradient(135deg, #E6F0FF, #F0F4FF);
+        color: #495057;
+        border: 2rpx solid transparent;
+        border-radius: 16rpx;
         padding: 28rpx;
         font-size: 32rpx;
-        font-weight: 500;
-        border: 1rpx solid #dee2e6;
+        font-weight: 600;
         transition: all 0.3s ease;
+        border-image: linear-gradient(120deg, #a0c4ff, #cfe2ff) 1;
+        box-shadow: 0 4rpx 12rpx rgba(79, 172, 254, 0.15);
         
         &:active {
           transform: scale(0.95);
-          background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+          background: linear-gradient(135deg, #cfe2ff, #E6F0FF);
+          box-shadow: 0 2rpx 8rpx rgba(79, 172, 254, 0.2);
         }
       }
     }
@@ -1995,33 +2119,37 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 24rpx 28rpx;
-  border: 2rpx solid #e9ecef;
+  border: 2rpx solid transparent;
   border-radius: 16rpx;
-  background-color: #fff;
+  background: linear-gradient(135deg, #E6F0FF, #F0F4FF);
+  border-image: linear-gradient(120deg, #a0c4ff, #cfe2ff) 1;
   transition: all 0.3s ease;
   cursor: pointer;
+  box-shadow: 0 4rpx 12rpx rgba(79, 172, 254, 0.15);
   
   &:active {
-    background-color: #f8f9fa;
+    background: linear-gradient(135deg, #cfe2ff, #E6F0FF);
     transform: scale(0.98);
+    box-shadow: 0 2rpx 8rpx rgba(79, 172, 254, 0.2);
   }
   
   .selector-content {
     flex: 1;
     font-size: 30rpx;
-    color: #333;
+    color: #495057;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-weight: 500;
     
     &.placeholder {
-      color: #adb5bd;
+      color: #94a3b8;
     }
   }
   
   .arrow-icon {
     font-size: 32rpx;
-    color: #999;
+    color: #64748b;
     margin-left: 16rpx;
     font-weight: 400;
   }
@@ -2042,33 +2170,43 @@ export default {
   .cascade-modal {
     width: 100%;
     height: 70vh;
-    background-color: #fff;
+    background: rgba(255, 255, 255, 0.95);
     border-radius: 32rpx 32rpx 0 0;
     animation: slideUp 0.3s ease-out;
     display: flex;
     flex-direction: column;
+    box-shadow: 0 -8rpx 32rpx rgba(79, 172, 254, 0.2);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     
     .cascade-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 32rpx 36rpx;
-      border-bottom: 1rpx solid #f0f0f0;
-      background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+      border-bottom: 1rpx solid rgba(160, 196, 255, 0.3);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(230, 240, 255, 0.8));
       
       .cascade-title {
         font-size: 36rpx;
         font-weight: 600;
         color: #333;
+        background: linear-gradient(120deg, #2b6ef0, #00b4ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
       }
       
       .cascade-close {
         font-size: 30rpx;
         color: #007aff;
         padding: 12rpx 20rpx;
+        border-radius: 12rpx;
+        transition: all 0.3s ease;
         
         &:active {
           opacity: 0.7;
+          background-color: rgba(0, 122, 255, 0.1);
         }
       }
     }
@@ -2080,8 +2218,8 @@ export default {
       
       .category-list {
         width: 35%;
-        background-color: #f8f9fa;
-        border-right: 1rpx solid #e9ecef;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        border-right: 1rpx solid rgba(160, 196, 255, 0.3);
         
         .category-item {
           padding: 28rpx 24rpx;
@@ -2095,7 +2233,7 @@ export default {
           }
           
           &.active {
-            background-color: #fff;
+            background: linear-gradient(135deg, #fff, #f0f8ff);
             color: #007aff;
             font-weight: 600;
             border-left-color: #007aff;
@@ -2112,7 +2250,7 @@ export default {
       
       .position-list {
         flex: 1;
-        background-color: #fff;
+        background: linear-gradient(135deg, #fff, #f8f9fa);
         
         .position-item {
           display: flex;
@@ -2121,7 +2259,7 @@ export default {
           padding: 28rpx 32rpx;
           font-size: 30rpx;
           color: #333;
-          border-bottom: 1rpx solid #f5f5f5;
+          border-bottom: 1rpx solid rgba(160, 196, 255, 0.2);
           transition: all 0.2s ease;
           
           &:active {
@@ -2131,7 +2269,7 @@ export default {
           &.active {
             color: #007aff;
             font-weight: 500;
-            background-color: #f0f8ff;
+            background: linear-gradient(135deg, #f0f8ff, #e6f2ff);
           }
           
           text {
@@ -2228,10 +2366,21 @@ export default {
 .dark-theme .input-area {
   background-color: #2d2d2d;
   
-  .text-input {
-    background-color: #3d3d3d;
+  .input-container-merged {
+    background: #3d3d3d;
     border-color: #4d4d4d;
-    color: #ffffff;
+    
+    &:focus-within {
+      background: #4d4d4d;
+    }
+    
+    .text-input-merged {
+      color: #ffffff;
+      
+      &::placeholder {
+        color: #888;
+      }
+    }
   }
 }
 

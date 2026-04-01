@@ -1,5 +1,5 @@
 <template>
-  <view class="job-card" :style="{ backgroundColor: isDark ? '#2c2c2c' : '#fff', boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
+  <view class="job-card" :style="{ background: isDark ? '#2c2c2c' : 'linear-gradient(135deg, #ffffff, #f8faff)', boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
     <view class="card-content" @click="goToDetail(data)">
       <view class="card-header">
         <text class="job-title" :style="{ color: isDark ? '#ffffff' : '#1E1E1E' }">{{ data.title }}</text>
@@ -12,10 +12,10 @@
       </view>
       
       <view class="job-tags">
-        <text v-for="tag in getJobTags(data)" :key="tag" class="tag" :style="{ backgroundColor: isDark ? '#3a3a3a' : '#F2F5F9', color: isDark ? '#ccc' : '#6C757D' }">{{ tag }}</text>
+        <text v-for="tag in getJobTags(data)" :key="tag" class="tag" :style="{ background: isDark ? '#3a3a3a' : 'linear-gradient(135deg, #E6F0FF, #F0F4FF)', color: isDark ? '#ccc' : '#6C757D' }">{{ tag }}</text>
       </view>
       
-      <view class="card-footer" :style="{ borderTop: isDark ? '1px solid #404040' : '1px solid #F0F2F5' }">
+      <view class="card-footer" :style="{ borderTop: isDark ? '1px solid #404040' : '1px solid #E6F0FF' }">
         <text class="location" :style="{ color: isDark ? '#ffffff' : '#1E1E1E' }">{{ data.city || '城市' }}</text>
         <text class="time" :style="{ color: isDark ? '#999' : '#6C757D' }">{{ formatTime(data.publish_time) }}</text>
       </view>
@@ -24,7 +24,7 @@
     <!-- 右侧按钮组 -->
     <view class="right-buttons">
       <!-- 收藏按钮 -->
-      <view class="favorite-btn" @click.stop="toggleFavorite" :style="{ backgroundColor: isDark ? 'rgba(42, 42, 42, 0.8)' : 'rgba(255, 255, 255, 0.8)' }">
+      <view class="favorite-btn" @click.stop="toggleFavorite" :style="{ background: isDark ? 'rgba(42, 42, 42, 0.8)' : 'linear-gradient(135deg, #ffffff, #f8faff)' }">
         <uni-icons 
           :type="isFavorite ? 'star-filled' : 'star'" 
           :size="30" 
@@ -33,7 +33,7 @@
       </view>
       
       <!-- 投递按钮 -->
-      <view class="apply-btn" :class="{ 'applied': isApplied }" @click.stop="applyForJob" :style="{ backgroundColor: isApplied ? (isDark ? '#3a3a3a' : '#F2F5F9') : '#007aff', color: isApplied ? (isDark ? '#999' : '#6C757D') : 'white' }">
+      <view class="apply-btn" :class="{ 'applied': isApplied }" @click.stop="applyForJob" :style="{ background: isApplied ? (isDark ? '#3a3a3a' : 'linear-gradient(135deg, #E6F0FF, #F0F4FF)') : 'linear-gradient(120deg, #4facfe, #00f2fe)', color: isApplied ? (isDark ? '#999' : '#6C757D') : 'white' }">
         {{ isApplied ? '已投递' : '投递' }}
       </view>
     </view>
@@ -171,7 +171,7 @@ export default {
     // 获取公司名称
     getCompanyName(data) {
       // 后端目前没有返回公司名称，需要根据company_id查询，这里暂时返回默认值
-      const companyMap = {
+     const companyMap = {
         '1': '花旗金融信息服务（中国）有限公司',
         '2': '中国移动通信有限公司在线营销服务中心',
         '3': 'Victoria\'s Secret'
@@ -227,18 +227,36 @@ export default {
 
 <style scoped>
 .job-card {
-  background-color: #fff;
+  background: linear-gradient(135deg, #ffffff, #f8faff);
   margin: 0;
   padding: 16px;
   border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 16px rgba(79, 172, 254, 0.15);
   position: relative;
   transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.job-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(79, 172, 254, 0.05), rgba(0, 242, 254, 0.05));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.job-card:hover::after {
+  opacity: 1;
 }
 
 .job-card:active {
   transform: scale(0.98);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 20px rgba(79, 172, 254, 0.25);
 }
 
 .right-buttons {
@@ -254,17 +272,19 @@ export default {
 }
 
 .favorite-btn {
-  background-color: rgba(255, 255, 255, 0.8);
+  background: linear-gradient(135deg, #ffffff, #f8faff);
   padding: 8px;
   border-radius: 50%;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .favorite-btn:active {
   transform: scale(0.9);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 
 .card-header {
@@ -280,12 +300,19 @@ export default {
   font-weight: 600;
   color: #1E1E1E;
   flex: 1;
+  background: linear-gradient(90deg, #1E1E1E, #4a4a4a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .salary {
   font-size: 16px;
   font-weight: 500;
-  color: #007aff;
+  background: linear-gradient(120deg, #4facfe, #00f2fe);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .company-info {
@@ -311,12 +338,38 @@ export default {
 
 .tag {
   font-size: 12px;
-  color: #6C757D;
-  background-color: #F2F5F9;
+  font-weight: 500;
   padding: 4px 8px;
   border-radius: 8px;
   margin-right: 6px;
   margin-bottom: 6px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.tag:nth-child(1) {
+  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+  color: #fff;
+}
+
+.tag:nth-child(2) {
+  background: linear-gradient(135deg, #a8edea, #fed6e3);
+  color: #333;
+}
+
+.tag:nth-child(3) {
+  background: linear-gradient(135deg, #fad0c4, #ffd1ff);
+  color: #333;
+}
+
+.tag:nth-child(4) {
+  background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+  color: #333;
+}
+
+.tag:active {
+  transform: scale(0.95);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .card-footer {
@@ -324,7 +377,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding-top: 12px;
-  border-top: 1px solid #F0F2F5;
+  border-top: 1px solid #E6F0FF;
   margin-top: 8px;
   padding-right: 80px;
 }
@@ -349,7 +402,7 @@ export default {
 
 /* 投递按钮 */
 .apply-btn {
-  background-color: #007aff;
+  background: linear-gradient(120deg, #4facfe, #00f2fe);
   color: white;
   font-size: 12px;
   font-weight: bold;
@@ -359,20 +412,22 @@ export default {
   display: flex;
   align-items: center;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(79, 172, 254, 0.3);
 }
 
 .apply-btn.applied {
-  background-color: #F2F5F9;
+  background: linear-gradient(135deg, #E6F0FF, #F0F4FF);
   color: #6C757D;
+  box-shadow: none;
 }
 
 .apply-btn:active {
-  background-color: #0056b3;
   transform: scale(0.95);
+  box-shadow: 0 1px 4px rgba(79, 172, 254, 0.4);
 }
 
 .apply-btn.applied:active {
-  background-color: #E3E8F0;
   transform: scale(0.95);
+  background: linear-gradient(135deg, #D6E8FF, #E6F0FF);
 }
 </style>

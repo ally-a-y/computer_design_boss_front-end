@@ -165,13 +165,13 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         b: tag
       };
     }),
-    j: $props.isDark ? "#3a3a3a" : "#F2F5F9",
+    j: $props.isDark ? "#3a3a3a" : "linear-gradient(135deg, #E6F0FF, #F0F4FF)",
     k: $props.isDark ? "#ccc" : "#6C757D",
     l: common_vendor.t($props.data.city || "\u57CE\u5E02"),
     m: $props.isDark ? "#ffffff" : "#1E1E1E",
     n: common_vendor.t($options.formatTime($props.data.publish_time)),
     o: $props.isDark ? "#999" : "#6C757D",
-    p: $props.isDark ? "1px solid #404040" : "1px solid #F0F2F5",
+    p: $props.isDark ? "1px solid #404040" : "1px solid #E6F0FF",
     q: common_vendor.o(($event) => $options.goToDetail($props.data)),
     r: common_vendor.p({
       type: $data.isFavorite ? "star-filled" : "star",
@@ -179,14 +179,14 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       color: $data.isFavorite ? "#ff9500" : $props.isDark ? "#666" : "#ccc"
     }),
     s: common_vendor.o((...args) => $options.toggleFavorite && $options.toggleFavorite(...args)),
-    t: $props.isDark ? "rgba(42, 42, 42, 0.8)" : "rgba(255, 255, 255, 0.8)",
+    t: $props.isDark ? "rgba(42, 42, 42, 0.8)" : "linear-gradient(135deg, #ffffff, #f8faff)",
     v: common_vendor.t($data.isApplied ? "\u5DF2\u6295\u9012" : "\u6295\u9012"),
     w: $data.isApplied ? 1 : "",
     x: common_vendor.o((...args) => $options.applyForJob && $options.applyForJob(...args)),
-    y: $data.isApplied ? $props.isDark ? "#3a3a3a" : "#F2F5F9" : "#007aff",
+    y: $data.isApplied ? $props.isDark ? "#3a3a3a" : "linear-gradient(135deg, #E6F0FF, #F0F4FF)" : "linear-gradient(120deg, #4facfe, #00f2fe)",
     z: $data.isApplied ? $props.isDark ? "#999" : "#6C757D" : "white",
-    A: $props.isDark ? "#2c2c2c" : "#fff",
-    B: $props.isDark ? "0 2px 8px rgba(0,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.05)"
+    A: $props.isDark ? "#2c2c2c" : "linear-gradient(135deg, #ffffff, #f8faff)",
+    B: $props.isDark ? "0 2px 8px rgba(0,0,0,0.3)" : "0 4px 16px rgba(79, 172, 254, 0.15)"
   };
 }
 var Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-0b59c612"], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/component/job/job-card.vue"]]);

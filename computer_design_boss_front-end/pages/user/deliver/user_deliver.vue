@@ -1,12 +1,12 @@
 <template>
-  <view class="deliver-page">
+  <view class="deliver-page" :style="{ background: isDarkMode ? '#1a1a1a' : 'linear-gradient(135deg, #e6f0ff 0%, #ffffff 100%)' }">
     <!-- 顶部导航 -->
-    <view class="nav-bar">
+    <view class="nav-bar" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'linear-gradient(135deg, rgba(230, 240, 255, 0.8), rgba(255, 255, 255, 0.8))', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
       <view class="nav-bar-left">
-        <text class="nav-back-icon" @click="goBack">←</text>
+        <text class="nav-back-icon" @click="goBack" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">←</text>
       </view>
       <view class="nav-bar-center">
-        <text class="nav-bar-title">投递职位</text>
+        <text class="nav-bar-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">投递职位</text>
       </view>
       <view class="nav-bar-right">
         <!-- 右侧预留空间 -->
@@ -15,44 +15,76 @@
 
     <!-- 投递列表 -->
     <view class="deliver-list">
-      <view v-for="(item, index) in delivers" :key="index" class="deliver-item">
+      <view v-for="(item, index) in delivers" :key="index" class="deliver-item" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
         <view class="job-info">
-          <text class="job-title">{{ item.jobTitle }}</text>
-          <text class="company">{{ item.company }}</text>
+          <text class="job-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">{{ item.jobTitle }}</text>
+          <text class="company" :style="{ color: isDarkMode ? '#999' : '#6C757D' }">{{ item.company }}</text>
           <text class="salary">{{ item.salary }}</text>
-          <text class="deliver-time">投递时间：{{ item.deliverTime }}</text>
+          <text class="deliver-time" :style="{ color: isDarkMode ? '#666' : '#ADB5BD' }">{{ item.deliverTime }}</text>
           <view class="status">
             <text class="status-text" :class="item.status">{{ item.statusText }}</text>
           </view>
         </view>
         <view class="actions">
-          <button class="cancel-btn" @click="cancelDeliver(index)">取消投递</button>
+          <button class="cancel-btn" @click="cancelDeliver(index)" :style="{ background: isDarkMode ? '#404040' : '#F2F5F9', color: isDarkMode ? '#999' : '#6C757D' }">取消投递</button>
           <button class="detail-btn" @click="viewDetails(item)">查看详情</button>
         </view>
       </view>
 
       <!-- 空状态 -->
       <view v-if="delivers.length === 0" class="empty-state">
-        <uni-icons type="paperplane" size="80" color="#ccc"></uni-icons>
-        <text>暂无投递记录</text>
+        <uni-icons type="paperplane" size="80" :color="isDarkMode ? '#404040' : '#ccc'"></uni-icons>
+        <text :style="{ color: isDarkMode ? '#666' : '#ADB5BD' }">暂无投递记录</text>
       </view>
     </view>
   </view>
 </template>
 
 <script>
+import { themeManager } from '@/common/utils/theme-simple.js'
+
 export default {
   data() {
     return {
-      delivers: []
+      delivers: [],
+      // 主题相关
+      currentTheme: 'light',
+      isDarkMode: false
     }
   },
 
   onLoad() {
     this.loadDelivers()
+    // 初始化主题
+    this.initTheme()
   },
-
+  
+  onUnload() {
+    // 清理主题监听
+    uni.$off('globalThemeChange', this.handleGlobalThemeChange)
+  },
+  
   methods: {
+    /**
+     * 初始化主题
+     */
+    initTheme() {
+      // 获取当前主题
+      this.currentTheme = themeManager.getCurrentTheme()
+      this.isDarkMode = this.currentTheme === 'dark'
+      
+      // 监听全局主题变化
+      uni.$on('globalThemeChange', this.handleGlobalThemeChange)
+    },
+    
+    /**
+     * 处理全局主题变化
+     */
+    handleGlobalThemeChange(data) {
+      this.currentTheme = data.theme
+      this.isDarkMode = data.isDark
+    },
+    
     goBack() {
       uni.navigateBack()
     },

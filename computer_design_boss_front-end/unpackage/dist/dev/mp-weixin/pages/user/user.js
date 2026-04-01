@@ -9,7 +9,7 @@ const _sfc_main = {
     return {
       userInfo: {
         name: "\u5F20\u4E09",
-        avatar: "/static/logo.png"
+        avatar: ""
       },
       currentTheme: "light",
       isDarkMode: false
@@ -33,34 +33,75 @@ const _sfc_main = {
       this.isDarkMode = data.isDark;
     },
     async checkLoginStatus() {
+      console.log("\u5F00\u59CB\u68C0\u67E5\u7528\u6237\u767B\u5F55\u72B6\u6001");
       const userInfo = common_vendor.index.getStorageSync("userInfo");
+      console.log("\u4ECE\u672C\u5730\u5B58\u50A8\u83B7\u53D6userInfo:", userInfo);
       if (userInfo) {
         if (typeof userInfo === "string") {
           try {
             this.userInfo = JSON.parse(userInfo);
+            console.log("\u89E3\u6790userInfo\u6210\u529F:", this.userInfo);
           } catch (e) {
             console.error("\u89E3\u6790userInfo\u5931\u8D25:", e);
             this.userInfo = null;
           }
         } else {
           this.userInfo = userInfo;
+          console.log("\u76F4\u63A5\u4F7F\u7528userInfo:", this.userInfo);
         }
         try {
-          const res = await common_api_user.userApi.getUserProfile();
+          console.log("\u5F00\u59CB\u83B7\u53D6\u7528\u6237\u540D\u79F0\u548C\u5934\u50CF");
+          const res = await common_api_user.userApi.getUserNameAndAvatar();
+          console.log("\u83B7\u53D6\u7528\u6237\u540D\u79F0\u548C\u5934\u50CF\u6210\u529F:", res);
           if (res) {
-            this.userInfo = res;
-            common_vendor.index.setStorageSync("userInfo", JSON.stringify(res));
+            this.userInfo.name = res.user_name;
+            this.userInfo.real_name = res.user_name;
+            this.userInfo.avatar = res.user_avatar;
+            this.userInfo.avatar_format = res.user_avatar_format;
+            this.userInfo.avatar_size = res.user_avatar_size;
+            console.log("\u66F4\u65B0\u7528\u6237\u4FE1\u606F\u6210\u529F:", this.userInfo);
+            const userInfoToSave = {
+              name: res.user_name,
+              real_name: res.user_name,
+              avatar: res.user_avatar,
+              avatar_format: res.user_avatar_format,
+              avatar_size: res.user_avatar_size
+            };
+            common_vendor.index.setStorageSync("userInfo", JSON.stringify(userInfoToSave));
+            console.log("\u4FDD\u5B58\u7528\u6237\u4FE1\u606F\u5230\u672C\u5730\u5B58\u50A8\u6210\u529F");
           }
         } catch (error) {
-          console.error("\u83B7\u53D6\u7528\u6237\u4FE1\u606F\u5931\u8D25:", error);
+          console.error("\u83B7\u53D6\u7528\u6237\u540D\u79F0\u548C\u5934\u50CF\u5931\u8D25:", error);
+          try {
+            console.log("\u5F00\u59CB\u83B7\u53D6\u7528\u6237\u4FE1\u606F");
+            const res = await common_api_user.userApi.getUserProfile();
+            console.log("\u83B7\u53D6\u7528\u6237\u4FE1\u606F\u6210\u529F:", res);
+            if (res) {
+              this.userInfo = res;
+              console.log("\u66F4\u65B0\u7528\u6237\u4FE1\u606F\u6210\u529F:", this.userInfo);
+              const userInfoToSave = {
+                name: res.name || res.real_name,
+                real_name: res.real_name,
+                avatar: res.avatar,
+                avatar_format: res.avatar_format,
+                avatar_size: res.avatar_size
+              };
+              common_vendor.index.setStorageSync("userInfo", JSON.stringify(userInfoToSave));
+              console.log("\u4FDD\u5B58\u7528\u6237\u4FE1\u606F\u5230\u672C\u5730\u5B58\u50A8\u6210\u529F");
+            }
+          } catch (error2) {
+            console.error("\u83B7\u53D6\u7528\u6237\u4FE1\u606F\u5931\u8D25:", error2);
+          }
         }
+      } else {
+        console.log("\u672C\u5730\u5B58\u50A8\u4E2D\u6CA1\u6709userInfo");
       }
     },
     isValidAvatar(avatar) {
       if (!avatar || avatar === "") {
         return false;
       }
-      if (avatar.startsWith("http://") || avatar.startsWith("https://") || avatar.startsWith("/")) {
+      if (avatar.startsWith("http://") || avatar.startsWith("https://")) {
         return false;
       }
       const cleaned = avatar.replace(/\s+/g, "");
@@ -149,7 +190,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return {
     a: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
     b: $data.isDarkMode ? "#2c2c2c" : "transparent",
-    c: $data.userInfo.avatar ? $data.userInfo.avatar.startsWith("http://") || $data.userInfo.avatar.startsWith("https://") || $data.userInfo.avatar.startsWith("/") ? $data.userInfo.avatar : $options.isValidAvatar($data.userInfo.avatar) ? "data:image/" + ($data.userInfo.avatar_format === "jpg" ? "jpeg" : $data.userInfo.avatar_format || "jpeg") + ";base64," + $options.decodeHtmlEntities($data.userInfo.avatar.replace(/\s+/g, "")) : "/static/default-avatar.png" : "/static/default-avatar.png",
+    c: $data.userInfo.avatar ? "data:image/jpeg;base64," + $data.userInfo.avatar.replace(/\s+/g, "") : "/static/default-avatar.png",
     d: common_vendor.t($data.userInfo.name || "\u5DF2\u767B\u5F55"),
     e: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
     f: common_vendor.o((...args) => $options.navigateToResume && $options.navigateToResume(...args)),

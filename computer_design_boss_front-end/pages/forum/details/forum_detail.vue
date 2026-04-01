@@ -1,7 +1,7 @@
 <template>
-  <view class="forum-detail-container" :style="{ backgroundColor: isDarkMode ? '#1a1a1a' : '#F8FAFD' }">
+  <view class="forum-detail-container" :style="{ background: isDarkMode ? '#1a1a1a' : 'linear-gradient(135deg, #e6f0ff 0%, #ffffff 100%)' }">
     <!-- 顶部导航 -->
-    <view class="nav-bar forum-nav" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
+    <view class="nav-bar forum-nav" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'linear-gradient(135deg, rgba(230, 240, 255, 0.8), rgba(255, 255, 255, 0.8))', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
       <view class="nav-bar-left">
         <text class="nav-icon" @click="goBack">←</text>
       </view>
@@ -14,7 +14,7 @@
     </view>
     
     <!-- 帖子详情 -->
-    <view class="post-detail" v-if="post">
+    <view class="post-detail" v-if="post" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)' }">
       <!-- 头部信息区 -->
       <view class="post-header">
         <image class="avatar" @click="goToUserProfile(post.user_id)" :src="isValidAvatar(post.user_avatar) ? 'data:image/' + (post.user_avatar_format === 'jpg' ? 'jpeg' : post.user_avatar_format || 'jpeg') + ';base64,' + decodeHtmlEntities(post.user_avatar.replace(/\s+/g, '')) : '/static/default-avatar.png'" mode="aspectFill"></image>
@@ -28,7 +28,7 @@
             <text class="edit-time" v-if="post.updated_at && post.updated_at !== post.created_at">最后编辑: {{formatTime(post.updated_at)}}</text>
           </view>
         </view>
-        <text class="category">{{getCategoryName(post.category_id)}}</text>
+        <text class="category" :style="{ background: isDarkMode ? '#3a3a3a' : 'linear-gradient(135deg, #E6F0FF, #F0F4FF)', color: '#007aff' }">{{getCategoryName(post.category_id)}}</text>
       </view>
       
       <!-- 帖子标题 -->
@@ -713,6 +713,8 @@ export default {
   height: 80px;
   padding: 0 16px;
   position: relative;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .nav-bar-left,
@@ -742,8 +744,6 @@ export default {
 }
 
 .forum-nav {
-  background-color: #ffffff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   height: 80px;
   padding: 0 16px;
 }
@@ -753,27 +753,57 @@ export default {
   font-weight: 600;
   color: #1E1E1E;
   text-align: center;
+  position: relative;
+  display: inline-block;
+}
+
+.forum-title::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, #4facfe, #00f2fe);
+  border-radius: 1px;
 }
 
 .nav-icon {
-  font-size: 20px;
-  color: #1E1E1E;
+  font-size: 24px;
+  color: #4facfe;
+  font-weight: bold;
   transition: all 0.3s ease;
   cursor: pointer;
 }
 
 .nav-icon:active {
-  color: #007aff;
-  transform: scale(0.95);
+  color: #00f2fe;
+  transform: scale(0.9);
 }
 
 /* 帖子详情样式 */
 .post-detail {
-  background: white;
-  padding: 16px;
-  margin: 12px 0;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 24px 16px;
+  margin: 16px;
   border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 16px rgba(79, 172, 254, 0.15);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  position: relative;
+  overflow: hidden;
+}
+
+.post-detail::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #4facfe, #00f2fe, transparent);
+  border-radius: 0 0 16px 16px;
 }
 
 .post-header {
@@ -861,103 +891,229 @@ export default {
 }
 
 .post-title-section {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  position: relative;
+  padding-left: 12px;
+}
+
+.post-title-section::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, #4facfe, #00f2fe);
+  border-radius: 3px;
 }
 
 .post-title {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   color: #1E1E1E;
   line-height: 1.4;
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+}
+
+.post-title::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, #4facfe, #00f2fe);
+  border-radius: 1px;
+  z-index: -1;
+  opacity: 0.3;
 }
 
 .post-content {
-  margin-bottom: 16px;
-  padding: 16px;
-  background: #f9f9f9;
+  margin-bottom: 20px;
+  padding: 20px;
+  background: linear-gradient(135deg, #E6F0FF, #F0F4FF);
   border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.post-content::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #4facfe, transparent);
+  border-radius: 0 0 12px 12px;
 }
 
 .content {
   font-size: 14px;
   line-height: 1.6;
   color: #333;
+  position: relative;
+  z-index: 1;
 }
 
 .post-stats {
   display: flex;
   gap: 24px;
-  padding: 12px;
-  background: #f5f5f5;
+  padding: 16px;
+  background: linear-gradient(135deg, #E6F0FF, #F0F4FF);
   border-radius: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.post-stats::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #4facfe, transparent);
+  border-radius: 0 0 12px 12px;
 }
 
 .stat-item {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 12px;
   color: #6C757D;
+  transition: all 0.3s ease;
+  padding: 6px 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.stat-item:active {
+  background: rgba(79, 172, 254, 0.1);
+  color: #4facfe;
+  transform: scale(0.95);
 }
 
 .stat-icon {
-  font-size: 12px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.stat-item:active .stat-icon {
+  transform: scale(1.1);
 }
 
 .post-actions {
   display: flex;
   gap: 24px;
-  padding-top: 12px;
-  border-top: 1px solid #f0f0f0;
+  padding: 16px 0;
+  border-top: 1px solid #e6f0ff;
+  justify-content: space-around;
 }
 
 .action-btn {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: none;
+  background: linear-gradient(135deg, #E6F0FF, #F0F4FF);
   border: none;
-  font-size: 12px;
+  font-size: 11px;
   color: #6C757D;
+  padding: 6px 12px;
+  border-radius: 16px;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   
   &.active {
-    color: #007aff;
+    background: linear-gradient(120deg, #4facfe, #00f2fe);
+    color: white;
+    box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
   }
   
   &:active {
     transform: scale(0.95);
+    box-shadow: 0 2px 8px rgba(79, 172, 254, 0.2);
   }
 }
 
 .icon {
-  font-size: 12px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.action-btn:active .icon {
+  transform: scale(1.1);
 }
 
 /* 回复列表样式 */
 .replies-section {
   flex: 1;
-  background: white;
-  padding: 16px;
-  margin: 12px 0;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 24px 16px;
+  margin: 16px;
   border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 16px rgba(79, 172, 254, 0.15);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  position: relative;
+  overflow: hidden;
+}
+
+.replies-section::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #4facfe, #00f2fe, transparent);
+  border-radius: 0 0 16px 16px;
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e6f0ff;
+  position: relative;
+}
+
+.section-header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, #4facfe, #00f2fe);
+  border-radius: 1px;
 }
 
 .section-title {
   font-size: 16px;
   font-weight: 600;
   color: #1E1E1E;
+  position: relative;
+  display: inline-block;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, #4facfe, #00f2fe);
+  border-radius: 1px;
 }
 
 .sort-options {
@@ -967,20 +1123,22 @@ export default {
 
 .sort-option {
   padding: 6px 12px;
-  background: #F0F4FF;
-  border-radius: 24px;
-  font-size: 12px;
+  background: linear-gradient(135deg, #E6F0FF, #F0F4FF);
+  border-radius: 16px;
+  font-size: 11px;
   color: #007aff;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   
   &.active {
-    background: #E0E9FF;
-    color: #007aff;
+    background: linear-gradient(120deg, #4facfe, #00f2fe);
+    color: white;
+    box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
   }
   
   &:active {
     transform: scale(0.95);
-    background: #E0E9FF;
+    box-shadow: 0 2px 8px rgba(79, 172, 254, 0.2);
   }
 }
 
@@ -989,12 +1147,35 @@ export default {
 }
 
 .reply-item {
-  padding: 16px 0;
-  border-bottom: 1px solid #f8f8f8;
+  padding: 20px 0;
+  border-bottom: 1px solid #e6f0ff;
   transition: all 0.3s ease;
+  position: relative;
+  
+  &:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, #4facfe, #00f2fe);
+    border-radius: 2px;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+  
+  &:hover {
+    background: rgba(79, 172, 254, 0.05);
+    transform: translateX(4px);
+  }
+  
+  &:hover:before {
+    opacity: 1;
+  }
   
   &:active {
-    background: #f9f9f9;
+    background: rgba(79, 172, 254, 0.1);
   }
 }
 
@@ -1002,7 +1183,7 @@ export default {
   display: flex;
   align-items: flex-start;
   gap: 16px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .floor {
@@ -1010,23 +1191,45 @@ export default {
   color: #999999;
   margin-left: auto;
   margin-top: 8px;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 4px 8px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .reply-content {
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   padding-left: 64px;
+  position: relative;
+}
+
+.reply-content::before {
+  content: '';
+  position: absolute;
+  left: 32px;
+  top: 8px;
+  bottom: 8px;
+  width: 1px;
+  background: linear-gradient(180deg, #4facfe, #00f2fe);
+  border-radius: 1px;
+  opacity: 0.3;
 }
 
 .reply-content .content {
   font-size: 14px;
   line-height: 1.5;
   color: #333;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .reply-actions {
   display: flex;
-  gap: 24px;
+  gap: 12px;
   padding-left: 64px;
+  justify-content: flex-start;
 }
 
 .no-replies {
@@ -1038,11 +1241,26 @@ export default {
 
 /* 回复输入框样式 */
 .reply-input-section {
-  background: white;
-  padding: 16px;
-  margin: 12px 0;
-  border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  background: rgba(255, 255, 255, 0.8);
+  padding: 16px 12px;
+  margin: 12px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(79, 172, 254, 0.15);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  position: relative;
+  overflow: hidden;
+}
+
+.reply-input-section::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #4facfe, #00f2fe, transparent);
+  border-radius: 0 0 12px 12px;
 }
 
 .input-header {
@@ -1050,101 +1268,154 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e6f0ff;
+  position: relative;
+}
+
+.input-header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, #4facfe, #00f2fe);
+  border-radius: 1px;
 }
 
 .input-title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: #1E1E1E;
+  position: relative;
+  display: inline-block;
+}
+
+.input-title::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 30px;
+  height: 2px;
+  background: linear-gradient(90deg, #4facfe, #00f2fe);
+  border-radius: 1px;
 }
 
 .advanced-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  background: none;
+  gap: 4px;
+  background: linear-gradient(135deg, #E6F0FF, #F0F4FF);
   border: none;
-  font-size: 12px;
+  font-size: 11px;
   color: #007aff;
+  padding: 4px 8px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  
+  &:active {
+    background: linear-gradient(120deg, #4facfe, #00f2fe);
+    color: white;
+    transform: scale(0.95);
+    box-shadow: 0 2px 8px rgba(79, 172, 254, 0.2);
+  }
 }
 
 .input-area {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   align-items: flex-end;
   margin-bottom: 12px;
 }
 
 .reply-textarea {
   flex: 1;
-  background: #F2F5F9;
-  border: 1px solid #e9ecef;
-  border-radius: 12px;
+  background: linear-gradient(135deg, #E6F0FF, #F0F4FF);
+  border: 1px solid #e6f0ff;
+  border-radius: 8px;
   padding: 12px;
-  font-size: 14px;
+  font-size: 13px;
   min-height: 80px;
-  max-height: 200px;
+  max-height: 150px;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
 }
 
 .reply-textarea:focus {
-  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+  box-shadow: 0 0 0 2px #4facfe, 0 4px 16px rgba(79, 172, 254, 0.2);
   outline: none;
+  background: linear-gradient(135deg, #F0F4FF, #E6F0FF);
 }
 
 .submit-btn {
-  background: #007aff;
+  background: linear-gradient(120deg, #4facfe, #00f2fe);
   color: white;
   border: none;
-  padding: 12px 24px;
-  border-radius: 24px;
-  font-size: 14px;
+  padding: 10px 16px;
+  border-radius: 16px;
+  font-size: 12px;
   font-weight: 500;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+  align-self: flex-end;
   
   &:active {
-    background-color: #0056b3;
     transform: scale(0.98);
+    box-shadow: 0 2px 8px rgba(79, 172, 254, 0.4);
   }
 }
 
 .submit-btn:disabled {
   background: #ccc;
+  box-shadow: none;
 }
 
 /* 高级编辑器样式 */
 .advanced-editor {
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid #e6f0ff;
 }
 
 .editor-tools {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .tool-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
-  background: #f0f0f0;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #E6F0FF, #F0F4FF);
   border: none;
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: 6px;
+  font-size: 12px;
   color: #666;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   
   &:active {
-    background: #e0e0e0;
+    background: linear-gradient(120deg, #4facfe, #00f2fe);
+    color: white;
     transform: scale(0.95);
+    box-shadow: 0 2px 8px rgba(79, 172, 254, 0.2);
   }
 }
 
 .tool-btn .icon {
-  font-size: 14px;
+  font-size: 12px;
+  transition: all 0.3s ease;
+}
+
+.tool-btn:active .icon {
+  transform: scale(1.1);
 }
 </style>

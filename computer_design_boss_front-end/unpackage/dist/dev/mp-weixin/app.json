@@ -35,8 +35,9 @@
   },
   "tabBar": {
     "color": "#999",
-    "selectedColor": "#007AFF",
-    "backgroundColor": "#fff",
+    "selectedColor": "#4facfe",
+    "backgroundColor": "rgba(255, 255, 255, 0.8)",
+    "borderStyle": "transparent",
     "list": [
       {
         "pagePath": "pages/index/index_index",
@@ -48,7 +49,7 @@
         "pagePath": "pages/forum/forum",
         "text": "论坛",
         "iconPath": "/static/tabbar/forum.png",
-        "selectedIconPath": "/static/tabbar/forum-active.png"
+        "selectedIconPath": "/static/tabbar/forum-active.svg"
       },
       {
         "pagePath": "pages/AI/AI",

@@ -198,8 +198,8 @@
   },
   "tabBar": {
       "color": "#999",
-      "selectedColor": "#007AFF",
-      "backgroundColor": "#fff",
+      "backgroundColor": "rgba(255, 255, 255, 0.8)",
+      "borderStyle": "transparent",
       "list":[
       {
       "pagePath": "pages/index/index_index",

@@ -1,7 +1,7 @@
 <template>
-  <view class="forum-container" :style="{ backgroundColor: isDarkMode ? '#1a1a1a' : '#F8FAFD' }">
+  <view class="forum-container" :style="{ background: isDarkMode ? '#1a1a1a' : 'linear-gradient(135deg, #e6f0ff 0%, #ffffff 100%)' }">
     <!-- 顶部导航 -->
-    <view class="nav-bar forum-nav" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
+    <view class="nav-bar forum-nav" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'linear-gradient(135deg, rgba(230, 240, 255, 0.8), rgba(255, 255, 255, 0.8))', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
       <view class="nav-bar-left">
         <!-- 取消返回按钮 -->
       </view>
@@ -14,9 +14,9 @@
     </view>
     
     <!-- 智能筛选器组 -->
-    <view class="filter-section" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
+    <view class="filter-section" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
       <!-- 搜索框 -->
-      <view class="search-bar" :style="{ backgroundColor: isDarkMode ? '#3a3a3a' : '#F2F5F9' }">
+      <view class="search-bar" :style="{ background: isDarkMode ? '#3a3a3a' : 'linear-gradient(135deg, #E6F0FF, #F0F4FF)' }">
         <input class="forum-input" placeholder="搜索话题..." v-model="keyword" @confirm="search" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }" />
         
       </view>
@@ -25,7 +25,10 @@
       <view class="filter-group">
         <!-- 岗位分类筛选 -->
         <view class="filter-item">
-          <text class="filter-label" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">分类</text>
+          <view class="filter-label-container">
+            <view class="title-dot"></view>
+            <text class="filter-label" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">分类</text>
+          </view>
           <view class="filter-options">
             <text 
               class="filter-option" 
@@ -33,20 +36,23 @@
               :key="category.id"
               :class="{active: currentCategory === category.id || (currentCategory === 'all' && categories.filter(c => c.level === 1).indexOf(category) === 0)}"
               @click="switchCategory(category.id)"
-              :style="{ backgroundColor: isDarkMode ? '#3a3a3a' : '#F0F4FF', color: '#007aff' }"
+              :style="{ background: isDarkMode ? '#3a3a3a' : 'linear-gradient(135deg, #E6F0FF, #F0F4FF)', color: '#007aff' }"
             >{{category.name}}</text>
           </view>
         </view>
         
         <!-- 子分类筛选（当选择技术开发类时显示） -->
         <view class="filter-item" v-if="showCategoryTabs && subCategoryList.length > 0">
-          <text class="filter-label" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">技术方向</text>
+          <view class="filter-label-container">
+            <view class="title-dot"></view>
+            <text class="filter-label" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">技术方向</text>
+          </view>
           <view class="filter-options">
             <text 
               class="filter-option" 
               :class="{active: selectedSubCategories.length === 0}"
               @click="clearSubCategories"
-              :style="{ backgroundColor: isDarkMode ? '#3a3a3a' : '#F0F4FF', color: '#007aff' }"
+              :style="{ background: isDarkMode ? '#3a3a3a' : 'linear-gradient(135deg, #E6F0FF, #F0F4FF)', color: '#007aff' }"
             >全部</text>
             <text 
               class="filter-option" 
@@ -54,7 +60,7 @@
               :key="category.id"
               :class="{active: selectedSubCategories.includes(Number(category.next_category_id || category.id))}"
               @click="toggleSubCategory(category.id)"
-              :style="{ backgroundColor: isDarkMode ? '#3a3a3a' : '#F0F4FF', color: '#007aff' }"
+              :style="{ background: isDarkMode ? '#3a3a3a' : 'linear-gradient(135deg, #E6F0FF, #F0F4FF)', color: '#007aff' }"
             >{{category.name}}</text>
           </view>
         </view>
@@ -63,13 +69,13 @@
     
     <!-- 帖子列表 -->
     <scroll-view class="post-list" scroll-y @scrolltolower="loadMore" refresher-enabled @refresherrefresh="onRefresh" :refresher-triggered="isRefreshing">
-      <view class="forum-card forum-mb-md" v-for="post in posts" :key="post.id" @click="goToDetail(post)" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
+      <view class="forum-card forum-mb-md" v-for="post in posts" :key="post.id" @click="goToDetail(post)" :style="{ background: isDarkMode ? '#2c2c2c' : 'linear-gradient(135deg, #ffffff, #f8faff)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
         <view class="post-main">
           <!-- 左侧：用户信息区 -->
           <view class="user-section">
             <image class="forum-avatar forum-avatar-md" :src="isValidAvatar(post.user_avatar) ? 'data:image/' + (post.user_avatar_format === 'jpg' ? 'jpeg' : post.user_avatar_format || 'jpeg') + ';base64,' + decodeHtmlEntities(post.user_avatar.replace(/\s+/g, '')) : '/static/default-avatar.png'" mode="aspectFill"></image>
             <text class="username" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">用户{{post.user_id}}</text>
-            <text class="user-level">L1</text>
+            <text class="user-level" :style="{ background: isDarkMode ? 'rgba(79, 172, 254, 0.2)' : 'rgba(79, 172, 254, 0.1)' }">L1</text>
           </view>  
           <!-- 中部：内容核心区 -->
           <view class="content-section">
@@ -77,9 +83,9 @@
             <text class="post-summary" v-if="post.content.length > 100" :style="{ color: isDarkMode ? '#999' : '#6C757D' }">{{post.content.substring(0, 100)}}...</text>
             <text class="post-summary" v-else-if="post.content !== post.title" :style="{ color: isDarkMode ? '#999' : '#6C757D' }">{{post.content}}</text>
             <view class="post-tags">
-              <text class="forum-tag forum-tag-primary" :style="{ backgroundColor: isDarkMode ? '#3a3a3a' : '#F0F4FF', color: '#007aff' }">{{getCategoryName(post.category_id)}}</text>
+              <text class="forum-tag forum-tag-primary" :style="{ background: isDarkMode ? '#3a3a3a' : 'linear-gradient(135deg, #E6F0FF, #F0F4FF)', color: '#007aff' }">{{getCategoryName(post.category_id)}}</text>
             </view>
-            <view class="post-stats" :style="{ borderTop: isDarkMode ? '1px solid #404040' : '1px solid #f0f0f0' }">
+            <view class="post-stats" :style="{ borderTop: isDarkMode ? '1px solid #404040' : '1px solid #E6F0FF' }">
               <text class="stat" :style="{ color: isDarkMode ? '#999' : '#6C757D' }">
                 <text class="icon">💬</text>
                 {{post.reply_count || 0}}
@@ -117,16 +123,16 @@
     
     <!-- 快速操作菜单 -->
     <view class="quick-menu" v-if="showQuickMenu" @click="hideQuickMenu">
-      <view class="menu-content" @click.stop :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff' }">
-        <view class="forum-card forum-mb-sm" @click="goToPost" :style="{ backgroundColor: isDarkMode ? '#3a3a3a' : '#ffffff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
+      <view class="menu-content" @click.stop :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.9)' : 'linear-gradient(135deg, #ffffff, #f8faff)' }">
+        <view class="forum-card forum-mb-sm" @click="goToPost" :style="{ background: isDarkMode ? '#3a3a3a' : 'linear-gradient(135deg, #ffffff, #f8faff)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
             <text class="menu-icon">✍️</text>
             <text class="menu-text" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">发布话题</text>
           </view>
-          <view class="forum-card forum-mb-sm" @click="goToAsk" :style="{ backgroundColor: isDarkMode ? '#3a3a3a' : '#ffffff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
+          <view class="forum-card forum-mb-sm" @click="goToAsk" :style="{ background: isDarkMode ? '#3a3a3a' : 'linear-gradient(135deg, #ffffff, #f8faff)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
             <text class="menu-icon">❓</text>
             <text class="menu-text" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">发布提问</text>
           </view>
-          <view class="forum-card" @click="goToShare" :style="{ backgroundColor: isDarkMode ? '#3a3a3a' : '#ffffff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
+          <view class="forum-card" @click="goToShare" :style="{ background: isDarkMode ? '#3a3a3a' : 'linear-gradient(135deg, #ffffff, #f8faff)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
             <text class="menu-icon">📤</text>
             <text class="menu-text" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">分享资源</text>
           </view>
@@ -754,10 +760,12 @@ export default {
 
 /* 论坛导航栏样式 */
 .forum-nav {
-  background-color: #ffffff;
+  background: linear-gradient(135deg, rgba(230, 240, 255, 0.8), rgba(255, 255, 255, 0.8));
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   height: 80px;
   padding: 0 16px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .forum-title {
@@ -765,6 +773,35 @@ export default {
   font-weight: 600;
   color: #1E1E1E;
   text-align: center;
+}
+
+/* 标题装饰点 */
+.title-dot {
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  border-radius: 50%;
+  margin-right: 8px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(79, 172, 254, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(79, 172, 254, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(79, 172, 254, 0);
+  }
+}
+
+/* 筛选器标签容器 */
+.filter-label-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
 }
 
 .nav-icon {
@@ -873,17 +910,19 @@ export default {
 
 /* 智能筛选器样式 */
 .filter-section {
-  background-color: #ffffff;
+  background: rgba(255, 255, 255, 0.8);
   margin: 12px 0;
   border-radius: 16px;
   padding: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 16px rgba(79, 172, 254, 0.15);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
 }
 
 .search-bar {
   display: flex;
   align-items: center;
-  background-color: #F2F5F9;
+  background: linear-gradient(135deg, #E6F0FF, #F0F4FF);
   border-radius: 30px;
   height: 44px;
   padding: 0 16px;
@@ -892,7 +931,8 @@ export default {
 }
 
 .search-bar:focus-within {
-  box-shadow: 0 0 0 2px #007aff;
+  box-shadow: 0 0 0 2px #4facfe;
+  background: linear-gradient(135deg, #F0F4FF, #E6F0FF);
 }
 
 .forum-input {
@@ -909,7 +949,7 @@ export default {
 }
 
 .forum-btn {
-  background-color: #007aff;
+  background: linear-gradient(120deg, #4facfe, #00f2fe);
   color: #ffffff;
   border: none;
   border-radius: 24px;
@@ -917,11 +957,12 @@ export default {
   font-size: 14px;
   font-weight: 500;
   transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
 }
 
 .forum-btn:active {
-  background-color: #0056b3;
   transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(79, 172, 254, 0.4);
 }
 
 /* 分类筛选样式 */
@@ -937,7 +978,6 @@ export default {
   font-size: 14px;
   font-weight: 600;
   color: #1E1E1E;
-  margin-bottom: 12px;
   display: block;
 }
 
@@ -949,7 +989,7 @@ export default {
 
 .filter-option {
   padding: 6px 12px;
-  background-color: #F0F4FF;
+  background: linear-gradient(135deg, #E6F0FF, #F0F4FF);
   border-radius: 24px;
   font-size: 12px;
   color: #007aff;
@@ -957,20 +997,22 @@ export default {
   position: relative;
   margin-right: 8px;
   margin-bottom: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .filter-option.active {
-  background-color: #007aff;
+  background: linear-gradient(120deg, #4facfe, #00f2fe);
   color: #ffffff;
   font-weight: 500;
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
 }
 
 .filter-option:active {
   transform: scale(0.95);
-  background-color: #007aff;
+  background: linear-gradient(120deg, #4facfe, #00f2fe);
   color: #ffffff;
   opacity: 0.8;
+  box-shadow: 0 2px 8px rgba(79, 172, 254, 0.4);
 }
 
 /* 帖子列表样式 */
@@ -980,17 +1022,30 @@ export default {
 }
 
 .forum-card {
-  background-color: #ffffff;
+  background: linear-gradient(135deg, #ffffff, #f8faff);
   border-radius: 16px;
   padding: 16px;
   margin: 12px 0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 16px rgba(79, 172, 254, 0.15);
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.forum-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #4facfe, #00f2fe, transparent);
+  border-radius: 0 0 16px 16px;
 }
 
 .forum-card:active {
-  transform: translateY(2px);
-  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  transform: scale(0.98);
+  box-shadow: 0 6px 20px rgba(79, 172, 254, 0.25);
 }
 
 .forum-mb-md {
@@ -1022,6 +1077,7 @@ export default {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .forum-avatar-md {
@@ -1044,10 +1100,11 @@ export default {
 
 .user-level {
   font-size: 10px;
-  color: #007aff;
-  background: rgba(0, 122, 255, 0.1);
+  color: #4facfe;
+  background: rgba(79, 172, 254, 0.1);
   padding: 4px 8px;
   border-radius: 8px;
+  font-weight: 500;
 }
 
 .content-section {
@@ -1062,12 +1119,37 @@ export default {
   font-weight: 600;
   color: #1E1E1E;
   line-height: 1.4;
+  position: relative;
+  z-index: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.post-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, #4facfe, #00f2fe);
+  border-radius: 1px;
+  z-index: -1;
+  opacity: 0.3;
 }
 
 .post-summary {
   font-size: 13px;
   color: #6C757D;
   line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .post-tags {
@@ -1077,15 +1159,22 @@ export default {
 }
 
 .forum-tag {
-  background-color: #F0F4FF;
+  background: linear-gradient(135deg, #E6F0FF, #F0F4FF);
   color: #007aff;
   font-size: 12px;
   padding: 6px 12px;
   border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.forum-tag:active {
+  transform: scale(0.95);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .forum-tag-primary {
-  background-color: #F0F4FF;
+  background: linear-gradient(135deg, #E6F0FF, #F0F4FF);
   color: #007aff;
 }
 
@@ -1093,7 +1182,7 @@ export default {
   display: flex;
   gap: 24px;
   padding-top: 12px;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid #E6F0FF;
 }
 
 .stat {
@@ -1106,7 +1195,17 @@ export default {
 }
 
 .stat:active {
-  color: #007aff;
+  color: #4facfe;
+  transform: scale(1.05);
+}
+
+.stat .icon {
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.stat:active .icon {
+  transform: scale(1.1);
 }
 
 .icon {
@@ -1156,13 +1255,14 @@ export default {
   align-items: center;
   justify-content: center;
   z-index: 100;
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+  box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
   transition: all 0.3s ease;
+  background: linear-gradient(120deg, #4facfe, #00f2fe);
 }
 
 .forum-btn.forum-btn-primary:active {
   transform: scale(0.95);
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+  box-shadow: 0 4px 16px rgba(79, 172, 254, 0.5);
 }
 
 .plus {
@@ -1183,24 +1283,58 @@ export default {
   align-items: flex-end;
   justify-content: center;
   z-index: 200;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .menu-content {
-  background-color: #ffffff;
+  background: linear-gradient(135deg, #ffffff, #f8faff);
   border-radius: 30px 30px 0 0;
   padding: 40px 20px;
   width: 100%;
   max-width: 600px;
+  animation: slideUp 0.3s ease;
+  box-shadow: 0 -6px 20px rgba(79, 172, 254, 0.15);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 
 .menu-icon {
   font-size: 20px;
   margin-right: 20px;
+  transition: all 0.3s ease;
+}
+
+.menu-content .forum-card:active .menu-icon {
+  transform: scale(1.1);
 }
 
 .menu-text {
   font-size: 14px;
   color: #1E1E1E;
   font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.menu-content .forum-card:active .menu-text {
+  color: #4facfe;
+  transform: translateX(4px);
 }
 </style>

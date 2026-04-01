@@ -409,7 +409,7 @@ if (!Array) {
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
     a: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
-    b: $data.isDarkMode ? "#2c2c2c" : "#ffffff",
+    b: $data.isDarkMode ? "rgba(44, 44, 44, 0.8)" : "linear-gradient(135deg, rgba(230, 240, 255, 0.8), rgba(255, 255, 255, 0.8))",
     c: $data.isDarkMode ? "0 2px 8px rgba(0,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.05)",
     d: common_vendor.p({
       type: "search",
@@ -419,7 +419,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     e: common_vendor.o([($event) => $data.keyword = $event.detail.value, (...args) => $options.onSearchInput && $options.onSearchInput(...args)]),
     f: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
     g: $data.keyword,
-    h: $data.isDarkMode ? "#2c2c2c" : "#F2F5F9",
+    h: $data.isDarkMode ? "#2c2c2c" : "rgba(255, 255, 255, 0.8)",
     i: common_vendor.f($data.bannerList, (banner, index, i0) => {
       return {
         a: banner.imageUrl,
@@ -435,7 +435,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       };
     }),
     k: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
-    l: $data.isDarkMode ? "#2c2c2c" : "#fff",
+    l: $data.isDarkMode ? "rgba(44, 44, 44, 0.8)" : "rgba(255, 255, 255, 0.8)",
     m: $data.isDarkMode ? "0 2px 8px rgba(0,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.05)",
     n: $data.showCategoryTabs && $data.subCategoryList.length > 0
   }, $data.showCategoryTabs && $data.subCategoryList.length > 0 ? {
@@ -447,7 +447,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: $data.selectedSubCategories.includes(category.id) ? 1 : ""
       };
     }),
-    p: $data.isDarkMode ? "#3a3a3a" : "#F0F4FF"
+    p: $data.isDarkMode ? "#3a3a3a" : "linear-gradient(135deg, #E6F0FF, #F0F4FF)"
   } : {}, {
     q: common_vendor.t(_ctx.categoryName || "\u63A8\u8350\u804C\u4F4D"),
     r: $data.isDarkMode ? "#ffffff" : "#1E1E1E",
@@ -467,9 +467,9 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     w: common_vendor.o((...args) => $options.loadMore && $options.loadMore(...args)),
     x: $data.isDarkMode ? "#999" : "#999"
   } : {}, {
-    y: $data.isDarkMode ? "#2c2c2c" : "#fff",
+    y: $data.isDarkMode ? "rgba(44, 44, 44, 0.8)" : "rgba(255, 255, 255, 0.8)",
     z: $data.isDarkMode ? "0 2px 8px rgba(0,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.05)",
-    A: $data.isDarkMode ? "#1a1a1a" : "#F8FAFD"
+    A: $data.isDarkMode ? "#1a1a1a" : "linear-gradient(135deg, #e6f0ff 0%, #ffffff 100%)"
   });
 }
 var MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "D:/.aboss_init(\u672C\u5730)/computer_design_boss_front-end/pages/index/index_index.vue"]]);

@@ -83,7 +83,7 @@
 		--text-secondary: #666666;
 		--text-tertiary: #999999;
 		--border-color: #eeeeee;
-		--primary-color: #007aff;
+		--primary-color: #4facfe;
 		--success-color: #4cd964;
 		--warning-color: #ff9500;
 		--error-color: #ff3b30;
@@ -113,5 +113,26 @@
 	.dark-theme page {
 		background-color: var(--bg-primary);
 		color: var(--text-primary);
+	}
+	
+	/* 底部导航栏毛玻璃效果 */
+	.uni-tabbar {
+		background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(230, 240, 255, 0.8)) !important;
+		backdrop-filter: blur(10px) !important;
+		-webkit-backdrop-filter: blur(10px) !important;
+		border-top: 1px solid rgba(79, 172, 254, 0.1) !important;
+		box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05) !important;
+	}
+	
+
+	
+	/* 导航栏图标颜色 */
+	.uni-tabbar__icon {
+		filter: brightness(1) saturate(1);
+		transition: all 0.3s ease;
+	}
+	
+	.uni-tabbar__item--active .uni-tabbar__icon {
+		filter: brightness(1.2) saturate(1.5);
 	}
 </style>

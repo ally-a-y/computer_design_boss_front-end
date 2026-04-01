@@ -1,8 +1,22 @@
 <template>
-  <view class="post-container">
-    <view class="form-section">
+  <view class="post-container" :style="{ background: 'linear-gradient(135deg, #e6f0ff 0%, #ffffff 100%)' }">
+    <!-- 顶部导航 -->
+    <view class="nav-bar" :style="{ background: 'linear-gradient(135deg, rgba(230, 240, 255, 0.8), rgba(255, 255, 255, 0.8))', boxShadow: '0 4px 16px rgba(79, 172, 254, 0.15)' }">
+      <view class="nav-left">
+        <text class="nav-back" @click="goBack">←</text>
+      </view>
+      <view class="nav-center">
+        <text class="nav-title">发布话题</text>
+      </view>
+      <view class="nav-right"></view>
+    </view>
+    
+    <view class="form-section" :style="{ background: 'rgba(255, 255, 255, 0.8)', boxShadow: '0 4px 16px rgba(79, 172, 254, 0.15)' }">
       <view class="form-item">
-        <text class="label">话题内容</text>
+        <view class="label-container">
+          <view class="title-dot"></view>
+          <text class="label">话题内容</text>
+        </view>
         <textarea 
           class="content-input" 
           placeholder="分享你的技术心得、项目经验或提出问题..." 
@@ -13,9 +27,12 @@
       </view>
       
       <view class="form-item">
-        <text class="label">选择分类</text>
+        <view class="label-container">
+          <view class="title-dot"></view>
+          <text class="label">选择分类</text>
+        </view>
         <picker @change="onCategoryChange" :value="categoryIndex" :range="categories" range-key="name">
-          <view class="picker">
+          <view class="picker" :style="{ background: 'linear-gradient(135deg, #E6F0FF, #F0F4FF)' }">
             <text>{{categories[categoryIndex]?.name || '请选择分类'}}</text>
             <text class="picker-arrow">▼</text>
           </view>
@@ -161,25 +178,117 @@ export default {
 <style lang="scss" scoped>
 .post-container {
   min-height: 100vh;
-  background-color: #F8FAFD;
-  padding: 16px;
+  background: linear-gradient(135deg, #e6f0ff 0%, #ffffff 100%);
+  padding: 0;
   font-family: -apple-system, Helvetica, Roboto, sans-serif;
 }
 
+/* 顶部导航 */
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 80px;
+  padding: 0 16px;
+  background: linear-gradient(135deg, rgba(230, 240, 255, 0.8), rgba(255, 255, 255, 0.8));
+  box-shadow: 0 4px 16px rgba(79, 172, 254, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.nav-left {
+  width: 40px;
+}
+
+.nav-back {
+  font-size: 24px;
+  color: #4facfe;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.nav-back:active {
+  transform: scale(0.9);
+  color: #00f2fe;
+}
+
+.nav-center {
+  flex: 1;
+  text-align: center;
+}
+
+.nav-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1E1E1E;
+  position: relative;
+  display: inline-block;
+}
+
+.nav-title::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, #4facfe, #00f2fe);
+  border-radius: 1px;
+}
+
+.nav-right {
+  width: 40px;
+}
+
 .form-section {
-  background: white;
+  background: rgba(255, 255, 255, 0.8);
   border-radius: 16px;
-  padding: 16px;
-  margin: 12px 0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  padding: 24px 16px;
+  margin: 16px;
+  box-shadow: 0 4px 16px rgba(79, 172, 254, 0.15);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
 }
 
 .form-item {
-  margin-bottom: 16px;
+  margin-bottom: 24px;
   
   &:last-child {
     margin-bottom: 0;
   }
+}
+
+/* 标题装饰点 */
+.title-dot {
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  border-radius: 50%;
+  margin-right: 8px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(79, 172, 254, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(79, 172, 254, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(79, 172, 254, 0);
+  }
+}
+
+/* 标签容器 */
+.label-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
 }
 
 .label {
@@ -187,24 +296,26 @@ export default {
   font-size: 14px;
   font-weight: 600;
   color: #1E1E1E;
-  margin-bottom: 12px;
 }
 
 .content-input {
   width: 100%;
   min-height: 200px;
-  background: #F2F5F9;
-  border: 1px solid #e9ecef;
+  background: linear-gradient(135deg, #E6F0FF, #F0F4FF);
+  border: 1px solid #e6f0ff;
   border-radius: 12px;
-  padding: 12px;
+  padding: 16px;
   font-size: 14px;
   line-height: 1.5;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
 }
 
 .content-input:focus {
-  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+  box-shadow: 0 0 0 2px #4facfe, 0 4px 16px rgba(79, 172, 254, 0.2);
   outline: none;
+  background: linear-gradient(135deg, #F0F4FF, #E6F0FF);
 }
 
 .char-count {
@@ -213,26 +324,39 @@ export default {
   font-size: 12px;
   color: #999999;
   margin-top: 8px;
+  transition: all 0.3s ease;
+}
+
+.content-input:focus + .char-count {
+  color: #4facfe;
 }
 
 .picker {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #F2F5F9;
-  border: 1px solid #e9ecef;
+  background: linear-gradient(135deg, #E6F0FF, #F0F4FF);
+  border: 1px solid #e6f0ff;
   border-radius: 12px;
   padding: 12px 16px;
   font-size: 14px;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .picker:focus-within {
-  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+  box-shadow: 0 0 0 2px #4facfe, 0 4px 16px rgba(79, 172, 254, 0.2);
+  background: linear-gradient(135deg, #F0F4FF, #E6F0FF);
 }
 
 .picker-arrow {
-  color: #999999;
+  color: #4facfe;
+  transition: all 0.3s ease;
+}
+
+.picker:active .picker-arrow {
+  transform: rotate(180deg);
+  color: #00f2fe;
 }
 
 .checkbox-item {
@@ -241,49 +365,70 @@ export default {
   gap: 12px;
   font-size: 14px;
   color: #1E1E1E;
+  transition: all 0.3s ease;
+}
+
+.checkbox-item:active {
+  color: #4facfe;
+  transform: translateX(4px);
+}
+
+/* 自定义复选框样式 */
+checkbox {
+  transform: scale(1.2);
+  transition: all 0.3s ease;
+}
+
+checkbox:active {
+  transform: scale(1.3);
 }
 
 .action-buttons {
   display: flex;
-  gap: 12px;
-  margin-top: 16px;
+  gap: 16px;
+  margin: 16px;
+  padding-bottom: 24px;
 }
 
 .btn-secondary {
   flex: 1;
-  background: #F2F5F9;
+  background: linear-gradient(135deg, #E6F0FF, #F0F4FF);
   color: #6C757D;
   border: none;
-  padding: 12px;
+  padding: 14px;
   border-radius: 24px;
   font-size: 14px;
   font-weight: 500;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   
   &:active {
-    background-color: #E9ECEF;
     transform: scale(0.98);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    color: #4facfe;
   }
 }
 
 .btn-primary {
   flex: 1;
-  background: #007aff;
+  background: linear-gradient(120deg, #4facfe, #00f2fe);
   color: white;
   border: none;
-  padding: 12px;
+  padding: 14px;
   border-radius: 24px;
   font-size: 14px;
   font-weight: 500;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(79, 172, 254, 0.3);
   
   &:active {
-    background-color: #0056b3;
     transform: scale(0.98);
+    box-shadow: 0 2px 8px rgba(79, 172, 254, 0.4);
   }
   
   &:disabled {
     background: #ccc;
+    box-shadow: none;
   }
 }
 </style>
