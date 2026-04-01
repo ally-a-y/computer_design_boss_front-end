@@ -118,21 +118,6 @@
             </view>
             
             <view class="input-fields">
-               <!-- <view v-show="currentMethod.includes('user')" class="input-group user-id-group">
-                <text class="input-label">用户ID</text>
-                <view class="user-id-display" :class="{ 'loading': isLoadingUser, 'error': !currentUserId && !isLoadingUser }">
-                  <text v-if="isLoadingUser" class="loading-text">获取用户信息中...</text>
-                  <text v-else-if="currentUserId" class="user-id-text">
-                    {{ currentUserId }}
-                  </text>
-                  <text v-else class="error-text">
-                    未获取到用户信息，请
-                    <text class="retry-link" @click.stop="fetchUserInfo">点击重试</text>
-                    或重新登录
-                  </text>
-                </view>
-              </view> -->
-              
               <view v-show="currentMethod.includes('position')" class="input-group">
                 <text class="input-label">职位选择</text>
                 <view class="cascade-selector" @click="openCascadePicker">
@@ -160,34 +145,7 @@
           
           <!-- 简历评估面板 -->
           <view v-if="currentPanel === 'resumeEvaluation'">
-            <!-- <view class="method-selector">
-              <radio-group :value="currentMethod" @change="onMethodChange">
-                <label class="radio-item">
-                  <radio value="user" />
-                  <text>用户ID</text>
-                </label>
-                <label class="radio-item">
-                  <radio value="pdf" />
-                  <text>PDF上传</text>
-                </label>
-              </radio-group>
-            </view> -->
-            
             <view class="input-fields">
-              <!-- <view v-show="currentMethod === 'user'" class="input-group" key="user-group">
-                <text class="input-label">用户ID</text>
-                <view class="user-id-display" :class="{ 'loading': isLoadingUser, 'error': !currentUserId && !isLoadingUser }">
-                  <text v-if="isLoadingUser" class="loading-text">获取用户信息中...</text>
-                  <text v-else-if="currentUserId" class="user-id-text">
-                    {{ currentUserId }}
-                  </text>
-                  <text v-else class="error-text">
-                    未获取到用户信息，请
-                    <text class="retry-link" @click.stop="fetchUserInfo">点击重试</text>
-                    或重新登录
-                  </text>
-                </view>
-              </view> -->
               <view v-show="currentMethod === 'pdf'" class="input-group" key="pdf-group">
                 <text class="input-label">请上传PDF简历</text>
                 <view class="file-upload" @click="chooseFile">
@@ -213,21 +171,6 @@
             </view>
             
             <view class="input-fields">
-              <!-- <view v-show="currentMethod.includes('user')" class="input-group" key="user-group">
-                <text class="input-label">用户ID</text>
-                <view class="user-id-display" :class="{ 'loading': isLoadingUser, 'error': !currentUserId && !isLoadingUser }">
-                  <text v-if="isLoadingUser" class="loading-text">获取用户信息中...</text>
-                  <text v-else-if="currentUserId" class="user-id-text">
-                    {{ currentUserId }}
-                  </text>
-                  <text v-else class="error-text">
-                    未获取到用户信息，请
-                    <text class="retry-link" @click.stop="fetchUserInfo">点击重试</text>
-                    或重新登录
-                  </text>
-                </view>
-              </view> -->
-              
               <view v-show="currentMethod.includes('position')" class="input-group" key="position-group">
                 <text class="input-label">职位选择</text>
                 <view class="cascade-selector" @click="openCascadePicker">
@@ -269,21 +212,6 @@
             </view>
             
             <view class="input-fields">
-              <!-- <view v-show="currentMethod.includes('user')" class="input-group" key="user-group">
-                <text class="input-label">用户ID</text>
-                <view class="user-id-display" :class="{ 'loading': isLoadingUser, 'error': !currentUserId && !isLoadingUser }">
-                  <text v-if="isLoadingUser" class="loading-text">获取用户信息中...</text>
-                  <text v-else-if="currentUserId" class="user-id-text">
-                    {{ currentUserId }}
-                  </text>
-                  <text v-else class="error-text">
-                    未获取到用户信息，请
-                    <text class="retry-link" @click.stop="fetchUserInfo">点击重试</text>
-                    或重新登录
-                  </text>
-                </view>
-              </view> -->
-              
               <view v-show="currentMethod.includes('position')" class="input-group" key="position-group">
                 <text class="input-label">职位选择</text>
                 <view class="cascade-selector" @click="openCascadePicker">
@@ -1351,7 +1279,7 @@ export default {
   display: flex;
   align-items: center;
   padding: calc(var(--status-bar-height) + 20rpx) 28rpx 30rpx 30rpx;
-  height: 120rpx;
+  height: 100rpx;
   
   .logo-section {
     display: flex;
@@ -1383,7 +1311,7 @@ export default {
     border-radius: 24rpx;
     padding: 16rpx 32rpx;
     font-size: 26rpx;
-    font-weight: 500;
+    font-weight: 600;
     box-shadow: 0 4rpx 12rpx rgba(0, 122, 255, 0.3);
     transition: all 0.3s ease;
     

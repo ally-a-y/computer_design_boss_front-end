@@ -41,27 +41,11 @@
           <view v-if="currentMethod.includes('pdf')" class="form-group">
             <text class="form-label" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">PDF简历</text>
             <view class="file-upload-area" @click="chooseResumeFile" :style="{ background: isDarkMode ? 'rgba(64, 64, 64, 0.8)' : 'rgba(255, 255, 255, 0.8)', borderColor: isDarkMode ? '#404040' : '#eee' }">
-              <image v-if="!formData.resumePdf" src="/static/ai/upload.png" mode="aspectFit"></image>
               <text v-if="!formData.resumePdf" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">点击上传PDF简历</text>
               <text v-else class="file-name" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">{{ formData.resumePdf.name }}</text>
             </view>
           </view>
-		  
-		  <!-- <view v-if="currentMethod.includes('user')" class="form-group">
-		    <text class="form-label">用户ID</text>
-		    <view class="user-id-display" :class="{ 'loading': isLoadingUser, 'error': !formData.userId && !isLoadingUser }">
-		      <text v-if="isLoadingUser" class="loading-text">获取用户信息中...</text>
-		      <text v-else-if="formData.userId" class="user-id-text">
-		        {{ formData.userId }}
-		      </text>
-		      <text v-else class="error-text">
-		        未获取到用户信息，请
-		        <text class="retry-link" @click.stop="fetchUserInfo">点击重试</text>
-		        或重新登录
-		      </text>
-		    </view>
-		  </view> -->
-
+		 
           <view v-if="currentMethod.includes('position') && !currentMethod.includes('positionText')" class="form-group">
             <text class="form-label" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">职位选择</text>
             <view class="cascade-selector" @click="openCascadePicker" :style="{ background: isDarkMode ? '#404040' : '#fff', borderColor: isDarkMode ? '#404040' : '#eee' }">
@@ -168,6 +152,7 @@
               v-model="tempAnswer"
               placeholder="输入你的回答..."
               :disabled="isProcessing || isAIThinking"
+			  maxlength="500"
               @keyup.enter="submitTextAnswer"
             />
             <div class="h5-send-btn" @click="submitTextAnswer" :class="{ disabled: !tempAnswer.trim() || isProcessing || isAIThinking }">
@@ -401,9 +386,7 @@ export default {
 		{ value: 'user+position', label: '职位' },
 		{ value: 'user+positionText', label: '职位文本' },
 		{ value: 'pdf+position', label: 'PDF简历+职位' },
-		// { value: 'resumeText+position', label: '简历文本+职位' },
 		{ value: 'pdf+positionText', label: 'PDF简历+职位文本' },
-        // { value: 'resumeText+positionText', label: '简历文本+职位文本' },
       ],
 
       // 面试流程状态
@@ -1461,7 +1444,7 @@ export default {
   box-shadow: 0 4rpx 16rpx rgba(79, 172, 254, 0.15);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  height: 120rpx;
+  height: 100rpx;
   display: flex;
   align-items: center;
   padding: calc(var(--status-bar-height) + 20rpx) 28rpx 30rpx 30rpx;
@@ -1507,6 +1490,7 @@ export default {
 .config-section {
   flex: 1;
   padding: 32rpx;
+  padding-top: 160rpx;
   overflow-y: auto;
 
   .config-card {
@@ -1587,33 +1571,25 @@ export default {
         }
 
         .file-upload-area {
-          padding: 60rpx 40rpx;
-          border: 2rpx dashed #007aff;
-          border-radius: 20rpx;
+          padding: 40rpx;
+          border: 2rpx dashed transparent;
+		  border-radius: 16rpx;
           text-align: center;
-          background: linear-gradient(135deg, #f0f8ff 0%, #e6f2ff 100%);
-
-          image {
-            width: 80rpx;
-            height: 80rpx;
-            margin-bottom: 24rpx;
-            background: radial-gradient(circle, rgba(160, 196, 255, 0.3) 0%, rgba(207, 226, 255, 0.1) 100%);
-            border-radius: 50%;
-            padding: 10rpx;
+          color: #007aff;
+          font-size: 30rpx;
+          background: linear-gradient(135deg, #f0f8ff, #e6f2ff);
+          border-image: linear-gradient(120deg, #4facfe, #00f2fe) 1;
+          transition: all 0.3s ease;
+          font-weight: 500;
+          box-shadow: 0 4rpx 12rpx rgba(79, 172, 254, 0.15);
+            
+            &:active {
+              background: linear-gradient(135deg, #e6f2ff, #f0f8ff);
+              transform: scale(0.98);
+              box-shadow: 0 2rpx 8rpx rgba(79, 172, 254, 0.2);
+            }
           }
-
-          text {
-            display: block;
-            color: #007aff;
-            font-size: 30rpx;
-            font-weight: 500;
-          }
-
-          .file-name {
-            color: #28a745;
-          }
-        }
-        
+		  
         .user-id-display {
           padding: 24rpx 28rpx;
           border: 2rpx solid transparent;
@@ -1727,6 +1703,7 @@ export default {
   flex: 1;
   display: flex;
   flex-direction: column;
+  padding-top: 150rpx; 
   background-color: #f5f7fa;
   overflow: hidden;
 
