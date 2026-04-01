@@ -143,14 +143,16 @@
 
 <script>
 import { forumApi } from '@/common/api/forum.js'
-import { themeManager } from '@/common/utils/theme-simple.js'
+import { themeMixin } from '@/common/mixins/themeMixin.js'
 
 export default {
+  mixins: [themeMixin],
   data() {
     return {
       keyword: '',
       currentCategory: 'all',
       posts: [],
+      allPosts: [],
       loading: false,
       hasMore: true,
       page: 1,
@@ -187,16 +189,108 @@ export default {
         '108': '嵌入式',
         '200': '产品设计',
         '300': '技术管理'
-      },
-      // 主题相关
-      currentTheme: 'light',
-      isDarkMode: false
+      }
+    }
+  },
+  
+  computed: {
+    // 计算筛选后的帖子
+    filteredPosts() {
+      let result = [...this.allPosts]
+      
+      // 分类筛选
+      if (this.currentCategory !== 'all') {
+        const currentCategoryNum = Number(this.currentCategory)
+        const isTopLevelCategory = this.categories.some(c => Number(c.id) === currentCategoryNum && c.level === 1)
+        
+        if (isTopLevelCategory) {
+          let targetCategoryIds = []
+          
+          // 处理200和300分类（没有子分类）
+          if ([200, 300].includes(currentCategoryNum)) {
+            targetCategoryIds = [currentCategoryNum]
+          } else {
+            // 获取该一级分类的所有子分类ID（使用next_category_id）
+            targetCategoryIds = this.categories
+              .filter(c => c.parent_id && (c.parent_id.toString() === this.currentCategory || c.parent_id === currentCategoryNum))
+              .map(c => parseInt(c.next_category_id))
+          }
+          
+          // 筛选该一级分类下的帖子
+          result = result.filter(post => {
+            if (!post || post.category_id === null) {
+              return false
+            }
+            return targetCategoryIds.includes(post.category_id)
+          })
+          
+          // 如果有子分类筛选
+          if (this.selectedSubCategories.length > 0) {
+            // 对于200和300分类，子分类筛选就是自身分类筛选
+            if ([200, 300].includes(currentCategoryNum)) {
+              result = result.filter(post => {
+                if (!post || post.category_id === null) {
+                  return false
+                }
+                return post.category_id === currentCategoryNum
+              })
+            } else {
+              // 对于其他分类，使用正常的子分类筛选
+              result = result.filter(post => {
+                if (!post || post.category_id === null) {
+                  return false
+                }
+                return this.selectedSubCategories.includes(post.category_id)
+              })
+            }
+          }
+        } else {
+          // 处理二级分类筛选
+          const currentCategoryObj = this.categories.find(c => c.id === this.currentCategory)
+          if (currentCategoryObj) {
+            const targetCategoryId = currentCategoryObj.next_category_id
+            result = result.filter(post => {
+              if (!post || post.category_id === null) {
+                return false
+              }
+              return post.category_id === targetCategoryId
+            })
+          }
+        }
+      }
+      
+      // 搜索筛选
+      if (this.keyword && this.keyword.trim() !== '') {
+        const keywordLower = this.keyword.toLowerCase().trim()
+        result = result.filter(post => {
+          const titleMatch = post.title && post.title.toLowerCase().includes(keywordLower)
+          const contentMatch = post.content && post.content.toLowerCase().includes(keywordLower)
+          return titleMatch || contentMatch
+        })
+      }
+      
+      return result
+    },
+    
+    // 计算子分类列表
+    subCategoryList() {
+      if (this.currentCategory === 'all') return []
+      
+      const currentCategoryNum = Number(this.currentCategory)
+      const isTopLevelCategory = this.categories.some(c => Number(c.id) === currentCategoryNum && c.level === 1)
+      
+      if (isTopLevelCategory && ![200, 300].includes(currentCategoryNum)) {
+        return this.categories.filter(c => {
+          return c.parent_id && (c.parent_id.toString() === this.currentCategory || c.parent_id === currentCategoryNum)
+        })
+      }
+      
+      return []
     }
   },
   
   onLoad() {
     this.initDefaultCategory()
-    this.initTheme()
   },
   
   onShow() {
@@ -209,8 +303,6 @@ export default {
     if (this.loadMoreTimer) {
       clearTimeout(this.loadMoreTimer)
     }
-    // 清理主题监听
-    uni.$off('globalThemeChange', this.handleGlobalThemeChange)
   },
   
   methods: {
@@ -247,35 +339,8 @@ export default {
       // 清理空白字符
       const cleaned = avatar.replace(/\s+/g, '')
       
-      // 检查是否是有效的图片base64编码
-      // 有效的JPEG开头: /9j/
-      // 有效的PNG开头: iVBOR
-      // 有效的GIF开头: R0lG
-      // 有效的BMP开头: Qk
-      const validPrefixes = ['/9j/', 'iVBOR', 'R0lG', 'Qk']
-      
       // 尝试使用后端返回的数据，即使不是标准格式
-      // 可能是后端的TO_BASE64函数生成的格式不同
       return cleaned.length > 0
-    },
-    /**
-     * 初始化主题
-     */
-    initTheme() {
-      // 获取当前主题
-      this.currentTheme = themeManager.getCurrentTheme()
-      this.isDarkMode = this.currentTheme === 'dark'
-      
-      // 监听全局主题变化
-      uni.$on('globalThemeChange', this.handleGlobalThemeChange)
-    },
-    
-    /**
-     * 处理全局主题变化
-     */
-    handleGlobalThemeChange(data) {
-      this.currentTheme = data.theme
-      this.isDarkMode = data.isDark
     },
     
     // 加载帖子数据
@@ -578,11 +643,6 @@ export default {
         } else {
           // 其他一级分类显示子分类标签
           this.showCategoryTabs = true
-          
-          // 获取该一级分类的子分类
-          this.subCategoryList = this.categories.filter(c => {
-            return c.parent_id && (c.parent_id.toString() === category || c.parent_id === categoryNum)
-          })
         }
       } else {
         this.showCategoryTabs = false

@@ -66,6 +66,8 @@
             <uni-icons type="phone" size="20" color="#999"></uni-icons>
             <input 
               type="number" 
+              id="login-mobile"
+              name="mobile"
               placeholder="请输入手机号" 
               v-model="loginForm.mobile"
               class="form-input"
@@ -81,6 +83,8 @@
             <uni-icons type="chat" size="20" color="#999"></uni-icons>
             <input 
               type="number" 
+              id="login-sms-code"
+              name="sms_code"
               placeholder="请输入验证码" 
               v-model="loginForm.sms_code"
               class="form-input"
@@ -103,6 +107,8 @@
             <uni-icons type="locked" size="20" color="#999"></uni-icons>
             <input 
               type="password" 
+              id="login-password"
+              name="password"
               placeholder="请输入密码" 
               v-model="loginForm.password"
               class="form-input"
@@ -139,6 +145,8 @@
               <uni-icons type="phone" size="20" color="#999"></uni-icons>
               <input 
                 type="number" 
+                id="register-mobile"
+                name="mobile"
                 placeholder="请输入手机号" 
                 v-model="registerForm.mobile"
                 class="form-input"
@@ -154,6 +162,8 @@
               <uni-icons type="chat" size="20" color="#999"></uni-icons>
               <input 
                 type="number" 
+                id="register-sms-code"
+                name="sms_code"
                 placeholder="请输入验证码" 
                 v-model="registerForm.sms_code"
                 class="form-input"
@@ -176,6 +186,8 @@
               <uni-icons type="locked" size="20" color="#999"></uni-icons>
               <input 
                 type="password" 
+                id="register-password"
+                name="password"
                 placeholder="请设置密码（至少8位）" 
                 v-model="registerForm.password"
                 class="form-input"
@@ -195,6 +207,8 @@
               <uni-icons type="locked" size="20" color="#999"></uni-icons>
               <input 
                 type="password" 
+                id="register-confirm-password"
+                name="confirm_password"
                 placeholder="请再次输入密码" 
                 v-model="registerForm.confirm_password"
                 class="form-input"

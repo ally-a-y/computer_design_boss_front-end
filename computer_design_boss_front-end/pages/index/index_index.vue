@@ -16,7 +16,7 @@
     <!-- 顶部搜索栏 -->
     <view class="search-bar" :style="{ background: isDarkMode ? '#2c2c2c' : 'rgba(255, 255, 255, 0.8)' }">
       <uni-icons type="search" size="30" :color="isDarkMode ? '#999' : '#999'"></uni-icons>
-      <input type="text" placeholder="搜索职位、公司名称" v-model="keyword" @input="onSearchInput" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }" />
+      <input type="text" id="search-keyword" name="keyword" placeholder="搜索职位、公司名称" v-model="keyword" @input="onSearchInput" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }" />
     </view>
     
     <!-- 轮播图 -->
@@ -76,9 +76,10 @@
 <script>
 import jobCard from '@/component/job/job-card.vue'
 import { jobApi } from '@/common/api/job.js'
-import { themeManager } from '@/common/utils/theme-simple.js'
+import { themeMixin } from '@/common/mixins/themeMixin.js'
 
 export default {
+  mixins: [themeMixin],
   components: {
     jobCard
   },
@@ -107,47 +108,25 @@ export default {
       keyword: '',
       selectedSubCategories: [],
       showCategoryTabs: false,
+      categoryName: '',
       // 分类常量
       techCategories,
       designCategories,
-      manageCategories,
-      // 主题相关
-      currentTheme: 'light',
-      isDarkMode: false
+      manageCategories
     }
   },
   onLoad() {
+    // 优先加载职位数据，保证首屏内容尽快显示
     this.getRecommendJobs()
-    this.getJobCategories()
-    this.initTheme()
-  },
-  onUnload() {
-    // 清理主题监听
-    uni.$off('globalThemeChange', this.handleGlobalThemeChange)
+    // 延迟加载分类数据，避免阻塞首屏渲染
+    setTimeout(() => {
+      this.getJobCategories()
+    }, 100)
   },
   onPullDownRefresh() {
     this.onRefresh()
   },
   methods: {
-    /**
-     * 初始化主题
-     */
-    initTheme() {
-      // 获取当前主题
-      this.currentTheme = themeManager.getCurrentTheme()
-      this.isDarkMode = this.currentTheme === 'dark'
-      
-      // 监听全局主题变化
-      uni.$on('globalThemeChange', this.handleGlobalThemeChange)
-    },
-    
-    /**
-     * 处理全局主题变化
-     */
-    handleGlobalThemeChange(data) {
-      this.currentTheme = data.theme
-      this.isDarkMode = data.isDark
-    },
     async getRecommendJobs() {
       try {
         // 检查网络状态

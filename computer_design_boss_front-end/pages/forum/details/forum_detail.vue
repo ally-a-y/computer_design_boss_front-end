@@ -188,9 +188,10 @@
 
 <script>
 import { forumApi } from '@/common/api/forum.js'
-import { themeManager } from '@/common/utils/theme-simple.js'
+import { themeMixin } from '@/common/mixins/themeMixin.js'
 
 export default {
+  mixins: [themeMixin],
   data() {
     return {
       postId: null,
@@ -208,10 +209,7 @@ export default {
         '103': '移动端',
         '104': '数据与AI',
         '105': '运维与测试'
-      },
-      // 主题相关
-      currentTheme: 'light',
-      isDarkMode: false
+      }
     }
   },
   
@@ -226,14 +224,8 @@ export default {
     // 确保postId是整数类型
     this.postId = parseInt(options.id) || null
     console.log('帖子ID (整数):', this.postId)
-    this.initTheme()
     this.loadPostDetail()
     this.loadReplies()
-  },
-  
-  onUnload() {
-    // 清理主题监听
-    uni.$off('globalThemeChange', this.handleGlobalThemeChange)
   },
   
   methods: {
@@ -270,26 +262,6 @@ export default {
       // 尝试使用后端返回的数据，即使不是标准格式
       // 可能是后端的TO_BASE64函数生成的格式不同
       return cleaned.length > 0
-    },
-    
-    /**
-     * 初始化主题
-     */
-    initTheme() {
-      // 获取当前主题
-      this.currentTheme = themeManager.getCurrentTheme()
-      this.isDarkMode = this.currentTheme === 'dark'
-      
-      // 监听全局主题变化
-      uni.$on('globalThemeChange', this.handleGlobalThemeChange)
-    },
-    
-    /**
-     * 处理全局主题变化
-     */
-    handleGlobalThemeChange(data) {
-      this.currentTheme = data.theme
-      this.isDarkMode = data.isDark
     },
     
     // 返回上一页

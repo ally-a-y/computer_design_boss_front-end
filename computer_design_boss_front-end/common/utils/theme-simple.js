@@ -21,10 +21,13 @@ class ThemeManager {
     this.themeMode = uni.getStorageSync(THEME_MODE_KEY) || 'system'
     this.currentTheme = uni.getStorageSync(CURRENT_THEME_KEY) || 'light'
     
-    // 如果是系统模式，检测系统主题
-    if (this.themeMode === 'system') {
-      this.detectSystemTheme()
-    }
+    // 延迟检测系统主题，避免阻塞首屏渲染
+    setTimeout(() => {
+      // 如果是系统模式，检测系统主题
+      if (this.themeMode === 'system') {
+        this.detectSystemTheme()
+      }
+    }, 100)
   }
 
   /**

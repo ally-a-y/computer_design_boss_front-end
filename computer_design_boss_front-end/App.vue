@@ -1,18 +1,24 @@
 <script>
 	import { themeManager } from '@/common/utils/theme-simple.js'
 	
-	export default {
+export default {
 		onLaunch: function() {
 			console.log('App Launch')
-			// 初始化应用主题
-			this.initAppTheme()
-			// 监听系统主题变化
-			this.listenSystemThemeChange()
+			// 延迟初始化应用主题，避免阻塞首屏渲染
+			setTimeout(() => {
+				// 初始化应用主题
+				this.initAppTheme()
+				// 监听系统主题变化
+				this.listenSystemThemeChange()
+			}, 50)
 		},
 		onShow: function() {
 			console.log('App Show')
-			// 重新检查主题设置
-			this.initAppTheme()
+			// 延迟重新检查主题设置，避免阻塞页面显示
+			setTimeout(() => {
+				// 重新检查主题设置
+				this.initAppTheme()
+			}, 50)
 		},
 		onHide: function() {
 			console.log('App Hide')
@@ -123,8 +129,6 @@
 		border-top: 1px solid rgba(79, 172, 254, 0.1) !important;
 		box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05) !important;
 	}
-	
-
 	
 	/* 导航栏图标颜色 */
 	.uni-tabbar__icon {

@@ -1,5 +1,9 @@
 import config from '../config.js'
 
+// 请求缓存
+const requestCache = new Map()
+const CACHE_EXPIRY = 5 * 60 * 1000 // 5分钟缓存
+
 // 构建完整 URL 的辅助函数
 const buildFullUrl = (path, params) => {
   if (!path) return config.baseURL
@@ -36,12 +40,49 @@ const buildFullUrl = (path, params) => {
   return url
 }
 
+// 生成缓存键
+const generateCacheKey = (url, params) => {
+  const fullUrl = buildFullUrl(url, params)
+  return fullUrl
+}
+
+// 检查缓存是否有效
+const getCachedData = (cacheKey) => {
+  const cached = requestCache.get(cacheKey)
+  if (cached) {
+    const { data, timestamp } = cached
+    if (Date.now() - timestamp < CACHE_EXPIRY) {
+      return data
+    }
+    // 缓存过期，删除
+    requestCache.delete(cacheKey)
+  }
+  return null
+}
+
+// 设置缓存
+const setCachedData = (cacheKey, data) => {
+  requestCache.set(cacheKey, {
+    data,
+    timestamp: Date.now()
+  })
+}
+
 // 请求重试机制
 const requestWithRetry = (options, retryCount = 3) => {
   return new Promise((resolve, reject) => {
+    const isGet = (options.method || 'GET').toUpperCase() === 'GET'
+    
+    // 检查缓存
+    if (isGet && !options.noCache) {
+      const cacheKey = generateCacheKey(options.url, options.params || options.data)
+      const cachedData = getCachedData(cacheKey)
+      if (cachedData) {
+        return resolve(cachedData)
+      }
+    }
+    
     const attemptRequest = (attempt) => {
-      const isGet = (options.method || 'GET').toUpperCase() === 'GET'
-     
       const queryParams = isGet 
         ? { ...(options.params || {}), ...(options.data || {}) }
         : (options.params || {})
@@ -77,7 +118,7 @@ const requestWithRetry = (options, retryCount = 3) => {
         ...requestConfig,
         success: (res) => {
           // 只在调试模式下显示响应日志
-          const debugMode = true // 可以在这里设置为true来开启调试
+          const debugMode = false // 关闭调试模式提高性能
           if (debugMode) {
             console.log('【响应】', res.statusCode, res.data)
           }
@@ -87,11 +128,22 @@ const requestWithRetry = (options, retryCount = 3) => {
             
             if (data && typeof data === 'object' && 'code' in data) {
               if (data.code === 200) {
-                resolve(data.data !== undefined ? data.data : data)
+                const result = data.data !== undefined ? data.data : data
+                // 缓存GET请求结果
+                if (isGet && !options.noCache) {
+                  const cacheKey = generateCacheKey(options.url, options.params || options.data)
+                  setCachedData(cacheKey, result)
+                }
+                resolve(result)
               } else {
                 reject(new Error(data.message || `请求失败: ${data.code}`))
               }
             } else {
+              // 缓存GET请求结果
+              if (isGet && !options.noCache) {
+                const cacheKey = generateCacheKey(options.url, options.params || options.data)
+                setCachedData(cacheKey, data)
+              }
               resolve(data)
             }
           } else {
@@ -99,10 +151,13 @@ const requestWithRetry = (options, retryCount = 3) => {
           }
         },
         fail: (err) => {
-          console.error(`【请求失败】`, err)
+          const debugMode = false // 关闭调试模式提高性能
+          if (debugMode) {
+            console.error(`【请求失败】`, err)
+          }
           
           if (attempt < retryCount - 1) {
-            const delay = Math.pow(2, attempt) * 1000
+            const delay = Math.pow(2, attempt) * 500 // 减少重试延迟
             setTimeout(() => attemptRequest(attempt + 1), delay)
           } else {
             reject(new Error(err.errMsg || '网络请求失败'))
@@ -113,6 +168,33 @@ const requestWithRetry = (options, retryCount = 3) => {
     
     attemptRequest(0)
   })
+}
+
+// 批量请求函数
+export const batchRequest = async (requests) => {
+  if (!Array.isArray(requests)) {
+    throw new Error('requests must be an array')
+  }
+  
+  try {
+    const results = await Promise.all(
+      requests.map(req => requestWithRetry(req))
+    )
+    return results
+  } catch (error) {
+    console.error('批量请求失败:', error)
+    throw error
+  }
+}
+
+// 清除缓存
+export const clearCache = (url, params) => {
+  if (url) {
+    const cacheKey = generateCacheKey(url, params)
+    requestCache.delete(cacheKey)
+  } else {
+    requestCache.clear()
+  }
 }
 
 export default requestWithRetry
