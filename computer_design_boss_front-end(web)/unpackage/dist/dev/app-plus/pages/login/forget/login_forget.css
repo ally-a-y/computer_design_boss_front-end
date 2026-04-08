@@ -1,0 +1,214 @@
+
+/* 全局样式 */
+.forget-page[data-v-30052982] {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #F8FAFD;
+  font-family: -apple-system, Helvetica, Roboto, sans-serif;
+}
+.forget-container[data-v-30052982] {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 16px;
+}
+
+/* 导航栏样式 */
+.nav-bar[data-v-30052982] {
+  background-color: #ffffff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  height: 80px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  position: relative;
+  margin-bottom: 12px;
+}
+.nav-bar-left[data-v-30052982] {
+  flex: 0 0 auto;
+  padding: 8px;
+}
+.nav-bar-center[data-v-30052982] {
+  flex: 1;
+  text-align: center;
+}
+.nav-bar-title[data-v-30052982] {
+  font-size: 17px;
+  font-weight: 600;
+  color: #1E1E1E;
+}
+.nav-bar-right[data-v-30052982] {
+  flex: 0 0 auto;
+  padding: 8px;
+}
+
+/* 忘记密码表单 */
+.forget-form[data-v-30052982] {
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 24px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 12px;
+}
+
+/* 验证方式选择 */
+.auth-method[data-v-30052982] {
+  display: flex;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #F0F2F5;
+}
+.method-item[data-v-30052982] {
+  flex: 1;
+  text-align: center;
+  padding: 12px 0;
+  position: relative;
+  transition: all 0.3s ease;
+}
+.method-item[data-v-30052982]:active {
+  background-color: #F0F4FF;
+}
+.method-item.active[data-v-30052982]::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 2px;
+  background-color: #007aff;
+  border-radius: 1px;
+  transition: all 0.3s ease;
+  width: 60px;
+}
+.method-text[data-v-30052982] {
+  font-size: 14px;
+  color: #6C757D;
+  transition: all 0.3s ease;
+}
+.method-item.active .method-text[data-v-30052982] {
+  color: #007aff;
+  font-weight: 600;
+}
+
+/* 表单样式 */
+.form-item[data-v-30052982] {
+  margin-bottom: 16px;
+}
+.form-label[data-v-30052982] {
+  font-size: 14px;
+  color: #6C757D;
+  margin-bottom: 8px;
+  display: block;
+}
+.form-input-wrapper[data-v-30052982] {
+  display: flex;
+  align-items: center;
+  border-radius: 12px;
+  padding: 0 12px;
+  background-color: #F2F5F9;
+  height: 48px;
+  transition: all 0.3s ease;
+}
+.form-input-wrapper[data-v-30052982]:focus-within {
+  box-shadow: 0 0 0 2px rgba(0,122,255,0.2);
+}
+.form-input[data-v-30052982] {
+  flex: 1;
+  font-size: 15px;
+  color: #1E1E1E;
+  padding-left: 12px;
+  background: transparent;
+  border: none;
+  outline: none;
+}
+.form-input[data-v-30052982]::-webkit-input-placeholder {
+  color: #ADB5BD;
+}
+.form-input[data-v-30052982]::placeholder {
+  color: #ADB5BD;
+}
+
+/* 验证码按钮 */
+.sms-btn[data-v-30052982] {
+  height: 40px;
+  background-color: #F0F4FF;
+  color: #007aff;
+  font-size: 13px;
+  border-radius: 20px;
+  margin-left: 12px;
+  padding: 0 16px;
+  transition: all 0.3s ease;
+  border: none;
+}
+.sms-btn[data-v-30052982]:active {
+  background-color: #E0E9FF;
+  transform: scale(0.95);
+}
+.sms-btn[data-v-30052982]:disabled {
+  background-color: #E9ECEF;
+  color: #ADB5BD;
+}
+
+/* 错误提示 */
+.error-text[data-v-30052982] {
+  font-size: 13px;
+  color: #e54d42;
+  margin-top: 8px;
+  display: block;
+}
+
+/* 按钮区域 */
+.reset-buttons[data-v-30052982] {
+  display: flex;
+  gap: 12px;
+  margin: 32px 0 16px;
+}
+.back-btn[data-v-30052982] {
+  flex: 1;
+  height: 48px;
+  background-color: #F2F5F9;
+  color: #6C757D;
+  font-size: 16px;
+  border-radius: 30px;
+  transition: all 0.3s ease;
+  border: none;
+}
+.back-btn[data-v-30052982]:active {
+  background-color: #E9ECEF;
+  transform: scale(0.98);
+}
+.confirm-btn[data-v-30052982] {
+  flex: 1;
+  height: 48px;
+  background-color: #007aff;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 30px;
+  transition: all 0.3s ease;
+  border: none;
+}
+.confirm-btn[data-v-30052982]:active {
+  background-color: #0056b3;
+  transform: scale(0.98);
+}
+.confirm-btn[data-v-30052982]:disabled {
+  background-color: #E9ECEF;
+  color: #ADB5BD;
+}
+
+/* 登录链接 */
+.login-link[data-v-30052982] {
+  text-align: center;
+  font-size: 13px;
+  color: #6C757D;
+  margin-top: 16px;
+}
+.login-text[data-v-30052982] {
+  color: #007aff;
+  margin-left: 4px;
+  transition: all 0.3s ease;
+}
+.login-text[data-v-30052982]:active {
+  opacity: 0.7;
+}

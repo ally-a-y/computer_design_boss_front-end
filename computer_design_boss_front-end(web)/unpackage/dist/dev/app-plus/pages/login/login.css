@@ -1,0 +1,310 @@
+
+/* 全局样式 */
+.login-page[data-v-e4e4508d] {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #F8FAFD;
+  font-family: -apple-system, Helvetica, Roboto, sans-serif;
+}
+.login-container[data-v-e4e4508d] {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 16px;
+}
+
+/* 导航栏样式 */
+.nav-bar[data-v-e4e4508d] {
+  background-color: #ffffff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  height: 80px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  position: relative;
+  margin-bottom: 12px;
+}
+.nav-bar-left[data-v-e4e4508d] {
+  flex: 0 0 auto;
+  padding: 8px;
+}
+.nav-bar-center[data-v-e4e4508d] {
+  flex: 1;
+  text-align: center;
+}
+.nav-bar-title[data-v-e4e4508d] {
+  font-size: 17px;
+  font-weight: 600;
+  color: #1E1E1E;
+}
+.nav-bar-right[data-v-e4e4508d] {
+  flex: 0 0 auto;
+  padding: 8px;
+}
+
+/* 页面标题 */
+.login-header[data-v-e4e4508d] {
+  margin: 24px 0 16px 0;
+  text-align: center;
+}
+.login-title[data-v-e4e4508d] {
+  font-size: 28px;
+  font-weight: bold;
+  color: #1E1E1E;
+  margin-bottom: 8px;
+}
+.login-subtitle[data-v-e4e4508d] {
+  font-size: 14px;
+  color: #6C757D;
+}
+
+/* 选项卡样式 */
+.tab-container[data-v-e4e4508d] {
+  display: flex;
+  background-color: #fff;
+  border-radius: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+.tab-item[data-v-e4e4508d] {
+  flex: 1;
+  text-align: center;
+  padding: 16px 0;
+  position: relative;
+  transition: all 0.3s ease;
+}
+.tab-item[data-v-e4e4508d]:active {
+  background-color: #F0F4FF;
+}
+.tab-item.active[data-v-e4e4508d]::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 2px;
+  background-color: #007aff;
+  border-radius: 1px;
+  transition: all 0.3s ease;
+  /* 宽度与文字等宽 */
+  width: 24px;
+}
+.tab-text[data-v-e4e4508d] {
+  font-size: 15px;
+  color: #6C757D;
+  transition: all 0.3s ease;
+}
+.tab-item.active .tab-text[data-v-e4e4508d] {
+  color: #007aff;
+  font-weight: 600;
+}
+
+/* 表单容器 */
+.form-container[data-v-e4e4508d] {
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 24px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 12px;
+}
+
+/* 登录方式切换 */
+.login-method[data-v-e4e4508d] {
+  display: flex;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #F0F2F5;
+}
+.method-item[data-v-e4e4508d] {
+  flex: 1;
+  text-align: center;
+  padding: 12px 0;
+  position: relative;
+  transition: all 0.3s ease;
+}
+.method-item[data-v-e4e4508d]:active {
+  background-color: #F0F4FF;
+}
+.method-item.active[data-v-e4e4508d]::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 2px;
+  background-color: #007aff;
+  border-radius: 1px;
+  transition: all 0.3s ease;
+  /* 宽度与文字等宽 */
+  width: 60px;
+}
+.method-text[data-v-e4e4508d] {
+  font-size: 14px;
+  color: #6C757D;
+  transition: all 0.3s ease;
+}
+.method-item.active .method-text[data-v-e4e4508d] {
+  color: #007aff;
+  font-weight: 600;
+}
+
+/* 表单样式 */
+.form-item[data-v-e4e4508d] {
+  margin-bottom: 16px;
+}
+.form-input-wrapper[data-v-e4e4508d] {
+  display: flex;
+  align-items: center;
+  border-radius: 12px;
+  padding: 0 12px;
+  background-color: #F2F5F9;
+  height: 48px;
+  transition: all 0.3s ease;
+}
+.form-input-wrapper[data-v-e4e4508d]:focus-within {
+  box-shadow: 0 0 0 2px rgba(0,122,255,0.2);
+}
+.form-input[data-v-e4e4508d] {
+  flex: 1;
+  font-size: 15px;
+  color: #1E1E1E;
+  padding-left: 12px;
+  background: transparent;
+  border: none;
+  outline: none;
+}
+.form-input[data-v-e4e4508d]::-webkit-input-placeholder {
+  color: #ADB5BD;
+}
+.form-input[data-v-e4e4508d]::placeholder {
+  color: #ADB5BD;
+}
+
+/* 验证码按钮 */
+.sms-btn[data-v-e4e4508d] {
+  height: 40px;
+  background-color: #F0F4FF;
+  color: #007aff;
+  font-size: 13px;
+  border-radius: 20px;
+  margin-left: 12px;
+  padding: 0 16px;
+  transition: all 0.3s ease;
+  border: none;
+}
+.sms-btn[data-v-e4e4508d]:active {
+  background-color: #E0E9FF;
+  transform: scale(0.95);
+}
+.sms-btn.counting[data-v-e4e4508d] {
+  background-color: #E9ECEF;
+  color: #ADB5BD;
+}
+.sms-btn[data-v-e4e4508d]:disabled {
+  background-color: #E9ECEF;
+  color: #ADB5BD;
+}
+
+/* 登录按钮 */
+.login-btn[data-v-e4e4508d] {
+  width: 100%;
+  height: 48px;
+  background-color: #007aff;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 30px;
+  margin: 24px 0 16px;
+  transition: all 0.3s ease;
+  border: none;
+}
+.login-btn[data-v-e4e4508d]:active {
+  background-color: #0056b3;
+  transform: scale(0.98);
+}
+.login-btn[data-v-e4e4508d]:disabled {
+  background-color: #E9ECEF;
+  color: #ADB5BD;
+}
+
+/* 注册按钮 */
+.register-btn[data-v-e4e4508d] {
+  width: 100%;
+  height: 48px;
+  background-color: #007aff;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 30px;
+  margin: 32px 0 16px;
+  transition: all 0.3s ease;
+  border: none;
+}
+.register-btn[data-v-e4e4508d]:active {
+  background-color: #0056b3;
+  transform: scale(0.98);
+}
+.register-btn[data-v-e4e4508d]:disabled {
+  background-color: #E9ECEF;
+  color: #ADB5BD;
+}
+
+/* 错误提示 */
+.error-text[data-v-e4e4508d] {
+  font-size: 13px;
+  color: #e54d42;
+  margin-top: 8px;
+  display: block;
+}
+
+/* 忘记密码链接 */
+.forget-password[data-v-e4e4508d] {
+  text-align: right;
+  margin-top: 8px;
+}
+.forget-link[data-v-e4e4508d] {
+  font-size: 13px;
+  color: #007aff;
+  transition: all 0.3s ease;
+}
+.forget-link[data-v-e4e4508d]:active {
+  opacity: 0.7;
+}
+
+/* 已有账号链接 */
+.have-account[data-v-e4e4508d] {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 13px;
+  color: #6C757D;
+}
+.login-link[data-v-e4e4508d] {
+  color: #007aff;
+  margin-left: 4px;
+  transition: all 0.3s ease;
+}
+.login-link[data-v-e4e4508d]:active {
+  opacity: 0.7;
+}
+
+/* 动画效果 */
+@keyframes fadeIn-e4e4508d {
+from {
+    opacity: 0;
+    transform: translateY(12px);
+}
+to {
+    opacity: 1;
+    transform: translateY(0);
+}
+}
+
+/* 注册步骤 */
+.register-step[data-v-e4e4508d] {
+  display: none;
+  animation: fadeIn-e4e4508d 0.3s ease-in-out;
+}
+.register-step.active[data-v-e4e4508d] {
+  display: block;
+}

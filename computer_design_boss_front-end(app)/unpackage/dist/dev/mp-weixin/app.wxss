@@ -1,0 +1,70 @@
+
+	/*每个页面公共css */
+page {
+		background-color: #f5f5f5;
+		transition: background-color 0.3s ease, color 0.3s ease;
+}
+	
+	/* 主题切换动画 */
+.theme-transition {
+		transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+	
+	/* 浅色主题 */
+.light-theme {
+		--bg-primary: #ffffff;
+		--bg-secondary: #f5f5f5;
+		--bg-card: #ffffff;
+		--text-primary: #333333;
+		--text-secondary: #666666;
+		--text-tertiary: #999999;
+		--border-color: #eeeeee;
+		--primary-color: #4facfe;
+		--success-color: #4cd964;
+		--warning-color: #ff9500;
+		--error-color: #ff3b30;
+}
+	
+	/* 深色主题 */
+.dark-theme {
+		--bg-primary: #1a1a1a;
+		--bg-secondary: #2c2c2c;
+		--bg-card: #2a2a2a;
+		--text-primary: #ffffff;
+		--text-secondary: #cccccc;
+		--text-tertiary: #999999;
+		--border-color: #404040;
+		--primary-color: #0a84ff;
+		--success-color: #32d74b;
+		--warning-color: #ff9f0a;
+		--error-color: #ff453a;
+}
+	
+	/* 应用主题变量 */
+.light-theme page {
+		background-color: var(--bg-secondary);
+		color: var(--text-primary);
+}
+.dark-theme page {
+		background-color: var(--bg-primary);
+		color: var(--text-primary);
+}
+	
+	/* 底部导航栏毛玻璃效果 */
+.uni-tabbar {
+		background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(230, 240, 255, 0.8)) !important;
+		backdrop-filter: blur(10px) !important;
+		-webkit-backdrop-filter: blur(10px) !important;
+		border-top: 1px solid rgba(79, 172, 254, 0.1) !important;
+		box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05) !important;
+}
+	
+	/* 导航栏图标颜色 */
+.uni-tabbar__icon {
+		filter: brightness(1) saturate(1);
+		transition: all 0.3s ease;
+}
+.uni-tabbar__item--active .uni-tabbar__icon {
+		filter: brightness(1.2) saturate(1.5);
+}
+page{--status-bar-height:25px;--top-window-height:0px;--window-top:0px;--window-bottom:0px;--window-left:0px;--window-right:0px;--window-magin:0px}[data-c-h="true"]{display: none !important;}

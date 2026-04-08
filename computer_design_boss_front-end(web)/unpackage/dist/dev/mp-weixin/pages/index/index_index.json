@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "职位首页",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "job-card": "../../component/job/job-card"
+  }
+}

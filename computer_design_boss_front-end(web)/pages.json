@@ -1,0 +1,230 @@
+{
+  "pages": [
+    {
+      "path": "pages/splash/splash",
+      "style": {
+        "navigationBarTitleText": "启动中",
+        "navigationStyle": "custom"
+      }
+    },
+	{
+      "path": "pages/login/login",
+      "style": {
+        "navigationBarTitleText": "登录",
+        "navigationBarBackgroundColor": "#007AFF",
+        "navigationBarTextStyle": "white",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/login/register/login_reister",
+      "style": {
+        "navigationBarTitleText": "新用户注册",
+        "navigationBarBackgroundColor": "#007AFF",
+        "navigationBarTextStyle": "white",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/login/forget/login_forget",
+      "style": {
+        "navigationBarTitleText": "忘记密码",
+        "navigationBarBackgroundColor": "#007AFF",
+        "navigationBarTextStyle": "white",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/index/index_index",
+      "style": {
+        "navigationBarTitleText": "职位首页",
+        "navigationStyle": "custom"
+      }
+    },
+
+    {
+      "path": "pages/job/detail/job_detail_index",
+      "style": {
+        "navigationBarTitleText": "职位详情",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/job/add/job_add_index",
+      "style": {
+        "navigationBarTitleText": "发布职位",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/user/user",
+      "style": {
+        "navigationBarTitleText": "个人中心",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/user/resume/user_resume",
+      "style": {
+        "navigationBarTitleText": "我的简历",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/user/collection/user_collection",
+      "style": {
+        "navigationBarTitleText": "收藏职位",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/user/deliver/user_deliver",
+      "style": {
+        "navigationBarTitleText": "投递职位",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/user/feedback/user_feedback",
+      "style": {
+        "navigationBarTitleText": "投诉反馈",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/user/account/user_account",
+      "style": {
+        "navigationBarTitleText": "我的账号",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/user/device/user_device",
+      "style": {
+        "navigationBarTitleText": "登录设备管理",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/user/display/user_display",
+      "style": {
+        "navigationBarTitleText": "显示设置",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/user/account/number/account_number",
+      "style": {
+        "navigationBarTitleText": "修改手机",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/user/account/number/number_change",
+      "style": {
+        "navigationBarTitleText": "修改手机号",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/user/account/email/account_email",
+      "style": {
+        "navigationBarTitleText": "邮箱设置",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/user/account/email/email_change",
+      "style": {
+        "navigationBarTitleText": "修改邮箱",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/user/account/code/account_code",
+      "style": {
+        "navigationBarTitleText": "密码设置",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/AI/AI",
+      "style": {
+        "navigationBarTitleText": "AI求职助手",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/AI/interview",
+      "style": {
+        "navigationBarTitleText": "AI模拟面试",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/forum/forum",
+      "style": {
+        "navigationBarTitleText": "技术论坛",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/forum/details/forum_detail",
+      "style": {
+        "navigationBarTitleText": "帖子详情",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/forum/post",
+      "style": {
+        "navigationBarTitleText": "发布话题",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/chart",
+      "style": {
+        "navigationBarTitleText": "竞争力分析",
+        "navigationStyle": "custom"
+      }
+    }
+  ],
+  "globalStyle": {
+      "navigationBarTextStyle": "black",
+      "navigationBarTitleText": "职位招聘",
+      "navigationBarBackgroundColor": "#F8F8F8",
+      "backgroundColor": "#F8F8F8"
+  },
+  "tabBar": {
+      "color": "#999",
+      "backgroundColor": "rgba(255, 255, 255, 0.8)",
+      "borderStyle": "transparent",
+      "list":[
+      {
+      "pagePath": "pages/index/index_index",
+      "text": "首页",
+      "iconPath": "/static/tabbar/home.png",
+      "selectedIconPath": "/static/tabbar/home-active.png"
+      },
+      {
+      "pagePath": "pages/forum/forum",
+      "text": "论坛",
+      "iconPath": "/static/tabbar/forum.png",
+      "selectedIconPath": "/static/tabbar/forum-active.png"
+      },
+      {
+      "pagePath": "pages/AI/AI",
+      "text": "AI助手",
+      "iconPath": "/static/tabbar/AI.png",
+      "selectedIconPath": "/static/tabbar/AI-active.png"
+      },
+      {
+      "pagePath": "pages/user/user",
+      "text": "我的",
+      "iconPath": "/static/tabbar/user.png",
+      "selectedIconPath": "/static/tabbar/user-active.png"
+      }
+    ]
+	}
+}

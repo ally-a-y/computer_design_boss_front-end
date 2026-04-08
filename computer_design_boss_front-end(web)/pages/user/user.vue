@@ -1,0 +1,464 @@
+<template>
+  <view class="user-page" :style="{ background: isDarkMode ? '#1a1a1a' : 'linear-gradient(135deg, #e6f0ff 0%, #ffffff 100%)' }">
+    <!-- 顶部导航 -->
+    <view class="nav-bar" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'linear-gradient(135deg, rgba(230, 240, 255, 0.8), rgba(255, 255, 255, 0.8))', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
+      <view class="nav-bar-left">
+        <!-- 左侧预留空间 -->
+      </view>
+      <view class="nav-bar-center">
+        <text class="nav-bar-title" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">我的</text>
+      </view>
+      <view class="nav-bar-right">
+        <!-- 右侧预留空间 -->
+      </view>
+    </view>
+    
+    <!-- 顶部卡片 -->
+    <view class="top-card" :style="{ background: isDarkMode ? 'rgba(44, 44, 44, 0.8)' : 'rgba(255, 255, 255, 0.8)', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 4px 16px rgba(79, 172, 254, 0.15)' }">
+      <view class="user-header">
+        <image class="avatar" :src="userInfo.avatar ? 'data:image/jpeg;base64,' + userInfo.avatar.replace(/\s+/g, '') : '/static/default-avatar.png'" mode="aspectFill"></image>
+        <view class="user-info">
+          <text class="user-name" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">{{ userInfo.name || '已登录' }}</text>
+          <text class="edit-resume" @click="navigateToResume" :style="{ color: '#007aff' }">编辑简历</text>
+        </view>
+      </view>
+      
+      <!-- 功能图标 -->
+      <view class="function-icons" :style="{ borderTop: isDarkMode ? '1px solid #404040' : '1px solid #E6F0FF' }">
+        <view class="icon-item" @click="navigateToCollection" :style="{ color: isDarkMode ? '#999' : '#6C757D' }">
+          <uni-icons type="star" size="40" :color="isDarkMode ? '#ffb800' : '#ff9500'"></uni-icons>
+          <text :style="{ color: isDarkMode ? '#999' : '#6C757D' }">收藏职位</text>
+        </view>
+        <view class="icon-item" @click="navigateToDeliver" :style="{ color: isDarkMode ? '#999' : '#6C757D' }">
+          <uni-icons type="paperplane" size="40" color="#007aff"></uni-icons>
+          <text :style="{ color: isDarkMode ? '#999' : '#6C757D' }">投递职位</text>
+        </view>
+        <view class="icon-item" @click="navigateToFeedback" :style="{ color: isDarkMode ? '#999' : '#6C757D' }">
+          <uni-icons type="chatbubble" size="40" :color="isDarkMode ? '#52c41a' : '#4cd964'"></uni-icons>
+          <text :style="{ color: isDarkMode ? '#999' : '#6C757D' }">投诉反馈</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 菜单列表 -->
+    <view class="menu-list" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#fff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
+      <view class="menu-item" @click="navigateToAccount" :style="{ borderBottom: isDarkMode ? '1px solid #404040' : '1px solid #F2F5F9', backgroundColor: isDarkMode ? 'transparent' : 'transparent' }">
+        <uni-icons type="person" size="30" :color="isDarkMode ? '#999' : '#666'"></uni-icons>
+        <text class="menu-text" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">我的账号</text>
+        <uni-icons type="right" size="20" :color="isDarkMode ? '#666' : '#999'"></uni-icons>
+      </view>
+      
+      <view class="menu-item" @click="navigateToDevice" :style="{ borderBottom: isDarkMode ? '1px solid #404040' : '1px solid #F2F5F9', backgroundColor: isDarkMode ? 'transparent' : 'transparent' }">
+        <uni-icons type="phone" size="30" :color="isDarkMode ? '#999' : '#666'"></uni-icons>
+        <text class="menu-text" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">登录设备管理</text>
+        <uni-icons type="right" size="20" :color="isDarkMode ? '#666' : '#999'"></uni-icons>
+      </view>
+      
+      <view class="menu-item" @click="navigateToDisplay" :style="{ borderBottom: isDarkMode ? '1px solid #404040' : '1px solid #F2F5F9', backgroundColor: isDarkMode ? 'transparent' : 'transparent' }">
+        <uni-icons type="settings" size="30" :color="isDarkMode ? '#999' : '#666'"></uni-icons>
+        <text class="menu-text" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">显示设置</text>
+        <uni-icons type="right" size="20" :color="isDarkMode ? '#666' : '#999'"></uni-icons>
+      </view>
+      
+      <view class="menu-item" @click="navigateToThemeDemo" :style="{ backgroundColor: isDarkMode ? 'transparent' : 'transparent' }">
+        <uni-icons type="color" size="30" :color="isDarkMode ? '#999' : '#666'"></uni-icons>
+        <text class="menu-text" :style="{ color: isDarkMode ? '#ffffff' : '#1E1E1E' }">竞争力分析</text>
+        <uni-icons type="right" size="20" :color="isDarkMode ? '#666' : '#999'"></uni-icons>
+      </view>
+    </view>
+    
+    <!-- 退出登录 -->
+    <view class="logout-btn" @click="logout" :style="{ backgroundColor: isDarkMode ? '#2c2c2c' : '#fff', boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.05)' }">
+      <text :style="{ color: '#ff3b30' }">退出登录</text>
+    </view>
+  </view>
+</template>
+
+<script>
+import { themeManager } from '@/common/utils/theme-simple.js'
+import { userApi } from '@/common/api/user.js'
+
+export default {
+  data() {
+    return {
+      userInfo: {
+        name: '张三',
+        avatar: ''
+      },
+      // 主题相关
+      currentTheme: 'light',
+      isDarkMode: false
+    }
+  },
+  onShow() {
+    // 检查用户登录状态
+    this.checkLoginStatus()
+    // 初始化主题
+    this.initTheme()
+  },
+  onUnload() {
+    // 清理主题监听
+    uni.$off('globalThemeChange', this.handleGlobalThemeChange)
+  },
+  methods: {
+    /**
+     * 初始化主题
+     */
+    initTheme() {
+      // 获取当前主题
+      this.currentTheme = themeManager.getCurrentTheme()
+      this.isDarkMode = this.currentTheme === 'dark'
+      
+      // 监听全局主题变化
+      uni.$on('globalThemeChange', this.handleGlobalThemeChange)
+    },
+    
+    /**
+     * 处理全局主题变化
+     */
+    handleGlobalThemeChange(data) {
+      this.currentTheme = data.theme
+      this.isDarkMode = data.isDark
+    },
+    
+    async checkLoginStatus() {
+      // 这里可以检查用户登录状态
+      console.log('开始检查用户登录状态')
+      const userInfo = uni.getStorageSync('userInfo')
+      console.log('从本地存储获取userInfo:', userInfo)
+      if (userInfo) {
+        // 检查userInfo是否为字符串，如果是则解析，否则直接使用
+        if (typeof userInfo === 'string') {
+          try {
+            this.userInfo = JSON.parse(userInfo)
+            console.log('解析userInfo成功:', this.userInfo)
+          } catch (e) {
+            console.error('解析userInfo失败:', e)
+            this.userInfo = null
+          }
+        } else {
+          this.userInfo = userInfo
+          console.log('直接使用userInfo:', this.userInfo)
+        }
+        
+        // 尝试从后端获取最新的用户信息，包括头像
+        try {
+          // 首先尝试使用专门的获取名称和头像的接口
+          console.log('开始获取用户名称和头像')
+          const res = await userApi.getUserNameAndAvatar()
+          console.log('获取用户名称和头像成功:', res)
+          if (res) {
+            // 更新用户信息
+            this.userInfo.name = res.user_name
+            this.userInfo.real_name = res.user_name
+            this.userInfo.avatar = res.user_avatar
+            this.userInfo.avatar_format = res.user_avatar_format
+            this.userInfo.avatar_size = res.user_avatar_size
+            console.log('更新用户信息成功:', this.userInfo)
+            // 保存到本地存储，只保存必要的信息
+            const userInfoToSave = {
+              name: res.user_name,
+              real_name: res.user_name,
+              avatar: res.user_avatar,
+              avatar_format: res.user_avatar_format,
+              avatar_size: res.user_avatar_size
+            }
+            uni.setStorageSync('userInfo', JSON.stringify(userInfoToSave))
+            console.log('保存用户信息到本地存储成功')
+          }
+        } catch (error) {
+          console.error('获取用户名称和头像失败:', error)
+          // 如果失败，尝试使用通用的用户信息接口
+          try {
+            console.log('开始获取用户信息')
+            const res = await userApi.getUserProfile()
+            console.log('获取用户信息成功:', res)
+            if (res) {
+              this.userInfo = res
+              console.log('更新用户信息成功:', this.userInfo)
+              // 保存到本地存储，只保存必要的信息
+              const userInfoToSave = {
+                name: res.name || res.real_name,
+                real_name: res.real_name,
+                avatar: res.avatar,
+                avatar_format: res.avatar_format,
+                avatar_size: res.avatar_size
+              }
+              uni.setStorageSync('userInfo', JSON.stringify(userInfoToSave))
+              console.log('保存用户信息到本地存储成功')
+            }
+          } catch (error) {
+            console.error('获取用户信息失败:', error)
+          }
+        }
+      } else {
+        console.log('本地存储中没有userInfo')
+      }
+    },
+    
+    // 检查头像数据是否有效
+    isValidAvatar(avatar) {
+      if (!avatar || avatar === '') {
+        return false
+      }
+      
+      // 检查是否是URL格式（以http://或https://开头）
+      if (avatar.startsWith('http://') || avatar.startsWith('https://')) {
+        return false
+      }
+      
+      // 清理空白字符
+      const cleaned = avatar.replace(/\s+/g, '')
+      
+      // 尝试使用后端返回的数据，即使不是标准格式
+      return cleaned.length > 0
+    },
+    
+    // 解码HTML实体
+    decodeHtmlEntities(text) {
+      const entities = {
+        '&amp;': '&',
+        '&lt;': '<',
+        '&gt;': '>',
+        '&quot;': '"',
+        '&#39;': "'"
+      }
+      return text.replace(/&[#\w]+;/g, (entity) => {
+        return entities[entity] || entity
+      })
+    },
+    navigateToResume() {
+      uni.navigateTo({
+        url: '/pages/user/resume/user_resume'
+      })
+    },
+    navigateToCollection() {
+      uni.navigateTo({
+        url: '/pages/user/collection/user_collection'
+      })
+    },
+    navigateToDeliver() {
+      uni.navigateTo({
+        url: '/pages/user/deliver/user_deliver'
+      })
+    },
+    navigateToFeedback() {
+      uni.navigateTo({
+        url: '/pages/user/feedback/user_feedback'
+      })
+    },
+    navigateToAccount() {
+      uni.navigateTo({
+        url: '/pages/user/account/user_account'
+      })
+    },
+    navigateToDevice() {
+      uni.navigateTo({
+        url: '/pages/user/device/user_device'
+      })
+    },
+    navigateToDisplay() {
+      uni.navigateTo({
+        url: '/pages/user/display/user_display'
+      })
+    },
+    navigateToThemeDemo() {
+      uni.navigateTo({
+        url: '/pages/chart'
+      })
+    },
+    logout() {
+      uni.showModal({
+        title: '提示',
+        content: '确定要退出登录吗？',
+        success: (res) => {
+          if (res.confirm) {
+            // 同时清除token和userInfo
+            uni.removeStorageSync('token')
+            uni.removeStorageSync('userInfo')
+            uni.showToast({
+              title: '已退出登录',
+              icon: 'success'
+            })
+            // 跳转到登录页面
+            setTimeout(() => {
+              uni.navigateTo({
+                url: '/pages/login/login'
+              })
+            }, 1500)
+          }
+        }
+      })
+    }
+  }
+}
+</script>
+
+<style>
+.user-page {
+  background-color: #F8FAFD;
+  min-height: 100vh;
+  padding: 0 16px;
+  padding-top: 16px;
+  padding-bottom: 40rpx;
+  font-family: -apple-system, Helvetica, Roboto, sans-serif;
+}
+
+/* 导航栏样式 */
+.nav-bar {
+  display: flex;
+  align-items: center;
+  height: 80px;
+  margin-bottom: 12px;
+}
+
+.nav-bar-left {
+  flex: 0 0 auto;
+  padding: 8px;
+}
+
+.nav-bar-center {
+  flex: 1;
+  text-align: center;
+}
+
+.nav-bar-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1E1E1E;
+}
+
+.nav-bar-right {
+  flex: 0 0 auto;
+  padding: 8px;
+}
+
+.nav-back-icon {
+  color: #1E1E1E;
+  transition: all 0.3s ease;
+}
+
+.nav-back-icon:active {
+  color: #007aff;
+}
+
+.top-card {
+  background-color: #fff;
+  padding: 20px;
+  margin-bottom: 12px;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.user-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-right: 16px;
+  border: 2px solid #F0F4FF;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.user-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1E1E1E;
+  margin-bottom: 8px;
+}
+
+.edit-resume {
+  font-size: 14px;
+  color: #007aff;
+  transition: all 0.3s ease;
+}
+
+.edit-resume:active {
+  opacity: 0.7;
+}
+
+.function-icons {
+  display: flex;
+  justify-content: space-around;
+  padding-top: 20px;
+  border-top: 1px solid #F2F5F9;
+}
+
+.icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #6C757D;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.icon-item:active {
+  background-color: #F0F4FF;
+  transform: scale(0.98);
+}
+
+.icon-item text {
+  margin-top: 8px;
+}
+
+.menu-list {
+  background-color: #fff;
+  margin-bottom: 12px;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #F2F5F9;
+  transition: all 0.3s ease;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-item:active {
+  background-color: #F8FAFD;
+}
+
+.menu-text {
+  flex: 1;
+  margin-left: 16px;
+  font-size: 16px;
+  color: #1E1E1E;
+}
+
+.logout-btn {
+  background-color: #fff;
+  padding: 16px;
+  text-align: center;
+  color: #ff3b30;
+  font-size: 16px;
+  margin: 12px 0;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+}
+
+.logout-btn:active {
+  background-color: #F8FAFD;
+  transform: scale(0.98);
+}
+</style>

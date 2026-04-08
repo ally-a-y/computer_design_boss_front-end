@@ -1,0 +1,30 @@
+{
+  "name": "computer_design_boss_front-end",
+  "version": "1.0.0",
+  "description": "Computer Design Boss Frontend",
+  "main": "main.js",
+  "scripts": {
+    "dev": "npm run dev:h5",
+    "dev:h5": "cross-env NODE_ENV=development uniapp-cli dev --platform h5",
+    "dev:mp-weixin": "cross-env NODE_ENV=development uniapp-cli dev --platform mp-weixin",
+    "dev:app": "cross-env NODE_ENV=development uniapp-cli dev --platform app-plus",
+    "build": "npm run build:h5",
+    "build:h5": "cross-env NODE_ENV=production uniapp-cli build --platform h5",
+    "build:mp-weixin": "cross-env NODE_ENV=production uniapp-cli build --platform mp-weixin",
+    "build:app": "cross-env NODE_ENV=production uniapp-cli build --platform app-plus",
+    "serve": "npm run dev:h5"
+  },
+  "dependencies": {
+    "@dcloudio/uni-app": "^3.0.0",
+    "@dcloudio/uni-h5": "^3.0.0",
+    "@dcloudio/uni-mp-weixin": "^3.0.0",
+    "@dcloudio/uni-ui": "^1.4.0",
+    "vue": "^3.0.0",
+    "vuex": "^4.0.0"
+  },
+  "devDependencies": {
+    "@dcloudio/uni-cli-shared": "^3.0.0",
+    "@dcloudio/webpack-uni-pages-loader": "^3.0.0",
+    "cross-env": "^7.0.3"
+  }
+}

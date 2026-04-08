@@ -1,0 +1,116 @@
+
+.device-page {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  padding-top: 80px;
+  box-sizing: border-box;
+}
+.nav-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fff;
+  height: 80px;
+  padding: 0 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  position: fixed;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  margin: 0;
+  left: 0;
+  right: 0;
+  box-sizing: border-box;
+}
+.nav-bar-left {
+  width: 40px;
+}
+.nav-bar-center {
+  flex: 1;
+  text-align: center;
+}
+.nav-bar-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1E1E1E;
+}
+.nav-bar-right {
+  width: 40px;
+}
+.nav-back-icon {
+  font-size: 24px;
+  color: #1E1E1E;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+.nav-back-icon:active {
+  color: #007AFF;
+}
+.warning {
+  background-color: #fff3e0;
+  padding: 0.625rem;
+  margin: 0.625rem;
+  border-radius: 0.25rem;
+  border-left: 0.15625rem solid #ff9800;
+}
+.warning uni-text {
+  font-size: 0.75rem;
+  color: #f57c00;
+  line-height: 1.5;
+}
+.device-list {
+  background-color: #fff;
+  margin: 0 0.625rem;
+  border-radius: 0.25rem;
+  overflow: hidden;
+}
+.device-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.9375rem;
+  border-bottom: 0.03125rem solid #eee;
+}
+.device-item:last-child {
+  border-bottom: none;
+}
+.device-info {
+  display: flex;
+  align-items: center;
+}
+.device-details {
+  margin-left: 0.625rem;
+}
+.device-name {
+  font-size: 0.875rem;
+  color: #333;
+  display: block;
+  margin-bottom: 0.3125rem;
+}
+.login-time {
+  font-size: 0.6875rem;
+  color: #999;
+  display: block;
+}
+.current-device {
+  font-size: 0.625rem;
+  color: #007aff;
+  background-color: #e3f2fd;
+  padding: 0.15625rem 0.46875rem;
+  border-radius: 0.625rem;
+  margin-top: 0.3125rem;
+  display: inline-block;
+}
+.actions {
+  display: flex;
+}
+.delete-btn {
+  background-color: #ffebee;
+  color: #ff3b30;
+  border: 0.03125rem solid #ffcdd2;
+  border-radius: 0.25rem;
+  padding: 0 0.78125rem;
+  height: 1.875rem;
+  line-height: 1.875rem;
+  font-size: 0.8125rem;
+}
